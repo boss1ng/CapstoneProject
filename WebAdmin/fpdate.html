@@ -19,7 +19,7 @@
             align-items: center;
         }
 
-        .fpCont {
+        .fpdCont {
             background-color: #c6e6f0;
             width: 40%;
             height: 60vh;
@@ -53,11 +53,13 @@
     </style>
 </head>
 <body>
-    <div class="fpCont container"> <!-- d-block align-items-center justify-content-center -->
+    <div class="fpdCont container"> <!-- d-block align-items-center justify-content-center -->
         <img src="images/Qsee.png">
         
         <div class="d-flex justify-content-center align-items-center mt-5">
-            <input type="text" class="form-control" id="emailAddress" placeholder="Email Address" aria-label="Username" aria-describedby="addon-wrapping">
+            <input type="date" class="form-control" id="dateInput" value="YYYY-MM-DD" name="dateInput" aria-describedby="addon-wrapping">
+            <!-- Di ko knows paano ibahin yung value/placeholder sa loob ng textbox kasi automatic sya nag dd/mm/yyyy format -->
+
         </div>
         <button type="button" class="btn btn-secondary btn-lg mt-5" id="btnSubmit">Submit</button> <br><br>
         <a href="">Sign In</a>
