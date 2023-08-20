@@ -14,14 +14,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
 
-//        View SignInButton = findViewById(R.id.SignInButton);
-//        SignInButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                simulateAppStartup(); // Simulate app startup process
-//            }
-//        });
-
         // Find the "Create an Account" button by its ID
         View createAccountButton = findViewById(R.id.createAccount);
 
@@ -33,7 +25,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Handle the "Create an Account" button click here
-                // For example, start the registration activity
                 Intent intent = new Intent(MainActivity.this, Register.class);
                 startActivity(intent);
             }
@@ -47,17 +38,5 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-}
-//    private void simulateAppStartup() {
-//        // Simulate a delay before starting the splash screen activity
-//        Handler handler = new Handler();
-//        handler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                Intent splashIntent = new Intent(MainActivity.this, splashActivity.class);
-//                startActivity(splashIntent);
-//            }
-//        }, 2000); // 2 seconds delay, adjust as needed
-//    }
+    }
 }

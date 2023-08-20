@@ -7,21 +7,23 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class splashActivity extends AppCompatActivity {
 
-    private static final int SPLASH_DISPLAY_DURATION = 2000; // 2 seconds
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash);
 
+        // Optional: You can add any initialization or setup code here
+
+        // Start the MainActivity after a delay
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 Intent mainIntent = new Intent(splashActivity.this, MainActivity.class);
                 startActivity(mainIntent);
-                finish(); // Close the splash screen activity
+                finish(); // Close the SplashActivity to prevent going back to it
             }
-        }, SPLASH_DISPLAY_DURATION);
+        }, 2000); // Set the desired delay time in milliseconds
     }
 }
+
 
