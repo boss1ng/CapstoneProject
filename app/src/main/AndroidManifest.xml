@@ -17,6 +17,10 @@
             android:exported="true">
         </activity>
         <activity
+            android:name=".Home"
+            android:exported="true">
+        </activity>
+        <activity
             android:name=".Register"
             android:exported="true">
     </activity>

@@ -20,6 +20,17 @@ public class MainActivity extends AppCompatActivity {
         // Find the "Forgot Password" button by its ID
         View forgotPasswordButton = findViewById(R.id.forgotPassword);
 
+        View signInButton = findViewById(R.id.SignInButton);
+
+        signInButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Handle the "Sign In" button click here
+                Intent intent = new Intent(MainActivity.this, Home.class);
+                startActivity(intent);
+            }
+        });
+
         // Set a click listener for the button
         createAccountButton.setOnClickListener(new View.OnClickListener() {
             @Override
