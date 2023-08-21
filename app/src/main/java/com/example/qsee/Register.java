@@ -1,6 +1,8 @@
 package com.example.qsee;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.DatePicker;
@@ -21,6 +23,25 @@ public class Register extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register);
         textInputLayout = findViewById(R.id.bdate);
+
+        View registerButton = findViewById(R.id.RegisterButton);
+        View regLoginButton = findViewById(R.id.regLogin);
+
+        registerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Register.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        regLoginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Register.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
 
         final EditText dateEditText = textInputLayout.getEditText();
 

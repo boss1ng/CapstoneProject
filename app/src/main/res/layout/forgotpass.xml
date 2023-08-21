@@ -71,7 +71,7 @@
         app:layout_constraintVertical_bias="0.043" />
 
     <TextView
-        android:id="@+id/forgotPassword"
+        android:id="@+id/forgotPassLogin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="300dp"

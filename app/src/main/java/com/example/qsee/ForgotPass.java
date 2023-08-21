@@ -11,6 +11,16 @@ public class ForgotPass extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.forgotpass);
+
+        View forgotPassLogin = findViewById(R.id.forgotPassLogin);
+        forgotPassLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ForgotPass.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
+
         ;}
     public void forgotPassSubmit(View view) {
         // Handle the "Submit" button click here
