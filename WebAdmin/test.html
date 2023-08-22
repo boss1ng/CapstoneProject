@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SVG Color Change on Hover</title>
+  <!-- <link rel="stylesheet" type="text/css" href="styles.css"> -->
+</head>
+
+<style>
+  .container {
+  width: 100px;
+  height: 100px;
+  background-color: lightgray;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s;
+}
+
+.container:hover {
+  background-color: gray;
+}
+
+.container svg circle {
+  fill: blue;
+  transition: fill 0.3s;
+}
+
+.container:hover svg circle {
+  fill: red;
+}
+</style>
+
+<body>
+
+<div class="container">
+  <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="40" />
+  </svg>
+</div>
+
+</body>
+</html>

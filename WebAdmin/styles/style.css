@@ -1,0 +1,56 @@
+
+body {
+    background-image: url(../images/Background.jpg);
+    background-size: cover;
+}
+
+.outerCont {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#loginCont {
+    background-color: #c6e6f0;
+    width: 40%;
+    height: 60vh;
+    vertical-align: middle;
+    padding: 20px;
+    text-align: center;
+}
+
+#emailAddress, #password, #dateInput {
+    width: 50%;
+    height: 50px;
+    font-size: larger;
+}
+
+button {
+    width: 300px;
+}
+
+img {
+    width: 120px;
+    margin-top: 40px;
+}
+
+.alertCont {
+    visibility: hidden;
+    /* display: none; */
+    top: 0px;
+    position: fixed;
+    width: 100%;
+    font-size: large;
+}
+
+.forgotPass {
+    font-family: monospace; /* Montserrat */
+    font-size: 25px;
+}
+
+.forgotPassSuccess {
+    font-family: monospace; /* Montserrat */
+    font-size: 35px;
+}
+

@@ -1,0 +1,70 @@
+
+body {
+    background-image: url(../images/Background.jpg);
+    background-size: cover;
+    overflow: hidden;
+}
+
+img {
+    width: 140px;
+}
+
+.sidebar {
+    height: 100%;
+    width: 300px;
+    position: fixed;
+    background-color: #fff;
+    color: #fff;
+}
+
+.sidebar a {
+    padding: 10px 15px;
+    text-decoration: none;
+    font-size: x-large;
+    color: #000;
+    display: block;
+    transition: background-color 0.3s;
+}
+
+.aCont, .aSelectedCont {
+    padding: 15px;
+}
+
+.aCont:hover {
+    background-color: #135272;
+}
+
+.aCont:hover svg {
+    fill: #fff;
+}
+
+.aCont:hover a {
+    color: #fff;
+}
+
+.aSelectedCont {
+    background-color: #135272;
+}
+
+.aSelectedCont a {
+    color: #fff;
+}
+
+
+/*  */
+
+.contentCont {
+    margin-left: 300px;
+    padding-top: 20px;
+}
+
+#emailAddress {
+    width: 35%;
+    height: 50px;
+    font-size: larger;
+}
+
+button {
+    width: 200px;
+}
+
