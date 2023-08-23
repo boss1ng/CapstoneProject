@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QSee - Web Admin Panel</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles/landing.css">
+
+    <!-- BOOTSTRAP v5.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+
+</head>
+<body>
+    <div class="sidebar">
+        <div class="d-flex align-items-center justify-content-center m-3 mt-5">
+            <img src="images/Qsee.png">
+        </div>
+
+        <div class="aCont container d-flex align-items-center mt-5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="black" class="bi bi-person-circle" style="margin-left: 40px;" viewBox="0 0 16 16">
+                <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+            </svg>
+            <a href="landing.html" class="mx-4">Account</a>
+        </div>
+
+        <div class="aSelectedCont container d-flex align-items-center mt-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="white" class="bi bi-grid"  style="margin-left: 40px;" viewBox="0 0 16 16">
+                <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z"/>
+            </svg>
+            <a href="#" class="mx-4">Categories</a>
+        </div>
+
+        <div class="aCont container d-flex align-items-center mt-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="black" class="bi bi-map"  style="margin-left: 40px;" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M15.817.113A.5.5 0 0 1 16 .5v14a.5.5 0 0 1-.402.49l-5 1a.502.502 0 0 1-.196 0L5.5 15.01l-4.902.98A.5.5 0 0 1 0 15.5v-14a.5.5 0 0 1 .402-.49l5-1a.5.5 0 0 1 .196 0L10.5.99l4.902-.98a.5.5 0 0 1 .415.103zM10 1.91l-4-.8v12.98l4 .8V1.91zm1 12.98 4-.8V1.11l-4 .8v12.98zm-6-.8V1.11l-4 .8v12.98l4-.8z"/>
+            </svg>
+            <a href="places.html" class="mx-4">Places</a>
+        </div>
+
+        <div class="aCont container d-flex align-items-center mt-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="black" class="bi bi-box-arrow-left"  style="margin-left: 40px;" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M6 12.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v2a.5.5 0 0 1-1 0v-2A1.5 1.5 0 0 1 6.5 2h8A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 5 12.5v-2a.5.5 0 0 1 1 0v2z"/>
+                <path fill-rule="evenodd" d="M.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L1.707 7.5H10.5a.5.5 0 0 1 0 1H1.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3z"/>
+            </svg>
+            <a href="index.html" class="mx-4">Sign Out</a>
+        </div>
+    </div>
+      
+    <div class="container" id="categoryPlacesCont">
+        <div class="textCont container">
+            <div class="container d-flex align-items-center justify-content-center">
+                <h1 class="my-4">Categories</h1>
+            </div>
+                
+                <table class="categoryTable">
+                    <tr>
+                        <td colspan="4" style="font-size: large; text-align: right; padding-right: 90px;">No. of Places</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 10%; padding-left: 50px;">Hotel</td>  
+                        <td class="text-center" style="width: 20%;">
+                            <button type="button" class="btn btn-info btn-lg rounded-pill" id="btnSave" style="margin-left: 100px;">Edit</button>   
+                            <button type="button" class="btn btn-danger btn-lg rounded-pill" id="btnSave" style="margin-left: 100px;">Delete</button>   
+                        </td>
+                        <td class="text-center" style="width: 10%;">6</td>  
+                    </tr>
+
+                    <tr>
+                        <td style="width: 10%; padding-left: 50px;">Monuments</td>  
+                        <td class="text-center" style="width: 20%;">
+                            <button type="button" class="btn btn-info btn-lg rounded-pill" id="btnSave" style="margin-left: 100px;">Edit</button>   
+                            <button type="button" class="btn btn-danger btn-lg rounded-pill" id="btnSave" style="margin-left: 100px;">Delete</button>   
+                        </td>
+                        <td class="text-center" style="width: 10%;">6</td>  
+                    </tr>
+
+                    <tr>
+                        <td style="width: 10%; padding-left: 50px;">Parks</td>  
+                        <td class="text-center" style="width: 20%;">
+                            <button type="button" class="btn btn-info btn-lg rounded-pill" id="btnSave" style="margin-left: 100px;">Edit</button>   
+                            <button type="button" class="btn btn-danger btn-lg rounded-pill" id="btnSave" style="margin-left: 100px;">Delete</button>   
+                        </td>
+                        <td class="text-center" style="width: 10%;">6</td>  
+                    </tr>
+
+                    <tr>
+                        <td style="width: 10%; padding-left: 50px;">Restaurants</td>  
+                        <td class="text-center" style="width: 20%;">
+                            <button type="button" class="btn btn-info btn-lg rounded-pill" id="btnSave" style="margin-left: 100px;">Edit</button>   
+                            <button type="button" class="btn btn-danger btn-lg rounded-pill" id="btnSave" style="margin-left: 100px;">Delete</button>   
+                        </td>
+                        <td class="text-center" style="width: 10%;">6</td>  
+                    </tr>
+
+                    <tr>
+                        <td style="width: 10%; padding-left: 50px;">Museums</td>  
+                        <td class="text-center" style="width: 20%;">
+                            <button type="button" class="btn btn-info btn-lg rounded-pill" id="btnSave" style="margin-left: 100px;">Edit</button>   
+                            <button type="button" class="btn btn-danger btn-lg rounded-pill" id="btnSave" style="margin-left: 100px;">Delete</button>   
+                        </td>
+                        <td class="text-center" style="width: 10%;">6</td>  
+                    </tr>
+
+                    <tr>
+                        <td style="width: 10%; padding-left: 50px;">Shops</td>  
+                        <td class="text-center" style="width: 20%;">
+                            <button type="button" class="btn btn-info btn-lg rounded-pill" id="btnSave" style="margin-left: 100px;">Edit</button>   
+                            <button type="button" class="btn btn-danger btn-lg rounded-pill" id="btnSave" style="margin-left: 100px;">Delete</button>   
+                        </td>
+                        <td class="text-center" style="width: 10%;">6</td>  
+                    </tr>
+    
+                </table>
+            
+            
+            
+        </div>
+    </div>
+
+    <!-- BOOTSTRAP v5.3 -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js" integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa" crossorigin="anonymous"></script>
+
+</body>
+</html>

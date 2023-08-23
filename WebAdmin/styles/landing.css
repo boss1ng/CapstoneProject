@@ -1,6 +1,6 @@
 
 body {
-    background-image: url(../images/Background.jpg);
+    background-image: url(../images/Enhanced.png);
     background-size: cover;
     overflow: hidden;
 }
@@ -11,14 +11,14 @@ img {
 
 .sidebar {
     height: 100%;
-    width: 300px;
+    width: 330px;
     position: fixed;
     background-color: #fff;
     color: #fff;
 }
 
 .sidebar a {
-    padding: 10px 15px;
+    padding: 10px;
     text-decoration: none;
     font-size: x-large;
     color: #000;
@@ -54,7 +54,7 @@ img {
 /*  */
 
 .contentCont {
-    margin-left: 300px;
+    margin-left: 330px;
     padding-top: 20px;
 }
 
@@ -68,3 +68,26 @@ button {
     width: 200px;
 }
 
+/*  */
+
+#categoryPlacesCont {
+    margin-left: 450px;
+    padding-top: 20px;
+}
+
+.textCont {
+    margin-top: 10%;
+    background-color: #c6e6f0;
+    height: 700px;
+    border-radius: 50px;
+}
+
+.categoryTable {
+    font-size: xx-large;
+    margin: auto;
+    width: fit-content;
+}
+
+.categoryTable tr {
+    height: 75px;
+}
