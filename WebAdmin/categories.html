@@ -52,9 +52,18 @@
       
     <div class="container" id="categoryPlacesCont">
         <div class="textCont container">
-            <div class="container d-flex align-items-center justify-content-center">
-                <h1 class="my-4">Categories</h1>
+            <div class="addCont container d-flex">
+                <div class="container d-flex align-items-center justify-content-center mt-5">
+                    <h1 class="">Categories</h1>
+                </div>
+                <div class="d-flex align-items-center justify-content-end mt-5" style="position: fixed; padding-top: 11px; margin-left: 73rem;">
+                    <svg xmlns="http://www.w3.org/2000/svg" id="addCategory" width="35" height="35" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
+                    </svg>
+                </div>
+                
             </div>
+            
                 
                 <table class="categoryTable">
                     <tr>
@@ -63,8 +72,8 @@
                     <tr>
                         <td style="width: 10%; padding-left: 50px;">Hotel</td>  
                         <td class="text-center" style="width: 20%;">
-                            <button type="button" class="btn btn-info btn-lg rounded-pill" id="btnSave" style="margin-left: 100px;">Edit</button>   
-                            <button type="button" class="btn btn-danger btn-lg rounded-pill" id="btnSave" style="margin-left: 100px;">Delete</button>   
+                            <button type="button" class="btn btn-info btn-lg rounded-pill" id="btnEdit" style="margin-left: 100px;">Edit</button>   
+                            <button type="button" class="btn btn-danger btn-lg rounded-pill" id="btnDelete" style="margin-left: 100px;">Delete</button>   
                         </td>
                         <td class="text-center" style="width: 10%;">6</td>  
                     </tr>
@@ -120,6 +129,24 @@
             
         </div>
     </div>
+
+    <script>
+        var buttonAdd = document.querySelector("#addCategory");
+        buttonAdd.addEventListener('click', goNext)
+
+        function goNext() {
+            window.location.replace("addCategory.html")
+        }
+
+        var buttonEdit = document.querySelector("#btnEdit");
+        buttonEdit.addEventListener('click', goNextEdit)
+
+        function goNextEdit() {
+            window.location.replace("editCategory.html")
+        }
+
+
+    </script>
 
     <!-- BOOTSTRAP v5.3 -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>

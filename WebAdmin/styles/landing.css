@@ -75,8 +75,12 @@ button {
     padding-top: 20px;
 }
 
+.addCont {
+    width: 10%;
+}
+
 .textCont {
-    margin-top: 10%;
+    margin-top: 9%;
     background-color: #c6e6f0;
     height: 700px;
     border-radius: 50px;
@@ -90,4 +94,42 @@ button {
 
 .categoryTable tr {
     height: 75px;
+}
+
+/*  */
+
+.addCategoryCont {
+    margin-top: 12.5%;
+    background-color: #c6e6f0;
+    height: 600px;
+    border-radius: 50px;
+}
+
+.outerCont {
+    margin-left: 7%;
+    margin-top: 60px;
+}
+
+#inputCat {
+    margin-left: 90px;
+    width: 49%;
+    height: 50px;
+    font-size: larger;
+}
+
+#inputCategory {
+    margin-left: 108px;
+    width: 25%;
+    height: 50px;
+    font-size: larger;
+}
+
+.addBtn {
+    width: 170px;
+}
+
+#actionCancelCat, #actionAddCat, #actionSaveCat {
+    border-radius: 50px;
+    width: 15%;
+    margin-top: 70px;
 }
