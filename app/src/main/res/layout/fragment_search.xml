@@ -77,7 +77,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
         android:drawableEnd="@drawable/ic_star_fill"
-        android:text="5 "
+        android:text="5.0 "
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.525"
