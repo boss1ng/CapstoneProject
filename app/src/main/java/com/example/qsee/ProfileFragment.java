@@ -14,51 +14,25 @@ import androidx.fragment.app.FragmentManager;
 
 public class ProfileFragment extends Fragment {
 
-    // ... Your code ...
-
+    public ProfileFragment() {
+        // Required empty public constructor
+    }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        Button unameButton;
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_profile, container, false);
 
-        View view = inflater.inflate(R.layout.fragment_profile, container, false);
-        unameButton = view.findViewById(R.id.unameButton);
-
-        // Example of using AppCompatActivity features in fragment
-        AppCompatActivity activity = (AppCompatActivity) getActivity();
-        if (activity != null) {
-            // Access support action bar if needed
-                super.onCreate(savedInstanceState);
-                activity.setContentView(R.layout.fragment_profile);
-
-                unameButton.setOnClickListener(new View.OnClickListener() {
-
-                    public void onClick(View v) {
-                        UserBottomSheetDialogFragment bottomSheetDialogFragment = new UserBottomSheetDialogFragment();
-                        bottomSheetDialogFragment.show(getChildFragmentManager(), bottomSheetDialogFragment.getTag());
-
-                }
-
+        Button unameButton = rootView.findViewById(R.id.unameButton);
+        unameButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UserBottomSheetDialogFragment bottomSheetDialog = new UserBottomSheetDialogFragment();
+                bottomSheetDialog.show(getParentFragmentManager(), bottomSheetDialog.getTag());
+            }
         });
 
-        
+        return rootView;
     }
-        return view;
-    }
-
-
-
-
-    /*public void OnCreate(Bundle savedInstanceState){
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_profile);
-
-            View unameButton = findViewById(R.id.unameButton);
-
-            unameButton.setOnClickListener(new View.OnClickListener() {
-    }*/
 
 }
 

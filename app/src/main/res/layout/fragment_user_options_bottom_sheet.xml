@@ -5,18 +5,47 @@
     android:orientation="vertical">
 
     <TextView
+        android:id="@+id/menu_registered_locations"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Registered Locations"
+        android:padding="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:drawableLeft="@drawable/baseline_email_24"
+        android:drawablePadding="8dp"/>
+
+    <TextView
+        android:id="@+id/menu_register_location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Register a Location"
+        android:padding="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:drawableLeft="@drawable/ic_maps"
+        android:drawablePadding="8dp"/>
+
+    <TextView
+        android:id="@+id/menu_change_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Change Password"
+        android:padding="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:drawableLeft="@drawable/baseline_lock_24"
+        android:drawablePadding="8dp"/>
+
+    <TextView
         android:id="@+id/menu_sign_out"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Sign Out"
         android:padding="16dp"
-        android:clickable="true"/>
+        android:clickable="true"
+        android:focusable="true"
+        android:drawableLeft="@drawable/baseline_keyboard_arrow_right_24"
+        android:drawablePadding="8dp"/>
 
-    <TextView
-        android:id="@+id/menu_forgot_password"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Forgot Password"
-        android:padding="16dp"
-        android:clickable="true"/>
 </LinearLayout>
