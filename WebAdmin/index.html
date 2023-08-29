@@ -21,14 +21,16 @@
         <div class="container" id="loginCont">
             <img src="images/Qsee.png">
             
-            <div class="d-flex justify-content-center align-items-center mt-5">
-                <input type="text" class="form-control" id="emailAddress" placeholder="Email Address" required aria-label="Username" aria-describedby="addon-wrapping"/>
-            </div>
-            <div class="d-flex justify-content-center align-items-center mt-3">
-                <input type="password" class="form-control" id="password" placeholder="Password" required aria-label="Username" aria-describedby="addon-wrapping"/>
-            </div>
-            <button type="button" class="btn btn-secondary btn-lg mt-5" id="btnSignIn">Sign In</button> <br><br>
-            <a href="forgotPass.html">Forgot Password?</a>
+            <!-- <form id="loginForm"> form-group -->
+                <div class="d-flex justify-content-center align-items-center mt-5">
+                    <input type="text" class="form-control" id="emailAddress" placeholder="Email Address" required aria-label="Username" aria-describedby="addon-wrapping"/>
+                </div>
+                <div class="d-flex justify-content-center align-items-center mt-3">
+                    <input type="password" class="form-control" id="password" placeholder="Password" required aria-label="Username" aria-describedby="addon-wrapping"/>
+                </div>
+                <button type="submit" class="btn btn-secondary btn-lg mt-5" id="btnSignIn">Sign In</button> <br><br>
+                <a href="forgotPass.html">Forgot Password?</a>
+            <!-- </form> -->
         </div>
     </div>
  
@@ -53,6 +55,16 @@
                 <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
             </svg>
                 Login Credentials Mismatch. Please try again.
+        </div>
+    </div>
+
+    <div class="alertCont">
+        <!-- ALERT MESSAGE (No Credentials) -->
+        <div class="alert alert-warning d-flex align-items-center" role="alert" id="loginWarning">
+            <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-exclamation-triangle-fill mx-3" viewBox="0 0 16 16">
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+            </svg>
+                Please fill out all fields.
         </div>
     </div>
 
@@ -93,43 +105,70 @@
         var inputPassword = document.querySelector("#password");
         var buttonSignIn = document.querySelector("#btnSignIn");
 
+        var formLogin = document.getElementById("loginForm");
+
         var loginSuccessAlert = document.getElementById("loginSuccess");
         var loginFailedAlert = document.getElementById("loginFailed");
+        var loginWarningAlert = document.getElementById("loginWarning");
 
         // var userId = 1;
 
         // DATE
         // https://www.scaler.com/topics/get-current-date-in-javascript/
-        let today = new Date().toLocaleDateString("en-GB");
+        // let today = new Date().toLocaleDateString("en-GB"); // 17/8/2022
+        let today = new Date().toJSON().slice(0, 10);    // 2022-08-17
 
+        sessionStorage.clear()
+
+// SEARCH
         function verifyData() {
-            const dbref = ref(db)
+            if (!(inputEmail.value == "" || inputPassword.value == "")) {
+                const dbref = ref(db)
 
-            for (let id = 1; id < 1000; id++) {
+                for (let id = 1; id < 1000; id++) {
 
-                get(child(dbref, "User/" + id))
-                .then( (snapshot)=> {
-                    if(snapshot.exists()) {
-                        if(snapshot.val().Email == inputEmail.value && snapshot.val().Password == inputPassword.value) {
-                            loginSuccessAlert.style.visibility = "visible";
-                            setTimeout(function(){
-                                window.location.replace("landing.html")
-                            }, 2000);
-                        }   
+                    get(child(dbref, "User/" + id))
+                    .then( (snapshot)=> {
+                        if(snapshot.exists()) {
 
-                        else {
-                            loginFailedAlert.style.visibility = "visible";
-                            setTimeout(function(){
-                                location.reload()
-                            }, 2000);
+                            if(snapshot.val().Email == inputEmail.value && snapshot.val().Password == inputPassword.value) {
+                                loginSuccessAlert.style.visibility = "visible";
+                                setTimeout(function(){
+                                    window.location.replace("landing.html")
+                                }, 2000);
+                            }   
+
+                            else {
+                                loginFailedAlert.style.visibility = "visible";
+                                setTimeout(function(){
+                                    location.reload()
+                                }, 2000);
+                            }
+
+                            // if (inputEmail.value == "" || inputPassword.value == "") {
+                                
                         }
-                    }
-                })
+                    })
+                }
+            }
+
+            else {
+                loginWarningAlert.style.visibility = "visible";
+                setTimeout(function(){
+                    location.reload()
+                }, 1500);
             }
         }
 
         buttonSignIn.addEventListener('click', verifyData)
 
+        /*
+        formLogin.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            
+        })
+        */
 
     </script>
 
@@ -146,6 +185,8 @@
 
 <!--
 
+// CREATE
+        function createData() {
             set(ref(db, "User/" + userId),   { // + inputEmail.value
                 // UserID: 1,
                 UserNumer: "",
@@ -154,9 +195,9 @@
                 Password: inputPassword.value,      // test
                 FirstName: "Maria Victoria",
                 LastName: "Auto",
-                Birthdate: "17/08/2022",             // DD/MM/YYYY
+                Birthdate: "17/08/2022",             // YYYY-MM-DD
                 ContactNo: null,
-                DateCreated: today                  // DD/MM/YYYY
+                DateCreated: today                  // YYYY-MM-DD
             })
 
             .then( ()=>{
@@ -166,9 +207,19 @@
             .catch( (error)=> {
                 alert("Login Credentials Mismatch. Please try again.")
             })
+        }
 
 
-
+// DELETE
+        function removeData() {
+            remove(ref(db, 'User/' + userId))
+            .then(() => {
+                alert("Record successfully removed.");
+            })
+            .catch((error) => {
+                alert(error);
+            });
+        }
 
 
 

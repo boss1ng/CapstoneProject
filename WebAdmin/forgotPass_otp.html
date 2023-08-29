@@ -37,8 +37,18 @@
     </div>
 
     <div class="alertCont">
+        <!-- ALERT MESSAGE (Valid OTP) -->
+        <div class="alert alert-success d-flex align-items-center" role="alert" id="validOTP">
+            <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-check-circle-fill mx-3" viewBox="0 0 16 16">
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+            </svg>
+            Valid OTP. Thank you!
+        </div>
+    </div>
+
+    <div class="alertCont">
         <!-- ALERT MESSAGE (Invalid OTP) -->
-        <div class="alert alert-danger d-flex align-items-center" role="alert" id="loginFailed">
+        <div class="alert alert-danger d-flex align-items-center" role="alert" id="invalidOTP">
             <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-exclamation-triangle-fill mx-3" viewBox="0 0 16 16">
                 <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
             </svg>
@@ -46,25 +56,85 @@
         </div>
     </div>
 
-    <script>
-        var buttonSubmit = document.querySelector("#btnSubmit");
-        buttonSubmit.addEventListener('click', goNext)
+    <!-- FIREBASE REALTIME DATABASE -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.2.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.2.0/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+      
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+          apiKey: "AIzaSyB08GrYWprzzbddoHqvTR5Ln-9i0CEXqHs",
+          authDomain: "capstone-project-ffe21.firebaseapp.com",
+          databaseURL: "https://capstone-project-ffe21-default-rtdb.asia-southeast1.firebasedatabase.app",
+          projectId: "capstone-project-ffe21",
+          storageBucket: "capstone-project-ffe21.appspot.com",
+          messagingSenderId: "67612839105",
+          appId: "1:67612839105:web:7d8ffd05e13733ef609840",
+          measurementId: "G-2BJMTCZ2SM"
+        };
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
 
-        function goNext() {
-    // ALERT Message
-            var loginFailedAlert = document.getElementById("loginFailed");
-            var inputOTP = document.querySelector("#emailAddress");
-            
-            if (inputOTP == "") {
-                loginFailedAlert.style.visibility = "visible";
-                setTimeout(function() {
-                    inputOTP.innerHTML = "";
-                }, 2000);
-            }
+        import {getDatabase, set, get, update, remove, ref, child}
+        from "https://www.gstatic.com/firebasejs/10.2.0/firebase-database.js"
+        
+        const db = getDatabase();
+
+
+// ------------------------------------------------------------------------------------------------------------------------------------
+
+
+        var buttonSubmit = document.querySelector("#btnSubmit");
+        buttonSubmit.addEventListener('click', updateDate);
+
+        var validOTP = document.getElementById("validOTP");
+        var invalidOTP = document.getElementById("invalidOTP");
+        var inputOTP = document.querySelector("#emailAddress");
+
+        var userId = 1;
+
+// SEARCH & UPDATE
+        function updateDate() {
+
+            if (inputOTP.value == "Sample OTP") {
+                const dbref = ref(db)
+
+                for (let id = 1; id < 1000; id++) {
+
+                    get(child(dbref, "User/" + id))
+                    .then( (snapshot)=> {
+                        if(snapshot.exists()) {
+
+                            update(ref(db, 'User/' + userId), {
+                                Password: snapshot.val().Birthdate
+                            })
+                            .then(() => {
+                                validOTP.style.visibility = "visible";
+                                setTimeout(function() {
+                                    window.location.replace("forgotPass_success.html")
+                                }, 2000);
+                            })
+                            .catch((error) => {
+                                alert(error);
+                            });
+                        }
+                    })
+                }
+            } //    17/08/2022: Birthdate from Firebase
 
             else {
-                window.location.replace("forgotPass_success.html")
-            }            
+                invalidOTP.style.visibility = "visible";
+                setTimeout(function() {
+                    inputOTP.value = "";
+                    invalidOTP.style.visibility = "hidden";
+                }, 2000);
+            } 
         }
 
     // TIMER
@@ -108,6 +178,14 @@
         document.getElementById("btnResend").addEventListener("click", startTimer);
 
         startTimer(); // Start the timer on page load
+
+
+
+        
+// GOOGLE MAIL API
+        
+
+
     </script>
 
     <!-- BOOTSTRAP v5.3 -->

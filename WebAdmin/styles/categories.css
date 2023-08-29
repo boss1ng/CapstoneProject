@@ -110,9 +110,10 @@ button {
 
 #inputCategory {
     margin-left: 108px;
-    width: 25%;
     height: 50px;
-    font-size: larger;
+    padding-top: 11px;
+    font-size: large;
+    width: 400px;
 }
 
 .addBtn {

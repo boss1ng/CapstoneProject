@@ -22,9 +22,9 @@
             <img src="images/Qsee.png">
             <p class="forgotPass mt-4">Forgot Password</p>
             <div class="d-flex justify-content-center align-items-center mt-4">
-                <input type="text" class="form-control" id="emailAddress" placeholder="Email Address" aria-label="Username" aria-describedby="addon-wrapping">
+                <input type="email" class="form-control" id="emailAddress" placeholder="Email Address" aria-label="Username" aria-describedby="addon-wrapping">
             </div>
-            <button type="button" class="btn btn-secondary btn-lg mt-5" id="btnSubmit">Submit</button> <br><br>
+            <button type="submit" class="btn btn-secondary btn-lg mt-5" id="btnSubmit">Submit</button> <br><br>
             Already have an account? <a href="index.html">Sign In</a>
         </div>
     </div>
@@ -33,8 +33,15 @@
         var buttonSubmit = document.querySelector("#btnSubmit");
         buttonSubmit.addEventListener('click', goNext)
 
+        const inputEmailAdd = document.getElementById("emailAddress");
+
         function goNext() {
-            window.location.replace("forgotPass_date.html")
+            sessionStorage.setItem('inputEmail', inputEmailAdd.value);
+            // localStorage.setItem('inputEmail', inputEmailAdd.value);
+            // sessionStorage.setItem('myObject', JSON.stringify([inputEmail]))
+
+            // window.location.replace("forgotPass_date.html")
+            window.location.href = "forgotPass_date.html";
         }
     </script>
 
