@@ -3,4 +3,9 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="blue">#0000FF</color>
+    <!-- Define the gradient start and end colors -->
+    <color name="gradient_start">#5DE0E6</color>
+    <color name="gradient_end">#004AAD</color>
+
+
 </resources>
