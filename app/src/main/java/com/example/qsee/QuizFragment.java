@@ -14,27 +14,36 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public class QuizFragment extends Fragment {
     // ... (other methods and variables)
 
     private Button correctButton; // Reference to the correct button
     private boolean isAnswerCorrect = false;
 
+    private Button btA, btB, btC, btD;
+    private TextView Q1, Q2, Q3, Q4;
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // ... (other code)
         View rootView = inflater.inflate(R.layout.fragment_quiz, container, false);
-        Button btA = rootView.findViewById(R.id.btA);
-        Button btB = rootView.findViewById(R.id.btB);
-        Button btC = rootView.findViewById(R.id.btC);
-        Button btD = rootView.findViewById(R.id.btD);
+        btA = rootView.findViewById(R.id.btA);
+        btB = rootView.findViewById(R.id.btB);
+        btC = rootView.findViewById(R.id.btC);
+        btD = rootView.findViewById(R.id.btD);
 
-        TextView Q1 = rootView.findViewById(R.id.Q1);
-        TextView Q2 = rootView.findViewById(R.id.Q2);
-        TextView Q3 = rootView.findViewById(R.id.Q3);
-        TextView Q4 = rootView.findViewById(R.id.Q4);
-        // Set the correct button
-        correctButton = btA;
+        Q1 = rootView.findViewById(R.id.Q1);
+        Q2 = rootView.findViewById(R.id.Q2);
+        Q3 = rootView.findViewById(R.id.Q3);
+        Q4 = rootView.findViewById(R.id.Q4);
+
+        resetButtons(); // Reset buttons to initial state
+        randomizeCorrectButton(); // Randomize the correct button
 
         View.OnClickListener buttonClickListener = new View.OnClickListener() {
             @Override
@@ -46,6 +55,8 @@ public class QuizFragment extends Fragment {
                 Button clickedButton = (Button) v;
                 if (clickedButton == correctButton) {
                     handleCorrectAnswerButtonClick(clickedButton, Q1);
+                    resetButtons(); // Reset buttons to initial state
+                    randomizeCorrectButton(); // Randomize the correct button
                 } else {
                     handleWrongAnswerButtonClick(clickedButton);
                 }
@@ -58,6 +69,26 @@ public class QuizFragment extends Fragment {
         btD.setOnClickListener(buttonClickListener);
 
         return rootView;
+    }
+
+    // ... (other methods)
+
+    private void resetButtons() {
+        btA.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.default_button_color));
+        btB.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.default_button_color));
+        btC.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.default_button_color));
+        btD.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.default_button_color));
+        ViewCompat.setElevation(btA, 0);
+        ViewCompat.setElevation(btB, 0);
+        ViewCompat.setElevation(btC, 0);
+        ViewCompat.setElevation(btD, 0);
+        isAnswerCorrect = false;
+    }
+
+    private void randomizeCorrectButton() {
+        List<Button> buttons = new ArrayList<>(Arrays.asList(btA, btB, btC, btD));
+        Collections.shuffle(buttons);
+        correctButton = buttons.get(0); // The first button in the shuffled list is the correct button
     }
 
     private void handleCorrectAnswerButtonClick(Button clickedButton, TextView questionTextView) {
@@ -73,7 +104,6 @@ public class QuizFragment extends Fragment {
         clickedButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.gradient_end));
         showWrongAnswerDialog();
     }
-
     private void showCorrectAnswerDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Correct Answer")
@@ -90,4 +120,5 @@ public class QuizFragment extends Fragment {
                 .setPositiveButton("OK", null)
                 .show();
     }
+    // ... (other methods)
 }
