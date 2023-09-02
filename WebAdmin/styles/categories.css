@@ -57,6 +57,10 @@ button {
     width: 200px;
 }
 
+.modalBtn {
+    width: auto;
+}
+
 /*  */
 
 #categoryPlacesCont {
@@ -108,12 +112,20 @@ button {
     font-size: larger;
 }
 
-#inputCategory {
+#inputCatIcon {
     margin-left: 108px;
     height: 50px;
     padding-top: 11px;
     font-size: large;
     width: 400px;
+}
+
+#inputCatIconEdit {
+    margin-left: 108px;
+    height: 50px;
+    padding-top: 11px;
+    font-size: large;
+    width: 300px;
 }
 
 .addBtn {
@@ -125,3 +137,15 @@ button {
     width: 15%;
     margin-top: 70px;
 }
+
+/*  */
+
+.alertCont {
+    visibility: hidden;
+    /* display: none; */
+    top: 0px;
+    position: fixed;
+    width: 100%;
+    font-size: large;
+}
+

@@ -61,17 +61,17 @@
                 <div class="container m-5">
                     <div class="d-flex align-items-center mt-5">
                         <h4 class="mx-3">First Name: </h4>
-                        <input type="text" class="form-control mx-5" id="emailAddress" placeholder="First Name" aria-label="Username" aria-describedby="addon-wrapping"/>
+                        <input type="text" class="form-control mx-5" id="firstName" aria-label="Username" aria-describedby="addon-wrapping"/>
                     </div>
                     
                     <div class="adminInfo d-flex align-items-center mt-4">
                         <h4 class="mx-3">Last Name: </h4>
-                        <input type="text" class="form-control mx-5" id="emailAddress" placeholder="Last Name" aria-label="Username" aria-describedby="addon-wrapping"/>
+                        <input type="text" class="form-control mx-5" id="lastName" aria-label="Username" aria-describedby="addon-wrapping"/>
                     </div>
 
                     <div class="adminInfo d-flex align-items-center mt-4">
                         <h4 class="mx-3">Email Address: </h4>
-                        <input type="text" class="form-control mx-2" id="emailAddress" placeholder="Email Address" disabled aria-label="Username" aria-describedby="addon-wrapping"/>
+                        <input type="text" class="form-control mx-2" id="emailAddress" disabled aria-label="Username" aria-describedby="addon-wrapping"/>
                     </div>
                 </div>
             </div>
@@ -81,17 +81,17 @@
                 <div class="container m-5">
                     <div class="d-flex align-items-center mt-5">
                         <h4 class="mx-3">Current Password: </h4>
-                        <input type="text" class="form-control mx-3" id="emailAddress" placeholder="" aria-label="Username" aria-describedby="addon-wrapping"/>
+                        <input type="text" class="form-control mx-3" id="currPass" placeholder="" aria-label="Username" aria-describedby="addon-wrapping"/>
                     </div>
                     
                     <div class="adminInfo d-flex align-items-center mt-4">
                         <h4 class="mx-3">New Password: </h4>
-                        <input type="text" class="form-control mx-5" id="emailAddress" placeholder="" aria-label="Username" aria-describedby="addon-wrapping"/>
+                        <input type="text" class="form-control mx-5" id="newPass" placeholder="" aria-label="Username" aria-describedby="addon-wrapping"/>
                     </div>
 
                     <div class="adminInfo d-flex align-items-center mt-4">
                         <h4 class="mx-3">Confirm Password: </h4>
-                        <input type="text" class="form-control mx-2" id="emailAddress" placeholder="" aria-label="Username" aria-describedby="addon-wrapping"/>
+                        <input type="text" class="form-control mx-2" id="rePass" placeholder="" aria-label="Username" aria-describedby="addon-wrapping"/>
                     </div>
                 </div>
 
@@ -103,34 +103,83 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.2.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.2.0/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+      
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+          apiKey: "AIzaSyB08GrYWprzzbddoHqvTR5Ln-9i0CEXqHs",
+          authDomain: "capstone-project-ffe21.firebaseapp.com",
+          databaseURL: "https://capstone-project-ffe21-default-rtdb.asia-southeast1.firebasedatabase.app",
+          projectId: "capstone-project-ffe21",
+          storageBucket: "capstone-project-ffe21.appspot.com",
+          messagingSenderId: "67612839105",
+          appId: "1:67612839105:web:7d8ffd05e13733ef609840",
+          measurementId: "G-2BJMTCZ2SM"
+        };
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+
+        import {getDatabase, set, get, update, remove, ref, child}
+        from "https://www.gstatic.com/firebasejs/10.2.0/firebase-database.js"
+        
+        const db = getDatabase();
+
+        var inputFName = document.querySelector("#firstName");
+
+        function verifyData() {
+            let id = 1;
+            const dbref = ref(db)
+            get(child(dbref, "User/" + id))
+            .then( (snapshot)=> {
+                if(snapshot.exists()) {
+                    inputFName.innerHTML = snapshot.val().FirstName;
+                }
+                else
+                    alert("error.");
+            })
+        }
+
+        var buttonSave = document.querySelector("#btnSave");
+        buttonSave.addEventListener('click', verifyData);
+
         var buttonLanding = document.querySelector("#landingCont");
-        buttonLanding.addEventListener('click', goNext1)
+        buttonLanding.addEventListener('click', goNext1);
+
+
 
         function goNext1() {
-            window.location.replace("landing.html")
+            window.location.replace("landing.html");
         }
 
         var buttonCategory = document.querySelector("#categoriesCont");
-        buttonCategory.addEventListener('click', goNext2)
+        buttonCategory.addEventListener('click', goNext2);
 
         function goNext2() {
-            window.location.replace("categories.html")
+            window.location.replace("categories.html");
         }
 
         var buttonPlaces = document.querySelector("#placeCont");
-        buttonPlaces.addEventListener('click', goNext3)
+        buttonPlaces.addEventListener('click', goNext3);
 
         function goNext3() {
-            window.location.replace("places.html")
+            window.location.replace("places.html");
         }
 
         var buttonSignOut = document.querySelector("#signoutCont");
-        buttonSignOut.addEventListener('click', goNext4)
+        buttonSignOut.addEventListener('click', goNext4);
 
         function goNext4() {
-            window.location.replace("index.html")
+            window.location.replace("index.html");
         } 
+
     </script>
 
     <!-- BOOTSTRAP v5.3 -->

@@ -58,7 +58,7 @@
 
             <div class="container d-flex">
                 <div class="container d-flex align-items-center justify-content-center">
-                    <h1 class="mt-5">Edit Place</h1>
+                    <h1 class="mt-5">Add Place</h1>
                 </div>
             </div>
             
@@ -68,7 +68,7 @@
                         <span class="">Establishment Name</span>
                     </div>
                     <div class="container">
-                        <input type="text" class="form-control" id="" aria-label="Username" aria-describedby="addon-wrapping"/>
+                        <input type="text" class="form-control" id="estabName" aria-label="Username" aria-describedby="addon-wrapping"/>
                     </div>
                 </div>
                 
@@ -90,15 +90,24 @@
                     -->
 
                     <div class="container btn-group">
-                        <button type="button" class="btn btn-light text-end" id="dropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
-                                <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
-                            </svg>
+                        <button type="button" class="btn btn-light" id="dropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="d-flex align-items-center">
+                                <div class="container">
+                                    <input type="text" placeholder="Select a Category" id="selectedCategory" style="border: none;" disabled>
+                                </div>
+                                <div class="container text-end">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill text-end" viewBox="0 0 16 16">
+                                        <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+                                    </svg>
+                                </div>
+                            </div>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end" style="width: 97.5%;">
+                        <ul class="dropdown-menu dropdown-menu-end" style="width: 97.5%;" id="categoryOptions">
+                            <!--                             
                             <li><button class="dropdown-item" type="button">Action</button></li>
                             <li><button class="dropdown-item" type="button">Another action</button></li>
                             <li><button class="dropdown-item" type="button">Something else here</button></li>
+                            -->
                         </ul>
                     </div>
                     
@@ -109,7 +118,7 @@
                         <span class="">Address</span>
                     </div>
                     <div class="container">
-                        <input type="text" class="form-control" id="" aria-label="Username" aria-describedby="addon-wrapping"/>
+                        <input type="text" class="form-control" id="estabAddress" aria-label="Username" aria-describedby="addon-wrapping"/>
                     </div>
                 </div>
                 
@@ -118,7 +127,7 @@
                         <span class="">Contact No.</span>
                     </div>
                     <div class="container">
-                        <input type="text" class="form-control" id="" aria-label="Username" aria-describedby="addon-wrapping"/>
+                        <input type="text" class="form-control" id="estabContact" aria-label="Username" aria-describedby="addon-wrapping"/>
                     </div>
                 </div>
                 
@@ -145,7 +154,7 @@
                         <span class="">Highest Price</span>
                     </div>
                     <div class="container">
-                        <input type="text" class="form-control" id="" aria-label="Username" aria-describedby="addon-wrapping"/>
+                        <input type="text" class="form-control" id="estabHighPrice" aria-label="Username" aria-describedby="addon-wrapping"/>
                     </div>
                 </div>
                 
@@ -154,7 +163,7 @@
                         <span class="">Lowest Price</span>
                     </div>
                     <div class="container">
-                        <input type="text" class="form-control" id="" aria-label="Username" aria-describedby="addon-wrapping"/>
+                        <input type="text" class="form-control" id="estabLowPrice" aria-label="Username" aria-describedby="addon-wrapping"/>
                     </div>
                 </div>
                 
@@ -163,8 +172,9 @@
                         <span class="">Upload Image</span>
                     </div>
                     <div class="container d-flex align-items-center my-3">
-                        <input type="file" class="form-control" id="imageFile" aria-label="Username" aria-describedby="addon-wrapping"/>
-                        <!-- <button type="button" class="btn btn-secondary btn-md mx-3" id="uploadImage">Upload Image</button> -->
+                        <input type="text" class="form-control text-center fst-italic" id="inputLocImageEdit" aria-label="Username" aria-describedby="addon-wrapping" disabled/>
+                        <!-- <button type="button" class="addBtn btn btn-secondary btn-lg mx-3" id="btnSignIn">Upload Image</button> -->
+                        <input type="file" class="form-control mx-3" onchange="updateOtherInput(this)" id="inputLocImage" aria-label="Username" aria-describedby="addon-wrapping" style="width: 108px; height: 40px; padding-top: 7px;"/>
                     </div>
                 </div>
                 
@@ -173,7 +183,7 @@
                         <span class="">Image Description</span>
                     </div>
                     <div class="container">
-                        <input type="text" class="form-control" id="" aria-label="Username" aria-describedby="addon-wrapping"/>
+                        <input type="text" class="form-control" id="estabImageDesc" aria-label="Username" aria-describedby="addon-wrapping"/>
                     </div>
                 </div>
                 
@@ -182,7 +192,7 @@
                         <span class="">Establishment Description</span>
                     </div>
                     <div class="container">
-                        <textarea class="form-control" id="" rows="9"></textarea>
+                        <textarea class="form-control" id="estabDesc" rows="9"></textarea>
                     </div>
                 </div>
             </div>
@@ -197,7 +207,193 @@
         </div>
     </div>
 
+    <!-- ALERT MESSAGE (SUCCESS) -->
+    <div class="alertCont">
+        <div class="alert alert-success d-flex align-items-center" role="alert" id="editSuccess">
+            <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-check-circle-fill mx-3" viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+            </svg>
+                Location Successfuly Updated.
+        </div>
+    </div>
+
+    <!-- ALERT MESSAGE (FAILED) -->
+    <div class="alertCont">
+        <div class="alert alert-danger d-flex align-items-center" role="alert" id="editFailed">
+            <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-exclamation-triangle-fill mx-3" viewBox="0 0 16 16">
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+            </svg>
+                Edit of Location Failed. Please try again.
+        </div>
+    </div>
+
     <script>
+        function updateOtherInput(inputFile) {
+            var inputLocImageEdit = document.querySelector("#inputLocImageEdit");
+
+            var selectedFile = inputFile.files[0];
+
+            // Check if a file was selected
+            if (selectedFile) 
+                // Update the value of the other input tag (display the file name)
+                inputLocImageEdit.value = selectedFile.name;
+        }
+
+        function changeSelected(categoryOption) {
+            const selectedCat = document.getElementById('selectedCategory'); 
+            selectedCat.value = categoryOption;
+        }
+    </script>
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.2.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.2.0/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyB08GrYWprzzbddoHqvTR5Ln-9i0CEXqHs",
+            authDomain: "capstone-project-ffe21.firebaseapp.com",
+            databaseURL: "https://capstone-project-ffe21-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "capstone-project-ffe21",
+            storageBucket: "capstone-project-ffe21.appspot.com",
+            messagingSenderId: "67612839105",
+            appId: "1:67612839105:web:7d8ffd05e13733ef609840",
+            measurementId: "G-2BJMTCZ2SM"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+
+        import {getDatabase, set, get, update, remove, ref, child, limitToLast, push }
+        from "https://www.gstatic.com/firebasejs/10.2.0/firebase-database.js"
+        
+        const db = getDatabase();
+
+        const locationToEdit = sessionStorage.getItem('locationID_PK');
+
+        var inputLocation = document.querySelector("#estabName");
+        var inputLocationAdd = document.querySelector("#estabAddress");
+        var inputLocationCat = document.querySelector("#selectedCategory");
+        var inputLocationCont = document.querySelector("#estabContact");
+        // var inputLocationLat = document.querySelector("#");
+        // var inputLocationLong = document.querySelector("#");
+        var inputLocationHigh = document.querySelector("#estabHighPrice");
+        var inputLocationLow = document.querySelector("#estabLowPrice");
+        var inputLocationImage = document.querySelector("#inputLocImage");
+        var inputLocationImageDesc = document.querySelector("#estabImageDesc");
+        var inputLocationDesc = document.querySelector("#estabDesc");
+
+        var inputLocImageEdit = document.querySelector("#inputLocImageEdit");
+
+        var editSuccessAlert = document.getElementById("editSuccess");
+        var editFailedAlert = document.getElementById("editFailed");
+
+        fetchAndPopulateCategory();
+        fetchAndPopulate();
+        
+
+        // Fetch data from the database and populate the table
+        function fetchAndPopulate() {
+            const dbref = ref(db)
+
+            get(child(dbref, "Location/" + locationToEdit))
+            .then( (snapshot)=> {
+                if(snapshot.exists()) {
+                    inputLocation.value = snapshot.val().Location;
+                    inputLocationCat.value = snapshot.val().Category;
+                    inputLocationAdd.value = snapshot.val().Address;
+                    inputLocationCont.value = snapshot.val().ContactNo;
+                    // inputLocationLat.value = snapshot.val().Latitude;
+                    // inputLocationLong.value = snapshot.val().Longitude;
+                    inputLocationDesc.value = snapshot.val().Description;
+                    inputLocationLow.value = snapshot.val().LowestPrice;
+                    inputLocationHigh.value = snapshot.val().HighestPrice;
+                    inputLocImageEdit.value = snapshot.val().Image;
+                    inputLocationImageDesc.value = snapshot.val().ImageDescription;
+                }
+            })
+        }
+
+        // Fetch data from the database and populate the table
+        function fetchAndPopulateCategory() {
+            const dbref = ref(db)
+
+            get(child(dbref, "Category"))
+            .then( (snapshot)=> {
+                if(snapshot.exists()) {
+                    
+                    const categoriesData = [];
+                    snapshot.forEach(childSnapshot => {
+                        const category = {
+                            Key: childSnapshot.key,
+                            Category: childSnapshot.val().Category,
+                            Icon: childSnapshot.val().Icon
+                        };
+                        categoriesData.push(category);
+                    });
+
+                    populateTable(categoriesData);
+                }
+            })
+        }
+
+        // Populate the table with the fetched data
+        function populateTable(data) {
+
+            // Reference to the <ul> element
+            const listElement = document.getElementById('categoryOptions');
+
+            data.forEach(category => {
+                const list = document.createElement('li');
+                list.innerHTML = `
+                    <button class="dropdown-item" type="button" onclick="changeSelected('${category.Category}')">${category.Category}</button>
+                `;
+
+                // Append the list item to the <ul>
+                listElement.appendChild(list);
+            });
+        }
+
+        function editLocation() {
+            update(ref(db, 'Location/' + locationToEdit), {
+                Location: inputLocation.value,                      // 
+                Category: inputLocationCat.value,
+                Address: inputLocationAdd.value,                    // 
+                ContactNo: inputLocationCont.value,                 // 
+                Latitude: "",
+                Longitude: "",
+                Description: inputLocationDesc.value,               // 
+                LowestPrice: inputLocationLow.value,                // 
+                HighestPrice: inputLocationHigh.value,              // 
+                Image: inputLocationImage.value,                    // 
+                ImageDescription: inputLocationImageDesc.value,     // 
+                AverateRate: 0,
+            })
+            .then(() => {
+                editSuccessAlert.style.visibility = "visible";
+                setTimeout(function() {
+                    sessionStorage.clear();
+                    window.location.replace("places.html");
+                }, 2000);
+            })
+            .catch((error) => {
+                alert(error);
+            });
+        }
+        
+        var buttonSave = document.querySelector("#actionSavePlace");
+        buttonSave.addEventListener('click', editLocation)
+
+        // ---------------------------------------------------------------------------------
+
+        
+
+        // ---------------------------------------------------------------------------------
 
         var buttonCancel = document.querySelector("#actionCancelPlace");
         buttonCancel.addEventListener('click', goNext)
@@ -235,12 +431,12 @@
         function goNext4() {
             window.location.replace("index.html")
         }
+
     </script>
 
     <!-- BOOTSTRAP v5.3 -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js" integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa" crossorigin="anonymous"></script>
 
-    
 </body>
 </html>

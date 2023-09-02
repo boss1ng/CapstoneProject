@@ -192,6 +192,10 @@ button {
     font-size: larger;
 }
 
+#dropdownBtn {
+    text-align: start;
+}
+
 #dropdownBtn:hover {
     background-color: #fff;
 }
@@ -201,12 +205,28 @@ button {
     width: 400px !important;
 }
 
+#inputLocImageEdit {
+    font-size: large;
+    width: 400px;
+}
+
 .descBox {
     height: 200px;
 }
 
-#actionCancelPlace, #actionAddPlace {
+#actionCancelPlace, #actionSavePlace {
     border-radius: 50px;
     width: 15%;
     /* margin-top: 70px; */
+}
+
+/*  */
+
+.alertCont {
+    visibility: hidden;
+    /* display: none; */
+    top: 0px;
+    position: fixed;
+    width: 100%;
+    font-size: large;
 }

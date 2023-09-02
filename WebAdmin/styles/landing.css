@@ -58,7 +58,7 @@ img {
     padding-top: 20px;
 }
 
-#emailAddress {
+#emailAddress, #firstName, #lastName, #currPass, #newPass, #rePass {
     width: 35%;
     height: 50px;
     font-size: larger;
