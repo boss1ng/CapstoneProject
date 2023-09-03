@@ -19,30 +19,38 @@ public class Home extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home);
 
+        // Get the username from the intent
+        String username = getIntent().getStringExtra("username");
+
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int itemId = item.getItemId();
                 if (itemId == R.id.action_home) {
-                    loadFragment(new HomeFragment());
+                    loadFragment(new HomeFragment(), username);
                 } else if (itemId == R.id.action_search) {
-                    loadFragment(new SearchFragment());
+                    loadFragment(new SearchFragment(), username);
                 } else if (itemId == R.id.action_maps) {
-                    loadFragment(new MapsFragment());
+                    loadFragment(new MapsFragment(), username);
                 } else if (itemId == R.id.action_quiz) {
-                    loadFragment(new QuizFragment());
+                    loadFragment(new QuizFragment(), username);
                 } else if (itemId == R.id.action_profile) {
-                    loadFragment(new ProfileFragment());
+                    loadFragment(new ProfileFragment(), username);
                 }
                 return true;
             }
         });
         // Load HomeFragment when the activity starts
-        loadFragment(new HomeFragment());
+        loadFragment(new HomeFragment(), username);
+
     }
 
-    private void loadFragment(Fragment fragment) {
+    private void loadFragment(Fragment fragment, String username) {
+        Bundle bundle = new Bundle();
+        bundle.putString("username", username);
+        fragment.setArguments(bundle);
+
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, fragment);
         transaction.addToBackStack(null);
