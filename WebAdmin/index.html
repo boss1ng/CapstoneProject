@@ -121,7 +121,7 @@
         sessionStorage.clear()
 
 // SEARCH
-        function verifyData() {
+        function verifyCredentials() {
             if (!(inputEmail.value == "" || inputPassword.value == "")) {
                 const dbref = ref(db)
 
@@ -160,7 +160,7 @@
             }
         }
 
-        buttonSignIn.addEventListener('click', verifyData)
+        buttonSignIn.addEventListener('click', verifyCredentials)
 
     </script>
 

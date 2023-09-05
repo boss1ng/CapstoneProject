@@ -56,7 +56,7 @@
     <div class="contentCont">
         <div class="container" style="margin-top: 50px; margin-left: 50px;">
             <h1>Account Settings</h1>
-            <div class="container m-5">
+            <div class="container mx-5 my-4">
                 <h2>Administrator Info</h2>
                 <div class="container m-5">
                     <div class="d-flex align-items-center mt-5">
@@ -74,9 +74,14 @@
                         <input type="text" class="form-control mx-2" id="emailAddress" disabled aria-label="Username" aria-describedby="addon-wrapping"/>
                     </div>
                 </div>
+
+                <div class="container" style="margin-left: 290px;">
+                    <button type="button" class="btn btn-secondary btn-lg" id="btnCancelInfo">Cancel</button>
+                    <button type="button" class="btn btn-secondary btn-lg" id="btnSaveInfo" style="margin-left: 100px;">Save</button>                
+                </div>
             </div>
 
-            <div class="container m-5">
+            <div class="container mx-5 my-4">
                 <h2>Change Password</h2>
                 <div class="container m-5">
                     <div class="d-flex align-items-center mt-5">
@@ -96,10 +101,30 @@
                 </div>
 
                 <div class="container" style="margin-left: 290px;">
-                    <button type="button" class="btn btn-secondary btn-lg" id="btnCancel">Cancel</button>
-                    <button type="button" class="btn btn-secondary btn-lg" id="btnSave" style="margin-left: 100px;">Save</button>                
+                    <button type="button" class="btn btn-secondary btn-lg" id="btnCancelPass">Cancel</button>
+                    <button type="button" class="btn btn-secondary btn-lg" id="btnSavePass" style="margin-left: 100px;">Save</button>                
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- ALERT MESSAGE (SUCCESS) -->
+    <div class="alertCont">
+        <div class="alert alert-success d-flex align-items-center" role="alert" id="editSuccess">
+            <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-check-circle-fill mx-3" viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+            </svg>
+                Account Information Successfuly Updated.
+        </div>
+    </div>
+
+    <!-- ALERT MESSAGE (FAILED) -->
+    <div class="alertCont">
+        <div class="alert alert-danger d-flex align-items-center" role="alert" id="editFailed">
+            <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-exclamation-triangle-fill mx-3" viewBox="0 0 16 16">
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+            </svg>
+                Update Failed. Please try again.
         </div>
     </div>
 
@@ -132,28 +157,120 @@
         
         const db = getDatabase();
 
-        var inputFName = document.querySelector("#firstName");
+        var inputFName = document.getElementById("firstName");
+        var inputLName = document.getElementById("lastName");
+        var inputEmail = document.getElementById("emailAddress");
 
-        function verifyData() {
-            let id = 1;
-            const dbref = ref(db)
-            get(child(dbref, "User/" + id))
+        var inputCurrentPass = document.querySelector("#currPass");
+        var inputNewPass = document.querySelector("#newPass");
+        var inputRePass = document.querySelector("#rePass");
+
+        var editSuccessAlert = document.getElementById("editSuccess");
+        var editFailedAlert = document.getElementById("editFailed");
+
+        var userID = 1;
+        
+        searchData();
+
+        function searchData() {
+            const dbref = ref(db);
+            get(child(dbref, "User/" + userID))
             .then( (snapshot)=> {
                 if(snapshot.exists()) {
-                    inputFName.innerHTML = snapshot.val().FirstName;
+                    inputFName.value = snapshot.val().FirstName;
+                    inputLName.value = snapshot.val().LastName;
+                    inputEmail.value = snapshot.val().Email; 
+                    
+                    // FirstName: "Maria Victoria"
+                    // LastName: "Auto"
+                    // Email: "joeybryan.pintor.cics@ust.edu.ph"
+                    // Password: "test"
                 }
-                else
-                    alert("error.");
             })
         }
 
-        var buttonSave = document.querySelector("#btnSave");
-        buttonSave.addEventListener('click', verifyData);
+        function changePersonalInfo() {
+            var firebaseFName = null;
+            var firebaseLName = null;
+
+            const dbref = ref(db);
+            get(child(dbref, "User/" + userID))
+            .then( (snapshot)=> {
+                if(snapshot.exists()) {
+                    firebaseFName = snapshot.val().FirstName;
+                    firebaseLName = snapshot.val().LastName;
+
+                    if (inputFName.value != firebaseFName || inputLName.value != firebaseLName) {
+                        update(ref(db, 'User/' + userID), {
+                            FirstName: inputFName.value,
+                            LastName: inputLName.value,
+                        })
+                        
+                        .then(() => {
+                            editSuccessAlert.style.visibility = "visible";
+                            setTimeout(function() {
+                                window.location.replace("landing.html");
+                            }, 2000);
+                        })
+
+                        .catch((error) => {
+                            alert(error);
+                        });
+                    }
+                }
+            })
+        }
+
+        function changePass() {
+            var firebasePassword = null;
+
+            const dbref = ref(db);
+            get(child(dbref, "User/" + userID))
+            .then( (snapshot)=> {
+                if(snapshot.exists()) {
+                    firebasePassword = snapshot.val().Password;
+
+                    if (inputCurrentPass.value != "" || inputNewPass.value != "" || inputRePass.value != "") {
+
+                        if (inputCurrentPass.value == firebasePassword && inputNewPass.value == inputRePass.value) {  // 
+                            update(ref(db, 'User/' + userID), {
+                                Password: inputRePass.value,
+                            })
+                            
+                            .then(() => {
+                                editSuccessAlert.style.visibility = "visible";
+                                setTimeout(function() {
+                                    window.location.replace("landing.html");
+                                }, 2000);
+                            })
+
+                            .catch((error) => {
+                                alert(error);
+                            });
+                        }
+
+                        else {
+                            editFailedAlert.style.visibility = "visible";
+                            setTimeout(function() {
+                                location.reload();
+                            }, 2000);
+                        }
+                    }
+                }
+            })
+            
+        }
+
+        var buttonSaveInfo = document.querySelector("#btnSaveInfo");
+        buttonSaveInfo.addEventListener('click', changePersonalInfo);
+
+        var buttonSavePass = document.querySelector("#btnSavePass");
+        buttonSavePass.addEventListener('click', changePass);
+
+        // ---------------------------------------------------------------------------------
 
         var buttonLanding = document.querySelector("#landingCont");
         buttonLanding.addEventListener('click', goNext1);
-
-
 
         function goNext1() {
             window.location.replace("landing.html");
@@ -170,6 +287,7 @@
         buttonPlaces.addEventListener('click', goNext3);
 
         function goNext3() {
+            sessionStorage.clear();
             window.location.replace("places.html");
         }
 

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <!--  -->
+    <script src="https://apis.google.com/js/client.js"></script>
+
+</head>
+<body>
+
+    <form id="email-form">
+        <label for="to">To:</label>
+        <input type="email" id="to" required><br>
+        <label for="subject">Subject:</label>
+        <input type="text" id="subject" required><br>
+        <label for="message">Message:</label>
+        <textarea id="message" required></textarea><br>
+        <input type="submit" value="Send Email">
+    </form>
+
+    
+    <script>
+
+        // Load the Gmail API client library
+        function loadGmailApi() {
+            gapi.client.load('gmail', 'v1', sendEmail);
+        }
+
+        // Send an email using the Gmail API
+        function sendEmail() {
+
+            const accessToken = oAuth2Client.getAccessToken();
+
+
+            const to = document.getElementById('to').value;
+            const subject = document.getElementById('subject').value;
+            const message = document.getElementById('message').value;
+
+            const email = {
+                to: to,
+                subject: subject,
+                message: message
+            };
+
+            const request = gapi.client.gmail.users.messages.send({
+                userId: 'me',
+                resource: {
+                    raw: btoa(`To: ${email.to}\nSubject: ${email.subject}\n\n${email.message}`)
+                }
+            });
+
+            request.execute(function (response) {
+                console.log(response);
+                alert('Email sent successfully');
+            });
+        }
+
+        // Initialize the Gmail API client
+        function init() {
+            gapi.client.init({
+                apiKey: 'AIzaSyBtT7xnsYRYHeo09h8E3P7GS4UsPLC7Wwc',
+                clientId: 'CL93006732287-lkifv53fqi7i3j2b052sob7qi8atoebl.apps.googleusercontent.comIENT_ID',
+                discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest"],
+                scope: 'https://www.googleapis.com/auth/gmail.send'
+            }).then(function () {
+                // Call the loadGmailApi function to load the Gmail API
+                loadGmailApi();
+            });
+        }
+
+        // Load the Gmail API client on window load
+        window.onload = function () {
+            gapi.load('client', init);
+        };
+
+    </script>
+    
+</body>
+</html>

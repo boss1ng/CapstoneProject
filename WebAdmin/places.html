@@ -63,10 +63,20 @@
 
                 <div class="container d-flex align-items-center justify-content-end mt-4">
                     <form class="nosubmit">
-                        <input class="nosubmit form-control" type="search" id="searchInput" autocomplete="off">
+                        <input class="form-control" type="search" id="searchInput" autocomplete="off" onchange="searchLocation(this)">
                     </form>
 
-                    <img class="filterImg mx-4" src="images/Filter.png"/>
+                    <div class="btn-group mx-4">
+                        <button type="button" class="btn" id="dropdownCategory" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img class="filterImg" src="images/Filter.png"/>                            
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" style="width:auto" id="categoryOptionsFilter">
+                            <li><button class="dropdown-item" type="button" onclick="filterLocBasedSelectedCategory()">-</button></li>
+
+                            <!-- REGISTERED CATEGORIES -->
+                        </ul>
+                    </div>
+                    
                     <svg xmlns="http://www.w3.org/2000/svg" id="addPlace" width="40" height="40" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
                         <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
                     </svg>
@@ -124,6 +134,9 @@
 
     <script>
 
+        // sessionStorage.clear();
+        document.getElementById('searchInput').value = sessionStorage.getItem('searchLoc');
+
         var deleteSuccessAlert = document.getElementById("deleteSuccess");
         var confirmDeleteBtn = document.getElementById("confirmDelete");
 
@@ -147,6 +160,35 @@
             sessionStorage.setItem('locationID_PK', locationID);
             window.location.href = "placesEdit.html";
         }
+
+        /*
+        const form = document.getElementById('searchForm');
+        form.addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevents the default form submission behavior
+            const inputValue = form.querySelector('#searchInput').value;
+            alert(`You entered: ${inputValue}`);
+            // You can add your custom JavaScript logic here
+        });
+        */
+
+        function searchLocation(input) {
+            const searchInput = input.value.toLowerCase();
+            sessionStorage.setItem('searchLoc', searchInput);
+            // alert(searchInput)
+        }
+
+        function filterLocBasedSelectedCat(category) {
+            // alert(category);
+            sessionStorage.setItem('selectedCategory', category);
+            location.reload();
+        }
+
+        function filterLocBasedSelectedCategory() {
+            // alert("- None -");
+            sessionStorage.removeItem("selectedCategory");
+            location.reload();
+        }
+
 
     </script>
 
@@ -179,9 +221,13 @@
         
         const db = getDatabase();
 
+        const inputSearchLoc = sessionStorage.getItem('searchLoc');
+        const filterLocations = sessionStorage.getItem('selectedCategory');
+        
         fetchAndPopulate();
 
         // Fetch data from the database and populate the table
+        /*
         function fetchAndPopulate() {
             const dbref = ref(db)
 
@@ -211,23 +257,118 @@
                     populateTable(locationsData);
                 }
             })
+        }*/
+
+        function fetchAndPopulate() {
+            const dbref = ref(db)
+
+            get(child(dbref, "Location"))
+            .then( (snapshot)=> {
+                if(snapshot.exists()) {
+                    
+                    const locationsData = [];
+                    snapshot.forEach(childSnapshot => {
+                        const location = {
+                            Key: childSnapshot.key,
+                            Location: childSnapshot.val().Location,
+                            Category: childSnapshot.val().Category,
+                            Address: childSnapshot.val().Address,
+                            ContactNo: childSnapshot.val().ContactNo,
+                            Latitude: childSnapshot.val().Latitude,
+                            Longitude: childSnapshot.val().Longitude,
+                            Description: childSnapshot.val().Description,
+                            LowestPrice: childSnapshot.val().LowestPrice,
+                            HighestPrice: childSnapshot.val().HighestPrice,
+                            Image: childSnapshot.val().Image,
+                            ImageDescription: childSnapshot.val().ImageDescription
+                        };
+                        locationsData.push(location);
+                    });
+
+                    fetchAndPopulateCat(locationsData);
+                }
+            })
+        }
+
+        function fetchAndPopulateCat(locationData) {
+            const dbref = ref(db)
+
+            get(child(dbref, "Category"))
+            .then( (snapshot)=> {
+                if(snapshot.exists()) {
+                    
+                    const categoriesData = [];
+                    snapshot.forEach(childSnapshot => {
+                        const category = {
+                            Key: childSnapshot.key,
+                            Category: childSnapshot.val().Category,
+                            Icon: childSnapshot.val().Icon
+                        };
+                        categoriesData.push(category);
+                    });
+
+                    populateTable(categoriesData, locationData);
+                }
+            })
         }
 
         // Populate the table with the fetched data
-        function populateTable(data) {
+        function populateTable(categoryData, locationData) {
             const tbody = document.querySelector('#categoryTable tbody');
             tbody.innerHTML = ''; // Clear existing rows
 
-            data.forEach(location => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="">${location.Location}</td>
-                    <td class="actionCol">
-                        <button type="button" class="btn btn-info btn-md rounded-pill mx-3" id="btnEdit" onclick="editLocation('${location.Key}')">Edit</button>
-                        <button type="button" class="btn btn-danger btn-md rounded-pill mx-3" id="btnDelete" onclick="deleteLocation('${location.Key}')" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Delete</button>
-                    </td>
-                `;
-                tbody.appendChild(row);
+            locationData.forEach(location => {
+
+                if (location.Location.toLowerCase().includes(inputSearchLoc) || inputSearchLoc == undefined) {
+                    if (filterLocations == "-" || filterLocations == undefined) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="">${location.Location}</td>
+                        <td class="actionCol">
+                            <button type="button" class="btn btn-info btn-md rounded-pill mx-3" id="btnEdit" onclick="editLocation('${location.Key}')">Edit</button>
+                            <button type="button" class="btn btn-danger btn-md rounded-pill mx-3" id="btnDelete" onclick="deleteLocation('${location.Key}')" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Delete</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                }
+
+                else { // filterLocations != "" || filterLocations != undefined
+                    if (location.Category == filterLocations) {
+                        categoryData.forEach(category => {
+
+                            if (location.Category == category.Category) {
+                                const row = document.createElement('tr');
+                                row.innerHTML = `
+                                    <td class="">${location.Location}</td>
+                                    <td class="actionCol">
+                                        <button type="button" class="btn btn-info btn-md rounded-pill mx-3" id="btnEdit" onclick="editLocation('${location.Key}')">Edit</button>
+                                        <button type="button" class="btn btn-danger btn-md rounded-pill mx-3" id="btnDelete" onclick="deleteLocation('${location.Key}')" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Delete</button>
+                                    </td>
+                                `;
+                                tbody.appendChild(row);
+                            }
+                        });  
+                    }               
+                }
+                }
+
+                /*
+                if (location.Location.toLowerCase().includes(inputSearchLoc) || inputSearchLoc == undefined) {
+                    // alert(inputSearchLoc)
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="">${location.Location}</td>
+                        <td class="actionCol">
+                            <button type="button" class="btn btn-info btn-md rounded-pill mx-3" id="btnEdit" onclick="editLocation('${location.Key}')">Edit</button>
+                            <button type="button" class="btn btn-danger btn-md rounded-pill mx-3" id="btnDelete" onclick="deleteLocation('${location.Key}')" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Delete</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                }
+                */
+
+                
             });
         }
 
@@ -260,6 +401,7 @@
         buttonPlaces.addEventListener('click', goNext3)
 
         function goNext3() {
+            sessionStorage.clear();
             window.location.replace("places.html")
         }
 
@@ -270,15 +412,55 @@
             window.location.replace("index.html")
         }
 
+        // ---------------------------------------------------------------------------------
+
+        fetchAndPopulateFilteringCategories();
+
+        // Fetch data from the database and populate the table
+        function fetchAndPopulateFilteringCategories() {
+            const dbref = ref(db)
+
+            get(child(dbref, "Category"))
+            .then( (snapshot)=> {
+                if(snapshot.exists()) {
+                    
+                    const categoriesData = [];
+                    snapshot.forEach(childSnapshot => {
+                        const category = {
+                            Key: childSnapshot.key,
+                            Category: childSnapshot.val().Category,
+                            Icon: childSnapshot.val().Icon
+                        };
+                        categoriesData.push(category);
+                    });
+
+                    populateDropdown(categoriesData);
+                }
+            })
+        }
+
+        // Populate the table with the fetched data
+        function populateDropdown(data) {
+
+            // Reference to the <ul> element
+            const listElement = document.getElementById('categoryOptionsFilter');
+
+            data.forEach(category => {
+                const list = document.createElement('li');
+                list.innerHTML = `
+                    <button class="dropdown-item" type="button" onclick="filterLocBasedSelectedCat('${category.Category}')">${category.Category}</button>
+                `;
+
+                // Append the list item to the <ul>
+                listElement.appendChild(list);
+            });
+        }
+
     </script>
 
     <!-- BOOTSTRAP v5.3 -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js" integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa" crossorigin="anonymous"></script>
-
-    <!-- BOOTSTRAP v5.0 -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
 
 </body>
 </html>

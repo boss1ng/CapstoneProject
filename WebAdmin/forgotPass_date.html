@@ -64,14 +64,14 @@
         // Your web app's Firebase configuration
         // For Firebase JS SDK v7.20.0 and later, measurementId is optional
         const firebaseConfig = {
-          apiKey: "AIzaSyB08GrYWprzzbddoHqvTR5Ln-9i0CEXqHs",
-          authDomain: "capstone-project-ffe21.firebaseapp.com",
-          databaseURL: "https://capstone-project-ffe21-default-rtdb.asia-southeast1.firebasedatabase.app",
-          projectId: "capstone-project-ffe21",
-          storageBucket: "capstone-project-ffe21.appspot.com",
-          messagingSenderId: "67612839105",
-          appId: "1:67612839105:web:7d8ffd05e13733ef609840",
-          measurementId: "G-2BJMTCZ2SM"
+            apiKey: "AIzaSyB08GrYWprzzbddoHqvTR5Ln-9i0CEXqHs",
+            authDomain: "capstone-project-ffe21.firebaseapp.com",
+            databaseURL: "https://capstone-project-ffe21-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "capstone-project-ffe21",
+            storageBucket: "capstone-project-ffe21.appspot.com",
+            messagingSenderId: "67612839105",
+            appId: "1:67612839105:web:7d8ffd05e13733ef609840",
+            measurementId: "G-2BJMTCZ2SM"
         };
       
         // Initialize Firebase
@@ -83,13 +83,6 @@
         
         const db = getDatabase();
 
-
-
-
-
-        var buttonSubmit = document.querySelector("#btnSubmit");
-        buttonSubmit.addEventListener('click', verifyData)
-
         const inputDate = document.getElementById("dateInput");
 
         var dateSuccessAlert = document.getElementById("dateSuccess");
@@ -99,59 +92,11 @@
         // const transferredInput = localStorage.getItem('inputEmail');
         var transferredInput = sessionStorage.getItem('inputEmail');
         var randomOTP = null;
-        var result = null;
 
+        var buttonSubmit = document.querySelector("#btnSubmit");
+        buttonSubmit.addEventListener('click', verifyDate)
 
-
-        const nodemailer = require('nodemailer');
-        const { google } = require('googleapis');
-
-        const CLIENT_ID = '93006732287-lkifv53fqi7i3j2b052sob7qi8atoebl.apps.googleusercontent.com';
-        const CLIENT_SECRET = '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';
-        const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
-        const REFRESH_TOKEN = '1//04vd3j4OxQFG2CgYIARAAGAQSNwF-L9IrzZlD5v8aEGnhuFpmvGxK3bChU0jERc7g0AijRX0mxs0Q5jLNL8wLbzfffx5oS4ZqBUI';
-
-        const oAuth2Client = new google.auth.OAuth2(
-            CLIENT_ID,
-            CLIENT_SECRET,
-            REDIRECT_URI
-        );
-        oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
-        const accessToken = await oAuth2Client.getAccessToken();
-                
-        var transport = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                type: 'OAUTH2',
-                user: 'capstoneproject.it.qsee@gmail.com',
-                clientId: CLIENT_ID,
-                clientSecret: CLIENT_SECRET,
-                refreshToken: REFRESH_TOKEN,
-                accessToken: accessToken
-            },
-        });
-
-        async function GmailAPI() {
-            try {
-                const mailOptions = {
-                    from: 'IT CAPSTONE PROJECT (QSEE) <capstoneproject.it.qsee@gmail.com>',
-                    to: 'joeybryan.pintor.cics@ust.edu.ph',
-                    subject: 'QSee - One-Time Password',
-                    text: '',
-                    html: 'A request to reset the password for your account has been initiated. To proceed with the password reset process, please use the following one-time password (OTP): <br><br> <h2>SAMPLE OTP</h2> <br> Please enter this OTP on the password reset page <b> within the next two (2) minutes </b> to verify your identity and reset your password. <br><br> If you did not initiate this request, please disregard this email. <br><br><br> Regards, <br><br><b>QSee, IT Capstone Project</b>'
-                };
-
-                result = await transport.sendMail(mailOptions);
-                return result;
-            }
-
-            catch (error) {
-                return error;
-            }
-        }
-
-
-        function verifyData() {
+        function verifyDate() {
 
             const dbref = ref(db)
 
@@ -166,16 +111,16 @@
                             // console.log(inputDate.value);
 
                             randomOTP = generateOTP();
-                            // GmailAPI()
+                            GmailAPI(randomOTP);
+                            // GmailAPI();
                             //     .then((result) => console.log('Email sent.', result))
                             //     .catch((error) => console.log(error.message));
 
                             dateSuccessAlert.style.visibility = "visible";
                             setTimeout(function() {
-                               
-                                
                                 alert(randomOTP);
-                                window.location.replace("forgotPass_otp.html")
+                                sessionStorage.setItem('otpCode', randomOTP);
+                                // window.location.replace("forgotPass_otp.html")
                             }, 2000);
                         }   
 
@@ -196,7 +141,7 @@
         }
 
         function generateOTP() {
-            const charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdejghijklmnopqrstuvwxyz";
             let otp = "";
             for (let i = 0; i < 4; i++) {
                 const randomIndex = Math.floor(Math.random() * charset.length);
@@ -205,17 +150,69 @@
             return otp;
         }
 
-
-
-
-// GOOGLE MAIL API
-        
-
-        
-
-
-
     </script>
+
+
+<!-- GOOGLE MAIL API -->
+    <script>
+        const nodemailer = require('nodemailer');
+        const { google } = require('googleapis');
+
+        const CLIENT_ID = '93006732287-lkifv53fqi7i3j2b052sob7qi8atoebl.apps.googleusercontent.com';
+        const CLIENT_SECRET = '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';
+        const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
+        const REFRESH_TOKEN = '1//04vd3j4OxQFG2CgYIARAAGAQSNwF-L9IrzZlD5v8aEGnhuFpmvGxK3bChU0jERc7g0AijRX0mxs0Q5jLNL8wLbzfffx5oS4ZqBUI';
+
+        const oAuth2Client = new google.auth.OAuth2(
+            CLIENT_ID,
+            CLIENT_SECRET,
+            REDIRECT_URI
+        );
+        oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
+        
+        var result = null;
+        const generatedOTP = sessionStorage.getItem('otpCode');
+
+        // GmailAPI(generatedOTP);
+
+        async function GmailAPI(generatedOTP) {
+
+            if (generatedOTP != undefined) {
+
+                try {
+                    const accessToken = await oAuth2Client.getAccessToken();
+
+                    const transport = nodemailer.createTransport({
+                        service: 'gmail',
+                        auth: {
+                            type: 'OAUTH2',
+                            user: 'capstoneproject.it.qsee@gmail.com',
+                            clientId: CLIENT_ID,
+                            clientSecret: CLIENT_SECRET,
+                            refreshToken: REFRESH_TOKEN,
+                            accessToken: accessToken
+                        },
+                    });
+
+                    const mailOptions = {
+                        from: 'IT CAPSTONE PROJECT (QSEE) <capstoneproject.it.qsee@gmail.com>',
+                        to: 'joeybryan.pintor.cics@ust.edu.ph',
+                        subject: 'QSee - One-Time Password',
+                        text: '',
+                        html: `A request to reset the password for your account has been initiated. To proceed with the password reset process, please use the following one-time password (OTP): <br><br> <h2> ${generatedOTP} </h2> <br> Please enter this OTP on the password reset page <b> within the next two (2) minutes </b> to verify your identity and reset your password. <br><br> If you did not initiate this request, please disregard this email. <br><br><br> Regards, <br><br><b>QSee, IT Capstone Project</b>`
+                    };
+
+                    result = await transport.sendMail(mailOptions);
+                    return result;
+                }
+
+                catch (error) {
+                    return error;
+                }
+            }
+        }
+    </script>    
+
 
     <!-- BOOTSTRAP v5.3 -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <!--  -->
+    <script src="https://apis.google.com/js/client.js"></script>
+</head>
+<body>
+    
+
+    <script>
+
+        // Load the Gmail API client on window load
+        window.onload = function () {
+            gapi.load('client', init);
+        };
+
+        // Initialize the Gmail API client
+        function init() {
+            gapi.client.init({
+                apiKey: 'AIzaSyBtT7xnsYRYHeo09h8E3P7GS4UsPLC7Wwc',
+                clientId: 'CL93006732287-lkifv53fqi7i3j2b052sob7qi8atoebl.apps.googleusercontent.comIENT_ID',
+                discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest"],
+                scope: 'https://www.googleapis.com/auth/gmail.send'
+            }).then(function () {
+                // Call the loadGmailApi function to load the Gmail API
+                loadGmailApi();
+            });
+        }
+
+        // Load the Gmail API client library
+        function loadGmailApi() {
+            gapi.client.load('gmail', 'v1', sendEmail);
+        }
+
+        // Send an email using the Gmail API
+        function sendEmail() {
+            // Create an email message
+            const email = {
+                to: 'joeybryan.pintor.cics@ust.edu.ph',
+                subject: 'My Subject',
+                message: 'Hello, this is the email message body.'
+            };
+
+            // Construct the raw email message
+            const rawEmail = `To: ${email.to}\r\n` +
+                `Subject: ${email.subject}\r\n\r\n` +
+                `${email.message}`;
+
+            // Send the email using the Gmail API
+            gapi.client.gmail.users.messages.send({
+                userId: 'me',
+                resource: {
+                    raw: window.btoa(unescape(encodeURIComponent(rawEmail))) // Base64 encode the raw email message
+                }
+            }).then(function (response) {
+                console.log('Email sent:', response);
+            }).catch(function (error) {
+                console.error('Error sending email:', error);
+            });
+        }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Gmail API Example</title>
+  <script src="https://apis.google.com/js/api.js"></script>
+</head>
+<body>
+  <h1>Gmail API Example</h1>
+  
+  <button id="authorizeButton">Authorize</button>
+  <button id="sendEmailButton" style="display:none;">Send Email</button>
+
+  <script>
+    // Your Gmail API Client ID and API Key
+    var CLIENT_ID = 'CL93006732287-lkifv53fqi7i3j2b052sob7qi8atoebl.apps.googleusercontent.comIENT_ID';
+    var API_KEY = 'AIzaSyBtT7xnsYRYHeo09h8E3P7GS4UsPLC7Wwc';
+
+    // Array of recipient email addresses
+    var recipients = [
+      'joeybryan.pintor.cics@ust.edu.ph',
+      'capstoneproject.it.qsee@gmail.com'
+    ];
+
+    // Load the Gmail API Client Library
+    gapi.load('client', function() {
+      gapi.client.init({
+        apiKey: API_KEY,
+        clientId: CLIENT_ID,
+        discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest'],
+        scope: 'https://www.googleapis.com/auth/gmail.send' // Scopes for Gmail API
+      }).then(function() {
+        // Listen for authorization changes
+        gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
+
+        // Handle initial authorization state
+        updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+
+        // Set up event listeners
+        document.getElementById('authorizeButton').addEventListener('click', handleAuthClick);
+        document.getElementById('sendEmailButton').addEventListener('click', sendEmail);
+      });
+    });
+
+    // Update UI based on authorization status
+    function updateSigninStatus(isSignedIn) {
+      if (isSignedIn) {
+        document.getElementById('authorizeButton').style.display = 'none';
+        document.getElementById('sendEmailButton').style.display = 'block';
+      } else {
+        document.getElementById('authorizeButton').style.display = 'block';
+        document.getElementById('sendEmailButton').style.display = 'none';
+      }
+    }
+
+    // Handle authorization click event
+    function handleAuthClick(event) {
+      gapi.auth2.getAuthInstance().signIn();
+    }
+
+    // Send an email
+    function sendEmail() {
+      var subject = 'Hello from Gmail API';
+      var messageText = 'This is a test email sent via the Gmail API.';
+      
+      var email = '';
+      for (var i = 0; i < recipients.length; i++) {
+        email += 'To: ' + recipients[i] + '\r\n';
+      }
+      email += 'Subject: ' + subject + '\r\n';
+      email += 'Content-Type: text/plain; charset="UTF-8"\r\n';
+      email += 'MIME-Version: 1.0\r\n\r\n';
+      email += messageText;
+
+      var base64EncodedEmail = btoa(email);
+
+      gapi.client.gmail.users.messages.send({
+        'userId': 'me',
+        'resource': {
+          'raw': base64EncodedEmail
+        }
+      }).then(function(response) {
+        console.log('Email sent successfully:', response);
+      }, function(error) {
+        console.error('Error sending email:', error);
+      });
+    }
+  </script>
+</body>
+</html>

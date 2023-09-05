@@ -163,10 +163,10 @@
         
         const db = getDatabase();
 
-        fetchAndPopulate();
+        fetchAndPopulateCat();
 
         // Fetch data from the database and populate the table
-        function fetchAndPopulate() {
+        function fetchAndPopulateCat() {
             const dbref = ref(db)
 
             get(child(dbref, "Category"))
@@ -183,30 +183,57 @@
                         categoriesData.push(category);
                     });
 
-                    populateTable(categoriesData);
+                    fetchAndPopulateLoc(categoriesData);
                 }
             })
         }
+
+        function fetchAndPopulateLoc(categoryData) {
+            const dbref = ref(db)
+
+            get(child(dbref, "Location"))
+            .then( (snapshot)=> {
+                if(snapshot.exists()) {
+
+                    const locationsData = [];
+                    snapshot.forEach(childSnapshot => {
+                        const location = {
+                            Key: childSnapshot.key,
+                            Location: childSnapshot.val().Location,
+                            Category: childSnapshot.val().Category,
+                        };
+                        locationsData.push(location);
+                    });
+
+                    populateTable(categoryData, locationsData);
+                }
+            })
+        }
+
         
         // Populate the table with the fetched data
-        function populateTable(data) {
+        function populateTable(categoryData, locationData) {
             const tbody = document.querySelector('#categoryTable tbody');
             tbody.innerHTML = ''; // Clear existing rows
 
-            // <td>${category.Key}</td>
-            // <td>${category.Icon}</td>
+            categoryData.forEach(category => {
+                var numLocations = 0;
 
-            data.forEach(category => {
+                locationData.forEach(location => {
+                    if (category.Category == location.Category)
+                        numLocations++;
+                });
+
                 const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="" style="width: 10%; padding-left: 80px;">${category.Category}</td>
-                    <td class="text-center" style="width: 10%;">
-                        <button type="button" class="btn btn-info btn-lg rounded-pill" id="btnEdit" onclick="editCategory('${category.Key}')" >Edit</button>
-                        <button type="button" class="btn btn-danger btn-lg rounded-pill" id="btnDelete" onclick="deleteCategory('${category.Key}')" data-bs-toggle="modal" data-bs-target="#staticBackdrop" style="margin-left: 25px;">Delete</button>
-                    </td>
-                    <td class="text-center" style="width: 10%;">6</td>
-                `;
-                tbody.appendChild(row);
+                    row.innerHTML = `
+                        <td class="" style="width: 10%; padding-left: 80px;">${category.Category}</td>
+                        <td class="text-center" style="width: 10%;">
+                            <button type="button" class="btn btn-info btn-lg rounded-pill" id="btnEdit" onclick="editCategory('${category.Key}')" >Edit</button>
+                            <button type="button" class="btn btn-danger btn-lg rounded-pill" id="btnDelete" onclick="deleteCategory('${category.Key}')" data-bs-toggle="modal" data-bs-target="#staticBackdrop" style="margin-left: 25px;">Delete</button>
+                        </td>
+                        <td class="text-center" style="width: 10%;">${numLocations}</td>
+                    `;
+                    tbody.appendChild(row);
             });
         }
 
@@ -242,6 +269,7 @@
         buttonPlaces.addEventListener('click', goNext3)
 
         function goNext3() {
+            sessionStorage.clear();
             window.location.replace("places.html")
         }
 

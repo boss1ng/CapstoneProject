@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <!--  -->
+    <script src="https://apis.google.com/js/client.js"></script>
+
+</head>
+<body>
+
+    <form id="email-form">
+        <label for="to">To:</label>
+        <input type="email" id="to" required><br>
+        <label for="subject">Subject:</label>
+        <input type="text" id="subject" required><br>
+        <label for="message">Message:</label>
+        <textarea id="message" required></textarea><br>
+        <input type="submit" value="Send Email">
+    </form>
+
+    
+    <script>
+
+        // Load the Google API client library
+        gapi.load('client', init);
+
+        function init() {
+            // Initialize the Google API client with your API key and client ID
+            gapi.client.init({
+                apiKey: 'AIzaSyBtT7xnsYRYHeo09h8E3P7GS4UsPLC7Wwc',
+                clientId: 'CL93006732287-lkifv53fqi7i3j2b052sob7qi8atoebl.apps.googleusercontent.comIENT_ID',
+                discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest'],
+                scope: 'https://www.googleapis.com/auth/gmail.readonly' // Adjust the scope for the specific API you want to use
+            }).then(function () {
+                // Handle the authorization and make API requests here
+                sendEmail();
+            });
+        }
+
+        // Send an email using the Gmail API
+        function sendEmail() {
+
+            const mailOptions = {
+                from: 'IT CAPSTONE PROJECT (QSEE) <capstoneproject.it.qsee@gmail.com>',
+                to: 'joeybryan.pintor.cics@ust.edu.ph',
+                subject: 'QSee - One-Time Password',
+                text: '',
+                //html: 'Good day! <br><br> Your one-time password (OTP) is <b>QWER</b>. <br><br> It will expire in two (2) minutes. <br><br><br> If you have any further questions or if there is anything else we can help you with, please let us know by reaching out to us via (02) 8-298-4313. <br><br><br> Regards, <br><br><b>QSee, IT Capstone Project</b>'
+                html: 'A request to reset the password for your account has been initiated. To proceed with the password reset process, please use the following one-time password (OTP): <br><br> <h2>SAMPLE OTP</h2> <br> Please enter this OTP on the password reset page <b> within the next two (2) minutes </b> to verify your identity and reset your password. <br><br> If you did not initiate this request, please disregard this email. <br><br><br> Regards, <br><br><b>QSee, IT Capstone Project</b>'
+            };
+
+            const request = gapi.client.gmail.users.messages.send({
+
+            });
+
+        }
+
+    </script>
+    
+</body>
+</html>

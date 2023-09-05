@@ -155,14 +155,14 @@ button[type="submit"]:focus,
 
 */
 
-form.nosubmit {
+.nosubmit {
     border: none;
     padding: 0;
     width: 550px;
 }
 
 
-input.nosubmit {
+ .nosubmit input{
     border: 1px solid #000;
     background-color: #fff;
     /* width: 100%; */
@@ -198,6 +198,20 @@ button {
 
 #dropdownBtn:hover {
     background-color: #fff;
+}
+
+#dropdownCategory {
+    text-align: end;
+    width: auto !important;
+}
+
+#dropdownCategory:hover {
+    background-color: none;
+}
+
+#categoryOptionsFilter li {
+    text-align: end;
+    font-size: large;
 }
 
 #imageFile {
