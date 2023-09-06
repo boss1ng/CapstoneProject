@@ -25,7 +25,6 @@ public class UserBottomSheetDialogFragment extends BottomSheetDialogFragment {
         TextView changePasswordOption = rootView.findViewById(R.id.menu_change_password);
         TextView signOutOption = rootView.findViewById(R.id.menu_sign_out);
 
-
         changePasswordOption.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
