@@ -40,7 +40,6 @@ public class UserBottomSheetDialogFragment extends BottomSheetDialogFragment {
                 startActivity(intent);
             }
         });
-
         return rootView;
     }
 
