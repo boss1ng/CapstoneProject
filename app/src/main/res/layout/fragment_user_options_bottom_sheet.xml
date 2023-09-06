@@ -5,28 +5,6 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/menu_registered_locations"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Registered Locations"
-        android:padding="16dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:drawableLeft="@drawable/baseline_email_24"
-        android:drawablePadding="8dp"/>
-
-    <TextView
-        android:id="@+id/menu_register_location"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Register a Location"
-        android:padding="16dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:drawableLeft="@drawable/ic_maps"
-        android:drawablePadding="8dp"/>
-
-    <TextView
         android:id="@+id/menu_change_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
