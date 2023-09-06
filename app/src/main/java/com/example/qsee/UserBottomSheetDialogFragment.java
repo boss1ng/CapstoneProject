@@ -31,7 +31,6 @@ public class UserBottomSheetDialogFragment extends BottomSheetDialogFragment {
                 // Handle Change Password option click
             }
         });
-
         signOutOption.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
