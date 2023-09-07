@@ -34,7 +34,7 @@ public class Home extends AppCompatActivity {
                 } else if (itemId == R.id.action_maps) {
                     loadFragment(new MapsFragment(), username);
                 } else if (itemId == R.id.action_quiz) {
-                    loadFragment(new QuizFragment(), username);
+                    loadFragment(new StartQuizFragment(), username);
                 } else if (itemId == R.id.action_profile) {
                     loadFragment(new ProfileFragment(), username);
                 }
