@@ -21,6 +21,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+
+
 public class MainActivity extends AppCompatActivity {
 
     private TextInputLayout unameInputLayout;
@@ -62,9 +64,38 @@ public class MainActivity extends AppCompatActivity {
         forgotPasswordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Handle the "Forgot Password" button click here
-                Intent intent = new Intent(MainActivity.this, ForgotPass.class);
-                startActivity(intent);
+                // Check if the username is empty
+                String username = unameInputLayout.getEditText().getText().toString();
+                if (TextUtils.isEmpty(username)) {
+                    Toast.makeText(MainActivity.this, "Please enter your username", Toast.LENGTH_SHORT).show();
+                    return; // Don't proceed if the username is empty
+                }
+
+                // Check if the username exists in the Firebase database
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+                DatabaseReference usersReference = databaseReference.child("MobileUsers");
+
+                usersReference.orderByChild("username").equalTo(username)
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                if (dataSnapshot.exists()) {
+                                    // Username exists, proceed to the "ForgotPass" activity
+                                    Intent intent = new Intent(MainActivity.this, ForgotPass.class);
+                                    intent.putExtra("username", username);
+                                    startActivity(intent);
+                                } else {
+                                    // Username does not exist in the database
+                                    Toast.makeText(MainActivity.this, "Username does not exist", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                // Handle database error, if any
+                                Toast.makeText(MainActivity.this, "Database error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
             }
         });
     }

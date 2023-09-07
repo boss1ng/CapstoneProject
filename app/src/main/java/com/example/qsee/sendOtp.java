@@ -5,15 +5,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import androidx.appcompat.app.AppCompatActivity;
+import java.util.Random;
+
 
 public class sendOtp extends AppCompatActivity {
 
     private EditText otpBox1, otpBox2, otpBox3, otpBox4;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,6 +25,14 @@ public class sendOtp extends AppCompatActivity {
         otpBox2 = findViewById(R.id.otpBox2);
         otpBox3 = findViewById(R.id.otpBox3);
         otpBox4 = findViewById(R.id.otpBox4);
+
+        // Retrieve the contact number from the Intent
+        String contactNumber = getIntent().getStringExtra("contactNumber");
+
+        // Generate a 4-digit OTP
+        Random random = new Random();
+        int otp = 1000 + random.nextInt(9000);
+
 
         Button verifyButton = findViewById(R.id.otpConfirmButton);
         verifyButton.setOnClickListener(new View.OnClickListener() {
