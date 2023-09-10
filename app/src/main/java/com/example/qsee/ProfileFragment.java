@@ -23,6 +23,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.tabs.TabLayout;
@@ -64,8 +65,6 @@ public class ProfileFragment extends Fragment {
         return rootView;
     }
 
-
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -74,8 +73,8 @@ public class ProfileFragment extends Fragment {
         ViewPager2 viewPager = view.findViewById(R.id.viewPager);
         TabLayout tabLayout = view.findViewById(R.id.tabLayout);
 
-        // Create and set the adapter for ViewPager2
-        ProfilePagerAdapter pagerAdapter = new ProfilePagerAdapter(getChildFragmentManager(), getLifecycle());
+        // Create and set the adapter for ViewPager2, passing the username
+        ProfilePagerAdapter pagerAdapter = new ProfilePagerAdapter(getChildFragmentManager(), getLifecycle(), username);
         viewPager.setAdapter(pagerAdapter);
 
         // Attach TabLayout to ViewPager2 using TabLayoutMediator
@@ -94,7 +93,6 @@ public class ProfileFragment extends Fragment {
                     }
                 }).attach();
     }
-
 }
 
 
