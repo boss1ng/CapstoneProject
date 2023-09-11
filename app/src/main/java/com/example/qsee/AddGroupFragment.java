@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 
 import androidx.annotation.NonNull;
@@ -14,15 +15,18 @@ import androidx.constraintlayout.widget.Group;
 import androidx.fragment.app.DialogFragment;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 public class AddGroupFragment extends DialogFragment {
 
     private Button cancelBtn;
     private Button createBtn;
     private TextInputLayout grpName;
-    // Add a field to store the username
     private String username;
 
     // Constructor to accept the username as an argument
@@ -68,32 +72,62 @@ public class AddGroupFragment extends DialogFragment {
                 dismiss(); // Close the dialog
             }
         });
+
         // Get a reference to the root of your Firebase database
         DatabaseReference rootReference = FirebaseDatabase.getInstance().getReference();
+
         createBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String sanitizedUsername = username.replace(".", "_"); // Replace '.' with '_'
                 String groupName = grpName.getEditText().getText().toString().trim();
                 if (!groupName.isEmpty()) {
-                    // Create a new Group object with only "Admin"
-                    Groups group = new Groups();
-                    group.setAdmin(username); // Set the admin (formerly createdBy) field
+                    // Get a reference to the Firebase database
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
 
-                    // Get a reference to the "Groups" node at the root level
-                    DatabaseReference groupsReference = rootReference.child("Groups");
+                    // Query to fetch the userId based on the username
+                    DatabaseReference usersReference = databaseReference.child("MobileUsers");
+                    Query query = usersReference.orderByChild("username").equalTo(username);
 
-                    // Create a new child node for the current user under the "Groups" node
-                    DatabaseReference userGroupsReference = groupsReference.child(sanitizedUsername);
+                    query.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.exists()) {
+                                // Retrieve the userId
+                                String userId = dataSnapshot.getChildren().iterator().next().getKey();
 
-                    // Create a new child node with the group name under the user's node
-                    DatabaseReference newGroupReference = userGroupsReference.child(groupName);
-                    newGroupReference.setValue(group);
+                                // Create a new Group object with the admin (userId)
+                                Groups group = new Groups();
+                                group.setAdmin(username);
 
-                    // Close the dialog
-                    dismiss();
+                                // Get a reference to the "Groups" node at the root level
+                                DatabaseReference groupsReference = databaseReference.child("Groups");
+
+                                // Create a new child node for the current user under the "Groups" node
+                                DatabaseReference userGroupsReference = groupsReference.child(userId);
+
+                                // Create a new child node with the group name under the user's node
+                                DatabaseReference newGroupReference = userGroupsReference.child(groupName);
+                                newGroupReference.setValue(group);
+
+                                // Display a Toast for successful group creation
+                                Toast.makeText(getActivity(), "Group created successfully", Toast.LENGTH_SHORT).show();
+
+                                // Close the dialog
+                                dismiss();
+                            } else {
+                                // Handle the case where the username does not exist
+                                // You can display an error message or take appropriate action
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            // Handle any database query errors here
+                        }
+                    });
                 } else {
-                    // Handle the case where the group name is empty
+                    // Display a Toast message for an empty group name
+                    Toast.makeText(getActivity(), "Group name cannot be empty", Toast.LENGTH_SHORT).show();
                 }
             }
         });
