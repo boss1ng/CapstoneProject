@@ -2,7 +2,11 @@ package com.example.qsee;
 
 import static android.content.Intent.getIntent;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -10,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -17,6 +22,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,7 +36,10 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 public class ProfileFragment extends Fragment {
+    private TextView userFullNameTextView;
+    private TextView userIdTextView;
     private TextView usernameTextView;
+    private Context context;
     private String username;
 
     public ProfileFragment() {
@@ -43,6 +52,8 @@ public class ProfileFragment extends Fragment {
         // Inflate the fragment_profile.xml layout
         View rootView = inflater.inflate(R.layout.fragment_profile, container, false);
 
+        context = getActivity(); // Get the context
+
         // Retrieve the username from the arguments
         username = getArguments().getString("username");
 
@@ -54,6 +65,69 @@ public class ProfileFragment extends Fragment {
                 // Show the UserBottomSheetDialogFragment
                 UserBottomSheetDialogFragment bottomSheetDialog = new UserBottomSheetDialogFragment();
                 bottomSheetDialog.show(getParentFragmentManager(), bottomSheetDialog.getTag());
+            }
+        });
+
+        // Find the userFullNameTextView and userIdTextView by their IDs
+        userFullNameTextView = rootView.findViewById(R.id.UserFullName);
+        userIdTextView = rootView.findViewById(R.id.UserId);
+
+        // Set a click listener for userIdTextView to copy its text to the clipboard
+        userIdTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Get the text from userIdTextView
+                String userId = userIdTextView.getText().toString().trim();
+
+                // Extract only the numeric part from the text
+                String numericPart = userId.replaceAll("[^0-9]", "");
+
+                if (!numericPart.isEmpty()) {
+                    try {
+                        // Copy the numeric part to the clipboard
+                        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                        ClipData clip = ClipData.newPlainText("UserId", numericPart);
+                        clipboard.setPrimaryClip(clip);
+
+                        // Show a toast message indicating that the numeric part has been copied
+                        Toast.makeText(context, "User ID copied to clipboard", Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+                        // Handle the exception (e.g., show a message to the user)
+                        Toast.makeText(context, "Clipboard functionality is not available", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    // Show a message if there are no numeric characters to copy
+                    Toast.makeText(context, "No numeric part found in User ID", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        // Retrieve user's data from Firebase based on the username
+        DatabaseReference usersReference = FirebaseDatabase.getInstance().getReference("MobileUsers");
+        Query query = usersReference.orderByChild("username").equalTo(username);
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                        // Get user data (firstName, lastName, and userId)
+                        String firstName = userSnapshot.child("firstName").getValue(String.class);
+                        String lastName = userSnapshot.child("lastName").getValue(String.class);
+                        String userId = userSnapshot.child("userId").getValue(String.class);
+
+                        // Set the text of userFullNameTextView with the full name
+                        userFullNameTextView.setText(firstName + " " + lastName);
+
+                        // Set the text of userIdTextView with the userId
+                        userIdTextView.setText("User ID: " + userId);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle any database query errors here
             }
         });
         // Find the usernameTextView by its ID
