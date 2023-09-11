@@ -106,15 +106,14 @@
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
-        android:layout_width="412dp"
-        android:layout_height="430dp"
+        android:layout_width="411dp"
+        android:layout_height="417dp"
         android:layout_below="@id/tabLayout"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.78" />
+        app:layout_constraintVertical_bias="0.781" />
 
     <TextView
         android:id="@+id/UserFullName"

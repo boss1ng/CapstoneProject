@@ -97,6 +97,7 @@ public class AddGroupFragment extends DialogFragment {
 
                                 // Create a new Group object with the admin (userId)
                                 Groups group = new Groups();
+                                group.setGroupName(groupName);
                                 group.setAdmin(username);
 
                                 // Get a reference to the "Groups" node at the root level

@@ -10,7 +10,7 @@ public class Groups {
 
     public Groups(String groupName, String admin) { // Change the constructor parameter name
         this.groupName = groupName;
-        this.admin = admin; // Change "createdBy" to "admin"
+        this.admin = admin;
     }
 
     public String getGroupName() {
