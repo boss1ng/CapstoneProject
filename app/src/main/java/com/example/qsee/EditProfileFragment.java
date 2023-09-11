@@ -8,13 +8,12 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 public class EditProfileFragment extends Fragment {
-
-    public EditProfileFragment(){
-
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -25,15 +24,12 @@ public class EditProfileFragment extends Fragment {
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Replace the current fragment with the "fragment_quiz" fragment
-                ProfileFragment profileFragment = new ProfileFragment();
-                FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragment_container, profileFragment); // Replace 'fragment_container' with the ID of your container layout
-                transaction.addToBackStack(null); // Optional: Add the transaction to the back stack
-                transaction.commit();
+                FragmentManager fragmentManager = getParentFragmentManager();
+                fragmentManager.popBackStack();
             }
         });
 
         return view;
     }
+
 }

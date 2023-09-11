@@ -139,7 +139,8 @@
             android:layout_marginTop="65dp"
             android:ems="10"
             android:inputType="text"
-            android:textSize="14dp" />
+            android:textSize="14dp"
+            tools:ignore="SpeakableTextPresentCheck" />
 
         <EditText
             android:id="@+id/inputLastName"
@@ -149,7 +150,8 @@
             android:layout_marginTop="110dp"
             android:ems="10"
             android:inputType="text"
-            android:textSize="14dp" />
+            android:textSize="14dp"
+            tools:ignore="SpeakableTextPresentCheck" />
 
         <EditText
             android:id="@+id/inputContactNo"
@@ -159,7 +161,8 @@
             android:layout_marginTop="155dp"
             android:ems="10"
             android:inputType="text"
-            android:textSize="14dp" />
+            android:textSize="14dp"
+            tools:ignore="SpeakableTextPresentCheck" />
 
         <EditText
             android:id="@+id/inputBirthdate"
@@ -179,7 +182,8 @@
             android:layout_marginTop="245dp"
             android:ems="10"
             android:inputType="text"
-            android:textSize="14dp" />
+            android:textSize="14dp"
+            tools:ignore="SpeakableTextPresentCheck" />
 
         <Button
             android:id="@+id/saveBt"
