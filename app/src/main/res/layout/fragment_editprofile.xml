@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/profilePic_edit"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:outlineAmbientShadowColor="@color/black"
+        android:src="@drawable/profilepicture"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.079" />
+
+    <TextView
+        android:id="@+id/UserId_edit"
+        android:layout_width="184dp"
+        android:layout_height="18dp"
+        android:gravity="center"
+        android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.237" />
+
+    <Button
+        android:id="@+id/cancelBt"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginBottom="144dp"
+        android:backgroundTint="#ffffff"
+        android:gravity="center_horizontal"
+        android:text="Cancel"
+        android:textColor="@color/black"
+        android:textSize="10dp"
+        app:layout_constraintBottom_toTopOf="@+id/frameLayout2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.157"
+        tools:ignore="TextSizeCheck" />
+
+    <FrameLayout
+        android:id="@+id/frameLayout2"
+        android:layout_width="413dp"
+        android:layout_height="534dp"
+        android:background="#efefef"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/UserId_edit"
+        app:layout_constraintVertical_bias="0.909">
+
+        <View
+            android:id="@+id/view"
+            android:layout_width="wrap_content"
+            android:layout_height="3dp"
+            android:background="@color/black" />
+
+        <View
+            android:id="@+id/view2"
+            android:layout_width="wrap_content"
+            android:layout_height="3dp"
+            android:layout_marginTop="40dp"
+            android:background="@color/black" />
+
+        <TextView
+            android:id="@+id/PersonalInformation"
+            android:layout_width="344dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="9dp"
+            android:gravity="start"
+            android:text="Personal Information"
+            android:textSize="20dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/edit_firstName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="56dp"
+            android:layout_marginTop="75dp"
+            android:text="First Name"
+            android:textSize="14dp" />
+
+        <TextView
+            android:id="@+id/edit_lastName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="56dp"
+            android:layout_marginTop="120dp"
+            android:text="Last Name"
+            android:textSize="14dp" />
+
+        <TextView
+            android:id="@+id/edit_contactNo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="56dp"
+            android:layout_marginTop="165dp"
+            android:text="Contact Number"
+            android:textSize="14dp" />
+
+        <TextView
+            android:id="@+id/edit_birthdate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="56dp"
+            android:layout_marginTop="210dp"
+            android:text="Birthday"
+            android:textSize="14dp" />
+
+        <TextView
+            android:id="@+id/edit_uname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="56dp"
+            android:layout_marginTop="255dp"
+            android:text="Username"
+            android:textSize="14dp"
+            tools:ignore="TextSizeCheck" />
+
+        <EditText
+            android:id="@+id/inputFirstName"
+            android:layout_width="190dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="170dp"
+            android:layout_marginTop="65dp"
+            android:ems="10"
+            android:inputType="text"
+            android:textSize="14dp" />
+
+        <EditText
+            android:id="@+id/inputLastName"
+            android:layout_width="190dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="170dp"
+            android:layout_marginTop="110dp"
+            android:ems="10"
+            android:inputType="text"
+            android:textSize="14dp" />
+
+        <EditText
+            android:id="@+id/inputContactNo"
+            android:layout_width="190dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="170dp"
+            android:layout_marginTop="155dp"
+            android:ems="10"
+            android:inputType="text"
+            android:textSize="14dp" />
+
+        <EditText
+            android:id="@+id/inputBirthdate"
+            android:layout_width="190dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="170dp"
+            android:layout_marginTop="200dp"
+            android:ems="10"
+            android:inputType="date"
+            android:textSize="14dp" />
+
+        <EditText
+            android:id="@+id/inputUsername"
+            android:layout_width="190dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="170dp"
+            android:layout_marginTop="245dp"
+            android:ems="10"
+            android:inputType="text"
+            android:textSize="14dp" />
+
+        <Button
+            android:id="@+id/saveBt"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_marginStart="300dp"
+            android:layout_marginTop="300dp"
+            android:backgroundTint="#f4c01e"
+            android:gravity="center_horizontal"
+            android:text="Save"
+            android:textColor="@color/black"
+            android:textSize="12dp" />
+
+
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -59,12 +59,26 @@ public class ProfileFragment extends Fragment {
 
         // Find the "Change Username" button
         Button unameButton = rootView.findViewById(R.id.unameButton);
+        Button editProfile = rootView.findViewById(R.id.editButton);
         unameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Show the UserBottomSheetDialogFragment
                 UserBottomSheetDialogFragment bottomSheetDialog = new UserBottomSheetDialogFragment();
                 bottomSheetDialog.show(getParentFragmentManager(), bottomSheetDialog.getTag());
+            }
+        });
+
+        editProfile.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                // Replace the current fragment with the "fragment_quiz" fragment
+                EditProfileFragment editProfileFragment = new EditProfileFragment();
+                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container, editProfileFragment); // Replace 'fragment_container' with the ID of your container layout
+                transaction.addToBackStack(null); // Optional: Add the transaction to the back stack
+                transaction.commit();
             }
         });
 
