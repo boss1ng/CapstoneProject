@@ -98,6 +98,12 @@ public class Register extends AppCompatActivity {
                     return; // Don't proceed with registration
                 }
 
+                // Check if the username contains a "."
+                if (username.contains(".")) {
+                    // Show an error Toast message if the username contains a "."
+                    Toast.makeText(Register.this, "Username cannot contain a period ('.')", Toast.LENGTH_SHORT).show();
+                    return; // Don't proceed with registration
+                }
 
                 // Create a new User object
                 User user = new User();
@@ -111,8 +117,8 @@ public class Register extends AppCompatActivity {
                 // Get a reference to the Firebase Realtime Database
                 DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
 
-                // Generate a unique key for the user
-                String userId = databaseReference.push().getKey();
+                // Generate a random User ID
+                user.generateRandomUserId();
 
 
                 // Check if the username already exists in the database
@@ -139,7 +145,7 @@ public class Register extends AppCompatActivity {
                             // Username is unique, proceed with registration
 
                             // Write the user data to the database under the generated key
-                            databaseReference.child("MobileUsers").child(userId).setValue(user)
+                            databaseReference.child("MobileUsers").child(user.getUserId()).setValue(user)
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {

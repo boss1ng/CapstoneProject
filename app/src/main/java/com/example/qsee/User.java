@@ -1,5 +1,7 @@
 package com.example.qsee;
 
+import java.util.Random;
+
 public class User {
     private String firstName;
     private String lastName;
@@ -7,6 +9,20 @@ public class User {
     private String birthdate;
     private String username;
     private String password;
+    private String userId;
+
+    public void generateRandomUserId() {
+        Random random = new Random();
+        StringBuilder userIdBuilder = new StringBuilder();
+
+        for (int i = 0; i < 10; i++) {
+            int randomDigit = random.nextInt(10); // Generate a random digit (0-9)
+            userIdBuilder.append(randomDigit); // Append the digit to the User ID
+        }
+
+        this.userId = userIdBuilder.toString(); // Set the generated User ID
+    }
+
 
     // Constructor (you can create an empty constructor if needed)
     public User() {
@@ -65,6 +81,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+    // Getter and Setter for UserId
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }
 
