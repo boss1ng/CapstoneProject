@@ -94,20 +94,30 @@ public class GroupsFragment extends Fragment {
             return;
         }
 
-        DatabaseReference userGroupsRef = databaseReference.child("Groups").child(userId);
+        DatabaseReference groupsRef = databaseReference.child("Groups"); // Reference to the "Groups" node
 
-        userGroupsRef.addValueEventListener(new ValueEventListener() {
+        groupsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<Groups> userGroups = new ArrayList<>();
 
-                for (DataSnapshot groupSnapshot : dataSnapshot.getChildren()) {
-                    String groupName = groupSnapshot.child("groupName").getValue(String.class);
-                    String admin = groupSnapshot.child("admin").getValue(String.class);
+                for (DataSnapshot adminSnapshot : dataSnapshot.getChildren()) {
+                    for (DataSnapshot groupSnapshot : adminSnapshot.getChildren()) {
+                        String groupName = groupSnapshot.child("groupName").getValue(String.class);
 
-                    // Create a Groups object with the retrieved data
-                    Groups group = new Groups(groupName, admin);
-                    userGroups.add(group);
+                        // Check if the user is a member of this group
+                        for (int i = 1; i <= 50; i++) { // Assuming there are up to 50 members
+                            String memberKey = "member" + i;
+                            String memberValue = groupSnapshot.child(memberKey).getValue(String.class);
+
+                            if (memberValue != null && memberValue.equals(userId)) {
+                                // User is a member, add this group to userGroups
+                                Groups group = new Groups(groupName, adminSnapshot.getKey());
+                                userGroups.add(group);
+                                break; // Break the loop if the user is found in this group
+                            }
+                        }
+                    }
                 }
 
                 // Update the RecyclerView adapter with the retrieved user groups
