@@ -110,6 +110,9 @@ public class AddGroupFragment extends DialogFragment {
                                 DatabaseReference newGroupReference = userGroupsReference.child(groupName);
                                 newGroupReference.setValue(group);
 
+                                // Set the creator (userId) as member1
+                                newGroupReference.child("member1").setValue(userId);
+
                                 // Display a Toast for successful group creation
                                 Toast.makeText(getActivity(), "Group created successfully", Toast.LENGTH_SHORT).show();
 

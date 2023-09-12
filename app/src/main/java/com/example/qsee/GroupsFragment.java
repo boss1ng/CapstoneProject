@@ -45,10 +45,6 @@ public class GroupsFragment extends Fragment {
         // Create a list of mock groups (you should replace this with your actual data)
         List<Groups> groupList = createMockGroupList();
 
-        // Create and set the adapter for the RecyclerView
-        adapter = new GroupListAdapter(groupList);
-        recyclerView.setAdapter(adapter);
-
         // Retrieve the username from the arguments
         Bundle args = getArguments();
         if (args != null) {
@@ -58,6 +54,12 @@ public class GroupsFragment extends Fragment {
 
         String currentUsername = username;
 
+
+        // Create and set the adapter for the RecyclerView
+        adapter = new GroupListAdapter(groupList, username);
+        recyclerView.setAdapter(adapter);
+
+
         // Query the database to find the userId based on the username
         databaseReference.child("MobileUsers").orderByChild("username").equalTo(currentUsername)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -65,23 +67,6 @@ public class GroupsFragment extends Fragment {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
                             userId = userSnapshot.getKey();
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.e("GroupsFragment", "Error finding user ID: " + databaseError.getMessage());
-                    }
-                });
-
-        // Query the database to find the userId based on the username
-        databaseReference.child("MobileUsers").orderByChild("username").equalTo(username)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
-                            userId = userSnapshot.getKey();
-                            // After obtaining the userId, load user groups
                             loadUserGroups();
                         }
                     }
@@ -91,7 +76,6 @@ public class GroupsFragment extends Fragment {
                         Log.e("GroupsFragment", "Error finding user ID: " + databaseError.getMessage());
                     }
                 });
-
         return view;
     }
 
@@ -101,6 +85,7 @@ public class GroupsFragment extends Fragment {
         // Populate groupList with actual data from Firebase or elsewhere
         return groupList;
     }
+
 
     private void loadUserGroups() {
         if (userId == null) {
