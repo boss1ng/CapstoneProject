@@ -15,13 +15,16 @@
     <!-- BOOTSTRAP v5.0 -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
+    <!-- Crypto-JS for Encryption -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
 </head>
 <body>
     <div class="outerCont">
         <div class="container" id="loginCont">
             <img src="images/Qsee.png">
             
-            <!-- <form id="loginForm"> form-group -->
+            <!-- <form id="loginForm"> form-group verifyCredentials() -->
                 <div class="d-flex justify-content-center align-items-center mt-5">
                     <input type="text" class="form-control" id="emailAddress" placeholder="Email Address" required aria-label="Username" aria-describedby="addon-wrapping"/>
                 </div>
@@ -68,8 +71,6 @@
         </div>
     </div>
 
-
-    
 
     <!-- FIREBASE REALTIME DATABASE -->
     <script type="module">
@@ -119,6 +120,11 @@
         let today = new Date().toJSON().slice(0, 10);    // 2022-08-17
 
         sessionStorage.clear()
+        // localStorage.removeItem("startTime");
+        localStorage.clear();
+
+        // Generate a random secret key (32 bytes / 256 bits)
+        const secretKey = 'e4e46af883548ced684eaf5d17c447c52c0d938b7e4b905738bcef51a3e88bd4';
 
 // SEARCH
         function verifyCredentials() {
@@ -131,7 +137,10 @@
                     .then( (snapshot)=> {
                         if(snapshot.exists()) {
 
-                            if(snapshot.val().Email == inputEmail.value && snapshot.val().Password == inputPassword.value) {
+                            const decryptedDataEmail = CryptoJS.AES.decrypt(snapshot.val().Email, secretKey).toString(CryptoJS.enc.Utf8);
+                            const decryptedDataPass = CryptoJS.AES.decrypt(snapshot.val().Password, secretKey).toString(CryptoJS.enc.Utf8);
+
+                            if(decryptedDataEmail == inputEmail.value && decryptedDataPass == inputPassword.value) {
                                 loginSuccessAlert.style.visibility = "visible";
                                 setTimeout(function(){
                                     window.location.replace("landing.html")
@@ -154,11 +163,14 @@
 
             else {
                 loginWarningAlert.style.visibility = "visible";
-                setTimeout(function(){
-                    location.reload()
+                setTimeout(function() {
+                    loginWarningAlert.style.visibility = "hidden";
+                    // location.reload()
                 }, 1500);
             }
         }
+
+        // document.getElementById('loginForm').addEventListener('submit', verifyCredentials)
 
         buttonSignIn.addEventListener('click', verifyCredentials)
 
@@ -201,6 +213,27 @@
             })
         }
 
+// READ
+        get(child(dbref, "User/" + id))
+        .then( (snapshot)=> {
+            if(snapshot.exists()) {
+
+                snapshot.val().Email
+
+            }
+        })
+
+// UPDATE  
+        update(ref(db, 'Category/' + categoryToEdit), {
+            Category: inputCategoryName.value,
+            Icon: inputFileCategoryIcon.value
+        })
+        .then(() => {
+            alert("Updated");
+        })
+        .catch((error) => {
+            alert(error);
+        });
 
 // DELETE
         function removeData() {

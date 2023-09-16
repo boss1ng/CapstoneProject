@@ -64,7 +64,7 @@
             <div class="container m-5">
                 <div class="outerCont d-flex align-items-center">
                     <h4 class="mx-5">Category Name</h4>
-                    <input type="text" class="form-control" id="inputCat" aria-label="Username" aria-describedby="addon-wrapping"/>
+                    <input type="text" class="form-control" id="inputCat" onchange="updateInput()" aria-label="Username" aria-describedby="addon-wrapping"/>
                 </div>
                 
                 <div class="outerCont d-flex align-items-center">
@@ -78,7 +78,7 @@
             <div class="container">
                 <div class="d-flex align-items-center justify-content-center">
                     <button type="button" class="btn btn-danger btn-lg mx-5" id="actionCancelCat">Cancel</button>
-                    <button type="button" class="btn btn-success btn-lg mx-5" id="actionSaveCat">Save</button>
+                    <button type="button" class="btn btn-success btn-lg mx-5" id="actionSaveCat" disabled>Save</button>
                 </div>
             </div>
 
@@ -106,6 +106,8 @@
     </div>
 
     <script>
+        var buttonSave = document.querySelector("#actionSaveCat");
+
         function updateOtherInput(inputFile) {
             var inputCategoryName = document.querySelector("#inputCat");
             var inputCategoryIcon = document.querySelector("#inputCatIconEdit");
@@ -116,7 +118,14 @@
             if (selectedFile) 
                 // Update the value of the other input tag (display the file name)
                 inputCategoryIcon.value = selectedFile.name;
+
+            buttonSave.disabled = false;
         }
+
+        function updateInput() {
+            buttonSave.disabled = false;
+        }
+        
     </script>
 
     <script type="module">

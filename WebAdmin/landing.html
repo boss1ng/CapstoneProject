@@ -15,6 +15,10 @@
     <!-- BOOTSTRAP v5.0 -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
+    <!-- Crypto-JS for Encryption -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+
 </head>
 <body>
     <div class="sidebar">
@@ -81,22 +85,24 @@
                 </div>
             </div>
 
+
+
             <div class="container mx-5 my-4">
                 <h2>Change Password</h2>
                 <div class="container m-5">
                     <div class="d-flex align-items-center mt-5">
                         <h4 class="mx-3">Current Password: </h4>
-                        <input type="text" class="form-control mx-3" id="currPass" placeholder="" aria-label="Username" aria-describedby="addon-wrapping"/>
+                        <input type="password" class="form-control mx-3" id="currPass" placeholder="" aria-label="Username" aria-describedby="addon-wrapping"/>
                     </div>
                     
                     <div class="adminInfo d-flex align-items-center mt-4">
                         <h4 class="mx-3">New Password: </h4>
-                        <input type="text" class="form-control mx-5" id="newPass" placeholder="" aria-label="Username" aria-describedby="addon-wrapping"/>
+                        <input type="password" class="form-control mx-5" id="newPass" placeholder="" aria-label="Username" aria-describedby="addon-wrapping"/>
                     </div>
 
                     <div class="adminInfo d-flex align-items-center mt-4">
                         <h4 class="mx-3">Confirm Password: </h4>
-                        <input type="text" class="form-control mx-2" id="rePass" placeholder="" aria-label="Username" aria-describedby="addon-wrapping"/>
+                        <input type="password" class="form-control mx-2" id="rePass" placeholder="" aria-label="Username" aria-describedby="addon-wrapping"/>
                     </div>
                 </div>
 
@@ -125,6 +131,16 @@
                 <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
             </svg>
                 Update Failed. Please try again.
+        </div>
+    </div>
+
+    <!-- ALERT MESSAGE (FAILED) -->
+    <div class="alertCont">
+        <div class="alert alert-danger d-flex align-items-center" role="alert" id="editPassFailed">
+            <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-exclamation-triangle-fill mx-3" viewBox="0 0 16 16">
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+            </svg>
+                Password must meet the complexity requirements (<i>minimum length of eigth characters; at least one uppercase, lowercase, numeric, and special character</i>).
         </div>
     </div>
 
@@ -167,8 +183,13 @@
 
         var editSuccessAlert = document.getElementById("editSuccess");
         var editFailedAlert = document.getElementById("editFailed");
+        var editPassFailedAlert = document.getElementById("editPassFailed");
 
         var userID = 1;
+
+        var firebaseFName = null;
+        var firebaseLName = null;
+        var firebasePassword = null;
         
         searchData();
 
@@ -177,21 +198,50 @@
             get(child(dbref, "User/" + userID))
             .then( (snapshot)=> {
                 if(snapshot.exists()) {
-                    inputFName.value = snapshot.val().FirstName;
-                    inputLName.value = snapshot.val().LastName;
-                    inputEmail.value = snapshot.val().Email; 
-                    
-                    // FirstName: "Maria Victoria"
-                    // LastName: "Auto"
-                    // Email: "joeybryan.pintor.cics@ust.edu.ph"
-                    // Password: "test"
+
+                    // console.log(snapshot.val().FirstName);       // Maria Victoria
+                    // console.log(snapshot.val().LastName);        // Auto
+                    // console.log(snapshot.val().Email);           // joeybryan.pintor.cics@ust.edu.ph
+                    // console.log(snapshot.val().Password);        // Capstone_QS33
+                    // console.log(snapshot.val().Birthdate);       // 17/08/2022
+                    // console.log(snapshot.val().DateCreated);     // 2023-08-27
+
+                    const decryptedDataFName = CryptoJS.AES.decrypt(snapshot.val().FirstName, secretKey).toString(CryptoJS.enc.Utf8);
+                    const decryptedDataLName = CryptoJS.AES.decrypt(snapshot.val().LastName, secretKey).toString(CryptoJS.enc.Utf8);
+                    const decryptedDataEmail = CryptoJS.AES.decrypt(snapshot.val().Email, secretKey).toString(CryptoJS.enc.Utf8);
+                    const decryptedDataPass = CryptoJS.AES.decrypt(snapshot.val().Password, secretKey).toString(CryptoJS.enc.Utf8);
+                    const decryptedDataBirthdate = CryptoJS.AES.decrypt(snapshot.val().Birthdate, secretKey).toString(CryptoJS.enc.Utf8);
+                    const decryptedDataDateCreated = CryptoJS.AES.decrypt(snapshot.val().DateCreated, secretKey).toString(CryptoJS.enc.Utf8);
+
+                    // console.log(decryptedDataFName);
+                    // console.log(decryptedDataLName);
+                    // console.log(decryptedDataEmail);
+                    // console.log(decryptedDataPass);
+                    // console.log(decryptedDataBirthdate);
+                    // console.log(decryptedDataDateCreated);
+
+                    inputFName.value = decryptedDataFName;
+                    inputLName.value = decryptedDataLName;
+                    inputEmail.value = decryptedDataEmail; 
+
+                    firebaseFName = snapshot.val().FirstName;
+                    firebaseLName = snapshot.val().LastName;
                 }
             })
         }
 
+        // Import CryptoJS
+        // const CryptoJS = require('crypto-js');
+
+        // Your secret encryption key (keep it secure)
+        // const secretKey = 'YourSecretKey123';
+
+        // Generate a random secret key (32 bytes / 256 bits)
+        const secretKey = 'e4e46af883548ced684eaf5d17c447c52c0d938b7e4b905738bcef51a3e88bd4';
+        // const secretKey1 = Array.from(crypto.getRandomValues(new Uint8Array(32)), byte => byte.toString(16).padStart(2, '0')).join('');
+        // console.log(secretKey1);
+
         function changePersonalInfo() {
-            var firebaseFName = null;
-            var firebaseLName = null;
 
             const dbref = ref(db);
             get(child(dbref, "User/" + userID))
@@ -200,10 +250,25 @@
                     firebaseFName = snapshot.val().FirstName;
                     firebaseLName = snapshot.val().LastName;
 
+                    // const email = snapshot.val().Email;
+                    var bdate = snapshot.val().Birthdate;
+                    var dateCreated = snapshot.val().DateCreated;
+
                     if (inputFName.value != firebaseFName || inputLName.value != firebaseLName) {
+
+                        // Encrypt the data
+                        const ciphertextFName = CryptoJS.AES.encrypt(inputFName.value, secretKey).toString();
+                        const ciphertextLName = CryptoJS.AES.encrypt(inputLName.value, secretKey).toString();
+                        const ciphertextEmail = CryptoJS.AES.encrypt(inputEmail.value, secretKey).toString();
+                        const ciphertextBDate = CryptoJS.AES.encrypt(bdate, secretKey).toString();
+                        const ciphertextDateCreated = CryptoJS.AES.encrypt(dateCreated, secretKey).toString();
+
                         update(ref(db, 'User/' + userID), {
-                            FirstName: inputFName.value,
-                            LastName: inputLName.value,
+                            FirstName: ciphertextFName,
+                            LastName: ciphertextLName,
+                            Email: ciphertextEmail,
+                            Birthdate: ciphertextBDate,
+                            DateCreated: ciphertextDateCreated,
                         })
                         
                         .then(() => {
@@ -222,31 +287,66 @@
         }
 
         function changePass() {
-            var firebasePassword = null;
 
             const dbref = ref(db);
             get(child(dbref, "User/" + userID))
             .then( (snapshot)=> {
                 if(snapshot.exists()) {
-                    firebasePassword = snapshot.val().Password;
 
-                    if (inputCurrentPass.value != "" || inputNewPass.value != "" || inputRePass.value != "") {
+                    const decryptedDataPassword = CryptoJS.AES.decrypt(snapshot.val().Password, secretKey).toString(CryptoJS.enc.Utf8);
+                    firebasePassword = decryptedDataPassword;
+                    // console.log(firebasePassword);
 
-                        if (inputCurrentPass.value == firebasePassword && inputNewPass.value == inputRePass.value) {  // 
-                            update(ref(db, 'User/' + userID), {
-                                Password: inputRePass.value,
-                            })
-                            
-                            .then(() => {
-                                editSuccessAlert.style.visibility = "visible";
+                    if (inputCurrentPass.value != "" || inputNewPass.value != "" || inputRePass.value != "") { 
+
+                        if (inputCurrentPass.value == firebasePassword && inputNewPass.value == inputRePass.value) {
+
+                            // Password Complexity
+
+                            // Regular expressions to check for each requirement
+                            const hasUppercase = /[A-Z]/;
+                            const hasLowercase = /[a-z]/;
+                            const hasNumeric = /[0-9]/;
+                            const hasSpecialChar = /[!@#$%^&*()_+{}\[\]:;<>,.?~\\-]/;
+
+                            // Check each requirement
+                            var isUppercase = hasUppercase.test(inputNewPass.value);
+                            var isLowercase = hasLowercase.test(inputNewPass.value);
+                            var isNumeric = hasNumeric.test(inputNewPass.value);
+                            var isSpecialChar = hasSpecialChar.test(inputNewPass.value);
+                            const hasMinLength = inputNewPass.value.length >= 8;
+
+                            // Check if all requirements are met
+                            if (isUppercase && isLowercase && isNumeric && isSpecialChar & hasMinLength) {
+
+                                // Encrypt the data
+                                const ciphertextPassword= CryptoJS.AES.encrypt(inputRePass.value, secretKey).toString();
+
+                                update(ref(db, 'User/' + userID), {
+                                    Password: ciphertextPassword,
+                                })
+                                
+                                .then(() => {
+                                    editSuccessAlert.style.visibility = "visible";
+                                    setTimeout(function() {
+                                        window.location.replace("landing.html");
+                                    }, 2000);
+                                })
+
+                                .catch((error) => {
+                                    alert(error);
+                                });
+                            }
+
+                            else {
+                                editPassFailedAlert.style.visibility = "visible";
                                 setTimeout(function() {
-                                    window.location.replace("landing.html");
-                                }, 2000);
-                            })
-
-                            .catch((error) => {
-                                alert(error);
-                            });
+                                    inputCurrentPass.value = "";
+                                    inputNewPass.value = "";
+                                    inputRePass.value = "";
+                                    editPassFailedAlert.style.visibility = "hidden";
+                                }, 5000);
+                            }
                         }
 
                         else {
@@ -266,6 +366,23 @@
 
         var buttonSavePass = document.querySelector("#btnSavePass");
         buttonSavePass.addEventListener('click', changePass);
+
+        var cancelInfo = document.getElementById('btnCancelInfo');
+        cancelInfo.addEventListener('click', cancelPersonalInfo);
+
+        function cancelPersonalInfo() {
+            inputFName.value = firebaseFName;
+            inputLName.value = firebaseLName;
+        }
+
+        var cancelPass = document.getElementById('btnCancelPass');
+        cancelPass.addEventListener('click', cancelPassword);
+
+        function cancelPassword() {
+            inputCurrentPass.value = "";
+            inputNewPass.value = "";
+            inputRePass.value = "";
+        }
 
         // ---------------------------------------------------------------------------------
 
@@ -296,7 +413,7 @@
 
         function goNext4() {
             window.location.replace("index.html");
-        } 
+        }
 
     </script>
 

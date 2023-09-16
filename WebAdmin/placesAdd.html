@@ -15,6 +15,9 @@
     <!-- BOOTSTRAP v5.0 -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
+    <!-- AXIOS -->
+    <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
+
 </head>
 <body>
     <div class="sidebar">
@@ -118,7 +121,7 @@
                         <span class="">Address</span>
                     </div>
                     <div class="container">
-                        <input type="text" class="form-control" id="estabAddress" aria-label="Username" aria-describedby="addon-wrapping"/>
+                        <input type="text" class="form-control" id="estabAddress" onchange="addLatLong()" aria-label="Username" aria-describedby="addon-wrapping"/>
                     </div>
                 </div>
                 
@@ -136,7 +139,7 @@
                         <span class="">Latitude</span>
                     </div>
                     <div class="container">
-                        <input type="text" class="form-control" id="" aria-label="Username" aria-describedby="addon-wrapping" disabled/>
+                        <input type="text" class="form-control" id="geocodeLat" aria-label="Username" aria-describedby="addon-wrapping" disabled/>
                     </div>
                 </div>
                 
@@ -145,7 +148,7 @@
                         <span class="">Longitude</span>
                     </div>
                     <div class="container">
-                        <input type="text" class="form-control" id="" aria-label="Username" aria-describedby="addon-wrapping" disabled/>
+                        <input type="text" class="form-control" id="geocodeLong" aria-label="Username" aria-describedby="addon-wrapping" disabled/>
                     </div>
                 </div>
                 
@@ -226,6 +229,28 @@
         </div>
     </div>
 
+    <!-- ALERT MESSAGE (FAILED) -->
+    <div class="alertCont">
+        <div class="alert alert-danger d-flex align-items-center" role="alert" id="categoryExisting">
+            <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-exclamation-triangle-fill mx-3" viewBox="0 0 16 16">
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+            </svg>
+                Establishment is already existing. Please try again.
+        </div>
+    </div>
+
+    <!-- ALERT MESSAGE (All fields are required.) -->
+    <div class="alertCont">
+        <div class="alert alert-warning d-flex align-items-center" role="alert" id="allFieldsRequired">
+            <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-exclamation-triangle-fill mx-3" viewBox="0 0 16 16">
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+            </svg>
+                Please fill out all fields.
+        </div>
+    </div>
+
+    
+
     <script>
         function changeSelected(categoryOption) {
             const selectedCat = document.getElementById('selectedCategory'); 
@@ -266,8 +291,8 @@
         var inputLocationAdd = document.querySelector("#estabAddress");
         var inputLocationCat = document.querySelector("#selectedCategory");
         var inputLocationCont = document.querySelector("#estabContact");
-        // var inputLocationLat = document.querySelector("#");
-        // var inputLocationLong = document.querySelector("#");
+        var inputLocationLat = document.querySelector("#geocodeLat");
+        var inputLocationLong = document.querySelector("#geocodeLong");
         var inputLocationHigh = document.querySelector("#estabHighPrice");
         var inputLocationLow = document.querySelector("#estabLowPrice");
         var inputLocationImage = document.querySelector("#imageFile");
@@ -276,6 +301,8 @@
 
         var addSuccessAlert = document.getElementById("addSuccess");
         var addFailedAlert = document.getElementById("addFailed");
+        var existingLocationAlert = document.getElementById("categoryExisting");
+        var allFieldsAlert = document.getElementById("allFieldsRequired");
 
         fetchAndPopulate();
 
@@ -319,39 +346,80 @@
             });
         }
 
+        var recordExisting = null;
+
         function createLocation() {
 
-            const dbref = ref(db)
+            if (!(inputLocation.value == "" || inputLocationAdd.value == ""  || inputLocationCat.value == ""  || inputLocationCont.value == ""  || inputLocationHigh.value == ""  || inputLocationLow.value == ""  || inputLocationImage.value == ""  || inputLocationImageDesc.value == ""  || inputLocationDesc.value == "")) {
+                
+                const dbref = ref(db)
 
-            push(ref(db, "Location"), {
-                Location: inputLocation.value,                      // University of Santo Tomas    De La Salle University
-                Category: inputLocationCat.value,
-                Address: inputLocationAdd.value,                    // España Blvd., Sampaloc, Manila, Philippines 1008
-                ContactNo: inputLocationCont.value,                 // (02) 3406 1611
-                Latitude: "",
-                Longitude: "",
-                Description: inputLocationDesc.value,               // The University of Santo Tomas, officially the Pontifical and Royal University of Santo Tomas, Manila, is a private, Catholic research university in Manila, Philippines.
-                LowestPrice: inputLocationLow.value,                // 48,500
-                HighestPrice: inputLocationHigh.value,              // 101,900
-                Image: inputLocationImage.value,                    // Prayer.png
-                ImageDescription: inputLocationImageDesc.value,     // This is only an image of UST's Prayer Before Study.
-                AverateRate: 0,
-                CreatedBy: "Administrator",
-            })
+                get(child(dbref, "Location"))
+                .then( (snapshot)=> {
+                    if(snapshot.exists()) { 
 
-            .then(()=>{
-                addSuccessAlert.style.visibility = "visible";
-                setTimeout(function(){
-                    window.location.replace("places.html")
-                }, 2000);
-            })
+                        const locationsData = [];
+                        snapshot.forEach(childSnapshot => {
+                            locationsData.push(childSnapshot.val().Location);                        
+                        });
 
-            .catch((error)=> {
-                addFailedAlert.style.visibility = "visible";
-                setTimeout(function(){
-                    location.reload()
-                }, 2000);
-            })
+                        for (let i = 0; i < locationsData.length; i++) {                        
+                            if (locationsData[i].toLowerCase() == inputLocation.value.toLowerCase()) {
+                                recordExisting = true;
+                            }
+                        }
+
+                        if (recordExisting) {
+                            existingLocationAlert.style.visibility = "visible";
+                            setTimeout(function(){
+                                existingLocationAlert.style.visibility = "hidden";
+                                inputLocation.value = "";
+                                recordExisting = null;
+                            }, 2000);
+                        }
+
+                        else {
+                            push(ref(db, "Location"), {
+                                Location: inputLocation.value,                      // University of Santo Tomas    De La Salle University
+                                Category: inputLocationCat.value,
+                                Address: inputLocationAdd.value,                    // España Blvd., Sampaloc, Manila, Philippines 1008
+                                ContactNo: inputLocationCont.value,                 // (02) 3406 1611
+                                Latitude: inputLocationLat.value,
+                                Longitude: inputLocationLong.value,
+                                Description: inputLocationDesc.value,               // The University of Santo Tomas, officially the Pontifical and Royal University of Santo Tomas, Manila, is a private, Catholic research university in Manila, Philippines.
+                                LowestPrice: inputLocationLow.value,                // 48,500
+                                HighestPrice: inputLocationHigh.value,              // 101,900
+                                Image: inputLocationImage.value,                    // Prayer.png
+                                ImageDescription: inputLocationImageDesc.value,     // This is only an image of UST's Prayer Before Study.
+                                AverateRate: 0,
+                                CreatedBy: "Administrator",
+                            })
+
+                            .then(()=>{
+                                addSuccessAlert.style.visibility = "visible";
+                                setTimeout(function(){
+                                    window.location.replace("places.html")
+                                }, 2000);
+                            })
+
+                            .catch((error)=> {
+                                addFailedAlert.style.visibility = "visible";
+                                setTimeout(function(){
+                                    location.reload()
+                                }, 2000);
+                            })
+                        }
+                    }
+                }) 
+
+            }
+
+            else {
+                allFieldsAlert.style.visibility = "visible";
+                setTimeout(function() {
+                    allFieldsAlert.style.visibility = "hidden";
+                }, 1500);
+            }
         }
 
         var buttonAdd = document.querySelector("#actionAddPlace");
@@ -396,9 +464,63 @@
 
     </script>
 
+    <script>
+
+        function addLatLong() {
+
+            var inputLocationAdd = document.querySelector("#estabAddress").value;
+            var estabLat = document.getElementById('geocodeLat');
+            var estabLong = document.getElementById('geocodeLong');
+
+            axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
+                params: {
+                    address: inputLocationAdd,
+                    key: 'AIzaSyAwTBhjMDtD74Nvqz7eUbN81v93SLhM3IU'
+                }
+            })
+            .then(function(response) {
+                console.log(response);
+
+                // Geometry
+                var lat = response.data.results[0].geometry.location.lat;
+                var long = response.data.results[0].geometry.location.lng;
+
+                // Output to app
+                estabLat.value = lat;
+                estabLong.value = long;
+            }) 
+            .catch(function(error) {
+                console.log(error);
+            })
+
+        }
+
+    </script>
+
     <!-- BOOTSTRAP v5.3 -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js" integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa" crossorigin="anonymous"></script>
 
 </body>
 </html>
+
+
+
+<!-- 
+
+{
+  "rules": {
+    ".read": "now < 1672473600000",  // 2023-9-18	= 1694966400000		// 1672473600000 = December 31, 2023
+    ".write": "now < 1672473600000",  // 2023-9-18	= 1694966400000		// 1672473600000 = December 31, 2023
+      "MobileUsers": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      "$userId": {
+        ".validate": "!root.child('MobileUsers').child($userId).exists()"
+      }
+    }
+  }
+}
+
+
+ -->

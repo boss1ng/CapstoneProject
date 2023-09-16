@@ -228,7 +228,7 @@ button {
     height: 200px;
 }
 
-#actionCancelPlace, #actionSavePlace {
+#actionCancelPlace, #actionAddPlace, #actionSavePlace {
     border-radius: 50px;
     width: 15%;
     /* margin-top: 70px; */

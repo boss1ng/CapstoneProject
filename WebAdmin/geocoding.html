@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <!-- AXIOS -->
+    <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
+</head>
+<body>
+
+    <input type="text" class="form-control" id="geocodeLat" aria-label="Username" aria-describedby="addon-wrapping" disabled/>
+    <input type="text" class="form-control" id="geocodeLong" aria-label="Username" aria-describedby="addon-wrapping" disabled/>
+
+    
+    <div class="container">
+        <div class="card-block" id="formatted-address"></div>
+        <div class="card-block" id="address-components"></div>
+        <div class="card-block" id="geometry"></div>
+    </div>
+
+    <script>
+        geocode();
+
+        function geocode() {    // function geocode(e) { e.preventDefault();
+        
+            // var location = 'España Blvd., Sampaloc, Manila, Philippines 1008';
+            var location = 'España Blvd., Sampaloc, Manila, Philippines 1008';
+
+            // https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=YOUR_API_KEY
+            // https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyAwTBhjMDtD74Nvqz7eUbN81v93SLhM3IU
+            
+            axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
+                params: {
+                    address: location,
+                    // key: 'API_KEY'
+                    key: 'AIzaSyAwTBhjMDtD74Nvqz7eUbN81v93SLhM3IU'
+                }
+            })
+            .then(function(response) {
+                console.log(response);
+
+                // Formatted Address
+                var formattedAddress = response.data.results[0].formatted_address;
+                var formattedAddressOutput = `
+                    <ul class="list-group">
+                        <li class="list-group-item">${formattedAddress}</li>
+                    </ul>
+                `;
+
+                // Address Components
+                var addressComponents = response.data.results[0].address_components;
+                var addressComponentsOutput = '<ul class="list-group">';
+                for(var i = 0; i < addressComponents.length; i++) {
+                    addressComponentsOutput += `
+                        <li class="list-group-item"><strong>${addressComponents[i].types[0]}</strong>: ${addressComponents[i].long_name}</li>
+                    `;
+                }
+                addressComponentsOutput += '</ul>';
+
+                // Geometry
+                var lat = response.data.results[0].geometry.location.lat;
+                var long = response.data.results[0].geometry.location.lng;
+                var geometryOutput = `
+                    <ul class="list-group">
+                        <li class="list-group-item"><strong>Latitude</strong>:${lat}</li>
+                        <li class="list-group-item"><strong>Longitude</strong>:${long}</li>
+                    </ul>
+                `;
+
+                // Output to app
+                document.getElementById('formatted-address').innerHTML = formattedAddressOutput;
+                document.getElementById('address-components').innerHTML = addressComponentsOutput;
+                document.getElementById('geometry').innerHTML = geometryOutput;
+
+            }) 
+            .catch(function(error) {
+                console.log(error);
+            })
+            
+        }
+    </script>
+
+</body>
+</html>
+
+<!-- 
+
+    API Key: AIzaSyAwTBhjMDtD74Nvqz7eUbN81v93SLhM3IU
+
+ -->
+
+ 

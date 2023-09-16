@@ -56,6 +56,16 @@
         </div>
     </div>
 
+    <!-- ALERT MESSAGE (All fields are required.) -->
+    <div class="alertCont">
+        <div class="alert alert-warning d-flex align-items-center" role="alert" id="allFieldsRequired">
+            <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-exclamation-triangle-fill mx-3" viewBox="0 0 16 16">
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+            </svg>
+                Please fill out all fields.
+        </div>
+    </div>
+
     <!-- FIREBASE REALTIME DATABASE -->
     <script type="module">
         // Import the functions you need from the SDKs you need
@@ -95,6 +105,7 @@
 
         var validOTP = document.getElementById("validOTP");
         var invalidOTP = document.getElementById("invalidOTP");
+        var allFieldsAlert = document.getElementById("allFieldsRequired");
         var inputOTP = document.querySelector("#emailAddress");
 
         var userId = 1;
@@ -102,82 +113,121 @@
 // SEARCH & UPDATE
         function updateDate() {
 
-            if (inputOTP.value == "OTP") {
-                const dbref = ref(db)
+            if (!(inputOTP.value == "" || inputOTP.value == null)) {
 
-                for (let id = 1; id < 1000; id++) {
+                if (inputOTP.value == "OTP") {
+                    const dbref = ref(db)
 
-                    get(child(dbref, "User/" + id))
-                    .then( (snapshot)=> {
-                        if(snapshot.exists()) {
+                    for (let id = 1; id < 1000; id++) {
 
-                            update(ref(db, 'User/' + userId), {
-                                Password: snapshot.val().Birthdate
-                            })
-                            .then(() => {
-                                validOTP.style.visibility = "visible";
-                                setTimeout(function() {
-                                    window.location.replace("forgotPass_success.html")
-                                }, 2000);
-                            })
-                            .catch((error) => {
-                                alert(error);
-                            });
-                        }
-                    })
-                }
-            } //    17/08/2022: Birthdate from Firebase
+                        get(child(dbref, "User/" + id))
+                        .then( (snapshot)=> {
+                            if(snapshot.exists()) {
+
+                                update(ref(db, 'User/' + userId), {
+                                    Password: snapshot.val().Birthdate
+                                })
+                                .then(() => {
+                                    validOTP.style.visibility = "visible";
+                                    setTimeout(function() {
+                                        window.location.replace("forgotPass_success.html")
+                                    }, 2000);
+                                })
+                                .catch((error) => {
+                                    alert(error);
+                                });
+                            }
+                        })
+                    }
+                } //    17/08/2022: Birthdate from Firebase
+
+                else {
+                    invalidOTP.style.visibility = "visible";
+                    setTimeout(function() {
+                        inputOTP.value = "";
+                        invalidOTP.style.visibility = "hidden";
+                    }, 2000);
+                } 
+
+            }
 
             else {
-                invalidOTP.style.visibility = "visible";
+                allFieldsAlert.style.visibility = "visible";
                 setTimeout(function() {
-                    inputOTP.value = "";
-                    invalidOTP.style.visibility = "hidden";
-                }, 2000);
-            } 
+                    allFieldsAlert.style.visibility = "hidden";
+                }, 1500);
+            }
         }
 
     // TIMER
         // Set the target time (02:00 minutes from now)
-        document.getElementById("timer").innerHTML = "02:00";
-        let targetTime = new Date().getTime() + 2 * 60 * 1000;
-        let interval;
+        
+        // Check if the timer has been previously set
+        const startTime = localStorage.getItem("startTime");
 
-        function startTimer() {
+        if (startTime) {
+            // Calculate the remaining time
             document.getElementById("timer").style.display = "block";
             document.getElementById("contResend").style.display = "none";
-            targetTime = new Date().getTime() + 2 * 60 * 1000;
-            updateCountdown();
-            clearInterval(interval);
-
-            // Update the countdown every second
-            interval = setInterval(updateCountdown, 1000);
-        }
-
-        function updateCountdown() {
             const currentTime = new Date().getTime();
-            const timeDifference = targetTime - currentTime;
+            const elapsedSeconds = Math.floor((currentTime - startTime) / 1000);
+            const remainingSeconds = 120 - elapsedSeconds;
 
-            if (timeDifference <= 0) {
-                clearInterval(interval);
-                document.getElementById("timer").style.display = "none";
-                document.getElementById("contResend").style.display = "block";
+            // Update the timer display
+            updateTimerDisplay(remainingSeconds);
+
+            // Start the timer
+            startTimer(remainingSeconds);
+        }
+        
+        else {
+            // If no start time is found, start a new timer
+            const resetNow = localStorage.getItem("resetTime");
+            if (resetNow == "Reset") {
+
             }
-            
+
             else {
-                const minutes = Math.floor(timeDifference / (60 * 1000));
-                const seconds = Math.floor((timeDifference % (60 * 1000)) / 1000);
-
-                const formattedMinutes = minutes.toString().padStart(2, "0");
-                const formattedSeconds = seconds.toString().padStart(2, "0");
-
-                document.getElementById("timer").innerHTML = `${formattedMinutes}:${formattedSeconds}`;
+                startNewTimer();
             }
         }
 
-        document.getElementById("btnResend").addEventListener("click", startTimer);
+        function startNewTimer() {
+            document.getElementById("timer").style.display = "block";
+            document.getElementById("contResend").style.display = "none";
+            const startTime = new Date().getTime();
+            localStorage.setItem("startTime", startTime);
+            startTimer(120);
+        }
 
-        startTimer(); // Start the timer on page load
+        function startTimer(duration) {
+            const timerElement = document.getElementById("timer");
+
+            const timerInterval = setInterval(function () {
+                if (duration == 0) {
+                    clearInterval(timerInterval);
+                    localStorage.removeItem("startTime");
+                    localStorage.setItem("resetTime", "Reset");
+                    // timerElement.textContent = "Timer Expired";
+                    document.getElementById("timer").style.display = "none";
+                    document.getElementById("contResend").style.display = "block";
+                }
+                
+                else {
+                    updateTimerDisplay(duration);
+                    duration--;
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay(seconds) {
+            const timerElement = document.getElementById("timer");
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            timerElement.textContent = `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+        }
+
+        document.getElementById("btnResend").addEventListener("click", startNewTimer);
 
     </script>
 

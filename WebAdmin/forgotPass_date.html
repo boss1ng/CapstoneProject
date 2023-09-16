@@ -15,6 +15,9 @@
     <!-- BOOTSTRAP v5.0 -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
+    <!-- Crypto-JS for Encryption -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+
 </head>
 <body>
     <div class="outerCont">
@@ -51,7 +54,21 @@
         </div>
     </div>
 
+    <!-- ALERT MESSAGE (All fields are required.) -->
+    <div class="alertCont">
+        <div class="alert alert-warning d-flex align-items-center" role="alert" id="allFieldsRequired">
+            <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-exclamation-triangle-fill mx-3" viewBox="0 0 16 16">
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+            </svg>
+                Please fill out all fields.
+        </div>
+    </div>
+
     <!-- <script src="../app.js"></script> -->
+
+    <script>
+        localStorage.clear();
+    </script>
 
     <!-- FIREBASE REALTIME DATABASE -->
     <script type="module">
@@ -87,56 +104,77 @@
 
         var dateSuccessAlert = document.getElementById("dateSuccess");
         var dateFailedAlert = document.getElementById("dateFailed");
+        var allFieldsAlert = document.getElementById("allFieldsRequired");
 
         // console.log(JSON.parse(sessionStorage.getItem('myObject')));
         // const transferredInput = localStorage.getItem('inputEmail');
         var transferredInput = sessionStorage.getItem('inputEmail');
         var randomOTP = null;
 
+        // Generate a random secret key (32 bytes / 256 bits)
+        const secretKey = 'e4e46af883548ced684eaf5d17c447c52c0d938b7e4b905738bcef51a3e88bd4';
+
         var buttonSubmit = document.querySelector("#btnSubmit");
         buttonSubmit.addEventListener('click', verifyDate)
 
         function verifyDate() {
 
-            const dbref = ref(db)
+            if (!(inputDate.value == "" || inputDate.value == null)) {
 
-            for (let id = 1; id < 1000; id++) {
+                const dbref = ref(db)
 
-                get(child(dbref, "User/" + id))
-                .then( (snapshot)=> {
-                    if(snapshot.exists()) {
+                for (let id = 1; id < 1000; id++) {
 
-                        if(snapshot.val().Email == transferredInput && snapshot.val().DateCreated == inputDate.value) { // && snapshot.val().DateCreated == inputDate.value
-                            // console.log(snapshot.val().DateCreated);
-                            // console.log(inputDate.value);
+                    get(child(dbref, "User/" + id))
+                    .then( (snapshot)=> {
+                        if(snapshot.exists()) {
 
-                            randomOTP = generateOTP();
-                            GmailAPI(randomOTP);
-                            // GmailAPI();
-                            //     .then((result) => console.log('Email sent.', result))
-                            //     .catch((error) => console.log(error.message));
+                            const decryptedDataEmail = CryptoJS.AES.decrypt(snapshot.val().Email, secretKey).toString(CryptoJS.enc.Utf8);
+                            const decryptedDataDateCreated = CryptoJS.AES.decrypt(snapshot.val().DateCreated, secretKey).toString(CryptoJS.enc.Utf8);
 
-                            dateSuccessAlert.style.visibility = "visible";
-                            setTimeout(function() {
-                                alert(randomOTP);
-                                sessionStorage.setItem('otpCode', randomOTP);
-                                // window.location.replace("forgotPass_otp.html")
-                            }, 2000);
-                        }   
+                            console.log(decryptedDataEmail);
+                            console.log(decryptedDataDateCreated);
 
-                        else {
-                            dateFailedAlert.style.visibility = "visible";
-                            setTimeout(function(){
-                                inputDate.value = "";
-                                dateFailedAlert.style.visibility = "hidden";
-                            }, 2000);
+                            if(decryptedDataEmail == transferredInput && decryptedDataDateCreated == inputDate.value) { // && snapshot.val().DateCreated == inputDate.value
+                                // console.log(snapshot.val().DateCreated);
+                                // console.log(inputDate.value);
+
+                                randomOTP = generateOTP();
+                                GmailAPI(randomOTP);
+                                // GmailAPI();
+                                //     .then((result) => console.log('Email sent.', result))
+                                //     .catch((error) => console.log(error.message));
+
+                                dateSuccessAlert.style.visibility = "visible";
+                                setTimeout(function() {
+                                    // alert(randomOTP);
+                                    sessionStorage.setItem('otpCode', randomOTP);
+                                    window.location.replace("forgotPass_otp.html")
+                                }, 2000);
+                            }   
+
+                            else {
+                                dateFailedAlert.style.visibility = "visible";
+                                setTimeout(function(){
+                                    inputDate.value = "";
+                                    dateFailedAlert.style.visibility = "hidden";
+                                }, 2000);
+                            }
+
+                            // if (inputEmail.value == "" || inputPassword.value == "") {
+                            // sessionStorage.clear()
+                            // sessionStorage.removeItem("test1");
                         }
+                    })
+                }
 
-                        // if (inputEmail.value == "" || inputPassword.value == "") {
-                        // sessionStorage.clear()
-                        // sessionStorage.removeItem("test1");
-                    }
-                })
+            }
+
+            else {
+                allFieldsAlert.style.visibility = "visible";
+                setTimeout(function() {
+                    allFieldsAlert.style.visibility = "hidden";
+                }, 1500);
             }
         }
 

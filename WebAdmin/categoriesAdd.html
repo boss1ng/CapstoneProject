@@ -104,6 +104,26 @@
         </div>
     </div>
 
+    <!-- ALERT MESSAGE (FAILED) -->
+    <div class="alertCont">
+        <div class="alert alert-danger d-flex align-items-center" role="alert" id="categoryExisting">
+            <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-exclamation-triangle-fill mx-3" viewBox="0 0 16 16">
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+            </svg>
+                Category is already existing. Please try again.
+        </div>
+    </div>
+
+    <!-- ALERT MESSAGE (All fields are required.) -->
+    <div class="alertCont">
+        <div class="alert alert-warning d-flex align-items-center" role="alert" id="allFieldsRequired">
+            <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-exclamation-triangle-fill mx-3" viewBox="0 0 16 16">
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+            </svg>
+                Please fill out all fields.
+        </div>
+    </div>
+
 
     <script type="module">
         // Import the functions you need from the SDKs you need
@@ -140,29 +160,71 @@
 
         var addSuccessAlert = document.getElementById("addSuccess");
         var addFailedAlert = document.getElementById("addFailed");
+        var existingCategoryAlert = document.getElementById("categoryExisting");
+        var allFieldsAlert = document.getElementById("allFieldsRequired");
+
+        var recordExisting = null;
 
         function createCategory() {
 
-            const dbref = ref(db)
+            if (!(inputCategory.value == "" || inputCategoryIcon.value == "")) {
+                const dbref = ref(db);
 
-            push(ref(db, "Category"), {
-                Category: inputCategory.value,
-                Icon: inputCategoryIcon.value
-            })
+                get(child(dbref, "Category"))
+                .then( (snapshot)=> {
+                    if(snapshot.exists()) { 
 
-            .then(()=>{
-                addSuccessAlert.style.visibility = "visible";
-                setTimeout(function(){
-                    window.location.replace("categories.html")
-                }, 2000);
-            })
+                        const categoriesData = [];
+                        snapshot.forEach(childSnapshot => {
+                            categoriesData.push(childSnapshot.val().Category);                        
+                        });
 
-            .catch((error)=> {
-                addFailedAlert.style.visibility = "visible";
-                setTimeout(function(){
-                    location.reload()
-                }, 2000);
-            })
+                        for (let i = 0; i < categoriesData.length; i++) {                        
+                            if (categoriesData[i].toLowerCase() == inputCategory.value.toLowerCase()) {
+                                recordExisting = true;
+                            }
+                        }
+
+                        if (recordExisting) {
+                            existingCategoryAlert.style.visibility = "visible";
+                            setTimeout(function(){
+                                existingCategoryAlert.style.visibility = "hidden";
+                                inputCategory.value = "";
+                                recordExisting = null;
+                            }, 2000);
+                        }
+
+                        else {
+                            push(ref(db, "Category"), {
+                                Category: inputCategory.value,
+                                Icon: inputCategoryIcon.value
+                            })
+
+                            .then(()=>{
+                                addSuccessAlert.style.visibility = "visible";
+                                setTimeout(function(){
+                                    window.location.replace("categories.html")
+                                }, 2000);
+                            })
+
+                            .catch((error)=> {
+                                addFailedAlert.style.visibility = "visible";
+                                setTimeout(function(){
+                                    location.reload()
+                                }, 2000);
+                            })
+                        }
+                    }
+                })
+
+            }
+
+            else {
+                allFieldsAlert.style.visibility = "visible";
+                setTimeout(function() {
+                    allFieldsAlert.style.visibility = "hidden";
+                }, 1500);
+            }
         }
 
         var buttonAdd = document.querySelector("#actionAddCat");
