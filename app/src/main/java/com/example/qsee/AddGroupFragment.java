@@ -27,11 +27,11 @@ public class AddGroupFragment extends DialogFragment {
     private Button cancelBtn;
     private Button createBtn;
     private TextInputLayout grpName;
-    private String username;
+    private String userId;
 
     // Constructor to accept the username as an argument
-    public AddGroupFragment(String username) {
-        this.username = username;
+    public AddGroupFragment(String userId) {
+        this.userId = userId;
     }
 
     @Override
@@ -43,10 +43,9 @@ public class AddGroupFragment extends DialogFragment {
         // Retrieve the username from the arguments
         Bundle args = getArguments();
         if (args != null) {
-            username = args.getString("username");
-            // Now you have the username, and you can use it in this fragment
-            Log.d("AddGroupFragment", username);
+            userId = args.getString("userId");
         }
+
 
         // Initialize and set up your dialog views and buttons here
 
@@ -86,7 +85,7 @@ public class AddGroupFragment extends DialogFragment {
 
                     // Query to fetch the userId based on the username
                     DatabaseReference usersReference = databaseReference.child("MobileUsers");
-                    Query query = usersReference.orderByChild("username").equalTo(username);
+                    Query query = usersReference.orderByChild("userId").equalTo(userId);
 
                     query.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -98,7 +97,7 @@ public class AddGroupFragment extends DialogFragment {
                                 // Create a new Group object with the admin (userId)
                                 Groups group = new Groups();
                                 group.setGroupName(groupName);
-                                group.setAdmin(username);
+                                group.setAdmin(userId);
 
                                 // Get a reference to the "Groups" node at the root level
                                 DatabaseReference groupsReference = databaseReference.child("Groups");

@@ -22,17 +22,17 @@ import com.google.firebase.database.ValueEventListener;
 
 public class AddUserToGroup extends DialogFragment {
     private DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
-    private String username;
-    private String groupName;
     private String userId;
+    private String groupName;
+    private String member;
     private String firstName;
     private String lastName;
     private Context context;
 
-    public AddUserToGroup(String username, String groupName, String userId, String firstName, String lastName) {
-        this.username = username;
-        this.groupName = groupName;
+    public AddUserToGroup(String userId, String groupName, String member, String firstName, String lastName) {
         this.userId = userId;
+        this.groupName = groupName;
+        this.member = member;
         this.firstName = firstName;
         this.lastName = lastName;
     }
@@ -62,7 +62,7 @@ public class AddUserToGroup extends DialogFragment {
             @Override
             public void onClick(View v) {
                 // Get the entered user ID
-                String enteredUserId = userId;
+                String enteredUserId = member;
 
                 // Check if the entered user ID is not empty
                 if (!enteredUserId.isEmpty()) {
@@ -95,13 +95,12 @@ public class AddUserToGroup extends DialogFragment {
                 dismiss();
             }
         });
-
         return view;
     }
 
-    private void addUserToGroup(String userId) {
+    private void addUserToGroup(String member) {
         // Find the group for the given username and groupName
-        databaseReference.child("MobileUsers").orderByChild("username").equalTo(username)
+        databaseReference.child("MobileUsers").orderByChild("userId").equalTo(userId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot userSnapshot) {
@@ -119,7 +118,7 @@ public class AddUserToGroup extends DialogFragment {
                                                 String groupId = groupSnapshot.getChildren().iterator().next().getKey();
 
                                                 // Check if the user is already a member of the group
-                                                if (isUserAlreadyMember(groupSnapshot.child(groupId), userId)) {
+                                                if (isUserAlreadyMember(groupSnapshot.child(groupId), member)) {
                                                     // Display a toast for duplicate user
                                                     Toast.makeText(context, "User is already a member of the group", Toast.LENGTH_SHORT).show();
                                                 } else {
@@ -135,8 +134,8 @@ public class AddUserToGroup extends DialogFragment {
 
                                                     // Create a new user object with userId as the key and set it as a member in the group
                                                     DatabaseReference groupRef = databaseReference.child("Groups").child(adminUserId).child(groupId).child("member" + nextMemberNumber);
-                                                    groupRef.setValue(userId);
-                                                    Log.d("AddUserToGroup", "Added user " + userId + " to group " + groupName + " as a member" + nextMemberNumber);
+                                                    groupRef.setValue(member);
+                                                    Log.d("AddUserToGroup", "Added user " + member + " to group " + groupName + " as a member" + nextMemberNumber);
                                                 }
                                             } else {
                                                 // The groupName doesn't exist for this adminUserId
@@ -159,11 +158,11 @@ public class AddUserToGroup extends DialogFragment {
                 });
     }
 
-    private boolean isUserAlreadyMember(DataSnapshot groupSnapshot, String userId) {
+    private boolean isUserAlreadyMember(DataSnapshot groupSnapshot, String member) {
         // Check if the user is already a member of the group
         for (DataSnapshot memberSnapshot : groupSnapshot.getChildren()) {
             String memberId = memberSnapshot.getValue(String.class);
-            if (userId.equals(memberId)) {
+            if (member.equals(memberId)) {
                 return true; // User is already a member
             }
         }

@@ -19,8 +19,7 @@ public class Home extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home);
 
-        // Get the username from the intent
-        String username = getIntent().getStringExtra("username");
+        String userId = getIntent().getStringExtra("userId");
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -28,27 +27,27 @@ public class Home extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int itemId = item.getItemId();
                 if (itemId == R.id.action_home) {
-                    loadFragment(new HomeFragment(), username);
+                    loadFragment(new HomeFragment(), userId);
                 } else if (itemId == R.id.action_search) {
-                    loadFragment(new SearchFragment(), username);
+                    loadFragment(new SearchFragment(), userId);
                 } else if (itemId == R.id.action_maps) {
-                    loadFragment(new MapsFragment(), username);
+                    loadFragment(new MapsFragment(), userId);
                 } else if (itemId == R.id.action_quiz) {
-                    loadFragment(new StartQuizFragment(), username);
+                    loadFragment(new StartQuizFragment(), userId);
                 } else if (itemId == R.id.action_profile) {
-                    loadFragment(new ProfileFragment(), username);
+                    loadFragment(new ProfileFragment(), userId);
                 }
                 return true;
             }
         });
         // Load HomeFragment when the activity starts
-        loadFragment(new HomeFragment(), username);
+        loadFragment(new HomeFragment(), userId);
 
     }
 
-    private void loadFragment(Fragment fragment, String username) {
+    private void loadFragment(Fragment fragment, String userId) {
         Bundle bundle = new Bundle();
-        bundle.putString("username", username);
+        bundle.putString("userId", userId);
         fragment.setArguments(bundle);
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();

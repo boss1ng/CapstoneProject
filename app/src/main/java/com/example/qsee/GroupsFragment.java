@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GroupsFragment extends Fragment {
-    private String username;
     private String userId;
     private GroupListAdapter adapter;
 
@@ -48,20 +47,18 @@ public class GroupsFragment extends Fragment {
         // Retrieve the username from the arguments
         Bundle args = getArguments();
         if (args != null) {
-            username = args.getString("username");
+            userId = args.getString("userId");
             loadUserGroups();
         }
 
-        String currentUsername = username;
-
 
         // Create and set the adapter for the RecyclerView
-        adapter = new GroupListAdapter(groupList, username);
+        adapter = new GroupListAdapter(groupList, userId);
         recyclerView.setAdapter(adapter);
 
 
         // Query the database to find the userId based on the username
-        databaseReference.child("MobileUsers").orderByChild("username").equalTo(currentUsername)
+        databaseReference.child("MobileUsers").orderByChild("userId").equalTo(userId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -152,11 +149,12 @@ public class GroupsFragment extends Fragment {
 
     private void showAddGroupDialog() {
         FragmentManager fragmentManager = getChildFragmentManager();
-        AddGroupFragment addGroupFragment = new AddGroupFragment(username);
+        AddGroupFragment addGroupFragment = new AddGroupFragment(userId);
+
 
         // Pass the stored username to AddGroupFragment using arguments
         Bundle args = new Bundle();
-        args.putString("username", username);
+        args.putString("userId", userId);
         addGroupFragment.setArguments(args);
 
         addGroupFragment.show(fragmentManager, "AddGroupFragment");

@@ -10,11 +10,11 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 public class ProfilePagerAdapter extends FragmentStateAdapter {
-    private String username;
+    private String userId;
 
-    public ProfilePagerAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle, String username) {
+    public ProfilePagerAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle, String userId) {
         super(fragmentManager, lifecycle);
-        this.username = username;
+        this.userId = userId;
     }
     public ProfilePagerAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle) {
         super(fragmentManager, lifecycle);
@@ -25,7 +25,7 @@ public class ProfilePagerAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         Fragment fragment;
         Bundle args = new Bundle();
-        args.putString("username", username);
+        args.putString("userId", userId);
 
         switch (position) {
             case 0:

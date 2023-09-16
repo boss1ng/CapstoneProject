@@ -27,12 +27,11 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
     private DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
     private List<Groups> groupList;
 
-    private String username;
+    private String userId;
 
-    public GroupListAdapter(List<Groups> groupList, String username) {
+    public GroupListAdapter(List<Groups> groupList, String userId) {
         this.groupList = groupList;
-        this.username = username;
-
+        this.userId = userId;
     }
 
     @NonNull
@@ -58,7 +57,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
                 // You can access the group information using 'group'
                 // Create an instance of the AddUserToGroup dialog fragment
                 String groupName = group.getGroupName();
-                AddUserFinder addUserFinderDialog = AddUserFinder.newInstance(username, groupName);
+                AddUserFinder addUserFinderDialog = AddUserFinder.newInstance(userId, groupName);
 
                 // Show the dialog using the FragmentManager
                 AppCompatActivity activity = (AppCompatActivity) v.getContext();

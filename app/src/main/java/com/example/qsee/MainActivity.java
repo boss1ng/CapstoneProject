@@ -120,8 +120,9 @@ public class MainActivity extends AppCompatActivity {
                         User user = userSnapshot.getValue(User.class);
                         if (user != null && user.getUsername().equals(username) && user.getPassword().equals(password)) {
                             // Username and password match, sign in successful
+                            String userId = user.getUserId(); // Get the user's ID
                             Intent intent = new Intent(MainActivity.this, Home.class);
-                            intent.putExtra("username", username); // Pass the username as an extra
+                            intent.putExtra("userId", userId); // Pass the userId as an extra
                             startActivity(intent);
                             return;
                         }

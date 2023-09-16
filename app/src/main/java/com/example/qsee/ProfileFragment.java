@@ -15,9 +15,6 @@ import android.widget.Button;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,7 +28,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager2.widget.ViewPager2;
-
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
@@ -40,7 +36,9 @@ public class ProfileFragment extends Fragment {
     private TextView userIdTextView;
     private TextView usernameTextView;
     private Context context;
-    private String username;
+    private String userId;
+    // Create a ViewModel instance
+
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -55,7 +53,8 @@ public class ProfileFragment extends Fragment {
         context = getActivity(); // Get the context
 
         // Retrieve the username from the arguments
-        username = getArguments().getString("username");
+        userId = getArguments().getString("userId");
+
 
         // Find the "Change Username" button
         Button unameButton = rootView.findViewById(R.id.unameButton);
@@ -69,18 +68,20 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        editProfile.setOnClickListener(new View.OnClickListener(){
-
+        editProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Replace the current fragment with the "fragment_quiz" fragment
-                EditProfileFragment editProfileFragment = new EditProfileFragment();
+                // Pass the username to EditProfileFragment
+                EditProfileFragment editProfileFragment = EditProfileFragment.newInstance(userId);
+
+                // Replace the current fragment with the "EditProfileFragment"
                 FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragment_container, editProfileFragment); // Replace 'fragment_container' with the ID of your container layout
-                transaction.addToBackStack(null); // Optional: Add the transaction to the back stack
+                transaction.replace(R.id.fragment_container, editProfileFragment);
+                transaction.addToBackStack(null);
                 transaction.commit();
             }
         });
+
 
         // Find the userFullNameTextView and userIdTextView by their IDs
         userFullNameTextView = rootView.findViewById(R.id.UserFullName);
@@ -118,7 +119,7 @@ public class ProfileFragment extends Fragment {
 
         // Retrieve user's data from Firebase based on the username
         DatabaseReference usersReference = FirebaseDatabase.getInstance().getReference("MobileUsers");
-        Query query = usersReference.orderByChild("username").equalTo(username);
+        Query query = usersReference.orderByChild("userId").equalTo(userId);
 
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -129,12 +130,19 @@ public class ProfileFragment extends Fragment {
                         String firstName = userSnapshot.child("firstName").getValue(String.class);
                         String lastName = userSnapshot.child("lastName").getValue(String.class);
                         String userId = userSnapshot.child("userId").getValue(String.class);
+                        String username = userSnapshot.child("username").getValue(String.class);
 
                         // Set the text of userFullNameTextView with the full name
                         userFullNameTextView.setText(firstName + " " + lastName);
 
                         // Set the text of userIdTextView with the userId
                         userIdTextView.setText("User ID: " + userId);
+
+                        // Find the usernameTextView by its ID
+                        usernameTextView = rootView.findViewById(R.id.ProfileUsername);
+
+                        // Set the text of usernameTextView with the retrieved username
+                        usernameTextView.setText(username);
                     }
                 }
             }
@@ -144,11 +152,7 @@ public class ProfileFragment extends Fragment {
                 // Handle any database query errors here
             }
         });
-        // Find the usernameTextView by its ID
-        usernameTextView = rootView.findViewById(R.id.ProfileUsername);
 
-        // Set the text of usernameTextView with the retrieved username
-        usernameTextView.setText(username);
 
         return rootView;
     }
@@ -161,8 +165,8 @@ public class ProfileFragment extends Fragment {
         ViewPager2 viewPager = view.findViewById(R.id.viewPager);
         TabLayout tabLayout = view.findViewById(R.id.tabLayout);
 
-        // Create and set the adapter for ViewPager2, passing the username
-        ProfilePagerAdapter pagerAdapter = new ProfilePagerAdapter(getChildFragmentManager(), getLifecycle(), username);
+        // Create and set the adapter for ViewPager2, passing the userId
+        ProfilePagerAdapter pagerAdapter = new ProfilePagerAdapter(getChildFragmentManager(), getLifecycle(), userId);
         viewPager.setAdapter(pagerAdapter);
 
         // Attach TabLayout to ViewPager2 using TabLayoutMediator

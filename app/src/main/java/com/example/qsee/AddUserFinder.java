@@ -26,17 +26,17 @@ import com.google.firebase.database.ValueEventListener;
 public class AddUserFinder extends DialogFragment {
 
     private DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
-    private String username;
+    private String userId;
     private String groupName;
 
     public AddUserFinder() {
         // Required empty public constructor
     }
 
-    public static AddUserFinder newInstance(String username, String groupName) {
+    public static AddUserFinder newInstance(String userId, String groupName) {
         AddUserFinder fragment = new AddUserFinder();
         Bundle args = new Bundle();
-        args.putString("username", username);
+        args.putString("userId", userId);
         args.putString("groupName", groupName);
         fragment.setArguments(args);
         return fragment;
@@ -46,7 +46,7 @@ public class AddUserFinder extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            username = getArguments().getString("username");
+            userId = getArguments().getString("userId");
             groupName = getArguments().getString("groupName");
             // Log the retrieved username and groupName
         }
@@ -83,9 +83,9 @@ public class AddUserFinder extends DialogFragment {
         return view;
     }
 
-    private void retrieveUserDetails(String userId) {
+    private void retrieveUserDetails(String member) {
         // Find the user details (firstname and lastname) based on userId
-        databaseReference.child("MobileUsers").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.child("MobileUsers").child(member).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot userSnapshot) {
                 if (userSnapshot.exists()) {
@@ -95,7 +95,7 @@ public class AddUserFinder extends DialogFragment {
 
                     // Now, you have firstname and lastname
                     // Display the AddUserToGroup dialog with user details
-                    showAddUserToGroupDialog(username, groupName, userId, firstname, lastname);
+                    showAddUserToGroupDialog(userId, groupName, member, firstname, lastname);
                 } else {
                     Toast.makeText(getActivity(), "User does not exist", Toast.LENGTH_SHORT).show();
                 }
@@ -108,9 +108,9 @@ public class AddUserFinder extends DialogFragment {
         });
     }
 
-    private void showAddUserToGroupDialog(String username, String groupName, String userId, String firstname, String lastname) {
+    private void showAddUserToGroupDialog(String userId, String groupName, String member, String firstname, String lastname) {
         // Create an instance of the AddUserToGroup dialog fragment
-        AddUserToGroup addUserToGroupDialog = new AddUserToGroup(username, groupName, userId, firstname, lastname);
+        AddUserToGroup addUserToGroupDialog = new AddUserToGroup(userId, groupName, member, firstname, lastname);
 
         // Show the dialog using the FragmentManager
         AppCompatActivity activity = (AppCompatActivity) getActivity();
