@@ -18,6 +18,9 @@
     <!-- Crypto-JS for Encryption -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
 
+    <!-- EmailJS -->
+    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+
 </head>
 <body>
     <div class="outerCont">
@@ -114,6 +117,9 @@
         // Generate a random secret key (32 bytes / 256 bits)
         const secretKey = 'e4e46af883548ced684eaf5d17c447c52c0d938b7e4b905738bcef51a3e88bd4';
 
+        // EmailJS
+        emailjs.init("y8xpRw9tDb01c-YNo"); // Replace with your actual user ID from Email.js
+
         var buttonSubmit = document.querySelector("#btnSubmit");
         buttonSubmit.addEventListener('click', verifyDate)
 
@@ -140,7 +146,25 @@
                                 // console.log(inputDate.value);
 
                                 randomOTP = generateOTP();
-                                GmailAPI(randomOTP);
+                                emailjs.send("service_hj4hy9o", "template_gc6nxfk", {
+                                    to_email: transferredInput, // "joeybryan.pintor.cics@ust.edu.ph"
+                                    // subject: "Your Subject",
+                                    message: randomOTP, // "Your Message"
+                                })
+                                .then(
+                                    function (response) {
+                                        console.log("Email sent:", response);
+                                        // alert("Email sent successfully!");
+                                    },
+
+                                    function (error) {
+                                        console.log("Email sending failed:", error);
+                                        // alert("Email sending failed.");
+                                    }
+                                );
+
+                                // GmailAPI(randomOTP);
+
                                 // GmailAPI();
                                 //     .then((result) => console.log('Email sent.', result))
                                 //     .catch((error) => console.log(error.message));
@@ -189,67 +213,7 @@
         }
 
     </script>
-
-
-<!-- GOOGLE MAIL API -->
-    <script>
-        const nodemailer = require('nodemailer');
-        const { google } = require('googleapis');
-
-        const CLIENT_ID = '93006732287-lkifv53fqi7i3j2b052sob7qi8atoebl.apps.googleusercontent.com';
-        const CLIENT_SECRET = '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';
-        const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
-        const REFRESH_TOKEN = '1//04vd3j4OxQFG2CgYIARAAGAQSNwF-L9IrzZlD5v8aEGnhuFpmvGxK3bChU0jERc7g0AijRX0mxs0Q5jLNL8wLbzfffx5oS4ZqBUI';
-
-        const oAuth2Client = new google.auth.OAuth2(
-            CLIENT_ID,
-            CLIENT_SECRET,
-            REDIRECT_URI
-        );
-        oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
-        
-        var result = null;
-        const generatedOTP = sessionStorage.getItem('otpCode');
-
-        // GmailAPI(generatedOTP);
-
-        async function GmailAPI(generatedOTP) {
-
-            if (generatedOTP != undefined) {
-
-                try {
-                    const accessToken = await oAuth2Client.getAccessToken();
-
-                    const transport = nodemailer.createTransport({
-                        service: 'gmail',
-                        auth: {
-                            type: 'OAUTH2',
-                            user: 'capstoneproject.it.qsee@gmail.com',
-                            clientId: CLIENT_ID,
-                            clientSecret: CLIENT_SECRET,
-                            refreshToken: REFRESH_TOKEN,
-                            accessToken: accessToken
-                        },
-                    });
-
-                    const mailOptions = {
-                        from: 'IT CAPSTONE PROJECT (QSEE) <capstoneproject.it.qsee@gmail.com>',
-                        to: 'joeybryan.pintor.cics@ust.edu.ph',
-                        subject: 'QSee - One-Time Password',
-                        text: '',
-                        html: `A request to reset the password for your account has been initiated. To proceed with the password reset process, please use the following one-time password (OTP): <br><br> <h2> ${generatedOTP} </h2> <br> Please enter this OTP on the password reset page <b> within the next two (2) minutes </b> to verify your identity and reset your password. <br><br> If you did not initiate this request, please disregard this email. <br><br><br> Regards, <br><br><b>QSee, IT Capstone Project</b>`
-                    };
-
-                    result = await transport.sendMail(mailOptions);
-                    return result;
-                }
-
-                catch (error) {
-                    return error;
-                }
-            }
-        }
-    </script>    
+ 
 
 
     <!-- BOOTSTRAP v5.3 -->
@@ -320,3 +284,83 @@
         }
 
 -->
+
+
+
+
+
+
+
+
+
+
+<!-- 
+
+
+
+GOOGLE MAIL API
+<script>
+    const nodemailer = require('nodemailer');
+    const { google } = require('googleapis');
+
+    const CLIENT_ID = '93006732287-lkifv53fqi7i3j2b052sob7qi8atoebl.apps.googleusercontent.com';
+    const CLIENT_SECRET = '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';
+    const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
+    const REFRESH_TOKEN = '1//04vd3j4OxQFG2CgYIARAAGAQSNwF-L9IrzZlD5v8aEGnhuFpmvGxK3bChU0jERc7g0AijRX0mxs0Q5jLNL8wLbzfffx5oS4ZqBUI';
+
+    const oAuth2Client = new google.auth.OAuth2(
+        CLIENT_ID,
+        CLIENT_SECRET,
+        REDIRECT_URI
+    );
+    oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
+    
+    var result = null;
+    const generatedOTP = sessionStorage.getItem('otpCode');
+
+    // GmailAPI(generatedOTP);
+
+    async function GmailAPI(generatedOTP) {
+
+        if (generatedOTP != undefined) {
+
+            try {
+                const accessToken = await oAuth2Client.getAccessToken();
+
+                const transport = nodemailer.createTransport({
+                    service: 'gmail',
+                    auth: {
+                        type: 'OAUTH2',
+                        user: 'capstoneproject.it.qsee@gmail.com',
+                        clientId: CLIENT_ID,
+                        clientSecret: CLIENT_SECRET,
+                        refreshToken: REFRESH_TOKEN,
+                        accessToken: accessToken
+                    },
+                });
+
+                const mailOptions = {
+                    from: 'IT CAPSTONE PROJECT (QSEE) <capstoneproject.it.qsee@gmail.com>',
+                    to: 'joeybryan.pintor.cics@ust.edu.ph',
+                    subject: 'QSee - One-Time Password',
+                    text: '',
+                    html: `A request to reset the password for your account has been initiated. To proceed with the password reset process, please use the following one-time password (OTP): <br><br> <h2> ${generatedOTP} </h2> <br> Please enter this OTP on the password reset page <b> within the next two (2) minutes </b> to verify your identity and reset your password. <br><br> If you did not initiate this request, please disregard this email. <br><br><br> Regards, <br><br><b>QSee, IT Capstone Project</b>`
+                };
+
+                result = await transport.sendMail(mailOptions);
+                return result;
+            }
+
+            catch (error) {
+                return error;
+            }
+        }
+    }
+</script>   
+
+
+
+
+
+
+ -->

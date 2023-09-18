@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+
+</head>
+<body>
+    
+    <button onclick="sendEmail()">Send Email</button>
+
+    <script>
+        emailjs.init("y8xpRw9tDb01c-YNo"); // Replace with your actual user ID from Email.js
+
+        function sendEmail() {
+        emailjs.send("service_hj4hy9o", "template_gc6nxfk", {
+            to_email: "joeybryan.pintor.cics@ust.edu.ph",
+            subject: "Your Subject",
+            message: "Your Message",
+        }).then(
+            function (response) {
+            console.log("Email sent:", response);
+            alert("Email sent successfully!");
+            },
+            function (error) {
+            console.log("Email sending failed:", error);
+            alert("Email sending failed.");
+            }
+        );
+        }
+
+    </script>
+</body>
+</html>
