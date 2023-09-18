@@ -84,18 +84,22 @@ public class AddUserFinder extends DialogFragment {
     }
 
     private void retrieveUserDetails(String member) {
-        // Find the user details (firstname and lastname) based on userId
+        // Find the user details (encrypted firstname and lastname) based on userId
         databaseReference.child("MobileUsers").child(member).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot userSnapshot) {
                 if (userSnapshot.exists()) {
                     // User with the provided userId exists
-                    String firstname = userSnapshot.child("firstName").getValue(String.class);
-                    String lastname = userSnapshot.child("lastName").getValue(String.class);
+                    String encryptedFirstName = userSnapshot.child("firstName").getValue(String.class);
+                    String encryptedLastName = userSnapshot.child("lastName").getValue(String.class);
 
-                    // Now, you have firstname and lastname
+                    // Decrypt firstname and lastname
+                    String firstName = AESUtils.decrypt(encryptedFirstName);
+                    String lastName = AESUtils.decrypt(encryptedLastName);
+
+                    // Now, you have decrypted firstname and lastname
                     // Display the AddUserToGroup dialog with user details
-                    showAddUserToGroupDialog(userId, groupName, member, firstname, lastname);
+                    showAddUserToGroupDialog(userId, groupName, member, firstName, lastName);
                 } else {
                     Toast.makeText(getActivity(), "User does not exist", Toast.LENGTH_SHORT).show();
                 }
@@ -107,6 +111,7 @@ public class AddUserFinder extends DialogFragment {
             }
         });
     }
+
 
     private void showAddUserToGroupDialog(String userId, String groupName, String member, String firstname, String lastname) {
         // Create an instance of the AddUserToGroup dialog fragment
