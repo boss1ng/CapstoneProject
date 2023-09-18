@@ -61,41 +61,47 @@ public class EditProfileFragment extends Fragment {
 
 
 
-            // Query the database to retrieve user information based on the username
-            userReference = FirebaseDatabase.getInstance().getReference("MobileUsers");
-            Query query = userReference.orderByChild("userId").equalTo(userId);
+        // Query the database to retrieve user information based on the username
+        userReference = FirebaseDatabase.getInstance().getReference("MobileUsers");
+        Query query = userReference.orderByChild("userId").equalTo(userId);
 
-            query.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.exists()) {
-                        for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                        // Get encrypted user data from Firebase
+                        String encryptedFirstName = userSnapshot.child("firstName").getValue(String.class);
+                        String encryptedLastName = userSnapshot.child("lastName").getValue(String.class);
+                        String encryptedContactNumber = userSnapshot.child("contactNumber").getValue(String.class);
+                        String encryptedBirthdate = userSnapshot.child("birthdate").getValue(String.class);
+                        String encryptedUsername = userSnapshot.child("username").getValue(String.class);
 
-                            // Get user data (firstName, lastName, contactNumber, birthdate)
-                            String firstName = userSnapshot.child("firstName").getValue(String.class);
-                            String lastName = userSnapshot.child("lastName").getValue(String.class);
-                            String contactNumber = userSnapshot.child("contactNumber").getValue(String.class);
-                            String birthdate = userSnapshot.child("birthdate").getValue(String.class);
-                            String username = userSnapshot.child("username").getValue(String.class);
+                        // Decrypt the values
+                        String firstName = AESUtils.decrypt(encryptedFirstName);
+                        String lastName = AESUtils.decrypt(encryptedLastName);
+                        String contactNumber = AESUtils.decrypt(encryptedContactNumber);
+                        String birthdate = AESUtils.decrypt(encryptedBirthdate);
+                        String username = AESUtils.decrypt(encryptedUsername);
 
-                            firstNameEditText.getEditText().setText(firstName);
-                            lastNameEditText.getEditText().setText(lastName);
-                            contactNumberEditText.getEditText().setText(contactNumber);
-                            birthdateEditText.getEditText().setText(birthdate);
-
-                            // Set the username text
-                            usernameEditText.getEditText().setText(username);
-                        }
-                    } else {
-                        Log.e("EditProfileFragment", "User with username not found.");
+                        // Set decrypted values in UI components
+                        firstNameEditText.getEditText().setText(firstName);
+                        lastNameEditText.getEditText().setText(lastName);
+                        contactNumberEditText.getEditText().setText(contactNumber);
+                        birthdateEditText.getEditText().setText(birthdate);
+                        usernameEditText.getEditText().setText(username);
                     }
+                } else {
+                    Log.e("EditProfileFragment", "User with username not found.");
                 }
+            }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                    // Handle any database query errors here
-                }
-            });
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle any database query errors here
+            }
+        });
+
 
         EditText dateEditText = birthdateEditText.getEditText();
 
@@ -133,8 +139,12 @@ public class EditProfileFragment extends Fragment {
                 String newBirthdate = birthdateEditText.getEditText().getText().toString();
                 String newUsername = usernameEditText.getEditText().getText().toString();
 
-
-
+                // Encrypt the data before saving
+                String encryptedFirstName = AESUtils.encrypt(newFirstName);
+                String encryptedLastName = AESUtils.encrypt(newLastName);
+                String encryptedContactNumber = AESUtils.encrypt(newContactNumber);
+                String encryptedBirthdate = AESUtils.encrypt(newBirthdate);
+                String encryptedUsername = AESUtils.encrypt(newUsername);
 
                 // Query the database to find the user with the matching username
                 DatabaseReference usersReference = FirebaseDatabase.getInstance().getReference("MobileUsers");
@@ -145,12 +155,12 @@ public class EditProfileFragment extends Fragment {
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()) {
                             for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
-                                // Update user information
-                                userSnapshot.getRef().child("firstName").setValue(newFirstName);
-                                userSnapshot.getRef().child("lastName").setValue(newLastName);
-                                userSnapshot.getRef().child("contactNumber").setValue(newContactNumber);
-                                userSnapshot.getRef().child("birthdate").setValue(newBirthdate);
-                                userSnapshot.getRef().child("username").setValue(newUsername);
+                                // Update user information with encrypted values
+                                userSnapshot.getRef().child("firstName").setValue(encryptedFirstName);
+                                userSnapshot.getRef().child("lastName").setValue(encryptedLastName);
+                                userSnapshot.getRef().child("contactNumber").setValue(encryptedContactNumber);
+                                userSnapshot.getRef().child("birthdate").setValue(encryptedBirthdate);
+                                userSnapshot.getRef().child("username").setValue(encryptedUsername);
 
                                 // Inform the user that the update was successful
                                 Toast.makeText(getContext(), "Profile updated successfully", Toast.LENGTH_SHORT).show();
@@ -171,6 +181,7 @@ public class EditProfileFragment extends Fragment {
                 });
             }
         });
+
 
         Button cancel = view.findViewById(R.id.cancelBt);
         cancel.setOnClickListener(new View.OnClickListener() {

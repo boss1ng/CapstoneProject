@@ -118,13 +118,23 @@ public class MainActivity extends AppCompatActivity {
                 if (dataSnapshot.exists()) {
                     for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
                         User user = userSnapshot.getValue(User.class);
-                        if (user != null && user.getUsername().equals(username) && user.getPassword().equals(password)) {
-                            // Username and password match, sign in successful
-                            String userId = user.getUserId(); // Get the user's ID
-                            Intent intent = new Intent(MainActivity.this, Home.class);
-                            intent.putExtra("userId", userId); // Pass the userId as an extra
-                            startActivity(intent);
-                            return;
+                        if (user != null) {
+                            // Decrypt the stored encrypted username and password
+                            String storedEncryptedUsername = user.getUsername();
+                            String storedEncryptedPassword = user.getPassword();
+                            String decryptedUsername = AESUtils.decrypt(storedEncryptedUsername);
+                            String decryptedPassword = AESUtils.decrypt(storedEncryptedPassword);
+
+                            // Check if the decrypted username and password match the input
+                            if (decryptedUsername != null && decryptedPassword != null &&
+                                    decryptedUsername.equals(username) && decryptedPassword.equals(password)) {
+                                // Username and password match, sign in successful
+                                String userId = user.getUserId(); // Get the user's ID
+                                Intent intent = new Intent(MainActivity.this, Home.class);
+                                intent.putExtra("userId", userId); // Pass the userId as an extra
+                                startActivity(intent);
+                                return;
+                            }
                         }
                     }
                 }
@@ -139,6 +149,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Database error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-
     }
+
 }

@@ -126,11 +126,15 @@ public class ProfileFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
-                        // Get user data (firstName, lastName, and userId)
-                        String firstName = userSnapshot.child("firstName").getValue(String.class);
-                        String lastName = userSnapshot.child("lastName").getValue(String.class);
-                        String userId = userSnapshot.child("userId").getValue(String.class);
-                        String username = userSnapshot.child("username").getValue(String.class);
+                        // Get encrypted user data from Firebase
+                        String encryptedFirstName = userSnapshot.child("firstName").getValue(String.class);
+                        String encryptedLastName = userSnapshot.child("lastName").getValue(String.class);
+                        String encryptedUsername = userSnapshot.child("username").getValue(String.class);
+
+                        // Decrypt the values
+                        String firstName = AESUtils.decrypt(encryptedFirstName);
+                        String lastName = AESUtils.decrypt(encryptedLastName);
+                        String username = AESUtils.decrypt(encryptedUsername);
 
                         // Set the text of userFullNameTextView with the full name
                         userFullNameTextView.setText(firstName + " " + lastName);
@@ -149,9 +153,10 @@ public class ProfileFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Handle any database query errors here
+                // Handle error if needed
             }
         });
+
 
 
         return rootView;

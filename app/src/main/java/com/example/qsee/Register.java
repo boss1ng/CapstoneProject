@@ -60,6 +60,18 @@ public class Register extends AppCompatActivity {
         View registerButton = findViewById(R.id.RegisterButton);
         View regLoginButton = findViewById(R.id.regLogin);
 
+        // Find the EditText associated with contactNoInputLayout
+        EditText contactNoEditText = contactNoInputLayout.getEditText();
+
+        if (contactNoEditText != null) {
+            // Create an InputFilter to limit the input to 11 digits
+            InputFilter[] filters = new InputFilter[1];
+            filters[0] = new InputFilter.LengthFilter(11);
+
+            // Apply the InputFilter to the EditText
+            contactNoEditText.setFilters(filters);
+        }
+
 
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,12 +119,13 @@ public class Register extends AppCompatActivity {
 
                 // Create a new User object
                 User user = new User();
-                user.setFirstName(firstName);
-                user.setLastName(lastName);
-                user.setContactNumber(contactNumber);
-                user.setBirthdate(birthdate);
-                user.setUsername(username);
-                user.setPassword(password);
+                user.setFirstName(AESUtils.encrypt(firstName));
+                user.setLastName(AESUtils.encrypt(lastName));
+                user.setContactNumber(AESUtils.encrypt(contactNumber));
+                user.setBirthdate(AESUtils.encrypt(birthdate));
+                user.setUsername(AESUtils.encrypt(username));
+                user.setPassword(AESUtils.encrypt(password));
+
 
                 // Get a reference to the Firebase Realtime Database
                 DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
