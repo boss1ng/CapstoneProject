@@ -17,11 +17,17 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class HomeFragment extends Fragment {
 
@@ -31,6 +37,7 @@ public class HomeFragment extends Fragment {
     private Button getWeatherButton;
     private Button previousButton;
     private Button nextButton;
+    private JSONArray forecasts;
     private int currentDayIndex = 0; // Track the currently displayed day index.
     private Map<String, List<Double>> dailyForecasts = new HashMap<>(); // Declare dailyForecasts as a class-level variable
 
@@ -67,34 +74,85 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
-    private void showPreviousDay() {
-        if (currentDayIndex > 0) {
-            currentDayIndex--;
-            displayDay(currentDayIndex);
-        }
-    }
-
-    private void showNextDay() {
-        if (currentDayIndex < 4) { // Assuming you want to show 5 days of forecasts
-            currentDayIndex++;
-            displayDay(currentDayIndex);
-        }
-    }
-
     private void displayDay(int dayIndex) {
         if (dailyForecasts != null && dayIndex >= 0 && dayIndex < dailyForecasts.size()) {
             List<String> sortedDates = new ArrayList<>(dailyForecasts.keySet());
-            Collections.sort(sortedDates); // Sort the dates in ascending order
+            Collections.sort(sortedDates);
 
             String date = sortedDates.get(dayIndex);
             List<Double> temperatures = dailyForecasts.get(date);
             double averageTemperature = calculateAverage(temperatures);
 
+            // Extract and display the weather condition
+            String weatherCondition = getWeatherCondition(date, forecasts);
+
+            // Extract and display the rain percentage
+            int rainPercentage = getRainPercentage(date);
+
             // Display the daily forecast for the selected day
             textView.setText("Date: " + date + "\n");
-            textView.append("Average Temperature: " + String.format("%.2f", averageTemperature) + "°C\n\n");
+            textView.append("Weather Condition: " + weatherCondition + "\n");
+            textView.append("Rain Percentage: " + rainPercentage + "%\n");
+            textView.append("Average Temperature: " + String.format("%.2f", averageTemperature) + "°C\n");
         }
     }
+
+
+    private int getRainPercentage(String date) {
+        try {
+            for (int i = 0; i < forecasts.length(); i++) {
+                JSONObject forecast = forecasts.getJSONObject(i);
+                String dateTime = forecast.getString("dt_txt");
+                if (dateTime.startsWith(date)) {
+                    JSONObject rainObject = forecast.optJSONObject("rain");
+                    if (rainObject != null) {
+                        double rainVolume3h = 0.0; // Default value if rain data is not available
+                        if (rainObject.has("3h")) {
+                            // Extract the rain volume for the last 3 hours (in mm)
+                            rainVolume3h = rainObject.getDouble("3h");
+                        }
+
+                        // Calculate the rain percentage based on the rain volume
+                        int rainPercentage = (int) ((rainVolume3h / 1.0) * 100);
+
+                        // Clamp the rain percentage to a maximum of 100%
+                        if (rainPercentage > 100) {
+                            rainPercentage = 100;
+                        }
+
+                        return rainPercentage;
+                    }
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return 0; // Default value if rain percentage cannot be determined
+    }
+
+
+
+
+    private String getWeatherCondition(String date, JSONArray forecasts) {
+        try {
+            for (int i = 0; i < forecasts.length(); i++) {
+                JSONObject forecast = forecasts.getJSONObject(i);
+                String dateTime = forecast.getString("dt_txt");
+                if (dateTime.startsWith(date)) {
+                    JSONArray weatherArray = forecast.getJSONArray("weather");
+                    if (weatherArray.length() > 0) {
+                        JSONObject weather = weatherArray.getJSONObject(0);
+                        return weather.getString("description");
+                    }
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return "N/A"; // Default value if weather condition cannot be determined
+    }
+
+
 
     private void getWeatherForecastByLocationName(String locationName) {
         String weather_url = "https://api.openweathermap.org/data/2.5/forecast?q=" +
@@ -111,49 +169,82 @@ public class HomeFragment extends Fragment {
                         try {
                             JSONObject jsonObject = new JSONObject(response);
 
-                            // Get the list of forecasts from the JSON
-                            JSONArray forecasts = jsonObject.getJSONArray("list");
+                            // Assign the list of forecasts from the JSON to the class-level variable
+                            forecasts = jsonObject.getJSONArray("list");
 
                             // Clear previous text
                             textView.setText("");
 
                             // Group forecasts by day
                             dailyForecasts.clear(); // Clear existing data
+
+                            // Get the current date in the local time zone
+                            Calendar calendar = Calendar.getInstance();
+                            calendar.setTimeZone(TimeZone.getTimeZone("America/New_York")); // Set your desired time zone
+                            Date currentDate = calendar.getTime();
+
+                            // Format the current date and time as "yyyy-MM-dd HH:mm:ss"
+                            SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
                             for (int i = 0; i < forecasts.length(); i++) {
                                 JSONObject forecast = forecasts.getJSONObject(i);
 
-                                // Extract the date, temperature, and time
+                                // Extract the date and time
                                 String dateTime = forecast.getString("dt_txt");
-                                String date = dateTime.split(" ")[0];
-                                JSONObject main = forecast.getJSONObject("main");
-                                double temperatureKelvin = main.getDouble("temp");
-                                double temperatureCelsius = temperatureKelvin - 273.15;
 
-                                // Add the temperature to the daily forecast list
-                                if (!dailyForecasts.containsKey(date)) {
-                                    dailyForecasts.put(date, new ArrayList<>());
+                                // Parse the date string into a Date object
+                                Date forecastDateTime = dateTimeFormat.parse(dateTime);
+
+                                // Check if the forecast date and time are greater than or equal to the current date and time
+                                if (forecastDateTime != null && forecastDateTime.compareTo(currentDate) >= 0) {
+                                    String date = new SimpleDateFormat("yyyy-MM-dd").format(forecastDateTime);
+
+                                    JSONObject main = forecast.getJSONObject("main");
+                                    double temperatureKelvin = main.getDouble("temp");
+                                    double temperatureCelsius = temperatureKelvin - 273.15;
+
+                                    // Add the temperature to the daily forecast list
+                                    if (!dailyForecasts.containsKey(date)) {
+                                        dailyForecasts.put(date, new ArrayList<>());
+                                    }
+                                    dailyForecasts.get(date).add(temperatureCelsius);
                                 }
-                                dailyForecasts.get(date).add(temperatureCelsius);
                             }
 
-                            // Display the daily forecasts for the next 5 days
+                            // Display the daily forecasts for the next 5 days including today in ascending order
+                            List<String> sortedDates = new ArrayList<>(dailyForecasts.keySet());
+                            Collections.sort(sortedDates);
+
                             int dayCount = 0;
-                            for (String date : dailyForecasts.keySet()) {
-                                if (dayCount >= 5) {
+                            for (String date : sortedDates) {
+                                if (dayCount < 5) { // Display 5 days, including today
+                                    List<Double> temperatures = dailyForecasts.get(date);
+                                    double averageTemperature = calculateAverage(temperatures);
+
+                                    // Extract and display the weather condition
+                                    String weatherCondition = getWeatherCondition(date, forecasts);
+
+                                    // Extract and display the rain percentage
+                                    int rainPercentage = getRainPercentage(date);
+
+                                    // Append the daily forecast to the TextView
+                                    textView.append("Date: " + date + "\n");
+                                    textView.append("Weather Condition: " + weatherCondition + "\n");
+                                    textView.append("Rain Percentage: " + rainPercentage + "%\n");
+                                    textView.append("Average Temperature: " + String.format("%.2f", averageTemperature) + "°C\n\n");
+
+                                    dayCount++;
+                                } else {
                                     break;
                                 }
-                                List<Double> temperatures = dailyForecasts.get(date);
-                                double averageTemperature = calculateAverage(temperatures);
-
-                                // Append the daily forecast to the TextView
-                                textView.append("Date: " + date + "\n");
-                                textView.append("Average Temperature: " + String.format("%.2f", averageTemperature) + "°C\n\n");
-
-                                dayCount++;
                             }
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                             textView.setText("JSON Parsing Error");
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                            textView.setText("Date Parsing Error");
                         }
                     }
                 },
@@ -165,6 +256,21 @@ public class HomeFragment extends Fragment {
                 });
 
         queue.add(stringRequest);
+    }
+
+
+    private void showPreviousDay() {
+        if (currentDayIndex > 0) {
+            currentDayIndex--;
+            displayDay(currentDayIndex);
+        }
+    }
+
+    private void showNextDay() {
+        if (currentDayIndex < 4) { // Assuming you want to show 5 days of forecasts
+            currentDayIndex++;
+            displayDay(currentDayIndex);
+        }
     }
 
     private double calculateAverage(List<Double> numbers) {
