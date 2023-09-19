@@ -2,6 +2,7 @@ package com.example.qsee;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,7 +39,7 @@ public class EditProfileFragment extends Fragment {
     private TextInputLayout firstNameEditText;
     private DatePickerDialog datePickerDialog;
     private TextInputLayout lastNameEditText;
-    private TextInputLayout contactNumberEditText;
+    private TextInputLayout contactNoInputLayout;
     private TextInputLayout birthdateEditText;
     private TextInputLayout usernameEditText;
     private DatabaseReference userReference;
@@ -51,9 +52,23 @@ public class EditProfileFragment extends Fragment {
         // Initialize TextInputLayout variables
         firstNameEditText = view.findViewById(R.id.firstName);
         lastNameEditText = view.findViewById(R.id.lastName);
-        contactNumberEditText = view.findViewById(R.id.contactNo);
+        contactNoInputLayout = view.findViewById(R.id.contactNo);
         birthdateEditText = view.findViewById(R.id.birthdate);
         usernameEditText = view.findViewById(R.id.username);
+
+
+        // Get the EditText inside the TextInputLayout
+        EditText contactNumberEditText = contactNoInputLayout.getEditText();
+
+        if (contactNumberEditText != null) {
+            // Create an InputFilter to limit the input to 11 digits
+            InputFilter[] filters = new InputFilter[1];
+            filters[0] = new InputFilter.LengthFilter(11);
+
+            // Apply the InputFilter to the EditText
+            contactNumberEditText.setFilters(filters);
+        }
+
 
         // Retrieve the username from arguments
         String userId = getArguments().getString("userId");
@@ -87,7 +102,7 @@ public class EditProfileFragment extends Fragment {
                         // Set decrypted values in UI components
                         firstNameEditText.getEditText().setText(firstName);
                         lastNameEditText.getEditText().setText(lastName);
-                        contactNumberEditText.getEditText().setText(contactNumber);
+                        contactNoInputLayout.getEditText().setText(contactNumber);
                         birthdateEditText.getEditText().setText(birthdate);
                         usernameEditText.getEditText().setText(username);
                     }
@@ -135,9 +150,10 @@ public class EditProfileFragment extends Fragment {
                 // Get updated information from TextInputLayout fields
                 String newFirstName = firstNameEditText.getEditText().getText().toString();
                 String newLastName = lastNameEditText.getEditText().getText().toString();
-                String newContactNumber = contactNumberEditText.getEditText().getText().toString();
+                String newContactNumber = contactNoInputLayout.getEditText().getText().toString();
                 String newBirthdate = birthdateEditText.getEditText().getText().toString();
                 String newUsername = usernameEditText.getEditText().getText().toString();
+
 
                 // Encrypt the data before saving
                 String encryptedFirstName = AESUtils.encrypt(newFirstName);
