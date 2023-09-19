@@ -7,14 +7,15 @@
 
     <ImageView
         android:id="@+id/imageView5"
-        android:layout_width="407dp"
-        android:layout_height="175dp"
+        android:layout_width="530dp"
+        android:layout_height="220dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.504"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
-        app:srcCompat="@drawable/plane" />
+        app:srcCompat="@drawable/bg_editpfp" />
 
     <ImageView
         android:id="@+id/profilePic_edit"
@@ -27,21 +28,7 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.079" />
-
-    <TextView
-        android:id="@+id/UserId_edit"
-        android:layout_width="184dp"
-        android:layout_height="18dp"
-        android:gravity="center"
-        android:text="Change Picture"
-        android:textColor="@color/blue"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.224" />
+        app:layout_constraintVertical_bias="0.057" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/firstName"
@@ -157,6 +144,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/saveBt"
         app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/pfpBtn"
+        android:layout_width="122dp"
+        android:layout_height="32dp"
+        android:backgroundTint="@color/white"
+        android:text="Change Picture"
+        android:textColor="@color/blue"
+        android:textSize="9dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.21" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
