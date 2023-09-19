@@ -56,6 +56,17 @@ public class ProfileFragment extends Fragment {
         userId = getArguments().getString("userId");
 
 
+        TextView uname = rootView.findViewById(R.id.ProfileUsername);
+
+        uname.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Show the UserBottomSheetDialogFragment
+                UserBottomSheetDialogFragment bottomSheetDialog = new UserBottomSheetDialogFragment();
+                bottomSheetDialog.show(getParentFragmentManager(), bottomSheetDialog.getTag());
+            }
+        });
+
         // Find the "Change Username" button
         Button unameButton = rootView.findViewById(R.id.unameButton);
         Button editProfile = rootView.findViewById(R.id.editButton);

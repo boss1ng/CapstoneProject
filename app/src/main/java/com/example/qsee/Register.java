@@ -86,6 +86,20 @@ public class Register extends AppCompatActivity {
                 String reTypedPassword = repassregInputLayout.getEditText().getText().toString();
                 CheckBox consentCheckbox = findViewById(R.id.consentCheckbox);
 
+                // Define the regex pattern
+                String passwordPattern = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}$";
+
+                // Check if the password matches the pattern
+                if (password.matches(passwordPattern)) {
+                    // Password is valid
+                    // Proceed with registration
+                } else {
+                    // Password is not valid
+                    // Show an error message
+                    Toast.makeText(Register.this, "Password must be at least 8 characters and include at least one uppercase letter, one lowercase letter, one special character, and one numeric character.", Toast.LENGTH_SHORT).show();
+                    return; // Don't proceed with registration
+                }
+
                 // Check if any of the input fields are empty
                 if (TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) ||
                         TextUtils.isEmpty(contactNumber) || TextUtils.isEmpty(birthdate) ||
