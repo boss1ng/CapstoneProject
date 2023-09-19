@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace = "com.example.qsee"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.qsee"
@@ -32,7 +32,11 @@ android {
 }
 
 dependencies {
+    //noinspection GradleCompatible
     implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.squareup.picasso:picasso:2.71828")
+    implementation("com.android.volley:volley:1.2.1")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
     implementation("com.google.android.material:material:1.9.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.google.firebase:firebase-common:20.3.3")
