@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void signIn() {
-        String username = unameInputLayout.getEditText().getText().toString();
+        String username = unameInputLayout.getEditText().getText().toString().trim().toLowerCase();
         String password = passInputLayout.getEditText().getText().toString();
 
         if (TextUtils.isEmpty(username) || TextUtils.isEmpty(password)) {

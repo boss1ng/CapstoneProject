@@ -81,7 +81,7 @@ public class Register extends AppCompatActivity {
                 String lastName = lnameInputLayout.getEditText().getText().toString();
                 String contactNumber = contactNoInputLayout.getEditText().getText().toString();
                 String birthdate = bdateInputLayout.getEditText().getText().toString();
-                String username = unameregInputLayout.getEditText().getText().toString();
+                String username = unameregInputLayout.getEditText().getText().toString().toLowerCase();
                 String password = passregInputLayout.getEditText().getText().toString();
                 String reTypedPassword = repassregInputLayout.getEditText().getText().toString();
                 CheckBox consentCheckbox = findViewById(R.id.consentCheckbox);
