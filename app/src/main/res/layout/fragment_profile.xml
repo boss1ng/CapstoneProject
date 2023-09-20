@@ -53,13 +53,13 @@
         android:id="@+id/notifButton"
         android:layout_width="30dp"
         android:layout_height="34dp"
+        android:layout_marginEnd="2dp"
         android:backgroundTint="#FFFFFF"
         android:drawableTop="@drawable/ic_bell"
         app:layout_constraintBaseline_toBottomOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.755"
-
+        app:layout_constraintEnd_toStartOf="@+id/editButton"
+        app:layout_constraintHorizontal_bias="0.979"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.022" />
