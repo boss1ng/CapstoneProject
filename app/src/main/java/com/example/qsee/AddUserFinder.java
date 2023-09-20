@@ -75,7 +75,7 @@ public class AddUserFinder extends DialogFragment {
                     // Retrieve user details (firstname and lastname) based on userId
                     retrieveUserDetails(enteredUserId);
                 } else {
-                    // Handle the case where the enteredUserId is empty
+                    Toast.makeText(getActivity(), "Please enter a User ID", Toast.LENGTH_SHORT).show();
                 }
             }
         });
