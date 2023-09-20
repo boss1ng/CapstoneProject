@@ -1,10 +1,12 @@
 package com.example.qsee;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -24,14 +26,16 @@ public class QuizFragment extends Fragment {
 
     private Button correctButton; // Reference to the correct button
     private boolean isAnswerCorrect = false;
-
+    private List<QuizQuestion> quizQuestions = new ArrayList<>();
+    private View rootView;
+    private QuizQuestion currentQuestion;
     private Button btA, btB, btC, btD;
     private TextView Q1, Q2, Q3, Q4;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // ... (other code)
-        View rootView = inflater.inflate(R.layout.fragment_quiz, container, false);
+        rootView = inflater.inflate(R.layout.fragment_quiz, container, false);
         btA = rootView.findViewById(R.id.btA);
         btB = rootView.findViewById(R.id.btB);
         btC = rootView.findViewById(R.id.btC);
@@ -42,8 +46,11 @@ public class QuizFragment extends Fragment {
         Q3 = rootView.findViewById(R.id.Q3);
         Q4 = rootView.findViewById(R.id.Q4);
 
-        resetButtons(); // Reset buttons to initial state
-        randomizeCorrectButton(); // Randomize the correct button
+        // Initialize the quiz questions
+        initializeQuizQuestions();
+
+        // Display the first quiz question
+        displayQuizQuestion(0); // Display the first question in the list
 
         View.OnClickListener buttonClickListener = new View.OnClickListener() {
             @Override
@@ -53,15 +60,27 @@ public class QuizFragment extends Fragment {
                 }
 
                 Button clickedButton = (Button) v;
-                if (clickedButton == correctButton) {
+                int clickedIndex = -1; // Initialize clicked index to an invalid value
+
+                // Determine which button was clicked and set the clickedIndex accordingly
+                if (clickedButton == btA) {
+                    clickedIndex = 0;
+                } else if (clickedButton == btB) {
+                    clickedIndex = 1;
+                } else if (clickedButton == btC) {
+                    clickedIndex = 2;
+                } else if (clickedButton == btD) {
+                    clickedIndex = 3;
+                }
+
+                if (clickedIndex == currentQuestion.getCorrectAnswerIndex()) {
                     handleCorrectAnswerButtonClick(clickedButton, Q1);
-                    resetButtons(); // Reset buttons to initial state
-                    randomizeCorrectButton(); // Randomize the correct button
                 } else {
                     handleWrongAnswerButtonClick(clickedButton);
                 }
             }
         };
+
 
         btA.setOnClickListener(buttonClickListener);
         btB.setOnClickListener(buttonClickListener);
@@ -70,35 +89,112 @@ public class QuizFragment extends Fragment {
 
         return rootView;
     }
+    private void initializeQuizQuestions() {
+        // Create quiz questions and add them to the list
+        List<String> question1Choices = Arrays.asList("Quezon Memorial Circle", "Quezon Memorial Shrine", "Quezon Heritage House", "Ninoy Aquino Parks and Wildlife Center");
+        quizQuestions.add(new QuizQuestion("Question 1?", question1Choices, 0, R.drawable.logo, "Quezon Memorial Circle is a national park located in Quezon City, Metro Manila, Philippines. The park is located inside a large traffic circle in the shape of an ellipse and bounded by the Elliptical Road and is the main park of Quezon City. "));
+
+        List<String> question2Choices = Arrays.asList("Quezon Heritage House", "Art in Island", "Circle of Fun", "Eastwood Central Park");
+        quizQuestions.add(new QuizQuestion("Question 2?", question2Choices, 1, R.drawable.logo, "Art in Island is the largest Mixed Media Art Museum in the Philippines that brings media technology and various artforms together to create a unique, immersive, and interactive experience."));
+
+        List<String> question3Choices = Arrays.asList("La Mesa Eco Park", "Ninoy Aquino Parks and Wildlife Center", "Quezon Heritage House", "Tandang Sora National Shrine");
+        quizQuestions.add(new QuizQuestion("Question 3?", question3Choices, 0, R.drawable.logo, "Activities that can be done by visitors in the park are hiking, mountain-biking, horseback riding, rappelling, zip-lining and fishing. They can also paddle boat ride in the lagoon. The park also has an \"Ecotrail\" and an orchidarium."));
+
+        List<String> question4Choices = Arrays.asList("Andres Bonifacio Monument", "Tandang Sora National Shrine", "Presidential Car Museum", "Quezon Heritage House");
+        quizQuestions.add(new QuizQuestion("Question 4?", question4Choices, 2, R.drawable.logo, "A museum that displays cars used by the former Philippine Presidents."));
+
+        List<String> question5Choices = Arrays.asList("La Mesa Eco Park", "Quezon Memorial Circle", "UP Sunken Garden", "Eastwood Central Park");
+        quizQuestions.add(new QuizQuestion("Question 5?", question5Choices, 2, R.drawable.logo, "The site of many important events in UP history. It was the venue for the first UP Fair in 1925, and it has also been used for graduation ceremonies, concerts, and rallies."));
+
+        List<String> question6Choices = Arrays.asList("Luxent Hotel", "Go Hotels North Edsa - Quezon City", "Fersal Hotel", "Seda Vertis North");
+        quizQuestions.add(new QuizQuestion("Question 6?", question6Choices, 3, R.drawable.logo, "In a bustling business and entertainment district, this modern high-rise hotel is 2 km from both the North Avenue MRT station and lively Quezon Memorial Circle park."));
+
+        List<String> question7Choices = Arrays.asList("North Pointe Residences", "Hop Inn Hotel Tomas Morato", "Harolds Evotel", "The Oracle Hotel and Residences");
+        quizQuestions.add(new QuizQuestion("Question 7?", question7Choices, 0, R.drawable.logo, "North Pointe Residences  has the following amenities: Free WiFi, Free parking, Accessible, Pool, Air-conditioned, Kid-friendly, and Restaurant."));
+
+        List<String> question8Choices = Arrays.asList("Residenciale Boutique Apartment", "Sequoia Hotel", "Park Vil-la Apartelle", "Pacific Waves Resort ");
+        quizQuestions.add(new QuizQuestion("Question 8?", question8Choices, 3, R.drawable.logo, "This laid-back resort is 2 km from Grotto of Our Lady of Lourdes, 9 km from Pinagrealan Cave and 11 km from shopping at SM City Fairview. "));
+
+        List<String> question9Choices = Arrays.asList("Provenciano", "The Frazzled Cook", "Half Saints", "Victorino's Restaurant");
+        quizQuestions.add(new QuizQuestion("Question 9?", question9Choices, 1, R.drawable.logo, "A quirky restaurant put together with the mission of serving good comfort food with a cozy homey ambiance."));
+
+        List<String> question10Choices = Arrays.asList("Provenciano", "The Frazzled Cook", "Half Saints", "Victorino's Restaurant");
+        quizQuestions.add(new QuizQuestion("Question 10?", question10Choices, 0, R.drawable.logo, "Family-owned neighborhood restaurant Provenciano has withstood the test of time, and remains to be one of food capital Maginhawa’s not-so-hidden but always recommended gems, ever since its founding in 2015."));
+
+        List<String> question11Choices = Arrays.asList("SM City Fairview", "Fairview Center Mall", "Ayala Malls Fairview Terraces", "Robinsons Novaliches");
+        quizQuestions.add(new QuizQuestion("Question 11?", question11Choices, 2, R.drawable.logo, "It is the second mall by Robinsons Malls in Quezon City after Robinsons Galleria."));
+
+        List<String> question12Choices = Arrays.asList("Trinoma", "Fairview Center Mall", "Ayala Malls Fairview Terraces", "Ayala Malls Vertis North");
+        quizQuestions.add(new QuizQuestion("Question 12?", question12Choices, 0, R.drawable.logo, "Vast shopping complex with familiar apparel brands, casual eats, a supermarket & a cinema."));
+
+        List<String> question13Choices = Arrays.asList("Trinoma", "Fairview Center Mall", "Ayala Malls Fairview Terraces", "Ayala Malls Vertis North");
+        quizQuestions.add(new QuizQuestion("Question 13?", question13Choices, 3, R.drawable.logo, "Sizable shopping center providing brand-name stores, services, informal eateries & a movie theater."));
+
+        List<String> question14Choices = Arrays.asList("SM City Faiview", "SM City Novaliches", "SM City North EDSA", "Fisher Mall");
+        quizQuestions.add(new QuizQuestion("Question 14?", question14Choices, 2, R.drawable.logo, "It is the first SM Supermall in the country and formerly the largest shopping mall in the Philippines from 2008 to 2011, circa 2014, and from 2015 to 2021."));
+
+        List<String> question15Choices = Arrays.asList("Fisher Mall", "Landers Superstore", "Commonwealth Market", "Gateway Mall");
+        quizQuestions.add(new QuizQuestion("Question 15?", question15Choices, 0, R.drawable.logo, "Dynamic shopping complex offering an array of stores, a supermarket, an arcade & a movie theater."));
+
+        List<String> question16Choices = Arrays.asList("Ayala Malls Fairview Terraces", "Ayala Malls Cloverleaf", "Ayala Malls Vertis North", "Gateway Mall");
+        quizQuestions.add(new QuizQuestion("Question 16?", question16Choices, 1, R.drawable.logo, "A shopping mall developed and managed by Ayala Malls, inside the Cloverleaf Estate in Quezon City. This is among Ayala Malls' establishments in Quezon City, after Ayala Malls Vertis North, UP Town Center and TriNoma. "));
+
+        List<String> question17Choices = Arrays.asList("Robinsons Novaliches", "Ayala Malls Vertis North", "Gateway Mall", "Robinsons Magnolia");
+        quizQuestions.add(new QuizQuestion("Question 17?", question17Choices, 3, R.drawable.logo, "Bustling shopping center offering clothing stores, services, a food court & movie theater."));
+
+        List<String> question18Choices = Arrays.asList("Robinsons Novaliches", "Ayala Malls Vertis North", "Gateway Mall", "UP Town Center");
+        quizQuestions.add(new QuizQuestion("Question 18?", question18Choices, 3, R.drawable.logo, "Airy, contemporary retail complex with brand-name shops, outdoor walkways & a fenced dog park."));
+
+        List<String> question19Choices = Arrays.asList("Our Lady of the Miraculous Medal Parish Church", "Parish of the Holy Sacrifice Church", "Santo Domingo Church", "Church of the Risen Lord");
+        quizQuestions.add(new QuizQuestion("Question 19?", question19Choices, 0, R.drawable.logo, "Our Lady of the Miraculous Medal Parish of the Roman Catholic Diocese of Cubao was established on September 4, 1976. It is located in Project 4, City of Quezon. The Parish Fiesta is celebrated every 27th day of November."));
+
+        List<String> question20Choices = Arrays.asList("Choice T1", "Choice T2", "Choice T3", "Choice T4");
+        quizQuestions.add(new QuizQuestion("Question 20?", question20Choices, 1, R.drawable.logo, "Description for correct answer 20"));
+
+        // Add more quiz questions with images and descriptions as needed
+        Collections.shuffle(quizQuestions);
+    }
+
+    private void displayQuizQuestion(int questionIndex) {
+        if (questionIndex < 0 || questionIndex >= quizQuestions.size()) {
+            // Handle the case where the question index is out of bounds
+            return;
+        }
+
+        currentQuestion = quizQuestions.get(questionIndex);
+
+        // Set the image resource for the question
+        ImageView imageView = rootView.findViewById(R.id.quizImg); // Assuming you have an ImageView in your layout
+        imageView.setImageResource(currentQuestion.getImageResourceId());
+
+        // Set the answer choices on TextViews (Q1, Q2, Q3, Q4)
+        Q1.setText(currentQuestion.getAnswerChoices().get(0));
+        Q2.setText(currentQuestion.getAnswerChoices().get(1));
+        Q3.setText(currentQuestion.getAnswerChoices().get(2));
+        Q4.setText(currentQuestion.getAnswerChoices().get(3));
+
+        // Set an OnClickListener for the answer choice buttons to check if the answer is correct
+
+        // Handle correct answer click to show description
+        if (isAnswerCorrect) {
+            showCorrectAnswerDialog();
+        }
+    }
 
     // ... (other methods)
 
-    private void resetButtons() {
-        btA.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.default_button_color));
-        btB.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.default_button_color));
-        btC.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.default_button_color));
-        btD.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.default_button_color));
-        ViewCompat.setElevation(btA, 0);
-        ViewCompat.setElevation(btB, 0);
-        ViewCompat.setElevation(btC, 0);
-        ViewCompat.setElevation(btD, 0);
-        isAnswerCorrect = false;
-    }
-
-    private void randomizeCorrectButton() {
-        List<Button> buttons = new ArrayList<>(Arrays.asList(btA, btB, btC, btD));
-        Collections.shuffle(buttons);
-        correctButton = buttons.get(0); // The first button in the shuffled list is the correct button
-    }
 
     private void handleCorrectAnswerButtonClick(Button clickedButton, TextView questionTextView) {
         clickedButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.gradient_start));
         ViewCompat.setElevation(clickedButton, getResources().getDimensionPixelSize(R.dimen.button_elevation));
         ViewCompat.setElevation(questionTextView, getResources().getDimensionPixelSize(R.dimen.textview_elevation));
 
-        isAnswerCorrect = true;
+        // Do not set isAnswerCorrect to true here
+
+        // Show the "Correct Answer" dialog without setting isAnswerCorrect
         showCorrectAnswerDialog();
     }
+
 
     private void handleWrongAnswerButtonClick(Button clickedButton) {
         clickedButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.gradient_end));
@@ -107,11 +203,45 @@ public class QuizFragment extends Fragment {
     private void showCorrectAnswerDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Correct Answer")
-                .setMessage("Your answer is correct!")
-                .setPositiveButton("Proceed", null)
-                .setNegativeButton("Cancel", null)
+                .setMessage(currentQuestion.getCorrectAnswerDescription()) // Use the description from the current question
+                .setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // Reset button colors
+                        resetButtonColors();
+
+                        // Proceed to the next question
+                        int nextQuestionIndex = quizQuestions.indexOf(currentQuestion) + 1;
+                        if (nextQuestionIndex < quizQuestions.size()) {
+                            displayQuizQuestion(nextQuestionIndex);
+                        } else {
+                            // Handle the case where there are no more questions (quiz is finished)
+                            // You can display a message or take any other appropriate action
+                        }
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // Reset button colors on Cancel
+                        resetButtonColors();
+                    }
+                })
                 .show();
     }
+    
+
+    private void resetButtonColors() {
+        btA.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.default_button_color));
+        btB.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.default_button_color));
+        btC.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.default_button_color));
+        btD.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.default_button_color));
+        ViewCompat.setElevation(btA, 0);
+        ViewCompat.setElevation(btB, 0);
+        ViewCompat.setElevation(btC, 0);
+        ViewCompat.setElevation(btD, 0);
+    }
+
 
     private void showWrongAnswerDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
