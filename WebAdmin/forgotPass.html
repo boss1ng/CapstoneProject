@@ -53,6 +53,7 @@
 
             if (!(inputEmailAdd.value == "" || inputEmailAdd.value == null)) {
 
+                sessionStorage.removeItem('inputEmail');
                 sessionStorage.setItem('inputEmail', inputEmailAdd.value);
                 // localStorage.setItem('inputEmail', inputEmailAdd.value);
                 // sessionStorage.setItem('myObject', JSON.stringify([inputEmail]))

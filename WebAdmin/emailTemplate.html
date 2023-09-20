@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <!-- BOOTSTRAP v5.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+
+    <!-- BOOTSTRAP v5.0 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+
+    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+
+</head>
+<body>
+
+    <div class="container d-flex justify-content-center align-items-center" style="height: 100vh;  background-color: aqua;">
+        <div class="" style="background-color: black;">
+            <div class="container m-1" style="width: 700px; height: auto; background-color: white;">
+                <div class="container d-flex justify-content-center align-items-center">
+                    <div class="m-5 text-center">
+                        <img src="images/Qsee.png" style="width: 80px; height: 80px;">
+                        <h1 class="my-3">Password Reset</h1>
+                        <div class="mx-5">
+                            <p style="font-family: arial;">A request to reset the password for your account has been initiated. To proceed with the password reset process, please use the following one-time password (OTP):</p>
+                        </div>
+
+                        <h1 class="my-4">OTP</h1>
+
+                        <div class="mx-5">
+                            <p style="font-family: arial; font-size: 15px;">Please enter this OTP on the password reset page <b>within the next two (2) minutes</b> to verify your identity and reset your password.</p>
+
+                            <p style="font-family: arial; font-size: 15px;">If you did not initiate this request, please disregard this email.</p>
+                        </div>
+                        
+                    </div>                                       
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+    <button onclick="sendEmail()">Send Email</button>
+
+    <script>
+
+        emailjs.init("y8xpRw9tDb01c-YNo"); // Replace with your actual user ID from Email.js
+
+        function sendEmail() {
+            emailjs.send("service_hj4hy9o", "template_ga3mezl", {
+                to_email: "joeybryan.pintor.cics@ust.edu.ph",
+                subject: "Your Subject",
+                message: "BIBI",
+            })
+            .then(
+                function (response) {
+                    console.log("Email sent:", response);
+                    alert("Email sent successfully!");
+                },
+                
+                function (error) {
+                    console.log("Email sending failed:", error);
+                    alert("Email sending failed.");
+                }
+            );
+        }
+
+    </script>
+    
+</body>
+</html>

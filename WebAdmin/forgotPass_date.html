@@ -146,7 +146,7 @@
                                 // console.log(inputDate.value);
 
                                 randomOTP = generateOTP();
-                                emailjs.send("service_hj4hy9o", "template_gc6nxfk", {
+                                emailjs.send("service_hj4hy9o", "template_ga3mezl", {
                                     to_email: transferredInput, // "joeybryan.pintor.cics@ust.edu.ph"
                                     // subject: "Your Subject",
                                     message: randomOTP, // "Your Message"
@@ -172,6 +172,7 @@
                                 dateSuccessAlert.style.visibility = "visible";
                                 setTimeout(function() {
                                     // alert(randomOTP);
+                                    sessionStorage.removeItem('otpCode');
                                     sessionStorage.setItem('otpCode', randomOTP);
                                     window.location.replace("forgotPass_otp.html")
                                 }, 2000);
