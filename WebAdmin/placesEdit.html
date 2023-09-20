@@ -17,6 +17,13 @@
 
     <!-- AXIOS -->
     <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
+
+    <!-- Firebase Libraries -->
+    <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-storage.js"></script>
+
 </head>
 <body>
     <div class="sidebar">
@@ -176,7 +183,7 @@
                     <div class="container d-flex align-items-center my-3">
                         <input type="text" class="form-control text-center fst-italic" id="inputLocImageEdit" aria-label="Username" aria-describedby="addon-wrapping" disabled/>
                         <!-- <button type="button" class="addBtn btn btn-secondary btn-lg mx-3" id="btnSignIn">Upload Image</button> -->
-                        <input type="file" class="form-control mx-3" onchange="updateOtherInput(this)" id="inputLocImage" aria-label="Username" aria-describedby="addon-wrapping" style="width: 108px; height: 40px; padding-top: 7px;"/>
+                        <input type="file" class="form-control mx-3" onchange="updateOtherInput(this)" id="inputLocImage" accept=".jpg, .jpeg, .png" aria-label="Username" aria-describedby="addon-wrapping" style="width: 108px; height: 40px; padding-top: 7px;"/>
                     </div>
                 </div>
                 
@@ -205,6 +212,8 @@
                     <button type="button" class="btn btn-success btn-lg mx-5" id="actionSavePlace" disabled>Save</button>
                 </div>
             </div>
+
+            <!-- <img src="" id="imageDatabase" style="width: 250px; height: 250px;"> -->
 
         </div>
     </div>
@@ -278,6 +287,7 @@
         };
 
         // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
 
@@ -305,6 +315,9 @@
         var editSuccessAlert = document.getElementById("editSuccess");
         var editFailedAlert = document.getElementById("editFailed");
 
+        const categoryIcon = document.getElementById('imageDatabase');
+        var firebaseIcon = null;
+
         fetchAndPopulateCategory();
         fetchAndPopulate();
         
@@ -327,6 +340,8 @@
                     inputLocationHigh.value = snapshot.val().HighestPrice;
                     inputLocImageEdit.value = snapshot.val().Image;
                     inputLocationImageDesc.value = snapshot.val().ImageDescription;
+
+                    categoryIcon.src = snapshot.val().Link;
                 }
             })
         }

@@ -2,7 +2,7 @@
 body {
     background-image: url(../images/Enhanced.jpg);
     background-size: cover;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 
 img {
@@ -66,6 +66,7 @@ button {
 #categoryPlacesCont {
     margin-left: 450px;
     padding-top: 20px;
+    margin-bottom: 30px;
 }
 
 .textCont {
@@ -78,7 +79,7 @@ button {
 }
 
 .categoryTable {
-    font-size: xx-large;
+    font-size: x-large;
     margin: auto;
     width: fit-content;
 }

@@ -58,7 +58,7 @@
                 <div class="container d-flex align-items-center justify-content-center mt-5">
                     <h1 class="">Categories</h1>
                 </div>
-                <div class="d-flex align-items-center justify-content-end mt-5" style="position: fixed; padding-top: 11px; margin-left: 73rem;">
+                <div class="d-flex align-items-center justify-content-end mt-5" style="position: absolute; padding-top: 11px; margin-left: 73rem;">
                     <svg xmlns="http://www.w3.org/2000/svg" id="addCategory" width="35" height="35" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
                         <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
                     </svg>
@@ -69,7 +69,7 @@
             <table class="categoryTable" id="categoryTable">
                 <thead>
                     <tr>
-                        <td colspan="4" style="font-size: large; text-align: right; padding-right: 140px;">No. of Places</td>
+                        <td colspan="4" style="font-size: large; text-align: right; padding-right: 130px;">No. of Places</td>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -207,6 +207,10 @@
 
                     populateTable(categoryData, locationsData);
                 }
+
+                else {
+                    populateTableNoLoc(categoryData);
+                }
             })
         }
 
@@ -223,6 +227,26 @@
                     if (category.Category == location.Category)
                         numLocations++;
                 });
+
+                const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="" style="width: 10%; padding-left: 80px;">${category.Category}</td>
+                        <td class="text-center" style="width: 10%;">
+                            <button type="button" class="btn btn-info btn-lg rounded-pill" id="btnEdit" onclick="editCategory('${category.Key}')" >Edit</button>
+                            <button type="button" class="btn btn-danger btn-lg rounded-pill" id="btnDelete" onclick="deleteCategory('${category.Key}')" data-bs-toggle="modal" data-bs-target="#staticBackdrop" style="margin-left: 25px;">Delete</button>
+                        </td>
+                        <td class="text-center" style="width: 10%;">${numLocations}</td>
+                    `;
+                    tbody.appendChild(row);
+            });
+        }
+
+        function populateTableNoLoc(categoryData) {
+            const tbody = document.querySelector('#categoryTable tbody');
+            tbody.innerHTML = ''; // Clear existing rows
+
+            categoryData.forEach(category => {
+                var numLocations = 0;
 
                 const row = document.createElement('tr');
                     row.innerHTML = `

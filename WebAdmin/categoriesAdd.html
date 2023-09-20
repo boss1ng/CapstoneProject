@@ -15,6 +15,12 @@
     <!-- BOOTSTRAP v5.0 -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
+    <!-- Firebase Libraries -->
+    <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-storage.js"></script>
+
 </head>
 <body>
     <div class="sidebar">
@@ -69,7 +75,7 @@
                 
                 <div class="outerCont d-flex align-items-center">
                     <span class="mx-5">Category Icon</span>
-                    <input type="file" class="form-control" id="inputCatIcon" aria-label="Username" aria-describedby="addon-wrapping"/>
+                    <input type="file" class="form-control" id="inputCatIcon" accept=".jpg, .jpeg, .png" aria-label="Username" aria-describedby="addon-wrapping"/>
                     <!-- <button type="button" class="addBtn btn btn-secondary btn-lg mx-3" id="btnSignIn">Upload Image</button> -->
                 </div>
             </div>
@@ -146,6 +152,7 @@
         };
     
         // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
 
@@ -166,6 +173,13 @@
         var recordExisting = null;
 
         function createCategory() {
+
+            var uploadedFile = inputCategoryIcon.files[0]; // Get the selected file
+            var fileInputName = uploadedFile.name;
+
+            // Initialize Cloud Storage
+            const storage = firebase.storage();
+            const storageRef = storage.ref();
 
             if (!(inputCategory.value == "" || inputCategoryIcon.value == "")) {
                 const dbref = ref(db);
@@ -195,25 +209,106 @@
                         }
 
                         else {
-                            push(ref(db, "Category"), {
-                                Category: inputCategory.value,
-                                Icon: inputCategoryIcon.value
-                            })
+                            // UPLOAD
+                            const uploadTask = storageRef.child('Categories/' + fileInputName).put(uploadedFile);
 
-                            .then(()=>{
-                                addSuccessAlert.style.visibility = "visible";
-                                setTimeout(function(){
-                                    window.location.replace("categories.html")
-                                }, 2000);
-                            })
+                            // Listen for upload completion
+                            uploadTask.on('state_changed', (snapshot) => {
+                                // Track the progress of the upload here if needed
 
-                            .catch((error)=> {
-                                addFailedAlert.style.visibility = "visible";
-                                setTimeout(function(){
-                                    location.reload()
-                                }, 2000);
-                            })
+                            }, (error) => {
+                                // Handle any errors that occur during the upload
+
+                            }, () => {
+                                // The upload is complete, and the file is now in Firebase Storage
+
+                                // Get the download URL of the uploaded file
+                                storageRef.child('Categories/' + fileInputName).getDownloadURL()
+                                    .then((url) => {
+                                        // Use the URL to access or display the uploaded file
+                                        console.log('Download URL:', url);
+
+                                        // UPLOAD URL to Firebase Realtime Database
+                                        push(ref(db, "Category"), {
+                                            Category: inputCategory.value,
+                                            Icon: fileInputName,
+                                            Link: url
+                                        })
+
+                                        .then( ()=>{
+                                            // alert('URL added to firebase realtimedatabase');
+                                            addSuccessAlert.style.visibility = "visible";
+                                            setTimeout(function(){
+                                                window.location.replace("categories.html")
+                                            }, 2000);
+                                        })
+
+                                        .catch( (error)=> {
+                                            // alert(error);
+                                            addFailedAlert.style.visibility = "visible";
+                                            setTimeout(function(){
+                                                location.reload()
+                                            }, 2000);
+                                        })
+
+                                    })
+
+                                    .catch((error) => {
+                                        // Handle any errors that occur while retrieving the download URL
+                                    });
+                            });
                         }
+                    }
+
+                    else {
+                        // UPLOAD
+                        const uploadTask = storageRef.child('Categories/' + fileInputName).put(uploadedFile);
+
+                        // Listen for upload completion
+                        uploadTask.on('state_changed', (snapshot) => {
+                            // Track the progress of the upload here if needed
+
+                        }, (error) => {
+                            // Handle any errors that occur during the upload
+
+                        }, () => {
+                            // The upload is complete, and the file is now in Firebase Storage
+
+                            // Get the download URL of the uploaded file
+                            storageRef.child('Categories/' + fileInputName).getDownloadURL()
+                                .then((url) => {
+                                    // Use the URL to access or display the uploaded file
+                                    console.log('Download URL:', url);
+
+                                    // UPLOAD URL to Firebase Realtime Database
+                                    push(ref(db, "Category"), {
+                                        Category: inputCategory.value,
+                                        Icon: inputCategoryIcon.value,
+                                        Link: url
+                                    })
+
+                                    .then( ()=>{
+                                        // alert('URL added to firebase realtimedatabase');
+                                        addSuccessAlert.style.visibility = "visible";
+                                        setTimeout(function(){
+                                            window.location.replace("categories.html")
+                                        }, 2000);
+                                    })
+
+                                    .catch( (error)=> {
+                                        // alert(error);
+                                        addFailedAlert.style.visibility = "visible";
+                                        setTimeout(function(){
+                                            location.reload()
+                                        }, 2000);
+                                    })
+
+                                })
+
+                                .catch((error) => {
+                                    // Handle any errors that occur while retrieving the download URL
+                                });
+                        });
                     }
                 })
 

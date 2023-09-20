@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <input type="file" id="photo" /></br>
+    <button id="upload">Upload Image</button>
+
+    <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase.js">    // 6.0.2
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyB08GrYWprzzbddoHqvTR5Ln-9i0CEXqHs",
+            authDomain: "capstone-project-ffe21.firebaseapp.com",
+            databaseURL: "https://capstone-project-ffe21-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "capstone-project-ffe21",
+            storageBucket: "capstone-project-ffe21.appspot.com",
+            messagingSenderId: "67612839105",
+            appId: "1:67612839105:web:7d8ffd05e13733ef609840",
+            measurementId: "G-2BJMTCZ2SM"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+
+        // --------------------------------------------------------------------------------------------------------------------------------------
+
+        
+        const fileInput = document.getElementById('photo');
+        var uploadedFile = fileInput.files[0]; // Get the selected file
+        var fileInputName = uploadedFile.name;
+
+        var buttonUpload = document.querySelector("#upload");
+        buttonUpload.addEventListener('click', uploadImage);
+
+        function uploadImage() {
+
+            const storageRef = firebase.storage().ref("Categories/" + fileInputName);
+            storageRef.put(uploadedFile).then(function(snapshot) {
+                console.log('Image uploaded successfully');
+            });
+
+
+
+
+            
+            
+            // const selectedFile = fileInput.files[0]; // Get the selected file
+
+            // // Create a reference to the storage location where you want to store the image
+            // const imageRef = storageRef.child('images/' + selectedFile.name);
+
+            // // Upload the selected file
+            // imageRef.put(selectedFile).then(function(snapshot) {
+            //     console.log('Image uploaded successfully');
+            // });
+
+        }
+
+    </script>
+    
+</body>
+</html>

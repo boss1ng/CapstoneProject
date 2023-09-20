@@ -14,6 +14,13 @@
 
     <!-- BOOTSTRAP v5.0 -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+    <!-- Firebase Libraries -->
+    <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-storage.js"></script>
+
 </head>
 <body>
     
@@ -38,6 +45,7 @@
         };
     
         // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
 
@@ -47,20 +55,54 @@
         const db = getDatabase();
 
         const categoryToDelete = sessionStorage.getItem('categoryID_ToDelete');
-        deleteCategory(categoryToDelete);
+        var firebaseIcon = null;
+
+        fetchAndPopulate();
+
+        // Fetch data from the database and populate the table
+        function fetchAndPopulate() {
+            const dbref = ref(db)
+
+            get(child(dbref, "Category/" + categoryToDelete))
+            .then( (snapshot)=> {
+                if(snapshot.exists()) {
+                    firebaseIcon = snapshot.val().Icon;
+                }
+
+                deleteCategory(categoryToDelete);
+            })
+        }
 
         function deleteCategory(categoryToDelete) {
-            // alert(categoryToDelete);
 
-            remove(ref(db, 'Category/' + categoryToDelete))
+            // Initialize Cloud Storage
+            const storage = firebase.storage();
+            const storageRef = storage.ref();
+
+            // Reference the specific file you want to delete
+            const fileRef = storageRef.child('Categories/' + firebaseIcon);
+
+            // Delete the file
+            fileRef.delete()
             .then(() => {
-                // alert("Record successfully removed.");
-                sessionStorage.clear();
-                window.location.replace("categories.html");
+                // File has been successfully deleted
+                console.log('File deleted successfully.');
+
+                remove(ref(db, 'Category/' + categoryToDelete))
+                .then(() => {
+                    // alert("Record successfully removed.");
+                    sessionStorage.clear();
+                    window.location.replace("categories.html");
+                })
+                .catch((error) => {
+                    alert(error);
+                });
             })
             .catch((error) => {
-                alert(error);
+                // Handle any errors that occur during deletion
+                console.error('Error deleting file:', error);
             });
+
         }
 
     </script>

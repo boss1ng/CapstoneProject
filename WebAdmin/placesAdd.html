@@ -18,6 +18,12 @@
     <!-- AXIOS -->
     <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
 
+    <!-- Firebase Libraries -->
+    <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-storage.js"></script>
+
 </head>
 <body>
     <div class="sidebar">
@@ -175,7 +181,7 @@
                         <span class="">Upload Image</span>
                     </div>
                     <div class="container d-flex align-items-center my-3">
-                        <input type="file" class="form-control" id="imageFile" aria-label="Username" aria-describedby="addon-wrapping"/>
+                        <input type="file" class="form-control" id="imageFile" accept=".jpg, .jpeg, .png" aria-label="Username" aria-describedby="addon-wrapping"/>
                         <!-- <button type="button" class="btn btn-secondary btn-md mx-3" id="uploadImage">Upload Image</button> -->
                     </div>
                 </div>
@@ -279,6 +285,7 @@
         };
 
         // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
 
@@ -350,6 +357,13 @@
 
         function createLocation() {
 
+            var uploadedFile = inputLocationImage.files[0]; // Get the selected file
+            var fileInputName = uploadedFile.name;
+
+            // Initialize Cloud Storage
+            const storage = firebase.storage();
+            const storageRef = storage.ref();
+
             if (!(inputLocation.value == "" || inputLocationAdd.value == ""  || inputLocationCat.value == ""  || inputLocationCont.value == ""  || inputLocationHigh.value == ""  || inputLocationLow.value == ""  || inputLocationImage.value == ""  || inputLocationImageDesc.value == ""  || inputLocationDesc.value == "")) {
                 
                 const dbref = ref(db)
@@ -379,36 +393,118 @@
                         }
 
                         else {
-                            push(ref(db, "Location"), {
-                                Location: inputLocation.value,                      // University of Santo Tomas    De La Salle University
-                                Category: inputLocationCat.value,
-                                Address: inputLocationAdd.value,                    // España Blvd., Sampaloc, Manila, Philippines 1008
-                                ContactNo: inputLocationCont.value,                 // (02) 3406 1611
-                                Latitude: inputLocationLat.value,
-                                Longitude: inputLocationLong.value,
-                                Description: inputLocationDesc.value,               // The University of Santo Tomas, officially the Pontifical and Royal University of Santo Tomas, Manila, is a private, Catholic research university in Manila, Philippines.
-                                LowestPrice: inputLocationLow.value,                // 48,500
-                                HighestPrice: inputLocationHigh.value,              // 101,900
-                                Image: inputLocationImage.value,                    // Prayer.png
-                                ImageDescription: inputLocationImageDesc.value,     // This is only an image of UST's Prayer Before Study.
-                                AverateRate: 0,
-                                CreatedBy: "Administrator",
-                            })
+                            // UPLOAD
+                            const uploadTask = storageRef.child('Location/' + fileInputName).put(uploadedFile);
 
-                            .then(()=>{
-                                addSuccessAlert.style.visibility = "visible";
-                                setTimeout(function(){
-                                    window.location.replace("places.html")
-                                }, 2000);
-                            })
+                            // Listen for upload completion
+                            uploadTask.on('state_changed', (snapshot) => {
+                                // Track the progress of the upload here if needed
 
-                            .catch((error)=> {
-                                addFailedAlert.style.visibility = "visible";
-                                setTimeout(function(){
-                                    location.reload()
-                                }, 2000);
-                            })
+                            }, (error) => {
+                                // Handle any errors that occur during the upload
+
+                            }, () => {
+                                // The upload is complete, and the file is now in Firebase Storage
+                                const uploadTask = storageRef.child('Location/' + fileInputName).put(uploadedFile);
+
+                                // Get the download URL of the uploaded file
+                                storageRef.child('Location/' + fileInputName).getDownloadURL()
+                                    .then((url) => {
+                                        // Use the URL to access or display the uploaded file
+                                        console.log('Download URL:', url);
+
+                                        // UPLOAD URL to Firebase Realtime Database
+                                        push(ref(db, "Location"), {
+                                            Location: inputLocation.value,                      // University of Santo Tomas    De La Salle University
+                                            Category: inputLocationCat.value,
+                                            Address: inputLocationAdd.value,                    // España Blvd., Sampaloc, Manila, Philippines 1008
+                                            ContactNo: inputLocationCont.value,                 // (02) 3406 1611
+                                            Latitude: inputLocationLat.value,
+                                            Longitude: inputLocationLong.value,
+                                            Description: inputLocationDesc.value,               // Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+                                            LowestPrice: inputLocationLow.value,                // 48,500
+                                            HighestPrice: inputLocationHigh.value,              // 101,900
+                                            Image: fileInputName,                               // 
+                                            Link: url,
+                                            ImageDescription: inputLocationImageDesc.value,     // Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                                            AverateRate: 0,
+                                            CreatedBy: "Administrator",
+                                        })
+
+                                        .then( ()=>{
+                                            // alert('URL added to firebase realtimedatabase');
+                                            addSuccessAlert.style.visibility = "visible";
+                                            setTimeout(function(){
+                                                window.location.replace("places.html")
+                                            }, 2000);
+                                        })
+
+                                        .catch( (error)=> {
+                                            // alert(error);
+                                            addFailedAlert.style.visibility = "visible";
+                                            setTimeout(function(){
+                                                location.reload()
+                                            }, 2000);
+                                        })
+
+                                    })
+
+                                    .catch((error) => {
+                                        // Handle any errors that occur while retrieving the download URL
+                                    });
+                            });
                         }
+                    }
+
+                    else {
+                        // The upload is complete, and the file is now in Firebase Storage
+                        const uploadTask = storageRef.child('Location/' + fileInputName).put(uploadedFile);
+
+                        // Get the download URL of the uploaded file
+                        storageRef.child('Location/' + fileInputName).getDownloadURL()
+                            .then((url) => {
+                                // Use the URL to access or display the uploaded file
+                                console.log('Download URL:', url);
+
+                                // UPLOAD URL to Firebase Realtime Database
+                                push(ref(db, "Location"), {
+                                    Location: inputLocation.value,                      // University of Santo Tomas
+                                    Category: inputLocationCat.value,
+                                    Address: inputLocationAdd.value,                    // España Blvd., Sampaloc, Manila, Philippines 1008
+                                    ContactNo: inputLocationCont.value,                 // (02) 3406 1611
+                                    Latitude: inputLocationLat.value,
+                                    Longitude: inputLocationLong.value,
+                                    Description: inputLocationDesc.value,               // Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+                                    LowestPrice: inputLocationLow.value,                // 48,500
+                                    HighestPrice: inputLocationHigh.value,              // 101,900
+                                    Image: inputLocationImage.value,                    // 
+                                    Link: url,
+                                    ImageDescription: inputLocationImageDesc.value,     // Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                                    AverateRate: 0,
+                                    CreatedBy: "Administrator",
+                                })
+
+                                .then( ()=>{
+                                    // alert('URL added to firebase realtimedatabase');
+                                    addSuccessAlert.style.visibility = "visible";
+                                    setTimeout(function(){
+                                        window.location.replace("places.html")
+                                    }, 2000);
+                                })
+
+                                .catch( (error)=> {
+                                    // alert(error);
+                                    addFailedAlert.style.visibility = "visible";
+                                    setTimeout(function(){
+                                        location.reload()
+                                    }, 2000);
+                                })
+
+                            })
+
+                            .catch((error) => {
+                                // Handle any errors that occur while retrieving the download URL
+                            });
                     }
                 }) 
 
