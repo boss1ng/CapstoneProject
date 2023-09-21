@@ -54,6 +54,10 @@
         
         const db = getDatabase();
 
+        if (localStorage.getItem('loggedUser') == "" || localStorage.getItem('loggedUser') == null) {
+            window.location.replace("index.html");
+        }
+
         const categoryToDelete = sessionStorage.getItem('categoryID_ToDelete');
         var firebaseIcon = null;
 

@@ -58,7 +58,7 @@
                 <path fill-rule="evenodd" d="M6 12.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v2a.5.5 0 0 1-1 0v-2A1.5 1.5 0 0 1 6.5 2h8A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 5 12.5v-2a.5.5 0 0 1 1 0v2z"/>
                 <path fill-rule="evenodd" d="M.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L1.707 7.5H10.5a.5.5 0 0 1 0 1H1.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3z"/>
             </svg>
-            <a href="index.html" class="mx-4">Sign Out</a>
+            <a id="signoutHref" class="mx-4">Sign Out</a>
         </div>
     </div>
       
@@ -238,7 +238,22 @@
         </div>
     </div>
 
+    <!-- ALERT MESSAGE (SUCCESS) -->
+    <div class="alertCont">
+        <div class="alert alert-success d-flex align-items-center" role="alert" id="logout">
+            <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-check-circle-fill mx-3" viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+            </svg>
+                Logout successful. You have been logged out of your account.
+        </div>
+    </div>
+
     <script>
+
+        if (localStorage.getItem('loggedUser') == "" || localStorage.getItem('loggedUser') == null) {
+            window.location.replace("index.html");
+        }
+
         var buttonSave = document.querySelector("#actionSavePlace");
 
         function updateOtherInput(inputFile) {
@@ -314,9 +329,10 @@
 
         var editSuccessAlert = document.getElementById("editSuccess");
         var editFailedAlert = document.getElementById("editFailed");
+        var logoutAlert = document.getElementById("logout");
 
         const categoryIcon = document.getElementById('imageDatabase');
-        var firebaseIcon = null;
+        var firebaseImage = null;
 
         fetchAndPopulateCategory();
         fetchAndPopulate();
@@ -340,6 +356,8 @@
                     inputLocationHigh.value = snapshot.val().HighestPrice;
                     inputLocImageEdit.value = snapshot.val().Image;
                     inputLocationImageDesc.value = snapshot.val().ImageDescription;
+
+                    firebaseImage = snapshot.val().Image;
 
                     categoryIcon.src = snapshot.val().Link;
                 }
@@ -387,30 +405,115 @@
         }
 
         function editLocation() {
-            update(ref(db, 'Location/' + locationToEdit), {
-                Location: inputLocation.value,                      // 
-                Category: inputLocationCat.value,
-                Address: inputLocationAdd.value,                    // 
-                ContactNo: inputLocationCont.value,                 // 
-                Latitude: "",
-                Longitude: "",
-                Description: inputLocationDesc.value,               // 
-                LowestPrice: inputLocationLow.value,                // 
-                HighestPrice: inputLocationHigh.value,              // 
-                Image: inputLocationImage.value,                    // 
-                ImageDescription: inputLocationImageDesc.value,     // 
-                AverateRate: 0,
-            })
-            .then(() => {
-                editSuccessAlert.style.visibility = "visible";
-                setTimeout(function() {
-                    sessionStorage.clear();
-                    window.location.replace("places.html");
-                }, 2000);
-            })
-            .catch((error) => {
-                alert(error);
-            });
+
+            if (inputLocationImage.value == "" || inputLocationImage.value == null) {
+                // UPDATE Location Information (except Image) in Firebase Realtime Database
+                update(ref(db, 'Location/' + locationToEdit), {
+                    Location: inputLocation.value,                      // 
+                    Category: inputLocationCat.value,
+                    Address: inputLocationAdd.value,                    // 
+                    ContactNo: inputLocationCont.value,                 // 
+                    Latitude: inputLocationLat.value,
+                    Longitude: inputLocationLong.value,
+                    Description: inputLocationDesc.value,               // 
+                    LowestPrice: inputLocationLow.value,                // 
+                    HighestPrice: inputLocationHigh.value,              // 
+                    ImageDescription: inputLocationImageDesc.value,     // 
+                })
+
+                .then( ()=>{
+                    // alert('URL updated to firebase realtimedatabase');
+                    editSuccessAlert.style.visibility = "visible";
+                    setTimeout(function() {
+                        sessionStorage.clear();
+                        window.location.replace("places.html");
+                    }, 2000);
+                })
+
+                .catch( (error)=> {
+                    alert(error);
+                })
+            }
+
+            else {
+
+                var uploadedFile = inputLocationImage.files[0]; // Get the selected file
+                var fileInputName = uploadedFile.name;
+
+                // Initialize Cloud Storage
+                const storage = firebase.storage();
+                const storageRef = storage.ref();
+
+                // Reference the specific file you want to delete
+                const fileRef = storageRef.child('Location/' + firebaseImage);
+
+                // Delete the file
+                fileRef.delete()
+                .then(() => {
+                    // File has been successfully deleted
+                    console.log('File deleted successfully.');
+                })
+                .catch((error) => {
+                    // Handle any errors that occur during deletion
+                    console.error('Error deleting file:', error);
+                });
+
+                // Upload NEW FILE
+                const uploadTask = storageRef.child('Location/' + fileInputName).put(uploadedFile);
+
+                // Listen for upload completion
+                uploadTask.on('state_changed', (snapshot) => {
+                    // Track the progress of the upload here if needed
+
+                }, (error) => {
+                    // Handle any errors that occur during the upload
+
+                }, () => {
+                    // The upload is complete, and the file is now in Firebase Storage
+
+                    // Get the download URL of the uploaded file
+                    storageRef.child('Location/' + fileInputName).getDownloadURL()
+                        .then((url) => {
+                            // Use the URL to access or display the uploaded file
+                            console.log('Download URL:', url);
+
+                            // UPDATE URL to the Existing Record in Firebase Realtime Database
+                            update(ref(db, 'Location/' + locationToEdit), {
+                                Location: inputLocation.value,                      // 
+                                Category: inputLocationCat.value,
+                                Address: inputLocationAdd.value,                    // 
+                                ContactNo: inputLocationCont.value,                 // 
+                                Latitude: inputLocationLat.value,
+                                Longitude: inputLocationLong.value,
+                                Description: inputLocationDesc.value,               // 
+                                LowestPrice: inputLocationLow.value,                // 
+                                HighestPrice: inputLocationHigh.value,              // 
+                                Image: fileInputName,                               // 
+                                Link: url,
+                                ImageDescription: inputLocationImageDesc.value,     // 
+                            })
+
+                            .then( ()=>{
+                                // alert('URL updated to firebase realtimedatabase');
+                                editSuccessAlert.style.visibility = "visible";
+                                setTimeout(function() {
+                                    sessionStorage.clear();
+                                    window.location.replace("places.html");
+                                }, 2000);
+                            })
+
+                            .catch( (error)=> {
+                                alert(error);
+                            })
+
+                        })
+
+                        .catch((error) => {
+                            // Handle any errors that occur while retrieving the download URL
+                        });
+                });
+
+            }
         }
         
         var buttonSave = document.querySelector("#actionSavePlace");
@@ -454,9 +557,15 @@
 
         var buttonSignOut = document.querySelector("#signoutCont");
         buttonSignOut.addEventListener('click', goNext4)
+        var buttonSignOutHref = document.querySelector("#signoutHref");
+        buttonSignOutHref.addEventListener('click', goNext4);
 
         function goNext4() {
-            window.location.replace("index.html")
+
+            logoutAlert.style.visibility = "visible";
+            setTimeout(function() {
+                window.location.replace("index.html");
+            }, 2000);
         }
 
     </script>
