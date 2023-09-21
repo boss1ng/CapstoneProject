@@ -25,12 +25,12 @@ public class ForgotPass extends AppCompatActivity {
         setContentView(R.layout.forgotpass);
 
         // Retrieve the username from the intent's extras
-        String username = getIntent().getStringExtra("username");
+        String username = getIntent().getStringExtra("userId");
 
         contactNoInput = findViewById(R.id.contactNoInput);
         databaseReference = FirebaseDatabase.getInstance().getReference(); // Initialize the reference
         // Query the database for the user's contact number
-        databaseReference.child("MobileUsers").orderByChild("username").equalTo(username)
+        databaseReference.child("MobileUsers").orderByChild("userId").equalTo(username)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -39,10 +39,12 @@ public class ForgotPass extends AppCompatActivity {
                             for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
                                 User user = userSnapshot.getValue(User.class);
                                 if (user != null) {
-                                    String contactNumber = user.getContactNumber();
+                                    // Decrypt the stored encrypted contact number
+                                    String storedEncryptedContactNumber = user.getContactNumber();
+                                    String decryptedContactNumber = AESUtils.decrypt(storedEncryptedContactNumber);
 
                                     // Set the contact number in the TextInputLayout
-                                    contactNoInput.getEditText().setText(contactNumber);
+                                    contactNoInput.getEditText().setText(decryptedContactNumber);
                                 }
                             }
                         }

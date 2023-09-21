@@ -67,31 +67,43 @@ public class MainActivity extends AppCompatActivity {
                     return; // Don't proceed if the username is empty
                 }
 
-                // Check if the username exists in the Firebase database
-                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
-                DatabaseReference usersReference = databaseReference.child("MobileUsers");
+                // Reference to the "MobileUsers" node in Firebase
+                DatabaseReference usersReference = FirebaseDatabase.getInstance().getReference().child("MobileUsers");
 
-                usersReference.orderByChild("username").equalTo(username)
-                        .addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                if (dataSnapshot.exists()) {
-                                    // Username exists, proceed to the "ForgotPass" activity
-                                    Intent intent = new Intent(MainActivity.this, ForgotPass.class);
-                                    intent.putExtra("username", username);
-                                    startActivity(intent);
-                                } else {
-                                    // Username does not exist in the database
-                                    Toast.makeText(MainActivity.this, "Username does not exist", Toast.LENGTH_SHORT).show();
-                                }
-                            }
+                usersReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        boolean usernameExists = false;
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                                // Handle database error, if any
-                                Toast.makeText(MainActivity.this, "Database error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                        for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                            // Assuming your user class has a getUsername method to retrieve the username
+                            String storedEncryptedUsername = userSnapshot.child("username").getValue(String.class);
+                            String decryptedUsername = AESUtils.decrypt(storedEncryptedUsername);
+                            String userId = userSnapshot.getKey(); // Get the user's ID
+
+                            // Check if the decrypted username matches the input username
+                            if (decryptedUsername != null && decryptedUsername.equals(username)) {
+                                // Username exists
+                                Intent intent = new Intent(MainActivity.this, ForgotPass.class);
+                                intent.putExtra("userId", userId);
+                                startActivity(intent);
+                                usernameExists = true;
+                                break; // Exit the loop since we found a match
                             }
-                        });
+                        }
+
+                        if (!usernameExists) {
+                            // Username does not exist in the database
+                            Toast.makeText(MainActivity.this, "Username not found", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        // Handle database error, if any
+                        Toast.makeText(MainActivity.this, "Database error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
     }

@@ -46,6 +46,7 @@
         app:layout_constraintVertical_bias="0.112" />
 
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/currentPwd"
         android:layout_width="373dp"
         android:layout_height="67dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -61,6 +62,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/newPwd"
         android:layout_width="373dp"
         android:layout_height="67dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -78,7 +80,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textInputLayout"
+        android:id="@+id/reNewPwd"
         android:layout_width="373dp"
         android:layout_height="67dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -108,11 +110,11 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout"
+        app:layout_constraintTop_toBottomOf="@+id/reNewPwd"
         app:layout_constraintVertical_bias="0.059" />
 
     <Button
-        android:id="@+id/saveBt"
+        android:id="@+id/changePwd"
         android:layout_width="308dp"
         android:layout_height="48dp"
         android:layout_marginBottom="88dp"
@@ -122,7 +124,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.504"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout"
+        app:layout_constraintTop_toBottomOf="@+id/reNewPwd"
         app:layout_constraintVertical_bias="0.333" />
 
     <Button
@@ -135,7 +137,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/saveBt"
+        app:layout_constraintTop_toBottomOf="@+id/changePwd"
         app:layout_constraintVertical_bias="0.0" />
 
 

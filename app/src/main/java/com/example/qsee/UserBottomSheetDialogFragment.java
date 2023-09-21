@@ -17,10 +17,30 @@ public class UserBottomSheetDialogFragment extends BottomSheetDialogFragment {
         // Required empty public constructor
     }
 
+    // Declaration of userId
+    private String userId;
+
+    public static UserBottomSheetDialogFragment newInstance(String userId) {
+        UserBottomSheetDialogFragment fragment = new UserBottomSheetDialogFragment();
+        Bundle args = new Bundle();
+        args.putString("userId", userId);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_user_options_bottom_sheet, container, false);
+
+        // Retrieve the userId argument inside onCreateView
+        Bundle args = getArguments();
+        if (args != null) {
+            userId = args.getString("userId");
+        } else {
+            // Handle the case where userId is not provided
+            // You might want to log an error or take appropriate action
+        }
 
         TextView changePasswordOption = rootView.findViewById(R.id.menu_change_password);
         TextView signOutOption = rootView.findViewById(R.id.menu_sign_out);
@@ -28,8 +48,8 @@ public class UserBottomSheetDialogFragment extends BottomSheetDialogFragment {
         changePasswordOption.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Replace the current fragment with the "EditPasswordFragment"
-                EditPasswordFragment editPasswordFragment = new EditPasswordFragment();
+                // Pass the userId to the EditPasswordFragment
+                EditPasswordFragment editPasswordFragment = EditPasswordFragment.newInstance(userId);
                 FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
                 transaction.replace(R.id.fragment_container, editPasswordFragment); // Replace 'fragment_container' with the ID of your container layout
                 transaction.addToBackStack(null); // Optional: Add the transaction to the back stack

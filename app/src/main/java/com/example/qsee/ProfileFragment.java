@@ -55,14 +55,13 @@ public class ProfileFragment extends Fragment {
         // Retrieve the username from the arguments
         userId = getArguments().getString("userId");
 
-
         TextView uname = rootView.findViewById(R.id.ProfileUsername);
 
         uname.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Show the UserBottomSheetDialogFragment
-                UserBottomSheetDialogFragment bottomSheetDialog = new UserBottomSheetDialogFragment();
+                UserBottomSheetDialogFragment bottomSheetDialog = new UserBottomSheetDialogFragment().newInstance(userId);
                 bottomSheetDialog.show(getParentFragmentManager(), bottomSheetDialog.getTag());
             }
         });
@@ -74,7 +73,8 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // Show the UserBottomSheetDialogFragment
-                UserBottomSheetDialogFragment bottomSheetDialog = new UserBottomSheetDialogFragment();
+                // Show the UserBottomSheetDialogFragment
+                UserBottomSheetDialogFragment bottomSheetDialog = UserBottomSheetDialogFragment.newInstance(userId);
                 bottomSheetDialog.show(getParentFragmentManager(), bottomSheetDialog.getTag());
             }
         });
