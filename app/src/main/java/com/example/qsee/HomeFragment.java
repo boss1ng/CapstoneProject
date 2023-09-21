@@ -26,6 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -90,21 +91,40 @@ public class HomeFragment extends Fragment {
             List<String> sortedDates = new ArrayList<>(dailyForecasts.keySet());
             Collections.sort(sortedDates);
 
-            String date = sortedDates.get(dayIndex);
-            List<Double> temperatures = dailyForecasts.get(date);
-            double averageTemperature = calculateAverage(temperatures);
+            if (dayIndex < sortedDates.size()) {
+                // Define a custom comparator to sort the dates in ascending order
+                Collections.sort(sortedDates, new Comparator<String>() {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, MMMM dd yyyy", Locale.US);
 
-            // Extract and display the weather condition
-            String weatherCondition = getWeatherCondition(date, forecasts);
+                    @Override
+                    public int compare(String date1, String date2) {
+                        try {
+                            Date d1 = dateFormat.parse(date1);
+                            Date d2 = dateFormat.parse(date2);
+                            return d1.compareTo(d2);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                            return 0; // Handle parsing error gracefully
+                        }
+                    }
+                });
 
-            // Extract and display the rain percentage
-            int rainPercentage = getRainPercentage(date);
+                String date = sortedDates.get(dayIndex);
+                List<Double> temperatures = dailyForecasts.get(date);
+                double averageTemperature = calculateAverage(temperatures);
 
-            // Display the daily forecast for the selected day
-            dateText.setText(date + "\n"); // Display day in the format "Thursday, MMMM dd yyyy"
-            wC.setText(weatherCondition + "\n");
-            rP.setText(rainPercentage + "%\n");
-            textView.setText(String.format("%.2f", averageTemperature) + "°C\n");
+                // Extract and display the weather condition
+                String weatherCondition = getWeatherCondition(date, forecasts);
+
+                // Extract and display the rain percentage
+                int rainPercentage = getRainPercentage(date);
+
+                // Display the daily forecast for the selected day
+                dateText.setText(date + "\n");
+                wC.setText(weatherCondition + "\n");
+                rP.setText(rainPercentage + "%\n");
+                textView.setText(String.format("%.2f", averageTemperature) + "°C\n");
+            }
         }
     }
 
