@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 import com.android.volley.Request;
@@ -14,6 +15,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.qsee.R;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,6 +29,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -33,6 +37,9 @@ public class HomeFragment extends Fragment {
 
     private String api_key = "4f37738f182c49802496e7f263ff8797"; // Replace with your API key
     private TextView textView;
+    private TextView dateText;
+    private TextView wC;
+    private TextView rP;
     private EditText locationEditText;
     private Button getWeatherButton;
     private Button previousButton;
@@ -50,18 +57,22 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         textView = view.findViewById(R.id.textView);
-        previousButton = view.findViewById(R.id.previousButton);
-        nextButton = view.findViewById(R.id.nextButton);
+        dateText = view.findViewById(R.id.date);
+        wC = view.findViewById(R.id.weatherCondition);
+        rP = view.findViewById(R.id.rainPercentage);
 
-        // Set click listeners for previous and next buttons
-        previousButton.setOnClickListener(new View.OnClickListener() {
+        ImageView previousImageView = view.findViewById(R.id.previousButton);
+        ImageView nextImageView = view.findViewById(R.id.nextButton);
+
+        // Set click listeners for previous and next ImageViews
+        previousImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showPreviousDay();
             }
         });
 
-        nextButton.setOnClickListener(new View.OnClickListener() {
+        nextImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showNextDay();
@@ -90,20 +101,25 @@ public class HomeFragment extends Fragment {
             int rainPercentage = getRainPercentage(date);
 
             // Display the daily forecast for the selected day
-            textView.setText("Date: " + date + "\n");
-            textView.append("Weather Condition: " + weatherCondition + "\n");
-            textView.append("Rain Percentage: " + rainPercentage + "%\n");
-            textView.append("Average Temperature: " + String.format("%.2f", averageTemperature) + "°C\n");
+            dateText.setText(date + "\n"); // Display day in the format "Thursday, MMMM dd yyyy"
+            wC.setText(weatherCondition + "\n");
+            rP.setText(rainPercentage + "%\n");
+            textView.setText(String.format("%.2f", averageTemperature) + "°C\n");
         }
     }
-
 
     private int getRainPercentage(String date) {
         try {
             for (int i = 0; i < forecasts.length(); i++) {
                 JSONObject forecast = forecasts.getJSONObject(i);
                 String dateTime = forecast.getString("dt_txt");
-                if (dateTime.startsWith(date)) {
+                SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                SimpleDateFormat compareFormatter = new SimpleDateFormat("EEEE, MMMM dd yyyy", Locale.US);
+
+                Date forecastDate = dateFormatter.parse(dateTime);
+                String formattedDate = compareFormatter.format(forecastDate);
+
+                if (formattedDate.equals(date)) {
                     JSONObject rainObject = forecast.optJSONObject("rain");
                     if (rainObject != null) {
                         double rainVolume3h = 0.0; // Default value if rain data is not available
@@ -126,19 +142,24 @@ public class HomeFragment extends Fragment {
             }
         } catch (JSONException e) {
             e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
-        return 0; // Default value if rain percentage cannot be determined
+        return -1; // Default value if rain percentage cannot be determined
     }
-
-
-
 
     private String getWeatherCondition(String date, JSONArray forecasts) {
         try {
             for (int i = 0; i < forecasts.length(); i++) {
                 JSONObject forecast = forecasts.getJSONObject(i);
                 String dateTime = forecast.getString("dt_txt");
-                if (dateTime.startsWith(date)) {
+                SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                SimpleDateFormat compareFormatter = new SimpleDateFormat("EEEE, MMMM dd yyyy", Locale.US);
+
+                Date forecastDate = dateFormatter.parse(dateTime);
+                String formattedDate = compareFormatter.format(forecastDate);
+
+                if (formattedDate.equals(date)) {
                     JSONArray weatherArray = forecast.getJSONArray("weather");
                     if (weatherArray.length() > 0) {
                         JSONObject weather = weatherArray.getJSONObject(0);
@@ -148,11 +169,11 @@ public class HomeFragment extends Fragment {
             }
         } catch (JSONException e) {
             e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
-        return "N/A"; // Default value if weather condition cannot be determined
+        return "Not available"; // Default value if weather condition cannot be determined
     }
-
-
 
     private void getWeatherForecastByLocationName(String locationName) {
         String weather_url = "https://api.openweathermap.org/data/2.5/forecast?q=" +
@@ -180,7 +201,7 @@ public class HomeFragment extends Fragment {
 
                             // Get the current date in the local time zone
                             Calendar calendar = Calendar.getInstance();
-                            calendar.setTimeZone(TimeZone.getTimeZone("America/New_York")); // Set your desired time zone
+                            calendar.setTimeZone(TimeZone.getTimeZone("Philippines/Manila")); // Set your desired time zone
                             Date currentDate = calendar.getTime();
 
                             // Format the current date and time as "yyyy-MM-dd HH:mm:ss"
@@ -197,7 +218,7 @@ public class HomeFragment extends Fragment {
 
                                 // Check if the forecast date and time are greater than or equal to the current date and time
                                 if (forecastDateTime != null && forecastDateTime.compareTo(currentDate) >= 0) {
-                                    String date = new SimpleDateFormat("yyyy-MM-dd").format(forecastDateTime);
+                                    String date = new SimpleDateFormat("EEEE, MMMM dd yyyy", Locale.US).format(forecastDateTime);
 
                                     JSONObject main = forecast.getJSONObject("main");
                                     double temperatureKelvin = main.getDouble("temp");
@@ -215,9 +236,10 @@ public class HomeFragment extends Fragment {
                             List<String> sortedDates = new ArrayList<>(dailyForecasts.keySet());
                             Collections.sort(sortedDates);
 
-                            int dayCount = 0;
+                            int dayCount = 1; // Initialize day count to 1
+
                             for (String date : sortedDates) {
-                                if (dayCount < 5) { // Display 5 days, including today
+                                if (dayCount <= 5) { // Display 5 days, including today
                                     List<Double> temperatures = dailyForecasts.get(date);
                                     double averageTemperature = calculateAverage(temperatures);
 
@@ -228,10 +250,7 @@ public class HomeFragment extends Fragment {
                                     int rainPercentage = getRainPercentage(date);
 
                                     // Append the daily forecast to the TextView
-                                    textView.append("Date: " + date + "\n");
-                                    textView.append("Weather Condition: " + weatherCondition + "\n");
-                                    textView.append("Rain Percentage: " + rainPercentage + "%\n");
-                                    textView.append("Average Temperature: " + String.format("%.2f", averageTemperature) + "°C\n\n");
+
 
                                     dayCount++;
                                 } else {
@@ -257,7 +276,6 @@ public class HomeFragment extends Fragment {
 
         queue.add(stringRequest);
     }
-
 
     private void showPreviousDay() {
         if (currentDayIndex > 0) {
