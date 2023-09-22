@@ -17,6 +17,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Qsee"
         tools:targetApi="34">
+
+        <!-- API Key for Google -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAwTBhjMDtD74Nvqz7eUbN81v93SLhM3IU"
+            >
+        </meta-data>
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
