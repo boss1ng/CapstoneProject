@@ -117,7 +117,7 @@ public class HomeFragment extends Fragment {
                 String weatherCondition = getWeatherCondition(date, forecasts);
 
                 // Extract and display the rain percentage
-                int rainPercentage = getRainPercentage(date);
+                String rainPercentage = getRainPercentage(date);
 
                 // Display the daily forecast for the selected day
                 dateText.setText(date + "\n");
@@ -128,7 +128,7 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    private int getRainPercentage(String date) {
+    private String getRainPercentage(String date) {
         try {
             for (int i = 0; i < forecasts.length(); i++) {
                 JSONObject forecast = forecasts.getJSONObject(i);
@@ -156,7 +156,11 @@ public class HomeFragment extends Fragment {
                             rainPercentage = 100;
                         }
 
-                        return rainPercentage;
+                        // Get the rain icon based on the rain percentage
+                        String rainIcon = getRainIcon(rainPercentage);
+
+                        // Construct the output string with the icon and percentage
+                        return rainIcon + " " + rainPercentage + "%";
                     }
                 }
             }
@@ -165,7 +169,20 @@ public class HomeFragment extends Fragment {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        return -1; // Default value if rain percentage cannot be determined
+        return "Not available"; // Default value if rain percentage cannot be determined
+    }
+
+    // Define a function to map rain percentages to icons
+    private String getRainIcon(int rainPercentage) {
+        // You can define your own logic for mapping rain percentages to icons here.
+        // Here's a simple example using a few ranges:
+        if (rainPercentage < 20) {
+            return "☔️"; // Light rain icon
+        } else if (rainPercentage < 60) {
+            return "🌧️"; // Moderate rain icon
+        } else {
+            return "⛈️"; // Heavy rain icon
+        }
     }
 
     private String getWeatherCondition(String date, JSONArray forecasts) {
@@ -183,7 +200,11 @@ public class HomeFragment extends Fragment {
                     JSONArray weatherArray = forecast.getJSONArray("weather");
                     if (weatherArray.length() > 0) {
                         JSONObject weather = weatherArray.getJSONObject(0);
-                        return weather.getString("description");
+                        String description = weather.getString("description");
+
+                        // Map weather descriptions to icons here
+                        String icon = mapWeatherToIcon(description);
+                        return icon;
                     }
                 }
             }
@@ -192,7 +213,76 @@ public class HomeFragment extends Fragment {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        return "Not available"; // Default value if weather condition cannot be determined
+        return "Not available"; // Default value if weather icon cannot be determined
+    }
+
+    // Define a function to map weather descriptions to icons
+    private String mapWeatherToIcon(String description) {
+        // You can implement your own mapping logic here.
+        // For example, you can use a switch statement or if-else statements to map descriptions to icons.
+        // Here's a simple example using a few common weather descriptions:
+        switch (description.toLowerCase()) {
+            case "clear sky":
+                return "☀️";
+            case "few clouds":
+                return "🌤️";
+            case "scattered clouds":
+                return "⛅";
+
+            case "broken clouds":
+            case "overcast clouds":
+                return "☁️";
+
+            case "light rain":
+            case "moderate rain":
+            case "heavy intensity rain":
+            case "very heavy rain":
+            case "	extreme rain":
+                return "🌦️";
+
+            case "rain":
+            case "light intensity drizzle":
+            case "drizzle":
+            case "heavy intensity drizzle":
+            case "light intensity drizzle rain":
+            case "drizzle rain":
+            case "heavy intensity drizzle rain":
+            case "shower rain and drizzle":
+            case "heavy shower rain and drizzle":
+            case "shower drizzle":
+                return "🌧️";
+
+
+            case "thunderstorm":
+            case "thunderstorm with light rain":
+            case "thunderstorm with rain":
+            case "thunderstorm with heavy rain":
+            case "light thunderstorm":
+            case "heavy thunderstorm":
+            case "ragged thunderstorm":
+            case "thunderstorm with light drizzle":
+            case "thunderstorm with drizzle":
+            case "thunderstorm with heavy drizzle":
+                return "⛈️";
+
+            case "snow":
+                return "🌨️";
+
+            case "mist":
+            case "smoke":
+            case "haze":
+            case "sand/dust whirls":
+            case "fog":
+            case "sand":
+            case "dust":
+            case "volcanic ash":
+            case "squalls":
+            case "tornado":
+                return "🌫️";
+
+            default:
+                return "❓"; // If the description doesn't match any known icon, return a question mark or handle it as needed.
+        }
     }
 
     private void getWeatherForecastByLocationName(String locationName) {
@@ -267,7 +357,7 @@ public class HomeFragment extends Fragment {
                                     String weatherCondition = getWeatherCondition(date, forecasts);
 
                                     // Extract and display the rain percentage
-                                    int rainPercentage = getRainPercentage(date);
+                                    String rainPercentage = getRainPercentage(date);
 
                                     // Append the daily forecast to the TextView
 

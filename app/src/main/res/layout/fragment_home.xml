@@ -60,7 +60,7 @@
             android:layout_marginTop="35dp"
             android:textSize="15dp"
             android:textAlignment="textStart"
-            android:text="Date" />
+            android:text="" />
 
         <TextView
             android:id="@+id/textView"
@@ -77,10 +77,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAlignment="textStart"
-            android:textSize="15dp"
-            android:layout_marginTop="60dp"
+            android:textSize="50dp"
+            android:layout_marginTop="55dp"
             android:layout_marginStart="45dp"
-            android:text="Weather Con" />
+            android:text="#" />
 
         <TextView
             android:id="@+id/rainPercentage"
@@ -88,9 +88,9 @@
             android:layout_height="wrap_content"
             android:textAlignment="textStart"
             android:textSize="15dp"
-            android:layout_marginTop="85dp"
+            android:layout_marginTop="120dp"
             android:layout_marginStart="45dp"
-            android:text="Rain %" />
+            android:text="" />
 
         <ImageView
             android:id="@+id/nextButton"
