@@ -1,80 +1,104 @@
 package com.example.qsee;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-
-// Import
-import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.SupportMapFragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import com.google.android.gms.maps.OnMapReadyCallback;
-
-// Quezon City ONLY
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.SupportMapFragment;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
-    private MapView mapView;
     private GoogleMap mMap;
+    private FusedLocationProviderClient fusedLocationProviderClient;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
     public MapsFragment() {
         // Required empty public constructor
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        //return inflater.inflate(R.layout.fragment_maps, container, false);
-
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
 
-        // Obtain the FragmentManager using getParentFragmentManager()
-        FragmentManager fragmentManager = getParentFragmentManager();
+        // Initialize the FusedLocationProviderClient
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
 
-        // Use fragmentManager to work with fragments, including SupportMapFragment
-        SupportMapFragment mapFragment = new SupportMapFragment();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.add(R.id.maps, mapFragment).commit();
-
-        // SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager.findFragmentId(R.id.maps);
-        mapFragment.getMapAsync(this);
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
+                .findFragmentById(R.id.maps);
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(this);
+        }
 
         return view;
     }
 
-//    @Override
-//    public void onMapReady(@NonNull GoogleMap googleMap) {
-//
-//    }
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
-        // Define the bounds for Quezon City, Philippines
-        LatLngBounds quezonCityBounds = new LatLngBounds(
-                new LatLng(14.6138, 121.0357), // Southwest corner
-                new LatLng(14.7395, 121.0711)  // Northeast corner
-        );
+        // Check if location permission is granted
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
 
-        // Constrain the map's camera position to Quezon City bounds
-        mMap.setLatLngBoundsForCameraTarget(quezonCityBounds);
+            // Request location permission if not granted
+            requestPermissions(new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+            }, LOCATION_PERMISSION_REQUEST_CODE);
+            return;
+        }
 
-        // Move the camera to Quezon City
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(quezonCityBounds.getCenter(), 12));
+        // Enable the My Location layer on the map
+        mMap.setMyLocationEnabled(true);
+
+        // Get the user's last known location and move the camera there
+        fusedLocationProviderClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
+            if (location != null) {
+                double latitude = location.getLatitude();
+                double longitude = location.getLongitude();
+                LatLng userLocation = new LatLng(latitude, longitude);
+
+                // Add a marker at the user's location
+                mMap.addMarker(new MarkerOptions().position(userLocation).title("Your Location"));
+
+                // Move the camera to the user's location
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
+            }
+        });
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, reinitialize the map
+                if (mMap != null) {
+                    onMapReady(mMap);
+                }
+            }
+        }
+    }
+}
+
 
     /*
     @Override
@@ -95,4 +119,4 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         mapView.onDestroy();
     }
 */
-}
+
