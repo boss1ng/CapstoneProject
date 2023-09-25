@@ -150,7 +150,7 @@ public class HomeFragment extends Fragment {
                         String rainIcon = getRainIcon(rainPercentage);
 
                         // Construct the output string with the icon and percentage
-                        return rainIcon + " " + rainPercentage + "%";
+                        return rainIcon + " " + rainPercentage;
                     }
                 }
             }
