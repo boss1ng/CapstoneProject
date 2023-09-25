@@ -60,11 +60,13 @@ public class HomeFragment extends Fragment {
 
         // Set click listeners for previous and next ImageViews
         previousImageView.setOnClickListener(v -> showPreviousDay());
-
         nextImageView.setOnClickListener(v -> showNextDay());
 
         // Automatically load the weather forecast for Quezon City
         getWeatherForecastByLocationName();
+
+        // Initially, display the first day's information (dayIndex = 0)
+        displayDay(currentDayIndex);
 
         return view;
     }
@@ -98,6 +100,7 @@ public class HomeFragment extends Fragment {
                 List<Double> temperatures = dailyForecasts.get(date);
                 assert temperatures != null;
                 double averageTemperature = calculateAverage(temperatures);
+
 
                 // Extract and display the weather condition
                 String weatherCondition = getWeatherCondition(date, forecasts);
@@ -207,8 +210,10 @@ public class HomeFragment extends Fragment {
         switch (description.toLowerCase()) {
             case "clear sky":
                 return "☀️";
+
             case "few clouds":
                 return "🌤️";
+
             case "scattered clouds":
                 return "⛅";
 
@@ -220,7 +225,6 @@ public class HomeFragment extends Fragment {
             case "moderate rain":
             case "heavy intensity rain":
             case "very heavy rain":
-            case "	extreme rain":
                 return "🌦️";
 
             case "rain":
@@ -233,6 +237,7 @@ public class HomeFragment extends Fragment {
             case "shower rain and drizzle":
             case "heavy shower rain and drizzle":
             case "shower drizzle":
+            case "extreme rain":
                 return "🌧️";
 
 
@@ -325,31 +330,8 @@ public class HomeFragment extends Fragment {
                             }
                         }
 
-                        // Display the daily forecasts for the next 5 days including today in ascending order
-                        List<String> sortedDates = new ArrayList<>(dailyForecasts.keySet());
-                        Collections.sort(sortedDates);
-
-                        int dayCount = 1; // Initialize day count to 1
-
-                        for (String date : sortedDates) {
-                            if (dayCount <= 5) { // Display 5 days, including today
-                                List<Double> temperatures = dailyForecasts.get(date);
-                                assert temperatures != null;
-
-                                // Extract and display the weather condition
-                                String weatherCondition = getWeatherCondition(date, forecasts);
-
-                                // Extract and display the rain percentage
-                                String rainPercentage = getRainPercentage(date);
-
-                                // Append the daily forecast to the TextView
-
-
-                                dayCount++;
-                            } else {
-                                break;
-                            }
-                        }
+                        // After fetching and processing the data, display the first day's information
+                        displayDay(currentDayIndex);
 
                     } catch (JSONException e) {
                         e.printStackTrace();

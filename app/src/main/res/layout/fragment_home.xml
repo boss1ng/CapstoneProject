@@ -60,7 +60,7 @@
             android:layout_marginTop="35dp"
             android:textSize="15dp"
             android:textAlignment="textStart"
-            android:text="" />
+             />
 
         <TextView
             android:id="@+id/textView"
@@ -70,7 +70,7 @@
             android:layout_marginStart="135dp"
             android:layout_marginTop="40dp"
             android:textSize="75dp"
-            android:text="" />
+             />
 
         <TextView
             android:id="@+id/weatherCondition"
@@ -80,7 +80,7 @@
             android:textSize="50dp"
             android:layout_marginTop="55dp"
             android:layout_marginStart="45dp"
-            android:text="#" />
+             />
 
         <TextView
             android:id="@+id/rainPercentage"
@@ -90,7 +90,8 @@
             android:textSize="15dp"
             android:layout_marginTop="120dp"
             android:layout_marginStart="45dp"
-            android:text="" />
+            android:text=""
+             />
 
         <ImageView
             android:id="@+id/nextButton"
