@@ -45,16 +45,19 @@
 
     <TextView
         android:id="@+id/description"
-        android:layout_width="306dp"
-        android:layout_height="100dp"
-        android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation"
+        android:layout_width="315dp"
+        android:layout_height="132dp"
+        android:text="1. You will be given an image of a place.\n
+2. Choose the correct answer from the multiple-choice options provided.\n
+3. If your answer is incorrect, keep guessing until you find the right answer.\n
+4. Once you select the correct answer, you will receive a trivia fact about the place.
+"
         android:textAlignment="center"
         android:textSize="15dp"
         app:layout_constraintBottom_toTopOf="@+id/bt_start"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView"
-        app:layout_constraintVertical_bias="0.501" />
+        app:layout_constraintVertical_bias="0.536" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
