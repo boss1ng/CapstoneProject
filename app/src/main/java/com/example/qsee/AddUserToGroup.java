@@ -99,63 +99,55 @@ public class AddUserToGroup extends DialogFragment {
     }
 
     private void addUserToGroup(String member) {
-        // Find the group for the given username and groupName
-        databaseReference.child("MobileUsers").orderByChild("userId").equalTo(userId)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot userSnapshot) {
-                        for (DataSnapshot user : userSnapshot.getChildren()) {
-                            String adminUserId = user.getKey();
-                            // Now you have the adminUserId based on the username
+        DatabaseReference groupsRef = databaseReference.child("Groups").child(userId);
 
-                            // Now, check if the groupName exists under the "Groups" node for this adminUserId
-                            databaseReference.child("Groups").child(adminUserId).orderByChild("groupName")
-                                    .equalTo(groupName).addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(DataSnapshot groupSnapshot) {
-                                            if (groupSnapshot.exists()) {
-                                                // The groupName exists for this adminUserId
-                                                String groupId = groupSnapshot.getChildren().iterator().next().getKey();
+        // Check if the group exists for the user
+        groupsRef.orderByChild("groupName").equalTo(groupName).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    DataSnapshot groupSnapshot = dataSnapshot.getChildren().iterator().next();
+                    String groupId = groupSnapshot.getKey();
 
-                                                // Check if the user is already a member of the group
-                                                if (isUserAlreadyMember(groupSnapshot.child(groupId), member)) {
-                                                    // Display a toast for duplicate user
-                                                    Toast.makeText(context, "User is already a member of the group", Toast.LENGTH_SHORT).show();
-                                                } else {
-                                                    Toast.makeText(context, firstName + " " + lastName + " successfully added to " + groupName, Toast.LENGTH_SHORT).show();
-                                                    // Determine the next member number dynamically
-                                                    int nextMemberNumber = 1;
-                                                    for (int i = 1; i <= 50; i++) {
-                                                        if (!groupSnapshot.child(groupId).hasChild("member" + i)) {
-                                                            nextMemberNumber = i;
-                                                            break;
-                                                        }
-                                                    }
+                    // Check if the user is already a member of the group
+                    if (isUserAlreadyMember(groupSnapshot, member)) {
+                        // Display a toast for duplicate user
+                        Toast.makeText(context, "User is already a member of the group", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Create a notification for the invitation without adding the user
+                        createNotification(member, groupId);
 
-                                                    // Create a new user object with userId as the key and set it as a member in the group
-                                                    DatabaseReference groupRef = databaseReference.child("Groups").child(adminUserId).child(groupId).child("member" + nextMemberNumber);
-                                                    groupRef.setValue(member);
-                                                    Log.d("AddUserToGroup", "Added user " + member + " to group " + groupName + " as a member" + nextMemberNumber);
-                                                }
-                                            } else {
-                                                // The groupName doesn't exist for this adminUserId
-                                                Log.d("AddUserToGroup", "Group doesn't exist for user: " + adminUserId);
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onCancelled(DatabaseError databaseError) {
-                                            Log.e("AddUserToGroup", "Error checking group: " + databaseError.getMessage());
-                                        }
-                                    });
-                        }
+                        // Display a confirmation to the user
+                        Toast.makeText(context, "Invitation sent to " + member, Toast.LENGTH_SHORT).show();
                     }
+                } else {
+                    // The group doesn't exist for this user
+                    Toast.makeText(context, "You are not the admin of this group.", Toast.LENGTH_SHORT).show();
+                    Log.d("AddUserToGroup", "Group doesn't exist for user: " + userId);
+                }
+            }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.e("AddUserToGroup", "Error finding user ID: " + databaseError.getMessage());
-                    }
-                });
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("AddUserToGroup", "Error checking group: " + databaseError.getMessage());
+            }
+        });
+    }
+
+
+
+    private void createNotification(String invitedUserId, String groupId) {
+        // Create a unique notification ID, for example, using timestamp
+        String notificationId = String.valueOf(System.currentTimeMillis());
+
+        // Create a Notification object
+        Notification notification = new Notification();
+        notification.setNotificationId(notificationId);
+        notification.setSenderId(userId);
+        notification.setGroupId(groupId);
+
+        // Store the notification in the database under the user's notifications
+        databaseReference.child("Notifications").child(invitedUserId).child(notificationId).setValue(notification);
     }
 
     private boolean isUserAlreadyMember(DataSnapshot groupSnapshot, String member) {

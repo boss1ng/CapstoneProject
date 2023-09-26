@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- notification_item.xml -->
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/nameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:text=""
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/inviteTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/nameTextView"
+        android:layout_toEndOf="@id/nameTextView"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="8dp"
+        android:text="invites you to join"
+        android:layout_alignBaseline="@id/nameTextView"
+        android:textStyle="italic"/>
+
+    <TextView
+        android:id="@+id/groupTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/inviteTextView"
+        android:layout_alignBaseline="@id/inviteTextView"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:text=""
+        android:textStyle="bold"/>
+
+    <Button
+        android:id="@+id/acceptButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/inviteTextView"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="105dp"
+        android:backgroundTint="#79BF49"
+        android:text="Accept" />
+
+    <Button
+        android:id="@+id/rejectButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/inviteTextView"
+        android:layout_alignParentEnd="true"
+        android:layout_marginLeft="29dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="7dp"
+        android:layout_toStartOf="@id/acceptButton"
+        android:layout_toRightOf="@id/acceptButton"
+        android:backgroundTint="#E47473"
+        android:text="Reject" />
+</RelativeLayout>

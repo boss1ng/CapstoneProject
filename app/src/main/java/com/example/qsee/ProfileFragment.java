@@ -1,18 +1,15 @@
 package com.example.qsee;
 
-import static android.content.Intent.getIntent;
-
+import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.firebase.database.DataSnapshot;
@@ -23,13 +20,16 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProfileFragment extends Fragment {
     private TextView userFullNameTextView;
@@ -37,7 +37,8 @@ public class ProfileFragment extends Fragment {
     private TextView usernameTextView;
     private Context context;
     private String userId;
-    // Create a ViewModel instance
+    private int notificationCount = 0;
+    private NotificationAdapter notificationAdapter;
 
 
     public ProfileFragment() {
@@ -63,6 +64,15 @@ public class ProfileFragment extends Fragment {
                 // Show the UserBottomSheetDialogFragment
                 UserBottomSheetDialogFragment bottomSheetDialog = new UserBottomSheetDialogFragment().newInstance(userId);
                 bottomSheetDialog.show(getParentFragmentManager(), bottomSheetDialog.getTag());
+            }
+        });
+
+        Button notifButton = rootView.findViewById(R.id.notifButton);
+        notifButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Show the custom notification container when the button is clicked
+                showNotificationContainer();
             }
         });
 
@@ -172,6 +182,115 @@ public class ProfileFragment extends Fragment {
 
         return rootView;
     }
+
+    private void showNotificationContainer() {
+        // Replace "YourNotificationNode" with the actual node path where notifications are stored in your Firebase database
+        DatabaseReference notificationsReference = FirebaseDatabase.getInstance().getReference("Notifications");
+
+        // Query the notifications based on the user's invitedUserId (receiver's ID)
+        DatabaseReference userNotificationsReference = notificationsReference.child(userId);
+
+        userNotificationsReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // Create and configure a custom dialog
+                    Dialog notificationDialog = new Dialog(context);
+                    notificationDialog.setContentView(R.layout.notification_dialog); // Set the custom dialog layout
+
+                    // Find the RecyclerView within the custom dialog layout
+                    RecyclerView recyclerView = notificationDialog.findViewById(R.id.notificationRecyclerView);
+
+                    // Initialize the NotificationAdapter
+                    notificationAdapter = new NotificationAdapter(getActivity(), new ArrayList<>(), userId);
+                    recyclerView.setAdapter(notificationAdapter);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(context));
+
+                    // Fetch and display notifications when the dialog is shown
+                    fetchAndDisplayNotifications();
+
+                    // Show the dialog
+                    notificationDialog.show();
+                } else {
+                    // Show a toast message when there are no notifications
+                    Toast.makeText(context, "No notifications found", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle the error if needed
+                Log.e("ProfileFragment", "Failed to fetch notifications", databaseError.toException());
+            }
+        });
+    }
+
+
+
+    // Fetch notification data from Firebase or your data source
+    private void fetchAndDisplayNotifications() {
+        List<Notification> notifications = new ArrayList<>();
+
+        // Replace "YourNotificationNode" with the actual node path where notifications are stored in your Firebase database
+        DatabaseReference notificationsReference = FirebaseDatabase.getInstance().getReference("Notifications");
+
+        // Query the notifications based on the user's invitedUserId (receiver's ID)
+        DatabaseReference userNotificationsReference = notificationsReference.child(userId);
+
+        userNotificationsReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot notificationSnapshot : dataSnapshot.getChildren()) {
+                        // Retrieve notification data from Firebase
+                        String notificationId = notificationSnapshot.getKey(); // Use the key as the notificationId
+                        String senderId = notificationSnapshot.child("senderId").getValue(String.class);
+                        String groupId = notificationSnapshot.child("groupId").getValue(String.class);
+
+                        // Query the MobileUsers node to get the sender's username
+                        DatabaseReference usersReference = FirebaseDatabase.getInstance().getReference("MobileUsers");
+                        usersReference.child(senderId).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot userSnapshot) {
+                                if (userSnapshot.exists()) {
+                                    String senderUsername = userSnapshot.child("username").getValue(String.class);
+                                    String decryptedUsername = AESUtils.decrypt(senderUsername);
+
+                                    // Create a Notification object and add it to the list
+                                    Notification notification = new Notification(notificationId, decryptedUsername, groupId);
+                                    notification.setMessage(senderId);
+                                    notifications.add(notification);
+
+                                    // Update the notification adapter with the retrieved notifications
+                                    notificationAdapter.updateData(notifications);
+                                }
+
+                                // Check if the notifications list is empty
+                                if (notifications.isEmpty()) {
+                                    // Show a toast message when there are no items in the notification list
+                                    Toast.makeText(context, "Notifications is empty", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                // Handle the error if needed
+                                Log.e("ProfileFragment", "Failed to fetch sender's username", databaseError.toException());
+                            }
+                        });
+                    }
+                } else {
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle the error if needed
+                Log.e("ProfileFragment", "Failed to fetch notifications", databaseError.toException());
+            }
+        });
+    }
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
