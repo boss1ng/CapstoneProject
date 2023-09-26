@@ -6,8 +6,8 @@
     <color name="default_text_color">#000000</color>
     <color name="default_button_color">#e6e2e5</color>
     <!-- Define the gradient start and end colors -->
-    <color name="gradient_start">#5DE0E6</color>
-    <color name="gradient_end">#7C0A02</color>
+    <color name="gradient_start">#79BF49</color>
+    <color name="gradient_end">#E47473</color>
 
 
 </resources>

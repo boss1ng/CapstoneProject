@@ -9,14 +9,13 @@
 
         <Button
             android:id="@+id/btA"
-            android:layout_width="261dp"
-            android:layout_height="55dp"
+            android:layout_width="341dp"
+            android:layout_height="57dp"
             android:layout_centerInParent="true"
             android:backgroundTint="#e6e2e5"
-            android:text="A"
             android:textAlignment="textStart"
-            android:textSize="20dp"
             android:textColor="@color/black"
+            android:textSize="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -27,25 +26,19 @@
             android:id="@+id/Q1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="62dp"
-            android:layout_marginTop="18dp"
-            android:layout_marginEnd="140dp"
-            android:layout_marginBottom="18dp"
             android:text="Question 1"
+            android:textAlignment="center"
             app:layout_constraintBottom_toBottomOf="@+id/btA"
             app:layout_constraintEnd_toEndOf="@+id/btA"
-            app:layout_constraintHorizontal_bias="0.125"
             app:layout_constraintStart_toStartOf="@+id/btA"
-            app:layout_constraintTop_toTopOf="@+id/btA"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintTop_toTopOf="@+id/btA" />
 
         <Button
             android:id="@+id/btB"
-            android:layout_width="261dp"
-            android:layout_height="55dp"
+            android:layout_width="341dp"
+            android:layout_height="57dp"
             android:layout_centerInParent="true"
             android:backgroundTint="#e6e2e5"
-            android:text="B"
             android:textAlignment="textStart"
             android:textColor="@color/black"
             android:textSize="20dp"
@@ -53,100 +46,122 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.593"
+            app:layout_constraintVertical_bias="0.608"
             tools:ignore="MissingConstraints" />
 
         <TextView
             android:id="@+id/Q2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="64dp"
-            android:layout_marginTop="17dp"
-            android:layout_marginEnd="139dp"
-            android:layout_marginBottom="19dp"
             android:text="Question 2"
+            android:textAlignment="center"
             app:layout_constraintBottom_toBottomOf="@+id/btB"
             app:layout_constraintEnd_toEndOf="@+id/btB"
-            app:layout_constraintHorizontal_bias="0.222"
+            app:layout_constraintHorizontal_bias="0.503"
             app:layout_constraintStart_toStartOf="@+id/btB"
             app:layout_constraintTop_toTopOf="@+id/btB"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintVertical_bias="0.473" />
 
         <Button
             android:id="@+id/btC"
-            android:layout_width="261dp"
-            android:layout_height="55dp"
+            android:layout_width="341dp"
+            android:layout_height="57dp"
             android:layout_centerInParent="true"
             android:backgroundTint="#e6e2e5"
             android:textAlignment="textStart"
-            android:text="C"
-            android:textSize="20dp"
             android:textColor="@color/black"
+            android:textSize="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.684"
+            app:layout_constraintVertical_bias="0.71"
             tools:ignore="MissingConstraints" />
 
         <TextView
             android:id="@+id/Q3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="64dp"
-            android:layout_marginTop="17dp"
-            android:layout_marginEnd="139dp"
-            android:layout_marginBottom="19dp"
             android:text="Question 3"
+            android:textAlignment="center"
             app:layout_constraintBottom_toBottomOf="@+id/btC"
             app:layout_constraintEnd_toEndOf="@+id/btC"
-            app:layout_constraintHorizontal_bias="0.222"
             app:layout_constraintStart_toStartOf="@+id/btC"
-            app:layout_constraintTop_toTopOf="@+id/btC"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintTop_toTopOf="@+id/btC" />
 
         <Button
             android:id="@+id/btD"
-            android:layout_width="261dp"
-            android:layout_height="55dp"
+            android:layout_width="341dp"
+            android:layout_height="57dp"
             android:layout_centerInParent="true"
             android:backgroundTint="#e6e2e5"
             android:textAlignment="textStart"
-            android:text="D"
-            android:textSize="20dp"
             android:textColor="@color/black"
+            android:textSize="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.778"
+            app:layout_constraintVertical_bias="0.818"
             tools:ignore="MissingConstraints" />
 
         <TextView
             android:id="@+id/Q4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="64dp"
-            android:layout_marginTop="17dp"
-            android:layout_marginEnd="139dp"
-            android:layout_marginBottom="19dp"
             android:text="Question 4"
+            android:textAlignment="center"
             app:layout_constraintBottom_toBottomOf="@+id/btD"
             app:layout_constraintEnd_toEndOf="@+id/btD"
-            app:layout_constraintHorizontal_bias="0.222"
             app:layout_constraintStart_toStartOf="@+id/btD"
-            app:layout_constraintTop_toTopOf="@+id/btD"
-            app:layout_constraintVertical_bias="0.0" /> />
+            app:layout_constraintTop_toTopOf="@+id/btD" />
 
         <ImageView
-            android:id="@+id/quizImg"
+            android:id="@+id/imageView11"
+            android:layout_width="464dp"
+            android:layout_height="339dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.509"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0"
+            app:srcCompat="@drawable/bg_quiz" />
+
+<!--        <ImageView-->
+<!--            android:id="@+id/quizImg"-->
+<!--            android:layout_width="261dp"-->
+<!--            android:layout_height="253dp"-->
+<!--            app:layout_constraintBottom_toTopOf="@+id/btA"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent"-->
+<!--            app:layout_constraintVertical_bias="0.464"-->
+<!--            app:srcCompat="@drawable/starbs" />-->
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardView"
             android:layout_width="261dp"
             android:layout_height="253dp"
+            android:layout_gravity="center"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="16dp"
             app:layout_constraintBottom_toTopOf="@+id/btA"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/starbs" />
+            app:layout_constraintVertical_bias="0.464">
+
+                <ImageView
+                    android:id="@+id/quizImg"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:adjustViewBounds="true"
+                android:scaleType="centerCrop"
+                app:srcCompat="@drawable/starbs" />
+
+        </androidx.cardview.widget.CardView>
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
