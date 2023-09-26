@@ -1,11 +1,13 @@
 package com.example.qsee;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
@@ -27,6 +29,7 @@ public class EditPasswordFragment extends Fragment {
     private TextInputLayout currentPasswordEditText; // Add this
     private TextInputLayout newPasswordEditText; // Add this
     private TextInputLayout reEnterPasswordEditText; // Add this
+    private TextView forgotPass;
 
     public static EditPasswordFragment newInstance(String userId) {
         EditPasswordFragment fragment = new EditPasswordFragment();
@@ -46,6 +49,7 @@ public class EditPasswordFragment extends Fragment {
         newPasswordEditText = view.findViewById(R.id.newPwd);
         // Find the TextInputEditText for re-entering the new password
         reEnterPasswordEditText = view.findViewById(R.id.reNewPwd);
+        forgotPass = view.findViewById(R.id.forgotPassword);
 
 
         // Retrieve the userId argument inside onCreateView
@@ -54,6 +58,16 @@ public class EditPasswordFragment extends Fragment {
             userId = args.getString("userId");
         }
         Log.d("EditPasswordFragment", "Received userId: " + userId);
+
+        forgotPass = view.findViewById(R.id.forgotPassword);
+        forgotPass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Handle the click on the "Forgot Password" text
+                openForgotPassActivity(userId);
+            }
+        });
+
 
         Button changePasswordButton = view.findViewById(R.id.changePwd);
         changePasswordButton.setOnClickListener(new View.OnClickListener() {
@@ -133,6 +147,18 @@ public class EditPasswordFragment extends Fragment {
 
         return view;
     }
+
+    private void openForgotPassActivity(String userId) {
+        // Create an Intent to start the ForgotPass activity
+        Intent intent = new Intent(getActivity(), ForgotPass.class);
+
+        // Pass the userId to the ForgotPass activity
+        intent.putExtra("userId", userId);
+
+        // Start the ForgotPass activity
+        startActivity(intent);
+    }
+
     private boolean isValidPassword(String password) {
         String passwordPattern = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*(),.?\":{}|<>])(?=.*[0-9]).{8,}$";
         return password.matches(passwordPattern);

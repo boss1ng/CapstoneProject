@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -37,8 +38,9 @@ public class ProfileFragment extends Fragment {
     private TextView usernameTextView;
     private Context context;
     private String userId;
-    private int notificationCount = 0;
+    private TextView notificationBadge;
     private NotificationAdapter notificationAdapter;
+    private int notificationCount = 0;
 
 
     public ProfileFragment() {
@@ -55,6 +57,12 @@ public class ProfileFragment extends Fragment {
 
         // Retrieve the username from the arguments
         userId = getArguments().getString("userId");
+
+        // Call showNotificationCount to update the notification count
+        showNotificationCount();
+
+        // Initialize the notificationBadge
+        notificationBadge = rootView.findViewById(R.id.notificationBadge);
 
         TextView uname = rootView.findViewById(R.id.ProfileUsername);
 
@@ -183,6 +191,44 @@ public class ProfileFragment extends Fragment {
         return rootView;
     }
 
+    // Update the notification count in your showNotificationCount method
+    private void showNotificationCount() {
+        // Replace "YourNotificationNode" with the actual node path where notifications are stored in your Firebase database
+        DatabaseReference notificationsReference = FirebaseDatabase.getInstance().getReference("Notifications");
+
+        // Query the notifications based on the user's invitedUserId (receiver's ID)
+        DatabaseReference userNotificationsReference = notificationsReference.child(userId);
+
+        userNotificationsReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    notificationCount = (int) dataSnapshot.getChildrenCount(); // Get the count of notifications
+                    updateNotificationBadge(); // Update the notification badge
+                } else {
+                    notificationCount = 0;
+                    updateNotificationBadge(); // Update the notification badge (hide it)
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle the error if needed
+                Log.e("ProfileFragment", "Failed to fetch notifications", databaseError.toException());
+            }
+        });
+    }
+
+    private void updateNotificationBadge() {
+        if (notificationCount > 0) {
+            notificationBadge.setVisibility(View.VISIBLE);
+            notificationBadge.setText(String.valueOf(notificationCount));
+        } else {
+            notificationBadge.setVisibility(View.GONE);
+        }
+    }
+
+
     private void showNotificationContainer() {
         // Replace "YourNotificationNode" with the actual node path where notifications are stored in your Firebase database
         DatabaseReference notificationsReference = FirebaseDatabase.getInstance().getReference("Notifications");
@@ -211,6 +257,15 @@ public class ProfileFragment extends Fragment {
 
                     // Show the dialog
                     notificationDialog.show();
+
+                    // Set a dismiss listener for the dialog
+                    notificationDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                            // The dialog is dismissed, recreate the ProfileFragment
+                            recreateProfileFragment();
+                        }
+                    });
                 } else {
                     // Show a toast message when there are no notifications
                     Toast.makeText(context, "No notifications found", Toast.LENGTH_SHORT).show();
@@ -225,6 +280,21 @@ public class ProfileFragment extends Fragment {
         });
     }
 
+    private void recreateProfileFragment() {
+        // Create a new instance of ProfileFragment
+        ProfileFragment newProfileFragment = new ProfileFragment();
+
+        // Create a bundle to pass any required data to the new instance, such as userId
+        Bundle args = new Bundle();
+        args.putString("userId", userId);
+        newProfileFragment.setArguments(args);
+
+        // Replace the current fragment with the new instance
+        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, newProfileFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
 
 
     // Fetch notification data from Firebase or your data source
@@ -321,5 +391,3 @@ public class ProfileFragment extends Fragment {
                 }).attach();
     }
 }
-
-
