@@ -1,8 +1,10 @@
 package com.example.qsee;
-
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.location.Location;
+import com.example.qsee.PlaceDetailActivity;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,30 +12,36 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.*;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.*;
+import com.google.android.libraries.places.api.net.FetchPlaceRequest;
+import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+    private PlacesClient placesClient;
 
     public MapsFragment() {
         // Required empty public constructor
@@ -47,12 +55,46 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         // Initialize the FusedLocationProviderClient
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
 
+        // Initialize Places API
+        if (!Places.isInitialized()) {
+            Places.initialize(requireContext(), getString(R.string.google_maps_api_key));
+        }
+
+        // Create a PlacesClient
+        placesClient = Places.createClient(requireContext());
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.maps);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
+
+        // Initialize AutocompleteSupportFragment
+        AutocompleteSupportFragment autocompleteFragment =
+                (AutocompleteSupportFragment) getChildFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+
+        // Specify the types of place data to return (e.g., address, establishment)
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME));
+
+        // Set the filter to restrict the search to a specific type of place (e.g., cities)
+        autocompleteFragment.setTypeFilter(TypeFilter.CITIES);
+
+        // Set up a PlaceSelectionListener to handle selected places
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(@NonNull com.google.android.libraries.places.api.model.Place place) {
+                // Handle the selected place
+                LatLng location = place.getLatLng();
+                // Move the camera to the selected place
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
+            }
+
+            @Override
+            public void onError(@NonNull Status status) {
+                // Handle any errors
+            }
+        });
 
         return view;
     }
@@ -88,9 +130,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
                 LatLng userLocation = new LatLng(latitude, longitude);
-
-                // Philippine Heart Center
-                // LatLng userLocation = new LatLng(14.6440, 121.0481);
 
                 // Add a marker at the user's location
                 mMap.addMarker(new MarkerOptions().position(userLocation).title("Your Location"));
@@ -130,116 +169,36 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                         // Add markers to the Google Map
                         Marker marker = mMap.addMarker(markerOptions);
 
+                        // Set a click listener for each marker
+                        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                            @Override
+                            public boolean onMarkerClick(Marker marker) {
+                                // Handle marker click event here
+                                // Show place details in your app
+
+                                // Example: Launch a new activity to display details
+                                Intent intent = new Intent(requireContext(), PlaceDetailActivity.class);
+                                intent.putExtra("placeName", marker.getTitle());
+                                intent.putExtra("latitude", marker.getPosition().latitude);
+                                intent.putExtra("longitude", marker.getPosition().longitude);
+                                startActivity(intent);
+
+                                return true;
+                            }
+                        });
+
                     } catch (NumberFormatException e) {
                         // Handle the case where the String cannot be parsed as a Double
                         // This can happen if the String is not a valid numeric format
                     }
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 // This method is called if there is an error reading from the database
                 // Handle the error here
             }
         });
-
-/*
-// ROUTES API
-        // Define the Directions API endpoint and your API key
-        String apiUrl = "https://maps.googleapis.com/maps/api/directions/json";
-        String apiKey = "AIzaSyAwTBhjMDtD74Nvqz7eUbN81v93SLhM3IU"; // YOUR_API_KEY_HERE
-
-        // Specify the origin and destination coordinates
-                String origin = "14.6440, 121.0481";
-                String destination = "14.6515,121.0493";
-
-        // Build the URL for the Directions API request
-                String requestUrl = apiUrl + "?origin=" + origin + "&destination=" + destination + "&key=" + apiKey;
-
-        // Make the API request using an HTTP client (e.g., HttpURLConnection, OkHttp)
-        // Parse the JSON response and draw directions on the map
-*/
-
-
-/*
-        // Define the bounds for Quezon City, Philippines
-        LatLngBounds quezonCityBounds = new LatLngBounds(
-                new LatLng(14.6138, 121.0357), // Southwest corner
-                new LatLng(14.7395, 121.0711)  // Northeast corner
-        );
-
-            // Request location permission if not granted
-            requestPermissions(new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-            }, LOCATION_PERMISSION_REQUEST_CODE);
-            return;
-        }
-
-        // Move the camera to Quezon City
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(quezonCityBounds.getCenter(), 12));
-        // mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(quezonCityBounds, 0));
-*/
     }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, reinitialize the map
-                if (mMap != null) {
-                    onMapReady(mMap);
-                }
-            }
-        }
-    }
-
-
-/*
-    //When the connect request has successfully completed
-    //@Override
-    public void onConnected(Bundle bundle) {
-
-    }
-
-    //Called when the client is temporarily in a disconnected state.
-    //@Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-
-    }
-
-    public void onLocationChanged(Location location) {
-
-    }
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mapView.onResume();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mapView.onPause();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mapView.onDestroy();
-    }
-
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        mapView.onLowMemory();
-    }
-*/
-
 }

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <!-- Place Name -->
+    <TextView
+        android:id="@+id/placeNameTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="8dp"
+        tools:text="Place Name" />
+
+    <!-- Place Address -->
+    <TextView
+        android:id="@+id/placeAddressTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/placeNameTextView"
+        android:layout_marginTop="8dp"
+        tools:text="123 Main St, City" />
+
+    <!-- Place Rating -->
+    <TextView
+        android:id="@+id/placeRatingTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/placeAddressTextView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        tools:text="4.5" />
+
+    <!-- Place Rating Label -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/placeAddressTextView"
+        android:layout_toLeftOf="@+id/placeRatingTextView"
+        android:text="Rating:"
+        android:textSize="16sp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginTop="16dp"
+        android:textColor="@android:color/darker_gray" />
+
+    <!-- Back Button -->
+    <ImageView
+        android:id="@+id/backButton"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/ic_carret_down" />
+    <!-- You can use a custom back button icon or the system back button -->
+
+</RelativeLayout>

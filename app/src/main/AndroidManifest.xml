@@ -29,7 +29,10 @@
             android:name=".MainActivity"
             android:exported="true">
         </activity>
-
+        <activity
+            android:name=".PlaceDetailActivity"
+            android:exported="true">
+        </activity>
         <activity
             android:name=".Home"
             android:exported="true"
