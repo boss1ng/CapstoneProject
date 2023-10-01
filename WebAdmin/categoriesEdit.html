@@ -78,6 +78,16 @@
                     <input type="text" class="form-control text-center fst-italic" id="inputCatIconEdit" aria-label="Username" aria-describedby="addon-wrapping" disabled/>
                     <!-- <button type="button" class="addBtn btn btn-secondary btn-lg mx-3" id="btnSignIn">Upload Image</button> -->
                     <input type="file" class="form-control mx-3" onchange="updateOtherInput(this)" id="inputCatIcon" accept=".jpg, .jpeg, .png" aria-label="Username" aria-describedby="addon-wrapping" style="width: 108px; height: 50px; padding-top: 11px;"/>
+                
+                    <div style="width: 300px; margin-left: 40px;">
+                        <span id="passwordHelpInline" style="font-size: large; font-style: italic;">
+                            File Types (.JPG .JPEG .PNG)
+                        </span>
+                        <br>
+                        <span id="passwordHelpInline" class="" style="font-size: large; font-style: italic;">
+                            Image Resolution (200 x 200)
+                        </span>
+                    </div>
                 </div>
             </div>
 
@@ -123,6 +133,16 @@
         </div>
     </div>
 
+    <!-- ALERT MESSAGE (Image Resolution) -->
+    <div class="alertCont">
+        <div class="alert alert-warning d-flex align-items-center" role="alert" id="imageResolution">
+            <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-exclamation-triangle-fill mx-3" viewBox="0 0 16 16">
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+            </svg>
+                Kindly comply with the image resolution.
+        </div>
+    </div>
+
     <script>
 
         if (localStorage.getItem('loggedUser') == "" || localStorage.getItem('loggedUser') == null) {
@@ -132,9 +152,40 @@
         var buttonSave = document.querySelector("#actionSaveCat");
 
         function updateOtherInput(inputFile) {
-            var inputCategoryName = document.querySelector("#inputCat");
+            // var inputCategoryName = document.querySelector("#inputCat");
             var inputCategoryIcon = document.querySelector("#inputCatIconEdit");
 
+            var imageResolutionAlert = document.getElementById("imageResolution");
+
+            if (inputFile.files && inputFile.files[0]) {
+                var img = new Image();
+                img.src = URL.createObjectURL(inputFile.files[0]);
+                img.onload = function() {
+                    var width = this.width;
+                    var height = this.height;
+                    if (width === 200 && height === 200) {
+                        // Image resolution is acceptable
+                        var selectedFile = inputFile.files[0];
+
+                        // Check if a file was selected
+                        if (selectedFile) 
+                            // Update the value of the other input tag (display the file name)
+                            inputCategoryIcon.value = selectedFile.name;
+
+                        buttonSave.disabled = false;
+                    } else {
+                        // alert("Please upload an image with the correct resolution.");
+
+                        imageResolutionAlert.style.visibility = "visible";
+                        setTimeout(function(){
+                                imageResolutionAlert.style.visibility = "hidden";
+                                inputFile.value = ""; // Clear the input field
+                            }, 2000);
+                    }
+                };
+            }
+
+            /*
             var selectedFile = inputFile.files[0];
 
             // Check if a file was selected
@@ -143,6 +194,7 @@
                 inputCategoryIcon.value = selectedFile.name;
 
             buttonSave.disabled = false;
+            */
         }
 
         function updateInput() {

@@ -146,6 +146,11 @@
             window.location.href = "categoriesEdit.html";
         }
 
+        function filterCategory(categoryName) {
+            sessionStorage.setItem('filterCategory', categoryName);
+            window.location.href = "places.html";
+        }
+
     </script>
 
     <script type="module">
@@ -246,7 +251,7 @@
 
                 const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td class="" style="width: 10%; padding-left: 80px;">${category.Category}</td>
+                        <td class="" style="width: 10%; padding-left: 80px;"><a onclick="filterCategory('${category.Category}')">${category.Category}</a></td>
                         <td class="text-center" style="width: 10%;">
                             <button type="button" class="btn btn-info btn-lg rounded-pill" id="btnEdit" onclick="editCategory('${category.Key}')" >Edit</button>
                             <button type="button" class="btn btn-danger btn-lg rounded-pill" id="btnDelete" onclick="deleteCategory('${category.Key}')" data-bs-toggle="modal" data-bs-target="#staticBackdrop" style="margin-left: 25px;">Delete</button>
@@ -266,7 +271,7 @@
 
                 const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td class="" style="width: 10%; padding-left: 80px;">${category.Category}</td>
+                        <td class="" style="width: 10%; padding-left: 80px;"><a onclick="filterCategory(${category.Category})">${category.Category}</a></td>
                         <td class="text-center" style="width: 10%;">
                             <button type="button" class="btn btn-info btn-lg rounded-pill" id="btnEdit" onclick="editCategory('${category.Key}')" >Edit</button>
                             <button type="button" class="btn btn-danger btn-lg rounded-pill" id="btnDelete" onclick="deleteCategory('${category.Key}')" data-bs-toggle="modal" data-bs-target="#staticBackdrop" style="margin-left: 25px;">Delete</button>

@@ -181,9 +181,19 @@
                         <span class="">Upload Image</span>
                     </div>
                     <div class="container d-flex align-items-center my-3">
-                        <input type="text" class="form-control text-center fst-italic" id="inputLocImageEdit" aria-label="Username" aria-describedby="addon-wrapping" disabled/>
+                        <input type="text" class="form-control text-center fst-italic" id="inputLocImageEdit" aria-label="Username" aria-describedby="addon-wrapping" disabled style="width: 250px; font-size: medium;"/>
                         <!-- <button type="button" class="addBtn btn btn-secondary btn-lg mx-3" id="btnSignIn">Upload Image</button> -->
-                        <input type="file" class="form-control mx-3" onchange="updateOtherInput(this)" id="inputLocImage" accept=".jpg, .jpeg, .png" aria-label="Username" aria-describedby="addon-wrapping" style="width: 108px; height: 40px; padding-top: 7px;"/>
+                        <input type="file" class="form-control mx-2" onchange="updateOtherInput(this)" id="inputLocImage" accept=".jpg, .jpeg, .png" aria-label="Username" aria-describedby="addon-wrapping" style="width: 108px; height: 40px; padding-top: 7px;"/>
+
+                        <div class="col-auto px-3">
+                            <span id="passwordHelpInline" style="font-size: medium; font-style: italic;">
+                                File Types (.JPG .JPEG .PNG)
+                            </span>
+                            
+                            <span id="passwordHelpInline" class="px-3" style="font-size: medium; font-style: italic;">
+                                Image Resolution (600 x 300)
+                            </span>
+                        </div>
                     </div>
                 </div>
                 
@@ -224,7 +234,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-check-circle-fill mx-3" viewBox="0 0 16 16">
                 <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
             </svg>
-                Location Successfuly Updated.
+                Establishment Successfuly Updated.
         </div>
     </div>
 
@@ -234,7 +244,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-exclamation-triangle-fill mx-3" viewBox="0 0 16 16">
                 <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
             </svg>
-                Edit of Location Failed. Please try again.
+                Edit of Establishment Failed. Please try again.
         </div>
     </div>
 
@@ -248,6 +258,16 @@
         </div>
     </div>
 
+    <!-- ALERT MESSAGE (Image Resolution) -->
+    <div class="alertCont">
+        <div class="alert alert-warning d-flex align-items-center" role="alert" id="imageResolution">
+            <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-exclamation-triangle-fill mx-3" viewBox="0 0 16 16">
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+            </svg>
+                Kindly comply with the image resolution.
+        </div>
+    </div>
+
     <script>
 
         if (localStorage.getItem('loggedUser') == "" || localStorage.getItem('loggedUser') == null) {
@@ -258,7 +278,38 @@
 
         function updateOtherInput(inputFile) {
             var inputLocImageEdit = document.querySelector("#inputLocImageEdit");
+            var imageResolutionAlert = document.getElementById("imageResolution");
 
+            if (inputFile.files && inputFile.files[0]) {
+                var img = new Image();
+                img.src = URL.createObjectURL(inputFile.files[0]);
+                img.onload = function() {
+                    var width = this.width;
+                    var height = this.height;
+                    if (width === 600 && height === 300) {
+                        // Image resolution is acceptable
+                        var selectedFile = inputFile.files[0];
+
+                        // Check if a file was selected
+                        if (selectedFile) 
+                            // Update the value of the other input tag (display the file name)
+                            inputLocImageEdit.value = selectedFile.name;
+
+                        buttonSave.disabled = false;
+                        
+                    } else {
+                        // alert("Please upload an image with the correct resolution.");
+
+                        imageResolutionAlert.style.visibility = "visible";
+                        setTimeout(function(){
+                                imageResolutionAlert.style.visibility = "hidden";
+                                inputFile.value = ""; // Clear the input field
+                            }, 2000);
+                    }
+                };
+            }
+
+            /*
             var selectedFile = inputFile.files[0];
 
             // Check if a file was selected
@@ -267,6 +318,7 @@
                 inputLocImageEdit.value = selectedFile.name;
             
             buttonSave.disabled = false;
+            */
         }
 
         function changeSelected(categoryOption) {
