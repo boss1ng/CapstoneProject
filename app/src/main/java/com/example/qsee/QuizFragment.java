@@ -2,6 +2,7 @@ package com.example.qsee;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,8 @@ public class QuizFragment extends Fragment {
     private QuizQuestion currentQuestion;
     private Button btA, btB, btC, btD;
     private TextView Q1, Q2, Q3, Q4;
+    private AlertDialog wrongAnswerDialog;
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -92,64 +95,64 @@ public class QuizFragment extends Fragment {
     private void initializeQuizQuestions() {
         // Create quiz questions and add them to the list
         List<String> question1Choices = Arrays.asList("Quezon Memorial Circle", "Quezon Memorial Shrine", "Quezon Heritage House", "Ninoy Aquino Parks and Wildlife Center");
-        quizQuestions.add(new QuizQuestion("Question 1?", question1Choices, 0, R.drawable.pic1, "Quezon Memorial Circle is a national park located in Quezon City, Metro Manila, Philippines. The park is located inside a large traffic circle in the shape of an ellipse and bounded by the Elliptical Road and is the main park of Quezon City. "));
+        quizQuestions.add(new QuizQuestion("Question 1?", question1Choices, 0, R.drawable.pic1, "Quezon Memorial Circle\n\nA national park located in Quezon City, Metro Manila, Philippines. The park is located inside a large traffic circle in the shape of an ellipse and bounded by the Elliptical Road and is the main park of Quezon City. "));
 
         List<String> question2Choices = Arrays.asList("Quezon Heritage House", "Art in Island", "Circle of Fun", "Eastwood Central Park");
-        quizQuestions.add(new QuizQuestion("Question 2?", question2Choices, 1, R.drawable.pic2, "Art in Island is the largest Mixed Media Art Museum in the Philippines that brings media technology and various artforms together to create a unique, immersive, and interactive experience."));
+        quizQuestions.add(new QuizQuestion("Question 2?", question2Choices, 1, R.drawable.pic2, "Art in Island\n\nThe largest Mixed Media Art Museum in the Philippines that brings media technology and various artforms together to create a unique, immersive, and interactive experience."));
 
         List<String> question3Choices = Arrays.asList("La Mesa Eco Park", "Ninoy Aquino Parks and Wildlife Center", "Quezon Heritage House", "Tandang Sora National Shrine");
-        quizQuestions.add(new QuizQuestion("Question 3?", question3Choices, 0, R.drawable.pic3, "Activities that can be done by visitors in the park are hiking, mountain-biking, horseback riding, rappelling, zip-lining and fishing. They can also paddle boat ride in the lagoon. The park also has an \"Ecotrail\" and an orchidarium."));
+        quizQuestions.add(new QuizQuestion("Question 3?", question3Choices, 0, R.drawable.pic3, "La Mesa Eco Park\n\nActivities that can be done by visitors in the park are hiking, mountain-biking, horseback riding, rappelling, zip-lining and fishing. They can also paddle boat ride in the lagoon. The park also has an \"Ecotrail\" and an orchidarium."));
 
         List<String> question4Choices = Arrays.asList("Andres Bonifacio Monument", "Tandang Sora National Shrine", "Presidential Car Museum", "Quezon Heritage House");
-        quizQuestions.add(new QuizQuestion("Question 4?", question4Choices, 2, R.drawable.pic4, "A museum that displays cars used by the former Philippine Presidents."));
+        quizQuestions.add(new QuizQuestion("Question 4?", question4Choices, 2, R.drawable.pic4, "Presidential Car Museum\n\nA museum that displays cars used by the former Philippine Presidents."));
 
         List<String> question5Choices = Arrays.asList("La Mesa Eco Park", "Quezon Memorial Circle", "UP Sunken Garden", "Eastwood Central Park");
-        quizQuestions.add(new QuizQuestion("Question 5?", question5Choices, 2, R.drawable.pic5, "The site of many important events in UP history. It was the venue for the first UP Fair in 1925, and it has also been used for graduation ceremonies, concerts, and rallies."));
+        quizQuestions.add(new QuizQuestion("Question 5?", question5Choices, 2, R.drawable.pic5, "UP Sunken Garden\n\nThe site of many important events in UP history. It was the venue for the first UP Fair in 1925, and it has also been used for graduation ceremonies, concerts, and rallies."));
 
         List<String> question6Choices = Arrays.asList("Luxent Hotel", "Go Hotels North Edsa - Quezon City", "Fersal Hotel", "Seda Vertis North");
-        quizQuestions.add(new QuizQuestion("Question 6?", question6Choices, 3, R.drawable.pic6, "In a bustling business and entertainment district, this modern high-rise hotel is 2 km from both the North Avenue MRT station and lively Quezon Memorial Circle park."));
+        quizQuestions.add(new QuizQuestion("Question 6?", question6Choices, 3, R.drawable.pic6, "Seda Vertis North\n\nIn a bustling business and entertainment district, this modern high-rise hotel is 2 km from both the North Avenue MRT station and lively Quezon Memorial Circle park."));
 
         List<String> question7Choices = Arrays.asList("North Pointe Residences", "Hop Inn Hotel Tomas Morato", "Harolds Evotel", "The Oracle Hotel and Residences");
-        quizQuestions.add(new QuizQuestion("Question 7?", question7Choices, 0, R.drawable.pic7, "North Pointe Residences  has the following amenities: Free WiFi, Free parking, Accessible, Pool, Air-conditioned, Kid-friendly, and Restaurant."));
+        quizQuestions.add(new QuizQuestion("Question 7?", question7Choices, 0, R.drawable.pic7, "North Pointe Residences\n\nhas the following amenities: Free WiFi, Free parking, Accessible, Pool, Air-conditioned, Kid-friendly, and Restaurant."));
 
-        List<String> question8Choices = Arrays.asList("Residenciale Boutique Apartment", "Sequoia Hotel", "Park Vil-la Apartelle", "Pacific Waves Resort ");
-        quizQuestions.add(new QuizQuestion("Question 8?", question8Choices, 3, R.drawable.pic8, "This laid-back resort is 2 km from Grotto of Our Lady of Lourdes, 9 km from Pinagrealan Cave and 11 km from shopping at SM City Fairview. "));
+        List<String> question8Choices = Arrays.asList("Residenciale Boutique Apartment", "Sequoia Hotel", "Park Vil-la Apartelle", "Pacific Waves Resort");
+        quizQuestions.add(new QuizQuestion("Question 8?", question8Choices, 3, R.drawable.pic8, "Pacific Waves Resort\n\nThis laid-back resort is 2 km from Grotto of Our Lady of Lourdes, 9 km from Pinagrealan Cave and 11 km from shopping at SM City Fairview. "));
 
         List<String> question9Choices = Arrays.asList("Provenciano", "The Frazzled Cook", "Half Saints", "Victorino's Restaurant");
-        quizQuestions.add(new QuizQuestion("Question 9?", question9Choices, 1, R.drawable.pic9, "A quirky restaurant put together with the mission of serving good comfort food with a cozy homey ambiance."));
+        quizQuestions.add(new QuizQuestion("Question 9?", question9Choices, 1, R.drawable.pic9, "The Frazzled Cook\n\nA quirky restaurant put together with the mission of serving good comfort food with a cozy homey ambiance."));
 
         List<String> question10Choices = Arrays.asList("Provenciano", "The Frazzled Cook", "Half Saints", "Victorino's Restaurant");
-        quizQuestions.add(new QuizQuestion("Question 10?", question10Choices, 0, R.drawable.pic10, "Family-owned neighborhood restaurant Provenciano has withstood the test of time, and remains to be one of food capital Maginhawa’s not-so-hidden but always recommended gems, ever since its founding in 2015."));
+        quizQuestions.add(new QuizQuestion("Question 10?", question10Choices, 0, R.drawable.pic10, "Provenciano\n\nFamily-owned neighborhood restaurant Provenciano has withstood the test of time, and remains to be one of food capital Maginhawa’s not-so-hidden but always recommended gems, ever since its founding in 2015."));
 
         List<String> question11Choices = Arrays.asList("SM City Fairview", "Fairview Center Mall", "Ayala Malls Fairview Terraces", "Robinsons Novaliches");
-        quizQuestions.add(new QuizQuestion("Question 11?", question11Choices, 2, R.drawable.pic11, "It is the second mall by Robinsons Malls in Quezon City after Robinsons Galleria."));
+        quizQuestions.add(new QuizQuestion("Question 11?", question11Choices, 2, R.drawable.pic11, "Ayala Malls Fairview Terraces\n\nIt is the second mall by Robinsons Malls in Quezon City after Robinsons Galleria."));
 
         List<String> question12Choices = Arrays.asList("Trinoma", "Fairview Center Mall", "Ayala Malls Fairview Terraces", "Ayala Malls Vertis North");
-        quizQuestions.add(new QuizQuestion("Question 12?", question12Choices, 0, R.drawable.pic12, "Vast shopping complex with familiar apparel brands, casual eats, a supermarket & a cinema."));
+        quizQuestions.add(new QuizQuestion("Question 12?", question12Choices, 0, R.drawable.pic12, "Trinoma\n\nVast shopping complex with familiar apparel brands, casual eats, a supermarket & a cinema."));
 
         List<String> question13Choices = Arrays.asList("Trinoma", "Fairview Center Mall", "Ayala Malls Fairview Terraces", "Ayala Malls Vertis North");
-        quizQuestions.add(new QuizQuestion("Question 13?", question13Choices, 3, R.drawable.pic13, "Sizable shopping center providing brand-name stores, services, informal eateries & a movie theater."));
+        quizQuestions.add(new QuizQuestion("Question 13?", question13Choices, 3, R.drawable.pic13, "Ayala Malls Vertis North\n\nSizable shopping center providing brand-name stores, services, informal eateries & a movie theater."));
 
         List<String> question14Choices = Arrays.asList("SM City Faiview", "SM City Novaliches", "SM City North EDSA", "Fisher Mall");
-        quizQuestions.add(new QuizQuestion("Question 14?", question14Choices, 2, R.drawable.pic14, "It is the first SM Supermall in the country and formerly the largest shopping mall in the Philippines from 2008 to 2011, circa 2014, and from 2015 to 2021."));
+        quizQuestions.add(new QuizQuestion("Question 14?", question14Choices, 2, R.drawable.pic14, "SM City North EDSA\n\nIt is the first SM Supermall in the country and formerly the largest shopping mall in the Philippines from 2008 to 2011, circa 2014, and from 2015 to 2021."));
 
         List<String> question15Choices = Arrays.asList("Fisher Mall", "Landers Superstore", "Commonwealth Market", "Gateway Mall");
-        quizQuestions.add(new QuizQuestion("Question 15?", question15Choices, 0, R.drawable.pic15, "Dynamic shopping complex offering an array of stores, a supermarket, an arcade & a movie theater."));
+        quizQuestions.add(new QuizQuestion("Question 15?", question15Choices, 0, R.drawable.pic15, "Fisher Mall\n\nDynamic shopping complex offering an array of stores, a supermarket, an arcade & a movie theater."));
 
         List<String> question16Choices = Arrays.asList("Ayala Malls Fairview Terraces", "Ayala Malls Cloverleaf", "Ayala Malls Vertis North", "Gateway Mall");
-        quizQuestions.add(new QuizQuestion("Question 16?", question16Choices, 1, R.drawable.pic16, "A shopping mall developed and managed by Ayala Malls, inside the Cloverleaf Estate in Quezon City. This is among Ayala Malls' establishments in Quezon City, after Ayala Malls Vertis North, UP Town Center and TriNoma. "));
+        quizQuestions.add(new QuizQuestion("Question 16?", question16Choices, 1, R.drawable.pic16, "Ayala Malls Cloverleaf\n\nA shopping mall developed and managed by Ayala Malls, inside the Cloverleaf Estate in Quezon City. This is among Ayala Malls' establishments in Quezon City, after Ayala Malls Vertis North, UP Town Center and TriNoma. "));
 
         List<String> question17Choices = Arrays.asList("Robinsons Novaliches", "Ayala Malls Vertis North", "Gateway Mall", "Robinsons Magnolia");
-        quizQuestions.add(new QuizQuestion("Question 17?", question17Choices, 3, R.drawable.pic17, "Bustling shopping center offering clothing stores, services, a food court & movie theater."));
+        quizQuestions.add(new QuizQuestion("Question 17?", question17Choices, 3, R.drawable.pic17, "Robinsons Magnolia\n\nBustling shopping center offering clothing stores, services, a food court & movie theater."));
 
         List<String> question18Choices = Arrays.asList("Robinsons Novaliches", "Ayala Malls Vertis North", "Gateway Mall", "UP Town Center");
-        quizQuestions.add(new QuizQuestion("Question 18?", question18Choices, 3, R.drawable.pic18, "Airy, contemporary retail complex with brand-name shops, outdoor walkways & a fenced dog park."));
+        quizQuestions.add(new QuizQuestion("Question 18?", question18Choices, 3, R.drawable.pic18, "UP Town Center\n\nAiry, contemporary retail complex with brand-name shops, outdoor walkways & a fenced dog park."));
 
         List<String> question19Choices = Arrays.asList("Our Lady of the Miraculous Medal Parish Church", "Parish of the Holy Sacrifice Church", "Santo Domingo Church", "Church of the Risen Lord");
-        quizQuestions.add(new QuizQuestion("Question 19?", question19Choices, 0, R.drawable.pic19, "Our Lady of the Miraculous Medal Parish of the Roman Catholic Diocese of Cubao was established on September 4, 1976. It is located in Project 4, City of Quezon. The Parish Fiesta is celebrated every 27th day of November."));
+        quizQuestions.add(new QuizQuestion("Question 19?", question19Choices, 0, R.drawable.pic19, "Our Lady of the Miraculous Medal Parish of the Roman Catholic Diocese of Cubao\n\nEstablished on September 4, 1976. It is located in Project 4, City of Quezon. The Parish Fiesta is celebrated every 27th day of November."));
 
         List<String> question20Choices = Arrays.asList("Choice T1", "Choice T2", "Choice T3", "Choice T4");
-        quizQuestions.add(new QuizQuestion("Question 20?", question20Choices, 1, R.drawable.logo, "Description for correct answer 20"));
+        quizQuestions.add(new QuizQuestion("Question 20?", question20Choices, 1, R.drawable.logo, "Choice T2\n\nDescription for correct answer 20"));
 
         // Add more quiz questions with images and descriptions as needed
         Collections.shuffle(quizQuestions);
@@ -196,10 +199,23 @@ public class QuizFragment extends Fragment {
     }
 
 
+
     private void handleWrongAnswerButtonClick(Button clickedButton) {
         clickedButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.gradient_end));
         showWrongAnswerDialog();
+
+        // Show the correct answer after a short delay (you can adjust the delay duration)
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (wrongAnswerDialog != null && wrongAnswerDialog.isShowing()) {
+                    wrongAnswerDialog.dismiss();  // Dismiss the "Wrong Answer" dialog
+                }
+                showCorrectAnswerDialog();
+            }
+        }, 1000); // Delay for 1 second (adjust as needed)
     }
+
     private void showCorrectAnswerDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Correct Answer")
@@ -246,9 +262,13 @@ public class QuizFragment extends Fragment {
     private void showWrongAnswerDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Wrong Answer")
-                .setMessage("Try again!")
-                .setPositiveButton("OK", null)
-                .show();
+                .setMessage("Try again next time!");
+
+        // Store the "Wrong Answer" dialog in the variable
+        wrongAnswerDialog = builder.create();
+
+        // Show the dialog
+        wrongAnswerDialog.show();
     }
-    // ... (other methods)
+
 }
