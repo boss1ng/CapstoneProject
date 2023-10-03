@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -163,81 +164,57 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
 
     // Create a method to show the delete confirmation dialog
     private void showDeleteConfirmationDialog(Context context, String groupName) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Leave Group");
-        builder.setMessage("Are you sure you want to leave the group?");
-
-        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // Delete the group in Firebase
-                deleteGroup(groupName);
-                dialog.dismiss();
-            }
-        });
-
-        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
-
-    // Create a method to delete the group in Firebase if the user is an admin or remove the user from any member position
-    private void deleteGroup(String groupName) {
-        DatabaseReference groupsReference = databaseReference.child("Groups");
-
-        groupsReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        // Query Firebase to check if the user is the admin of the group
+        DatabaseReference groupReference = databaseReference.child("Groups").child(userId).child(groupName);
+        groupReference.child("admin").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot userGroupSnapshot : dataSnapshot.getChildren()) {
-                    String groupId = userGroupSnapshot.getKey();
-                    DatabaseReference groupReference = userGroupSnapshot.child(groupName).getRef();
+                String adminId = dataSnapshot.getValue(String.class);
+                if (adminId != null && adminId.equals(userId)) {
+                    // User is the admin, show the delete confirmation dialog
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("Delete Group");
+                    builder.setMessage("Are you sure you want to delete the group?");
 
-                    // Check if the current user is a member of this group
-                    groupReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         @Override
-                        public void onDataChange(@NonNull DataSnapshot groupSnapshot) {
-                            String adminId = groupSnapshot.child("admin").getValue(String.class);
-
-                            if (userId.equals(adminId)) {
-                                // The user is an admin, delete the group
-                                groupReference.removeValue();
-                            } else {
-                                // The user is not an admin, check if they are a member of this group
-                                for (DataSnapshot memberSnapshot : groupSnapshot.getChildren()) {
-                                    String memberKey = memberSnapshot.getKey();
-                                    if (!memberKey.equals("admin") && !memberKey.equals("groupName")) {
-                                        String memberId = memberSnapshot.getValue(String.class);
-                                        if (userId.equals(memberId)) {
-                                            // Remove the user from this member position
-                                            groupReference.child(memberKey).removeValue();
-                                            break; // Exit the loop after removing the user
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                            // Handle database error
-                            Log.e("Firebase", "Error checking admin status: " + databaseError.getMessage());
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Delete the group in Firebase
+                            deleteGroup(groupName);
+                            dialog.dismiss();
                         }
                     });
+
+                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                } else {
+                    // User is not the admin, show a toast message
+                    Toast.makeText(context, "Only admins can delete a group", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 // Handle database error
-                Log.e("Firebase", "Error fetching groups: " + databaseError.getMessage());
+                Log.e("Firebase", "Error checking admin status: " + databaseError.getMessage());
             }
         });
+    }
+
+
+
+    // Create a method to delete the group in Firebase
+    private void deleteGroup(String groupName) {
+        // Delete the group in Firebase
+        DatabaseReference groupReference = databaseReference.child("Groups").child(userId).child(groupName);
+        groupReference.removeValue();
     }
 
     // Create a method to update the group's admin, set "member1," and transfer members (excluding those with newAdminId) to a new group in Firebase
