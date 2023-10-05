@@ -1,10 +1,9 @@
 package com.example.qsee;
+
 import android.Manifest;
 import android.content.pm.PackageManager;
-import com.example.qsee.PlaceDetailActivity;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +11,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -23,7 +21,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.*;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.*;
-import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
@@ -33,8 +30,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
@@ -151,20 +150,27 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
                 for (DataSnapshot placeSnapshot : dataSnapshot.getChildren()) {
                     // Extract place data (e.g., latitude, longitude, name) from placeSnapshot
-
+                    String address = placeSnapshot.child("Address").getValue(String.class);
                     String name = placeSnapshot.child("Location").getValue(String.class);
                     String latitude = placeSnapshot.child("Latitude").getValue(String.class);
                     String longitude = placeSnapshot.child("Longitude").getValue(String.class);
+                    Integer rating = placeSnapshot.child("AverateRate").getValue(Integer.class);
 
                     try {
                         Double doubleLatitude = Double.parseDouble(latitude);
                         Double doubleLongitude = Double.parseDouble(longitude);
 
+
                         // Create MarkerOptions or LatLng objects for each place
                         LatLng location = new LatLng(doubleLatitude, doubleLongitude);
+
+
                         MarkerOptions markerOptions = new MarkerOptions()
                                 .position(location)
-                                .title(name);
+                                .title(name)
+                               // .title(rating)
+                                .snippet(address);
+
 
                         // Add markers to the Google Map
                         Marker marker = mMap.addMarker(markerOptions);
@@ -176,12 +182,16 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                                 // Handle marker click event here
                                 // Show place details in your app
 
-                                // Example: Launch a new activity to display details
-                                Intent intent = new Intent(requireContext(), PlaceDetailActivity.class);
-                                intent.putExtra("placeName", marker.getTitle());
-                                intent.putExtra("latitude", marker.getPosition().latitude);
-                                intent.putExtra("longitude", marker.getPosition().longitude);
-                                startActivity(intent);
+                                // Create a new PlaceDetailDialogFragment and pass the place details as arguments
+                                PlaceDetailDialogFragment fragment = new PlaceDetailDialogFragment();
+                                Bundle args = new Bundle();
+                                args.putString("placeName", marker.getTitle());
+                                args.putString("placeAddress", marker.getSnippet()); // Use the snippet as address
+                                args.putDouble("placeRating", rating); // Replace with actual rating
+                                fragment.setArguments(args);
+
+                                // Show the PlaceDetailDialogFragment as a dialog
+                                fragment.show(getChildFragmentManager(), "PlaceDetailDialogFragment");
 
                                 return true;
                             }
@@ -201,4 +211,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             }
         });
     }
+
+    // Method to retrieve the address from coordinates using reverse geocoding
+
 }

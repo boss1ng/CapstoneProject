@@ -1,0 +1,61 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical">
+
+        <!-- Place Name -->
+        <TextView
+            android:id="@+id/placeNameTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="32dp"
+            android:textColor="#000000"
+            tools:text="Place Name" />
+
+        <!-- Place Address -->
+        <TextView
+            android:id="@+id/placeAddressTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/placeNameTextView"
+            android:layout_marginTop="8dp"
+            android:textColor="#000000"
+            tools:text="123 Main St, City" />
+
+        <!-- Place Rating -->
+        <TextView
+            android:id="@+id/placeRatingTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/placeAddressTextView"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="16dp"
+            android:textColor="#000000"
+            tools:text="4.5" />
+
+        <!-- Directions Button -->
+
+        <!-- Report Button -->
+        <Button
+            android:id="@+id/directionsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="80dp"
+            android:text="Directions" />
+
+        <Button
+            android:id="@+id/reportButton"
+            android:layout_width="116dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="80dp"
+            android:text="!" />
+
+</LinearLayout>
