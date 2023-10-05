@@ -131,7 +131,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 LatLng userLocation = new LatLng(latitude, longitude);
 
                 // Add a marker at the user's location
-                mMap.addMarker(new MarkerOptions().position(userLocation).title("Your Location"));
+                // mMap.addMarker(new MarkerOptions().position(userLocation).title("Your Location"));
 
                 // Move the camera to the user's location
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
@@ -154,23 +154,25 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                     String name = placeSnapshot.child("Location").getValue(String.class);
                     String latitude = placeSnapshot.child("Latitude").getValue(String.class);
                     String longitude = placeSnapshot.child("Longitude").getValue(String.class);
-                    Integer rating = placeSnapshot.child("AverateRate").getValue(Integer.class);
+                    String stringRating = placeSnapshot.child("AverageRate").getValue(String.class);
+                    String description = placeSnapshot.child("Description").getValue(String.class);
+                    String imageLink = placeSnapshot.child("Link").getValue(String.class);
+                    String lowestPrice = placeSnapshot.child("LowestPrice").getValue(String.class);
+                    String highestPrice = placeSnapshot.child("HighestPrice").getValue(String.class);
+                    String placePrice = "₱" + lowestPrice + " - ₱" + highestPrice;
 
                     try {
                         Double doubleLatitude = Double.parseDouble(latitude);
                         Double doubleLongitude = Double.parseDouble(longitude);
 
-
                         // Create MarkerOptions or LatLng objects for each place
                         LatLng location = new LatLng(doubleLatitude, doubleLongitude);
-
 
                         MarkerOptions markerOptions = new MarkerOptions()
                                 .position(location)
                                 .title(name)
-                               // .title(rating)
-                                .snippet(address);
-
+                                //.title(rating)
+                                .snippet(address + "@" + stringRating + "@" + description + "@" + imageLink + "@" + placePrice);
 
                         // Add markers to the Google Map
                         Marker marker = mMap.addMarker(markerOptions);
@@ -182,12 +184,20 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                                 // Handle marker click event here
                                 // Show place details in your app
 
+                                String locationDetails = marker.getSnippet();
+
+                                // Split the input string into an array of parts
+                                String[] parts = locationDetails.split("@");
+
                                 // Create a new PlaceDetailDialogFragment and pass the place details as arguments
                                 PlaceDetailDialogFragment fragment = new PlaceDetailDialogFragment();
                                 Bundle args = new Bundle();
                                 args.putString("placeName", marker.getTitle());
-                                args.putString("placeAddress", marker.getSnippet()); // Use the snippet as address
-                                args.putDouble("placeRating", rating); // Replace with actual rating
+                                args.putString("placeAddress", parts[0]); // Use the snippet as address
+                                args.putString("placeRating", parts[1]); // Replace with actual rating
+                                args.putString("placeDescription", parts[2]);
+                                args.putString("placeLink", parts[3]);
+                                args.putString("placePrice", parts[4]);
                                 fragment.setArguments(args);
 
                                 // Show the PlaceDetailDialogFragment as a dialog
@@ -210,6 +220,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 // Handle the error here
             }
         });
+
+        // ROUTES
+
+
     }
 
     // Method to retrieve the address from coordinates using reverse geocoding
