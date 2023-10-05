@@ -96,76 +96,68 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     }
 
     private void acceptGroupInvitation(String groupName, String member, String senderId, Notification notification) {
-        DatabaseReference mobileUsersReference = FirebaseDatabase.getInstance().getReference("MobileUsers");
+        DatabaseReference groupsReference = FirebaseDatabase.getInstance().getReference("Groups");
 
-        mobileUsersReference.orderByChild("userId").equalTo(senderId).addListenerForSingleValueEvent(new ValueEventListener() {
+        // Query for the group with the given name and admin
+        groupsReference.orderByChild("groupName").equalTo(groupName).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot userSnapshot) {
-                for (DataSnapshot user : userSnapshot.getChildren()) {
-                    String adminUserId = user.getKey();
+            public void onDataChange(DataSnapshot groupSnapshot) {
+                for (DataSnapshot group : groupSnapshot.getChildren()) {
+                    String adminUserId = group.child("admin").getValue(String.class);
 
-                    DatabaseReference groupsReference = FirebaseDatabase.getInstance().getReference("Groups");
-                    groupsReference.child(adminUserId).orderByChild("groupName")
-                            .equalTo(groupName).addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot groupSnapshot) {
-                                    if (groupSnapshot.exists()) {
-                                        String groupId = groupSnapshot.getChildren().iterator().next().getKey();
+                    // Check if the user is already a member
+                    boolean isUserAlreadyMember = isUserAlreadyMember(group, member);
 
-                                        if (isUserAlreadyMember(groupSnapshot.child(groupId), member)) {
-                                            Toast.makeText(context, "User is already a member of the group", Toast.LENGTH_SHORT).show();
-                                        } else {
-                                            Toast.makeText(context, "Successfully joined " + groupName, Toast.LENGTH_SHORT).show();
+                    if (adminUserId != null && adminUserId.equals(member)) {
+                        Toast.makeText(context, "You are the admin of the group.", Toast.LENGTH_SHORT).show();
+                    } else if (isUserAlreadyMember) {
+                        Toast.makeText(context, "User is already a member of the group", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // User is not the admin and not already a member, proceed with adding.
+                        Toast.makeText(context, "Successfully joined " + groupName, Toast.LENGTH_SHORT).show();
 
-                                            int nextMemberNumber = 1;
-                                            for (int i = 1; i <= 50; i++) {
-                                                if (!groupSnapshot.child(groupId).hasChild("member" + i)) {
-                                                    nextMemberNumber = i;
-                                                    break;
-                                                }
-                                            }
+                        // Find the next available member number
+                        int nextMemberNumber = 1;
+                        for (int i = 1; i <= 50; i++) {
+                            String memberKey = "member" + i;
+                            if (!group.hasChild(memberKey)) {
+                                nextMemberNumber = i;
+                                break;
+                            }
+                        }
 
-                                            DatabaseReference groupRef = groupsReference.child(adminUserId).child(groupId).child("member" + nextMemberNumber);
-                                            groupRef.setValue(member);
-                                            Log.d("AddUserToGroup", "Added user " + member + " to group " + groupName + " as a member" + nextMemberNumber);
+                        // Add the user as a member to the group
+                        String memberKey = "member" + nextMemberNumber;
+                        group.getRef().child(memberKey).setValue(member);
 
-                                            // Remove the accepted notification from the database
-                                            DatabaseReference notificationsReference = FirebaseDatabase.getInstance().getReference("Notifications")
-                                                    .child(member).child(notification.getNotificationId());
+                        // Remove the accepted notification from the database
+                        DatabaseReference notificationsReference = FirebaseDatabase.getInstance().getReference("Notifications")
+                                .child(member).child(notification.getNotificationId());
 
-                                            notificationsReference.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-                                                    if (task.isSuccessful()) {
-                                                        // Notification removed from the database, now remove it from the list
-                                                        notificationList.remove(notification);
-                                                        notifyDataSetChanged();
-                                                    } else {
-                                                        // Handle the error
-                                                        Log.e("RemoveNotification", "Error removing notification from the database: " + task.getException().getMessage());
-                                                    }
-                                                }
-                                            });
-                                        }
-                                    } else {
-                                        Log.d("AddUserToGroup", "Group doesn't exist for user: " + adminUserId);
-                                    }
+                        notificationsReference.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    // Notification removed from the database, now remove it from the list
+                                    notificationList.remove(notification);
+                                    notifyDataSetChanged();
+                                } else {
+                                    // Handle the error
+                                    Log.e("RemoveNotification", "Error removing notification from the database: " + task.getException().getMessage());
                                 }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-                                    Log.e("AddUserToGroup", "Error checking group: " + databaseError.getMessage());
-                                }
-                            });
+                            }
+                        });
+                    }
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.e("AddUserToGroup", "Error finding user ID: " + databaseError.getMessage());
+                Log.e("acceptGroupInvitation", "Error finding group: " + databaseError.getMessage());
             }
         });
     }
+
 
     private void rejectGroupInvitation(String senderId, Notification notification) {
         DatabaseReference notificationsReference = FirebaseDatabase.getInstance().getReference("Notifications")

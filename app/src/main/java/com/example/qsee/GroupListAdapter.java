@@ -21,6 +21,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -84,23 +85,30 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
         holder.deleteImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Query Firebase to fetch the list of members for the selected group
+                // Check if the user is the admin of the group
                 String groupName = group.getGroupName();
-                databaseReference.child("Groups").child(userId).child(groupName).addListenerForSingleValueEvent(new ValueEventListener() {
+                databaseReference.child("Groups").child(groupName).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        // Create a dialog to show the list of members and select a new admin
-                        showMemberSelectionDialog(v.getContext(), groupName, dataSnapshot);
+                        String adminId = dataSnapshot.child("admin").getValue(String.class);
+                        if (adminId != null && adminId.equals(userId)) {
+                            // User is the admin, show the member selection dialog
+                            showMemberSelectionDialog(v.getContext(), groupName, dataSnapshot);
+                        } else {
+                            // User is not the admin, show a leave confirmation dialog
+                            showLeaveConfirmationDialog(v.getContext(), groupName);
+                        }
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
                         // Handle database error
-                        Log.e("Firebase", "Error fetching group members: " + databaseError.getMessage());
+                        Log.e("Firebase", "Error checking admin status: " + databaseError.getMessage());
                     }
                 });
             }
         });
+
     }
 
     // Create a method to show the member selection dialog and confirm deletion
@@ -162,10 +170,66 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
         }
     }
 
+
+    // Create a method to show the leave confirmation dialog for non-admin users
+    private void showLeaveConfirmationDialog(Context context, String groupName) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Leave Group");
+        builder.setMessage("Are you sure you want to leave the group?");
+
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Leave the group (you can implement the leave action here)
+                leaveGroup(groupName);
+                dialog.dismiss();
+            }
+        });
+
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    // Add a method to leave the group in Firebase
+    private void leaveGroup(String groupName) {
+        // Reference to the group in the Firebase database
+        DatabaseReference groupReference = databaseReference.child("Groups").child(groupName);
+
+        // Query to find the current user's position in the group's members list
+        Query query = groupReference.orderByValue().equalTo(userId);
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot memberSnapshot : dataSnapshot.getChildren()) {
+                    // Remove the user's ID from the group's members list
+                    memberSnapshot.getRef().removeValue();
+                }
+
+                // Optionally, you can perform additional actions after leaving the group
+                // For example, update UI or show a confirmation message
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle database error
+                Log.e("Firebase", "Error leaving group: " + databaseError.getMessage());
+            }
+        });
+    }
+
+
     // Create a method to show the delete confirmation dialog
     private void showDeleteConfirmationDialog(Context context, String groupName) {
         // Query Firebase to check if the user is the admin of the group
-        DatabaseReference groupReference = databaseReference.child("Groups").child(userId).child(groupName);
+        DatabaseReference groupReference = databaseReference.child("Groups").child(groupName);
         groupReference.child("admin").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -213,55 +277,39 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
     // Create a method to delete the group in Firebase
     private void deleteGroup(String groupName) {
         // Delete the group in Firebase
-        DatabaseReference groupReference = databaseReference.child("Groups").child(userId).child(groupName);
+        DatabaseReference groupReference = databaseReference.child("Groups").child(groupName);
         groupReference.removeValue();
     }
 
     // Create a method to update the group's admin, set "member1," and transfer members (excluding those with newAdminId) to a new group in Firebase
     private void updateGroupAdmin(String groupName, String newAdminId) {
-        DatabaseReference groupReference = databaseReference.child("Groups").child(userId).child(groupName);
+        DatabaseReference groupReference = databaseReference.child("Groups").child(groupName);
 
-        // Create a new group under "Groups" with the new admin
-        DatabaseReference newGroupReference = databaseReference.child("Groups").child(newAdminId).child(groupName);
+        // Update the 'admin' field for the group to the new admin ID
+        groupReference.child("admin").setValue(newAdminId);
+        groupReference.child("member1").setValue(newAdminId);
 
-        // Set "member1" for the new group with the new admin ID
-        newGroupReference.child("member1").setValue(newAdminId);
-
-        // Set the 'admin' field for the new group to the new admin ID
-        newGroupReference.child("admin").setValue(newAdminId);
-
-        // Set the 'groupName' field for the new group
-        newGroupReference.child("groupName").setValue(groupName);
-
-        // Fetch the list of members from the original group
-        groupReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot memberSnapshot : dataSnapshot.getChildren()) {
-                    String memberKey = memberSnapshot.getKey();
-                    if (!memberKey.equals("admin") && !memberKey.equals("groupName") && !memberKey.equals("member1")) {
-                        // Get the member's ID
-                        String memberId = memberSnapshot.getValue(String.class);
-
-                        // Check if the member's ID is not the same as the new admin ID
-                        if (!newAdminId.equals(memberId)) {
-                            // Transfer each member (excluding those with newAdminId) to the new group
-                            newGroupReference.child(memberKey).setValue(memberId);
-                        }
+        // Loop to remove the 'newAdminId' from 'member2' to 'member50'
+        for (int i = 2; i <= 50; i++) {
+            String memberKey = "member" + i;
+            groupReference.child(memberKey).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    String memberId = dataSnapshot.getValue(String.class);
+                    if (newAdminId.equals(memberId)) {
+                        // Remove 'newAdminId' from the member
+                        dataSnapshot.getRef().removeValue();
                     }
                 }
 
-                // Finally, delete the original group
-                groupReference.removeValue();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Handle database error
-                Log.e("Firebase", "Error transferring members: " + databaseError.getMessage());
-            }
-        });
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    // Handle database error
+                }
+            });
+        }
     }
+
 
     @Override
     public int getItemCount() {

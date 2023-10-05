@@ -99,7 +99,7 @@ public class AddUserToGroup extends DialogFragment {
     }
 
     private void addUserToGroup(String member) {
-        DatabaseReference groupsRef = databaseReference.child("Groups").child(userId);
+        DatabaseReference groupsRef = databaseReference.child("Groups");
 
         // Check if the group exists for the user
         groupsRef.orderByChild("groupName").equalTo(groupName).addListenerForSingleValueEvent(new ValueEventListener() {

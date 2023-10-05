@@ -80,46 +80,58 @@ public class AddGroupFragment extends DialogFragment {
             public void onClick(View v) {
                 String groupName = grpName.getEditText().getText().toString().trim();
                 if (!groupName.isEmpty()) {
-                    // Get a reference to the Firebase database
                     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+                    DatabaseReference groupsReference = databaseReference.child("Groups");
 
-                    // Query to fetch the userId based on the username
-                    DatabaseReference usersReference = databaseReference.child("MobileUsers");
-                    Query query = usersReference.orderByChild("userId").equalTo(userId);
-
-                    query.addListenerForSingleValueEvent(new ValueEventListener() {
+                    // Check if the group name already exists
+                    groupsReference.child(groupName).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             if (dataSnapshot.exists()) {
-                                // Retrieve the userId
-                                String userId = dataSnapshot.getChildren().iterator().next().getKey();
-
-                                // Create a new Group object with the admin (userId)
-                                Groups group = new Groups();
-                                group.setGroupName(groupName);
-                                group.setAdmin(userId);
-
-                                // Get a reference to the "Groups" node at the root level
-                                DatabaseReference groupsReference = databaseReference.child("Groups");
-
-                                // Create a new child node for the current user under the "Groups" node
-                                DatabaseReference userGroupsReference = groupsReference.child(userId);
-
-                                // Create a new child node with the group name under the user's node
-                                DatabaseReference newGroupReference = userGroupsReference.child(groupName);
-                                newGroupReference.setValue(group);
-
-                                // Set the creator (userId) as member1
-                                newGroupReference.child("member1").setValue(userId);
-
-                                // Display a Toast for successful group creation
-                                Toast.makeText(getActivity(), "Group created successfully", Toast.LENGTH_SHORT).show();
-
-                                // Close the dialog
-                                dismiss();
+                                // The group name already exists, show a toast message
+                                Toast.makeText(getActivity(), "Group already exists, Try a different group name", Toast.LENGTH_SHORT).show();
                             } else {
-                                // Handle the case where the username does not exist
-                                // You can display an error message or take appropriate action
+                                // Group name does not exist, proceed to create the group
+                                DatabaseReference usersReference = databaseReference.child("MobileUsers");
+                                Query query = usersReference.orderByChild("userId").equalTo(userId);
+
+                                query.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        if (dataSnapshot.exists()) {
+                                            // Retrieve the userId
+                                            String userId = dataSnapshot.getChildren().iterator().next().getKey();
+
+                                            // Create a new Group object with the admin (userId)
+                                            Groups group = new Groups();
+                                            group.setGroupName(groupName);
+                                            group.setAdmin(userId);
+
+                                            // Get a reference to the "Groups" node at the root level
+                                            DatabaseReference newGroupReference = groupsReference.child(groupName);
+
+                                            // Create a new child node with the group name under the user's node
+                                            newGroupReference.setValue(group);
+
+                                            // Set the creator (userId) as member1
+                                            newGroupReference.child("member1").setValue(userId);
+
+                                            // Display a Toast for successful group creation
+                                            Toast.makeText(getActivity(), "Group created successfully", Toast.LENGTH_SHORT).show();
+
+                                            // Close the dialog
+                                            dismiss();
+                                        } else {
+                                            // Handle the case where the username does not exist
+                                            // You can display an error message or take appropriate action
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                                        // Handle any database query errors here
+                                    }
+                                });
                             }
                         }
 
@@ -134,5 +146,6 @@ public class AddGroupFragment extends DialogFragment {
                 }
             }
         });
+
     }
 }

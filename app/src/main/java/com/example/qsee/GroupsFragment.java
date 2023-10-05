@@ -98,22 +98,28 @@ public class GroupsFragment extends Fragment {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<Groups> userGroups = new ArrayList<>();
 
-                for (DataSnapshot adminSnapshot : dataSnapshot.getChildren()) {
-                    for (DataSnapshot groupSnapshot : adminSnapshot.getChildren()) {
-                        String groupName = groupSnapshot.child("groupName").getValue(String.class);
+                for (DataSnapshot groupSnapshot : dataSnapshot.getChildren()) {
+                    String groupName = groupSnapshot.child("groupName").getValue(String.class);
+                    String adminId = groupSnapshot.child("admin").getValue(String.class);
 
-                        // Check if the user is a member of this group
-                        for (int i = 1; i <= 50; i++) { // Assuming there are up to 50 members
-                            String memberKey = "member" + i;
-                            String memberValue = groupSnapshot.child(memberKey).getValue(String.class);
+                    // Check if the user is a member of this group
+                    boolean isUserMember = false;
 
-                            if (memberValue != null && memberValue.equals(userId)) {
-                                // User is a member, add this group to userGroups
-                                Groups group = new Groups(groupName, adminSnapshot.getKey());
-                                userGroups.add(group);
-                                break; // Break the loop if the user is found in this group
-                            }
+                    for (int i = 1; i <= 50; i++) {
+                        String memberKey = "member" + i;
+                        String memberValue = groupSnapshot.child(memberKey).getValue(String.class);
+
+                        if (memberValue != null && memberValue.equals(userId)) {
+                            // User is a member of this group
+                            isUserMember = true;
+                            break; // No need to check further
                         }
+                    }
+
+                    if (isUserMember) {
+                        // User is a member, add this group to userGroups
+                        Groups group = new Groups(groupName, adminId);
+                        userGroups.add(group);
                     }
                 }
 
@@ -129,7 +135,6 @@ public class GroupsFragment extends Fragment {
             }
         });
     }
-
 
 
     @Override
