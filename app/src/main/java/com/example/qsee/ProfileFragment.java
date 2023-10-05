@@ -72,6 +72,10 @@ public class ProfileFragment extends Fragment {
                 // Show the UserBottomSheetDialogFragment
                 UserBottomSheetDialogFragment bottomSheetDialog = new UserBottomSheetDialogFragment().newInstance(userId);
                 bottomSheetDialog.show(getParentFragmentManager(), bottomSheetDialog.getTag());
+
+                //PlaceDetailFragment pdf = new PlaceDetailFragment().newInstance(userId);
+                //pdf.show(getParentFragmentManager(), pdf.getTag());
+
             }
         });
 

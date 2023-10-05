@@ -1,0 +1,152 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_marginTop="50dp"
+    android:layout_marginLeft="20dp"
+    android:layout_marginRight="20dp">
+
+        <Button
+            android:id="@+id/reportButton"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:text="!" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="-20dp" >
+
+                <ImageView
+                    android:id="@+id/imageViewLocation"
+                    android:layout_width="600px"
+                    android:layout_height="300px"
+                    android:layout_weight="1"
+                    />
+                <!-- android:src="@tools:sample/avatars" -->
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    >
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/placeNameTextView"
+                                    android:layout_width="290dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_centerHorizontal="true"
+                                    android:textColor="#000000"
+                                    android:textSize="24sp"
+                                    android:textStyle="bold"
+                                    tools:text="Ateneo de Manila University Katipunan" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal" >
+
+                                <TextView
+                                    android:id="@+id/placeRatingTextView"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_vertical"
+                                    android:gravity="right"
+                                    android:textColor="#000000"
+                                    tools:text="4.5" />
+                        </LinearLayout>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/placeAddressTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/placeNameTextView"
+                    android:layout_marginTop="8dp"
+                    android:textColor="#000000"
+                    tools:text="123 Main St, City" />
+
+                <TextView
+                    android:id="@+id/placeDescriptionTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/placeNameTextView"
+                    android:layout_marginTop="8dp"
+                    android:textColor="#000000"
+                    tools:text="123 Main St, City" />
+
+        </LinearLayout>
+
+        <!-- Place Address -->
+
+        <!-- Place Rating -->
+
+        <!-- Directions Button -->
+
+        <!-- Report Button -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/placePriceTextView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginRight="10dp"
+                            android:textColor="#000000"
+                            android:textSize="18sp"
+                            tools:text="Price" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="right"
+                    android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/directionsButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="right"
+                            android:text="Directions" />
+                </LinearLayout>
+
+        </LinearLayout>
+
+</LinearLayout>
