@@ -10,9 +10,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.squareup.picasso.Picasso;
 
@@ -47,6 +52,13 @@ public class PlaceDetailDialogFragment extends DialogFragment {
         String placeLink = getArguments().getString("placeLink");
         String placePrice = getArguments().getString("placePrice");
 
+        Double currentUserLat = getArguments().getDouble("userLatitude");
+        Double currentUserLong = getArguments().getDouble("userLongitude");
+        String destinationLat = getArguments().getString("destinationLatitude");
+        String destinationLong = getArguments().getString("destinationLongitude");
+
+        // Toast.makeText(getContext(), String.valueOf(destinationLat), Toast.LENGTH_LONG).show();
+
         // Populate UI elements with place details
         TextView nameTextView = view.findViewById(R.id.placeNameTextView);
         TextView addressTextView = view.findViewById(R.id.placeAddressTextView);
@@ -70,19 +82,44 @@ public class PlaceDetailDialogFragment extends DialogFragment {
         directionsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*
-                // Open Google Maps for directions
-                Uri gmmIntentUri = Uri.parse("google.navigation:q=" + placeAddress);
-                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-                mapIntent.setPackage("com.google.android.apps.maps");
-                if (mapIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-                    startActivity(mapIntent);
-                }
-                 */
-
-                //view.setVisibility(View.GONE);
 
                 dismiss(); // Dismiss the dialog
+
+                // In the fragment or activity where you want to navigate
+                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+
+                MapsFragmentConfirmation fragmentConfirmation = new MapsFragmentConfirmation();
+
+                // Use Bundle to pass values
+                Bundle bundle = new Bundle();
+                bundle.putString("placeName", placeName);
+                bundle.putDouble("userCurrentLatitude", currentUserLat);
+                bundle.putDouble("userCurrentLongitude", currentUserLong);
+                bundle.putString("destinationLatitude", destinationLat);
+                bundle.putString("destinationLongitude", destinationLong);
+                fragmentConfirmation.setArguments(bundle);
+
+                // Replace the current fragment with the receiving fragment
+                transaction.replace(R.id.maps, fragmentConfirmation);
+                transaction.addToBackStack(null);
+                transaction.commit();
+
+
+
+                /*
+        // Create a new PlaceDetailDialogFragment and pass the place details as arguments
+                MapsFragmentConfirmation fragment = new MapsFragmentConfirmation();
+
+                Bundle args = new Bundle();
+                args.putString("placeName", placeName);
+                args.putDouble("userCurrentLatitude", currentUserLat);
+                args.putDouble("userCurrentLongitude", currentUserLong);
+                fragment.setArguments(args);
+
+                // Show the PlaceDetailDialogFragment as a dialog
+                fragment.show(getChildFragmentManager(), "MapsFragmentConfirmation");
+                */
+
 
             }
         });

@@ -42,6 +42,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private PlacesClient placesClient;
 
+    Double currentUserLocationLat;
+    Double currentUserLocationLong;
+
     public MapsFragment() {
         // Required empty public constructor
     }
@@ -128,6 +131,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             if (location != null) {
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
+                currentUserLocationLat = location.getLatitude();
+                currentUserLocationLong = location.getLongitude();
                 LatLng userLocation = new LatLng(latitude, longitude);
 
                 // Add a marker at the user's location
@@ -172,7 +177,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                                 .position(location)
                                 .title(name)
                                 //.title(rating)
-                                .snippet(address + "@" + stringRating + "@" + description + "@" + imageLink + "@" + placePrice);
+                                .snippet(address + "@" + stringRating + "@" + description + "@" + imageLink + "@" + placePrice + "@" + doubleLatitude + "@" + doubleLongitude);
 
                         // Add markers to the Google Map
                         Marker marker = mMap.addMarker(markerOptions);
@@ -198,6 +203,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                                 args.putString("placeDescription", parts[2]);
                                 args.putString("placeLink", parts[3]);
                                 args.putString("placePrice", parts[4]);
+                                args.putDouble("userLatitude", currentUserLocationLat);
+                                args.putDouble("userLongitude", currentUserLocationLong);
+                                args.putString("destinationLatitude", parts[5]);
+                                args.putString("destinationLongitude", parts[6]);
                                 fragment.setArguments(args);
 
                                 // Show the PlaceDetailDialogFragment as a dialog
