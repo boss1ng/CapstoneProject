@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -65,7 +66,7 @@ public class PlaceDetailDialogFragment extends DialogFragment {
         TextView descriptionTextView = view.findViewById(R.id.placeDescriptionTextView);
         TextView ratingTextView = view.findViewById(R.id.placeRatingTextView);
         Button directionsButton = view.findViewById(R.id.directionsButton);
-        Button reportButton = view.findViewById(R.id.reportButton);
+        ImageButton reportButton = view.findViewById(R.id.reportButton);
         ImageView imageViewLocation = view.findViewById(R.id.imageViewLocation);
         TextView priceTextView = view.findViewById(R.id.placePriceTextView);
 
@@ -103,23 +104,6 @@ public class PlaceDetailDialogFragment extends DialogFragment {
                 transaction.replace(R.id.maps, fragmentConfirmation);
                 transaction.addToBackStack(null);
                 transaction.commit();
-
-
-
-                /*
-        // Create a new PlaceDetailDialogFragment and pass the place details as arguments
-                MapsFragmentConfirmation fragment = new MapsFragmentConfirmation();
-
-                Bundle args = new Bundle();
-                args.putString("placeName", placeName);
-                args.putDouble("userCurrentLatitude", currentUserLat);
-                args.putDouble("userCurrentLongitude", currentUserLong);
-                fragment.setArguments(args);
-
-                // Show the PlaceDetailDialogFragment as a dialog
-                fragment.show(getChildFragmentManager(), "MapsFragmentConfirmation");
-                */
-
 
             }
         });
