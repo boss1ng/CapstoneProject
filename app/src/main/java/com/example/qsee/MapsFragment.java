@@ -8,9 +8,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
+
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -96,6 +101,42 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             public void onError(@NonNull Status status) {
                 // Handle any errors
             }
+        });
+
+        ImageButton filterMenuBar = view.findViewById(R.id.filterMenuBar);
+        filterMenuBar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                /*
+                // In the fragment or activity where you want to navigate
+                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+
+                FilterCategories filterCategories = new FilterCategories();
+
+                // Replace the current fragment with the receiving fragment
+                transaction.replace(R.id.fragment_container, new FilterCategories());
+                transaction.addToBackStack(null);
+                transaction.commit();
+                */
+
+
+                // Create a new PlaceDetailDialogFragment and pass the place details as arguments
+                FilterCategories fragment = new FilterCategories();
+
+                // Show the PlaceDetailDialogFragment as a dialog
+                fragment.show(getChildFragmentManager(), "FilterCategories");
+
+
+                /*
+                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container, new FilterCategories());
+                //transaction.addToBackStack(null); // Optional: Add to back stack for navigation
+                transaction.commit();
+                */
+
+            }
+
         });
 
         return view;

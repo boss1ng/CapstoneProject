@@ -9,9 +9,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -63,6 +67,17 @@ public class MapsFragmentConfirmation extends Fragment implements OnMapReadyCall
         // Initialize the FusedLocationProviderClient
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
 
+        // Receive the values from the Bundle
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            // DESTINATION LOCATION
+            String placeName = bundle.getString("placeName");
+
+            // Populate UI elements with place details
+            TextView textViewName = view.findViewById(R.id.textViewName);
+            textViewName.setText(placeName);
+        }
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.maps);
@@ -70,11 +85,61 @@ public class MapsFragmentConfirmation extends Fragment implements OnMapReadyCall
             mapFragment.getMapAsync(this);
         }
 
+        Button cancelButton = view.findViewById(R.id.btnCancel);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // In the fragment or activity where you want to navigate
+                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+
+                MapsFragment mapsFragment = new MapsFragment();
+
+                // Replace the current fragment with the receiving fragment
+                transaction.replace(R.id.fragment_container, mapsFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+
+        });
+
+        Button proceedButton = view.findViewById(R.id.btnProceed);
+        proceedButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // In the fragment or activity where you want to navigate
+                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+
+                MapsFragmentRoute mapsFragmentRoute = new MapsFragmentRoute();
+
+                /*
+                // Use Bundle to pass values
+                Bundle bundle = new Bundle();
+                bundle.putString("placeName", placeName);
+                bundle.putDouble("userCurrentLatitude", currentUserLat);
+                bundle.putDouble("userCurrentLongitude", currentUserLong);
+                bundle.putString("destinationLatitude", destinationLat);
+                bundle.putString("destinationLongitude", destinationLong);
+                fragmentConfirmation.setArguments(bundle);
+                 */
+
+                // Replace the current fragment with the receiving fragment
+                transaction.replace(R.id.fragment_container, mapsFragmentRoute);
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+
+        });
+
+
+
         return view;
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         mMap.getUiSettings().setZoomControlsEnabled(true);
@@ -191,7 +256,7 @@ public class MapsFragmentConfirmation extends Fragment implements OnMapReadyCall
                                     builder.include(originLatLng);
                                     builder.include(destinationLatLng);
                                     LatLngBounds bounds = builder.build();
-                                    mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
+                                    mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 250));
                                 }
                             },
                             error -> {
