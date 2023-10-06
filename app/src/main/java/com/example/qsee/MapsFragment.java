@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -108,32 +110,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onClick(View v) {
 
-                /*
-                // In the fragment or activity where you want to navigate
-                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-
-                FilterCategories filterCategories = new FilterCategories();
-
-                // Replace the current fragment with the receiving fragment
-                transaction.replace(R.id.fragment_container, new FilterCategories());
-                transaction.addToBackStack(null);
-                transaction.commit();
-                */
-
-
                 // Create a new PlaceDetailDialogFragment and pass the place details as arguments
                 FilterCategories fragment = new FilterCategories();
+                fragment.setCancelable(false);
 
                 // Show the PlaceDetailDialogFragment as a dialog
                 fragment.show(getChildFragmentManager(), "FilterCategories");
-
-
-                /*
-                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragment_container, new FilterCategories());
-                //transaction.addToBackStack(null); // Optional: Add to back stack for navigation
-                transaction.commit();
-                */
 
             }
 
@@ -194,74 +176,171 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                for (DataSnapshot placeSnapshot : dataSnapshot.getChildren()) {
-                    // Extract place data (e.g., latitude, longitude, name) from placeSnapshot
-                    String address = placeSnapshot.child("Address").getValue(String.class);
-                    String name = placeSnapshot.child("Location").getValue(String.class);
-                    String latitude = placeSnapshot.child("Latitude").getValue(String.class);
-                    String longitude = placeSnapshot.child("Longitude").getValue(String.class);
-                    String stringRating = placeSnapshot.child("AverageRate").getValue(String.class);
-                    String description = placeSnapshot.child("Description").getValue(String.class);
-                    String imageLink = placeSnapshot.child("Link").getValue(String.class);
-                    String lowestPrice = placeSnapshot.child("LowestPrice").getValue(String.class);
-                    String highestPrice = placeSnapshot.child("HighestPrice").getValue(String.class);
-                    String placePrice = "₱" + lowestPrice + " - ₱" + highestPrice;
+                // Retrieve selected categories from Bundle arguments
+                Bundle bundle = getArguments();
+                String categoryName = bundle.getString("categoryName");
+                if (categoryName != null) {
 
-                    try {
-                        Double doubleLatitude = Double.parseDouble(latitude);
-                        Double doubleLongitude = Double.parseDouble(longitude);
+                    Toast.makeText(getContext(), categoryName, Toast.LENGTH_LONG).show();
 
-                        // Create MarkerOptions or LatLng objects for each place
-                        LatLng location = new LatLng(doubleLatitude, doubleLongitude);
+                    for (DataSnapshot placeSnapshot : dataSnapshot.getChildren()) {
+                        // Extract place data (e.g., latitude, longitude, name) from placeSnapshot
+                        String address = placeSnapshot.child("Address").getValue(String.class);
+                        String name = placeSnapshot.child("Location").getValue(String.class);
+                        String category = placeSnapshot.child("Category").getValue(String.class);
+                        String latitude = placeSnapshot.child("Latitude").getValue(String.class);
+                        String longitude = placeSnapshot.child("Longitude").getValue(String.class);
+                        String stringRating = placeSnapshot.child("AverageRate").getValue(String.class);
+                        String description = placeSnapshot.child("Description").getValue(String.class);
+                        String imageLink = placeSnapshot.child("Link").getValue(String.class);
+                        String lowestPrice = placeSnapshot.child("LowestPrice").getValue(String.class);
+                        String highestPrice = placeSnapshot.child("HighestPrice").getValue(String.class);
+                        String placePrice = "₱" + lowestPrice + " - ₱" + highestPrice;
 
-                        MarkerOptions markerOptions = new MarkerOptions()
-                                .position(location)
-                                .title(name)
-                                //.title(rating)
-                                .snippet(address + "@" + stringRating + "@" + description + "@" + imageLink + "@" + placePrice + "@" + doubleLatitude + "@" + doubleLongitude);
+                        //Toast.makeText(getContext(), category, Toast.LENGTH_SHORT).show();
 
-                        // Add markers to the Google Map
-                        Marker marker = mMap.addMarker(markerOptions);
+                        if (categoryName.equals(category)) {
 
-                        // Set a click listener for each marker
-                        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                            @Override
-                            public boolean onMarkerClick(Marker marker) {
-                                // Handle marker click event here
-                                // Show place details in your app
+                            try {
+                                Double doubleLatitude = Double.parseDouble(latitude);
+                                Double doubleLongitude = Double.parseDouble(longitude);
 
-                                String locationDetails = marker.getSnippet();
+                                // Create MarkerOptions or LatLng objects for each place
+                                LatLng location = new LatLng(doubleLatitude, doubleLongitude);
 
-                                // Split the input string into an array of parts
-                                String[] parts = locationDetails.split("@");
+                                MarkerOptions markerOptions = new MarkerOptions()
+                                        .position(location)
+                                        .title(name)
+                                        //.title(rating)
+                                        .snippet(address + "@" + stringRating + "@" + description + "@" + imageLink + "@" + placePrice + "@" + doubleLatitude + "@" + doubleLongitude);
 
-                                // Create a new PlaceDetailDialogFragment and pass the place details as arguments
-                                PlaceDetailDialogFragment fragment = new PlaceDetailDialogFragment();
-                                Bundle args = new Bundle();
-                                args.putString("placeName", marker.getTitle());
-                                args.putString("placeAddress", parts[0]); // Use the snippet as address
-                                args.putString("placeRating", parts[1]); // Replace with actual rating
-                                args.putString("placeDescription", parts[2]);
-                                args.putString("placeLink", parts[3]);
-                                args.putString("placePrice", parts[4]);
-                                args.putDouble("userLatitude", currentUserLocationLat);
-                                args.putDouble("userLongitude", currentUserLocationLong);
-                                args.putString("destinationLatitude", parts[5]);
-                                args.putString("destinationLongitude", parts[6]);
-                                fragment.setArguments(args);
+                                // Add markers to the Google Map
+                                Marker marker = mMap.addMarker(markerOptions);
 
-                                // Show the PlaceDetailDialogFragment as a dialog
-                                fragment.show(getChildFragmentManager(), "PlaceDetailDialogFragment");
+                                // Set a click listener for each marker
+                                mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                                    @Override
+                                    public boolean onMarkerClick(Marker marker) {
+                                        // Handle marker click event here
+                                        // Show place details in your app
 
-                                return true;
+                                        String locationDetails = marker.getSnippet();
+
+                                        // Split the input string into an array of parts
+                                        String[] parts = locationDetails.split("@");
+
+                                        // Create a new PlaceDetailDialogFragment and pass the place details as arguments
+                                        PlaceDetailDialogFragment fragment = new PlaceDetailDialogFragment();
+                                        Bundle args = new Bundle();
+                                        args.putString("placeName", marker.getTitle());
+                                        args.putString("placeAddress", parts[0]); // Use the snippet as address
+                                        args.putString("placeRating", parts[1]); // Replace with actual rating
+                                        args.putString("placeDescription", parts[2]);
+                                        args.putString("placeLink", parts[3]);
+                                        args.putString("placePrice", parts[4]);
+                                        args.putDouble("userLatitude", currentUserLocationLat);
+                                        args.putDouble("userLongitude", currentUserLocationLong);
+                                        args.putString("destinationLatitude", parts[5]);
+                                        args.putString("destinationLongitude", parts[6]);
+                                        fragment.setArguments(args);
+
+                                        // Show the PlaceDetailDialogFragment as a dialog
+                                        fragment.show(getChildFragmentManager(), "PlaceDetailDialogFragment");
+
+                                        return true;
+                                    }
+                                });
+
+                            } catch (NumberFormatException e) {
+                                // Handle the case where the String cannot be parsed as a Double
+                                // This can happen if the String is not a valid numeric format
                             }
-                        });
 
-                    } catch (NumberFormatException e) {
-                        // Handle the case where the String cannot be parsed as a Double
-                        // This can happen if the String is not a valid numeric format
+                        }
+
+                        else {
+                            // Toast.makeText(getContext(), "No Locations Found", Toast.LENGTH_LONG).show();
+                        }
+
                     }
+
                 }
+
+                else {
+
+                    for (DataSnapshot placeSnapshot : dataSnapshot.getChildren()) {
+                        // Extract place data (e.g., latitude, longitude, name) from placeSnapshot
+                        String address = placeSnapshot.child("Address").getValue(String.class);
+                        String name = placeSnapshot.child("Location").getValue(String.class);
+                        String category = placeSnapshot.child("Category").getValue(String.class);
+                        String latitude = placeSnapshot.child("Latitude").getValue(String.class);
+                        String longitude = placeSnapshot.child("Longitude").getValue(String.class);
+                        String stringRating = placeSnapshot.child("AverageRate").getValue(String.class);
+                        String description = placeSnapshot.child("Description").getValue(String.class);
+                        String imageLink = placeSnapshot.child("Link").getValue(String.class);
+                        String lowestPrice = placeSnapshot.child("LowestPrice").getValue(String.class);
+                        String highestPrice = placeSnapshot.child("HighestPrice").getValue(String.class);
+                        String placePrice = "₱" + lowestPrice + " - ₱" + highestPrice;
+
+                        try {
+                            Double doubleLatitude = Double.parseDouble(latitude);
+                            Double doubleLongitude = Double.parseDouble(longitude);
+
+                            // Create MarkerOptions or LatLng objects for each place
+                            LatLng location = new LatLng(doubleLatitude, doubleLongitude);
+
+                            MarkerOptions markerOptions = new MarkerOptions()
+                                    .position(location)
+                                    .title(name)
+                                    //.title(rating)
+                                    .snippet(address + "@" + stringRating + "@" + description + "@" + imageLink + "@" + placePrice + "@" + doubleLatitude + "@" + doubleLongitude);
+
+                            // Add markers to the Google Map
+                            Marker marker = mMap.addMarker(markerOptions);
+
+                            // Set a click listener for each marker
+                            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                                @Override
+                                public boolean onMarkerClick(Marker marker) {
+                                    // Handle marker click event here
+                                    // Show place details in your app
+
+                                    String locationDetails = marker.getSnippet();
+
+                                    // Split the input string into an array of parts
+                                    String[] parts = locationDetails.split("@");
+
+                                    // Create a new PlaceDetailDialogFragment and pass the place details as arguments
+                                    PlaceDetailDialogFragment fragment = new PlaceDetailDialogFragment();
+                                    Bundle args = new Bundle();
+                                    args.putString("placeName", marker.getTitle());
+                                    args.putString("placeAddress", parts[0]); // Use the snippet as address
+                                    args.putString("placeRating", parts[1]); // Replace with actual rating
+                                    args.putString("placeDescription", parts[2]);
+                                    args.putString("placeLink", parts[3]);
+                                    args.putString("placePrice", parts[4]);
+                                    args.putDouble("userLatitude", currentUserLocationLat);
+                                    args.putDouble("userLongitude", currentUserLocationLong);
+                                    args.putString("destinationLatitude", parts[5]);
+                                    args.putString("destinationLongitude", parts[6]);
+                                    fragment.setArguments(args);
+
+                                    // Show the PlaceDetailDialogFragment as a dialog
+                                    fragment.show(getChildFragmentManager(), "PlaceDetailDialogFragment");
+
+                                    return true;
+                                }
+                            });
+
+                        } catch (NumberFormatException e) {
+                            // Handle the case where the String cannot be parsed as a Double
+                            // This can happen if the String is not a valid numeric format
+                        }
+
+                    }
+
+                }
+
             }
 
             @Override
