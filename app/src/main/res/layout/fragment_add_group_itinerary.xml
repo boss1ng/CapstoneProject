@@ -238,7 +238,7 @@
             app:layout_constraintStart_toEndOf="@+id/textView29"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.029"
-            app:srcCompat="@drawable/btn_addDate" />
+            app:srcCompat="@drawable/btn_adddate" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

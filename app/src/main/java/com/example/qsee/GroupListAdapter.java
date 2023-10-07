@@ -13,7 +13,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.Group;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -112,22 +111,54 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
     }
 
     // Create a method to show the member selection dialog and confirm deletion
+    // Modify the showMemberSelectionDialog method to display decrypted usernames
     private void showMemberSelectionDialog(Context context, String groupName, DataSnapshot dataSnapshot) {
         // Create a list of members from the dataSnapshot
-        List<String> members = new ArrayList<>();
+        List<String> memberIds = new ArrayList<>();
         for (DataSnapshot memberSnapshot : dataSnapshot.getChildren()) {
             String memberKey = memberSnapshot.getKey();
             if (!memberKey.equals("admin") && !memberKey.equals("groupName") && !memberKey.equals("member1")) {
                 // Exclude "member1" and add the actual user IDs to the list
                 String memberId = memberSnapshot.getValue(String.class);
-                members.add(memberId);
+                memberIds.add(memberId);
             }
         }
 
+        // Fetch and decrypt usernames instead of user IDs
+        final List<String> decryptedMemberNames = new ArrayList<>();
+        DatabaseReference usersReference = databaseReference.child("MobileUsers");
+        for (String memberId : memberIds) {
+            usersReference.child(memberId).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    String encryptedUsername = dataSnapshot.child("username").getValue(String.class);
+                    if (encryptedUsername != null) {
+                        // Decrypt the encrypted username
+                        String decryptedUsername = AESUtils.decrypt(encryptedUsername);
+                        decryptedMemberNames.add(decryptedUsername);
+                    }
+                    // Check if all usernames have been fetched and decrypted
+                    if (decryptedMemberNames.size() == memberIds.size()) {
+                        // Display the member selection dialog
+                        displayMemberSelectionDialog(context, groupName, decryptedMemberNames, memberIds);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    // Handle database error
+                    Log.e("Firebase", "Error fetching encrypted username: " + databaseError.getMessage());
+                }
+            });
+        }
+    }
+
+    // Create a method to display the member selection dialog with decrypted usernames
+    private void displayMemberSelectionDialog(Context context, String groupName, List<String> decryptedMemberNames, List<String> memberIds) {
         // Check if there are members to delete or if the group should be deleted
-        if (!members.isEmpty()) {
+        if (!decryptedMemberNames.isEmpty()) {
             // Convert the list to an array for radio button selection
-            final String[] memberArray = members.toArray(new String[0]);
+            final String[] memberArray = decryptedMemberNames.toArray(new String[0]);
             final int[] selectedMemberIndex = {-1}; // Initialize to no selection
 
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -147,9 +178,10 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
                 public void onClick(DialogInterface dialog, int which) {
                     if (selectedMemberIndex[0] != -1) {
                         // A member is selected, handle the selection
-                        String newAdminId = memberArray[selectedMemberIndex[0]];
+                        String newAdminName = memberArray[selectedMemberIndex[0]];
+                        String newAdminId = memberIds.get(selectedMemberIndex[0]);
                         // Update the group's admin in Firebase
-                        updateGroupAdmin(groupName, newAdminId);
+                        updateGroupAdmin(groupName, newAdminId, newAdminName);
                     }
                     dialog.dismiss(); // Dismiss the dialog when "OK" is clicked
                 }
@@ -169,6 +201,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
             showDeleteConfirmationDialog(context, groupName);
         }
     }
+
 
 
     // Create a method to show the leave confirmation dialog for non-admin users
@@ -282,7 +315,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
     }
 
     // Create a method to update the group's admin, set "member1," and transfer members (excluding those with newAdminId) to a new group in Firebase
-    private void updateGroupAdmin(String groupName, String newAdminId) {
+    private void updateGroupAdmin(String groupName, String newAdminId, String newAdminName) {
         DatabaseReference groupReference = databaseReference.child("Groups").child(groupName);
 
         // Update the 'admin' field for the group to the new admin ID
