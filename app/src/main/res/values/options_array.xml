@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="options">
+        <item>Add another plan</item>
+        <item>Add another day</item>
+    </string-array>
+</resources>
