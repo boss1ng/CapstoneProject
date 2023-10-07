@@ -110,7 +110,6 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
 
     }
 
-    // Create a method to show the member selection dialog and confirm deletion
     // Modify the showMemberSelectionDialog method to display decrypted usernames
     private void showMemberSelectionDialog(Context context, String groupName, DataSnapshot dataSnapshot) {
         // Create a list of members from the dataSnapshot
@@ -139,7 +138,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
                     }
                     // Check if all usernames have been fetched and decrypted
                     if (decryptedMemberNames.size() == memberIds.size()) {
-                        // Display the member selection dialog
+                        // Proceed to display the member selection dialog
                         displayMemberSelectionDialog(context, groupName, decryptedMemberNames, memberIds);
                     }
                 }
@@ -151,7 +150,14 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
                 }
             });
         }
+
+        // Check if there are no other members and show delete confirmation directly
+        if (memberIds.isEmpty()) {
+            showDeleteConfirmationDialog(context, groupName);
+        }
     }
+
+
 
     // Create a method to display the member selection dialog with decrypted usernames
     private void displayMemberSelectionDialog(Context context, String groupName, List<String> decryptedMemberNames, List<String> memberIds) {
