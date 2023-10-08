@@ -21,7 +21,7 @@
         tools:listitem="@layout/location_list_item" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/addGroupBtn"
+        android:id="@+id/addLocationBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

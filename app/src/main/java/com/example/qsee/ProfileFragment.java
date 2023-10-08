@@ -22,6 +22,7 @@ import com.google.firebase.database.ValueEventListener;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -76,6 +77,20 @@ public class ProfileFragment extends Fragment {
                 //PlaceDetailFragment pdf = new PlaceDetailFragment().newInstance(userId);
                 //pdf.show(getParentFragmentManager(), pdf.getTag());
 
+            }
+        });
+
+        Button addButton = rootView.findViewById(R.id.addButton);
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Create an instance of the AddGlimpseFragment
+                AddGlimpseFragment addGlimpseFragment = new AddGlimpseFragment();
+
+                // Show the AddGlimpseFragment as a dialog
+                FragmentManager fragmentManager = getChildFragmentManager();
+                FragmentTransaction transaction = fragmentManager.beginTransaction();
+                addGlimpseFragment.show(transaction, "add_glimpse_dialog"); // You can provide a tag for the dialog
             }
         });
 

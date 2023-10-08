@@ -8,6 +8,6 @@
     <!-- Define the gradient start and end colors -->
     <color name="gradient_start">#79BF49</color>
     <color name="gradient_end">#E47473</color>
-
+    <color name="transparent">@android:color/transparent</color>
 
 </resources>
