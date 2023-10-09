@@ -137,6 +137,7 @@ public class MapsFragmentConfirmation extends Fragment implements OnMapReadyCall
         return view;
     }
 
+    @SuppressLint("PotentialBehaviorOverride")
     @Override
     public void onMapReady(GoogleMap googleMap) {
 

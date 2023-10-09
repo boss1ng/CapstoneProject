@@ -36,6 +36,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.squareup.picasso:picasso:2.71828")
     implementation("com.android.volley:volley:1.2.1")
+    //implementation("com.google.maps.android:polyline:2.1.0")
     implementation("com.google.android.material:material:1.9.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.google.firebase:firebase-common:20.3.3")
@@ -48,6 +49,7 @@ dependencies {
 
     // Google Maps SDK
     implementation("com.google.android.gms:play-services-maps:18.1.0")
+    implementation ("com.google.maps.android:android-maps-utils:x.y.z")
         // OLDER
         // implementation("com.google.android.gms:play-services-maps:17.0.0")
 
