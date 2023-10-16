@@ -2,7 +2,11 @@ package com.example.qsee;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,10 +14,15 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -23,11 +32,26 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Dash;
 import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+
 
 public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
 
@@ -41,6 +65,9 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
     Double currentUserLocationLat;
     Double currentUserLocationLong;
 
+    Marker currentLocMarker;
+    Marker destinationLocMarker;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -49,19 +76,9 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
         // Initialize the FusedLocationProviderClient
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
 
-        // Receive the values from the Bundle
-        Bundle bundle = getArguments();
-        if (bundle != null) {
-
-        }
-
-        else {
-            Toast.makeText(getContext(), "ROUTE", Toast.LENGTH_SHORT).show();
-        }
-
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
-                .findFragmentById(R.id.maps);
+                .findFragmentById(R.id.mapsRoute);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
@@ -74,27 +91,81 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
     public void onMapReady(GoogleMap googleMap) {
 
         mMap = googleMap;
-        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setZoomGesturesEnabled(true);
-        mMap.getUiSettings().setCompassEnabled(true);
+        //mMap.getUiSettings().setCompassEnabled(true);
 
         // Check if location permission is granted
-        if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION)
+                && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
 
             // Request location permission if not granted
             requestPermissions(new String[]{
-                    android.Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION
             }, LOCATION_PERMISSION_REQUEST_CODE);
             return;
         }
 
         // Enable the My Location layer on the map
-        mMap.setMyLocationEnabled(true);
+        mMap.setMyLocationEnabled(false);
+
+        /*
+        // Set a custom marker for the user's location
+        mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
+            @Override
+            public void onMyLocationChange(@NonNull Location location) {
+                mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                        .icon(customArrow)
+                        .anchor(0.5f, 0.5f) // Adjust the anchor to the center of your custom arrow
+                        .rotation(location.getBearing()) // Rotate the arrow to match the user's heading
+                        .flat(true) // Make the arrow always face the same direction
+                );
+            }
+        });
+         */
+
+        updateMap();
+
+        // Use a Handler to refresh the map every second
+        final int INTERVAL = 1000; // 1000 milliseconds = 1 second
+        Handler handler = new Handler();
+        Runnable mapRefreshRunnable = new Runnable() {
+            @Override
+            public void run() {
+                manualMap(); // Call the method to update the map
+
+            }
+        };
+
+        handler.postDelayed(mapRefreshRunnable, 2000); // Schedule it to run again in 1 second
+
+    }
+
+    // Create a method to update the map
+    private void updateMap() {
+        // Add your code here to update the map
+        // This method will be called every time you want to refresh the map
+
+        BitmapDescriptor customArrow = BitmapDescriptorFactory.fromResource(R.drawable.arrow);
+
+        // Check if location permission is granted
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Request location permission if not granted
+            requestPermissions(new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+            }, LOCATION_PERMISSION_REQUEST_CODE);
+            return;
+        }
 
         // Get the user's last known location and move the camera there
         fusedLocationProviderClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
@@ -105,14 +176,349 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                 currentUserLocationLong = location.getLongitude();
                 LatLng userLocation = new LatLng(latitude, longitude);
 
+                // Add a marker to the map using the scaled custom arrow icon
+                currentLocMarker = mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(location.getLatitude(), location.getLongitude())) // Specify the position of the marker
+                        .icon(customArrow) // Use the scaled custom arrow as the marker icon
+                        .anchor(0.5f, 0.5f) // Adjust the anchor to the center of your custom arrow
+                        .rotation(location.getBearing()) // Rotate the arrow to match the user's heading (if needed)
+                        .flat(true) // Make the arrow always face the same direction
+                );
+
+                mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(@NonNull Marker marker) {
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 19));
+                        return true;
+                    }
+                });
+
                 // Add a marker at the user's location
                 // mMap.addMarker(new MarkerOptions().position(userLocation).title("Your Location"));
 
                 // Move the camera to the user's location
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
+                //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
             }
         });
 
+        // Receive the values from the Bundle
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            // CURRENT USER LOCATION
+            //Double userCurrentLatitude = bundle.getDouble("userCurrentLatitude");
+            //Double userCurrentLongitude = bundle.getDouble("userCurrentLongitude");
+
+            // DESTINATION LOCATION
+            String placeName = bundle.getString("placeName");
+            String destinationLatitude = bundle.getString("destinationLatitude");
+            String destinationLongitude = bundle.getString("destinationLongitude");
+
+            Double destLatitude = Double.parseDouble(destinationLatitude);
+            Double destLongitude = Double.parseDouble(destinationLongitude);
+
+            // Create MarkerOptions or LatLng objects for each place
+            LatLng marketLocation = new LatLng(destLatitude, destLongitude);
+
+            MarkerOptions markerOptions = new MarkerOptions()
+                    .position(marketLocation)
+                    .title(placeName);
+
+            // Add markers to the Google Map
+            Marker marker = mMap.addMarker(markerOptions);
+
+            // Clear the previous route polyline and border polyline if they exist
+            if (currentRoutePolyline != null) {
+                currentRoutePolyline.remove();
+            }
+            if (currentBorderPolyline != null) {
+                currentBorderPolyline.remove();
+            }
+
+            // Get the destination coordinates (latitude and longitude) of the clicked marker
+            LatLng destinationLatLng = marker.getPosition();
+
+            // Get your current location using the FusedLocationProviderClient
+            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
+                if (location != null) {
+                    LatLng originLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+
+                    // Use Google Directions API to request directions
+                    String apiKey = getString(R.string.google_maps_api_key);
+                    String url = "https://maps.googleapis.com/maps/api/directions/json?" +
+                            "origin=" + originLatLng.latitude + "," + originLatLng.longitude +
+                            "&destination=" + destinationLatLng.latitude + "," + destinationLatLng.longitude +
+                            "&key=" + apiKey;
+
+                    // Make an HTTP request to the Directions API
+                    RequestQueue queue = Volley.newRequestQueue(requireContext());
+
+                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
+                            response -> {
+                                // Parse the JSON response to extract the route information
+                                List<LatLng> points = parseDirectionsResponse(response);
+
+                                // Draw the border line on the map with color "#1967d2" (slightly wider)
+                                if (points != null) {
+                                    PolylineOptions borderOptions = new PolylineOptions()
+                                            .addAll(points)
+                                            .width(20) // Adjust the width as needed for the border
+                                            .color(Color.parseColor("#1967d2")); // Set color to "#1967d2" for the border
+                                    currentBorderPolyline = mMap.addPolyline(borderOptions);
+
+                                    // Draw the solid route line on the map with color "#00b0ff"
+                                    PolylineOptions routeOptions = new PolylineOptions()
+                                            .addAll(points)
+                                            .width(14) // Adjust the width as needed for the route
+                                            .color(Color.parseColor("#00b0ff")); // Set color to "#00b0ff" for the route
+                                    currentRoutePolyline = mMap.addPolyline(routeOptions);
+
+                                    // Move the camera to fit the bounds of the new route
+                                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                                    builder.include(originLatLng);
+                                    builder.include(destinationLatLng);
+                                    LatLngBounds bounds = builder.build();
+                                    //mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 50));
+
+                                    // Move the camera to the user's location
+                                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(originLatLng, 19));   //19
+                                }
+                            },
+                            error -> {
+                                // Handle errors in making the request or parsing the response
+                                Log.e("Directions Error", error.toString());
+                            }
+                    );
+
+
+
+
+                    // Add the request to the queue
+                    queue.add(request);
+                }
+            });
+
+            /*
+            // To remove the marker from the map
+            if (currentLocMarker != null) {
+                currentLocMarker.remove();
+            }
+             */
+        }
+    }
+
+
+
+    // TESTING PURPOSES ONLY --------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    public void manualMap() {
+
+        Toast.makeText(getContext(), "NEW CURRENT LOC", Toast.LENGTH_LONG).show();
+
+        currentLocMarker.remove();
+
+        BitmapDescriptor customArrow = BitmapDescriptorFactory.fromResource(R.drawable.arrow);
+
+        // Check if location permission is granted
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Request location permission if not granted
+            requestPermissions(new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+            }, LOCATION_PERMISSION_REQUEST_CODE);
+            return;
+        }
+
+        // Get the user's last known location and move the camera there
+        fusedLocationProviderClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
+            if (location != null) {
+                double latitude = location.getLatitude();
+                double longitude = location.getLongitude();
+                currentUserLocationLat = 14.6060039;
+                currentUserLocationLong = 120.9893612;
+                LatLng userLocation = new LatLng(14.6060039, 120.9893612);
+
+                // Add a marker to the map using the scaled custom arrow icon
+                mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(currentUserLocationLat, currentUserLocationLong)) // Specify the position of the marker
+                        .icon(customArrow) // Use the scaled custom arrow as the marker icon
+                        .anchor(0.5f, 0.5f) // Adjust the anchor to the center of your custom arrow
+                        .rotation(location.getBearing()) // Rotate the arrow to match the user's heading (if needed)
+                        .flat(true) // Make the arrow always face the same direction
+                );
+
+                mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(@NonNull Marker marker) {
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 19));
+                        return true;
+                    }
+                });
+
+                // Add a marker at the user's location
+                // mMap.addMarker(new MarkerOptions().position(userLocation).title("Your Location"));
+
+                // Move the camera to the user's location
+                //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
+            }
+        });
+
+        // Receive the values from the Bundle
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            // DESTINATION LOCATION
+            String placeName = bundle.getString("placeName");
+            String destinationLatitude = bundle.getString("destinationLatitude");
+            String destinationLongitude = bundle.getString("destinationLongitude");
+
+            Double destLatitude = Double.parseDouble(destinationLatitude);
+            Double destLongitude = Double.parseDouble(destinationLongitude);
+
+            // Create MarkerOptions or LatLng objects for each place
+            LatLng marketLocation = new LatLng(destLatitude, destLongitude);
+
+            MarkerOptions markerOptions = new MarkerOptions()
+                    .position(marketLocation)
+                    .title(placeName);
+
+            // Add markers to the Google Map
+            Marker marker = mMap.addMarker(markerOptions);
+
+            // Clear the previous route polyline and border polyline if they exist
+            if (currentRoutePolyline != null) {
+                currentRoutePolyline.remove();
+            }
+            if (currentBorderPolyline != null) {
+                currentBorderPolyline.remove();
+            }
+
+            // Get the destination coordinates (latitude and longitude) of the clicked marker
+            LatLng destinationLatLng = marker.getPosition();
+
+            // Get your current location using the FusedLocationProviderClient
+            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
+                if (location != null) {
+
+                    LatLng originLatLng = new LatLng(currentUserLocationLat, currentUserLocationLong);
+
+                    // Use Google Directions API to request directions
+                    String apiKey = getString(R.string.google_maps_api_key);
+                    String url = "https://maps.googleapis.com/maps/api/directions/json?" +
+                            "origin=" + originLatLng.latitude + "," + originLatLng.longitude +
+                            "&destination=" + destinationLatLng.latitude + "," + destinationLatLng.longitude +
+                            "&key=" + apiKey;
+
+                    // Make an HTTP request to the Directions API
+                    RequestQueue queue = Volley.newRequestQueue(requireContext());
+
+                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
+                            response -> {
+                                // Parse the JSON response to extract the route information
+                                List<LatLng> points = parseDirectionsResponse(response);
+
+                                // Draw the border line on the map with color "#1967d2" (slightly wider)
+                                if (points != null) {
+                                    PolylineOptions borderOptions = new PolylineOptions()
+                                            .addAll(points)
+                                            .width(20) // Adjust the width as needed for the border
+                                            .color(Color.parseColor("#1967d2")); // Set color to "#1967d2" for the border
+                                    currentBorderPolyline = mMap.addPolyline(borderOptions);
+
+                                    // Draw the solid route line on the map with color "#00b0ff"
+                                    PolylineOptions routeOptions = new PolylineOptions()
+                                            .addAll(points)
+                                            .width(14) // Adjust the width as needed for the route
+                                            .color(Color.parseColor("#00b0ff")); // Set color to "#00b0ff" for the route
+                                    currentRoutePolyline = mMap.addPolyline(routeOptions);
+
+                                    // Move the camera to fit the bounds of the new route
+                                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                                    builder.include(originLatLng);
+                                    builder.include(destinationLatLng);
+                                    LatLngBounds bounds = builder.build();
+                                    //mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 50));
+
+                                    // Move the camera to the user's location
+                                    //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(originLatLng, 15));   //19
+                                }
+                            },
+                            error -> {
+                                // Handle errors in making the request or parsing the response
+                                Log.e("Directions Error", error.toString());
+                            }
+                    );
+
+                    // Add the request to the queue
+                    queue.add(request);
+                }
+            });
+        }
+
+    }
+
+
+
+
+
+
+
+
+
+    // Method to parse the Directions API response and extract the route points
+    private List<LatLng> parseDirectionsResponse(JSONObject response) {
+        List<LatLng> points = new ArrayList<>();
+
+        try {
+            JSONArray routes = response.getJSONArray("routes");
+            if (routes.length() > 0) {
+                JSONObject route = routes.getJSONObject(0);
+                JSONObject overviewPolyline = route.getJSONObject("overview_polyline");
+                String encodedPolyline = overviewPolyline.getString("points");
+
+                // Decode the polyline to get a list of LatLng points
+                points = decodePolyline(encodedPolyline);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return points;
+    }
+
+    // Method to decode an encoded polyline into a list of LatLng points
+    private List<LatLng> decodePolyline(String encoded) {
+        List<LatLng> points = new ArrayList<>();
+        int index = 0, len = encoded.length();
+        int lat = 0, lng = 0;
+
+        while (index < len) {
+            int b, shift = 0, result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lat += dlat;
+
+            shift = 0;
+            result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lng += dlng;
+
+            LatLng point = new LatLng((lat / 1E5), (lng / 1E5));
+            points.add(point);
+        }
+
+        return points;
     }
 
 }

@@ -60,6 +60,12 @@ public class MapsFragmentConfirmation extends Fragment implements OnMapReadyCall
     Double currentUserLocationLat;
     Double currentUserLocationLong;
 
+    String placeName;
+
+    String userDestinationLat;
+
+    String userDestinationLong;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maps_confirmation, container, false);
@@ -71,7 +77,9 @@ public class MapsFragmentConfirmation extends Fragment implements OnMapReadyCall
         Bundle bundle = getArguments();
         if (bundle != null) {
             // DESTINATION LOCATION
-            String placeName = bundle.getString("placeName");
+            placeName = bundle.getString("placeName");
+            userDestinationLat = bundle.getString("destinationLatitude");
+            userDestinationLong = bundle.getString("destinationLongitude");
 
             // Populate UI elements with place details
             TextView textViewName = view.findViewById(R.id.textViewName);
@@ -113,16 +121,16 @@ public class MapsFragmentConfirmation extends Fragment implements OnMapReadyCall
 
                 MapsFragmentRoute mapsFragmentRoute = new MapsFragmentRoute();
 
-                /*
+
                 // Use Bundle to pass values
                 Bundle bundle = new Bundle();
                 bundle.putString("placeName", placeName);
-                bundle.putDouble("userCurrentLatitude", currentUserLat);
-                bundle.putDouble("userCurrentLongitude", currentUserLong);
-                bundle.putString("destinationLatitude", destinationLat);
-                bundle.putString("destinationLongitude", destinationLong);
-                fragmentConfirmation.setArguments(bundle);
-                 */
+                //bundle.putDouble("userCurrentLatitude", currentUserLat);
+                //bundle.putDouble("userCurrentLongitude", currentUserLong);
+                bundle.putString("destinationLatitude", userDestinationLat);
+                bundle.putString("destinationLongitude", userDestinationLong);
+                mapsFragmentRoute.setArguments(bundle);
+
 
                 // Replace the current fragment with the receiving fragment
                 transaction.replace(R.id.fragment_container, mapsFragmentRoute);

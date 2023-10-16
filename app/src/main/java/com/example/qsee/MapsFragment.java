@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -109,6 +110,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         filterMenuBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                /*
+                // Find and remove the LinearLayout
+                LinearLayout filterMenu = view.findViewById(R.id.filterMenu);
+                if (filterMenu != null && filterMenu.getParent() != null) {
+                    ((ViewGroup) filterMenu.getParent()).removeView(filterMenu);
+                }
+                 */
 
                 // Create a new PlaceDetailDialogFragment and pass the place details as arguments
                 FilterCategories fragment = new FilterCategories();
@@ -243,6 +252,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                                         args.putString("destinationLatitude", parts[5]);
                                         args.putString("destinationLongitude", parts[6]);
                                         fragment.setArguments(args);
+
+                                        /*
+                                        // Find and remove the LinearLayout
+                                        LinearLayout filterMenu = getView().findViewById(R.id.filterMenu);
+                                        if (filterMenu != null && filterMenu.getParent() != null) {
+                                            ((ViewGroup) filterMenu.getParent()).removeView(filterMenu);
+                                        }
+                                         */
 
                                         // Show the PlaceDetailDialogFragment as a dialog
                                         fragment.show(getChildFragmentManager(), "PlaceDetailDialogFragment");
