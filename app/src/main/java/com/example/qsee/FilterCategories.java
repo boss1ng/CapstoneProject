@@ -2,6 +2,7 @@ package com.example.qsee;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.SparseBooleanArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -46,6 +47,66 @@ public class FilterCategories extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_filter_categories, container, false);
 
+        String categoryName = null;
+
+        // For Reading the Database
+        // Initialize Firebase Database reference
+        // Reference to the "Location" node in Firebase
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Category");
+        List categories = new ArrayList<>();
+        ListView listView = view.findViewById(R.id.listView);
+        ArrayAdapter<Object> adapter= new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_multiple_choice, categories);
+
+        // Retrieve selected categories from Bundle arguments
+        Bundle getBundle = getArguments();
+        if (getBundle != null) {
+            categoryName = getBundle.getString("categoryName");
+            //Toast.makeText(view.getContext(), categoryName, Toast.LENGTH_SHORT).show();
+
+            if (categoryName == "")
+                Toast.makeText(view.getContext(), categoryName, Toast.LENGTH_SHORT).show();
+            else {
+                Toast.makeText(view.getContext(), categoryName, Toast.LENGTH_LONG).show();
+
+                /*
+                if (categoryName.contains("+")) {
+                    // Split the string by the '+' character
+                    String[] preSelectedCategories = categoryName.split("\\+");
+
+                    // Get the count of the resulting substrings
+                    int numberOfCategories = preSelectedCategories.length;
+                }
+
+                else {
+                    Toast.makeText(view.getContext(), categoryName, Toast.LENGTH_LONG).show();
+                }
+                 */
+
+
+
+            }
+
+            /*
+            if (categoryName != "") {
+                // Split the string by the '+' character
+                String[] preSelectedCategories = categoryName.split("\\+");
+
+                // Get the count of the resulting substrings
+                int numberOfCategories = preSelectedCategories.length;
+
+                if (numberOfCategories == 1) {
+
+                }
+
+                else {
+
+                }
+            }
+             */
+        }
+
+
+
         // Customize the dialog's appearance and position
         Window window = getDialog().getWindow();
         if (window != null) {
@@ -63,13 +124,10 @@ public class FilterCategories extends DialogFragment {
              */
         }
 
-        // For Reading the Database
-        // Initialize Firebase Database reference
-        // Reference to the "Location" node in Firebase
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Category");
-        List categories = new ArrayList<>();
-        ListView listView = view.findViewById(R.id.listView);
-        ArrayAdapter<Object> adapter= new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_multiple_choice, categories);
+
+
+
+
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -83,6 +141,16 @@ public class FilterCategories extends DialogFragment {
                 ArrayAdapter<Object> adapter= new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_multiple_choice, categories);
                 listView.setAdapter(adapter);
                 listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
+                /*
+                // Autocheck items based on a condition
+                for (int i = 0; i < listView.getCount(); i++) {
+                    String item = (String) listView.getItemAtPosition(i);
+                    if (item != null && preSelectedCategories[0].equals(item)) {
+                        listView.setItemChecked(i, true);
+                    }
+                }
+                 */
             }
 
             @Override
@@ -106,6 +174,9 @@ public class FilterCategories extends DialogFragment {
                   SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
                   ArrayList<String> selectedItems = new ArrayList<>();
 
+                  // Concatenate selected categories
+                  String selectedItem = "";
+
                   // Use Bundle to pass values
                   Bundle bundle = new Bundle();
                   for (int i = 0; i < checkedItems.size(); i++) {
@@ -113,11 +184,18 @@ public class FilterCategories extends DialogFragment {
                       boolean isChecked = checkedItems.valueAt(i); // Get whether the item is checked
 
                       if (isChecked) {
-                          String selectedItem = (String) categories.get(position); // Get the selected item's data
-                          // Do something with the selected item
-                          bundle.putString("categoryName", selectedItem);
+                          String category = (String) categories.get(position); // Replace with your list of categories
+                          //category += "+";
+                          selectedItems.add(category); // Add selected category to the list
                       }
                   }
+
+                  // Concatenate the selected categories into a single string
+                  if (!selectedItems.isEmpty()) {
+                      selectedItem = TextUtils.join("+", selectedItems);
+                  }
+
+                  bundle.putString("categoryName", selectedItem);
                   mapsFragment.setArguments(bundle);
 
                   // Replace the current fragment with the receiving fragment

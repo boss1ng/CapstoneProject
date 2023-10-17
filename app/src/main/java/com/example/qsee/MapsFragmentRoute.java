@@ -12,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -148,14 +150,14 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
         Runnable mapRefreshRunnable = new Runnable() {
             @Override
             public void run() {
-                updateMap(); // Call the method to update the map
+                //updateMap(); // Call the method to update the map
                 reUpdateMap();
                 // manualMap();
+                handler.postDelayed(this, 2000); // Schedule the next execution after 2 seconds
             }
         };
 
         handler.postDelayed(mapRefreshRunnable, 2000); // Schedule it to run again in 1 second
-
 
     }
 
@@ -167,6 +169,22 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
         if (currentLocMarker != null) {
             currentLocMarker.remove();
         }
+
+        LinearLayout linearLayoutDirections = getView().findViewById(R.id.directionsCont);
+        linearLayoutDirections.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        LinearLayout linearLayoutOverview = getView().findViewById(R.id.overviewCont);
+        linearLayoutOverview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
 
         BitmapDescriptor customArrow = BitmapDescriptorFactory.fromResource(R.drawable.arrow);
 
@@ -210,6 +228,15 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                     }
                 });
 
+                ImageView imageViewReCenter = getView().findViewById(R.id.imageViewOverviewButton);
+                imageViewReCenter.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 19));
+                    }
+
+                });
+
                 // Add a marker at the user's location
                 // mMap.addMarker(new MarkerOptions().position(userLocation).title("Your Location"));
 
@@ -243,6 +270,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
             // Add markers to the Google Map
             Marker marker = mMap.addMarker(markerOptions);
 
+            /*
             // Clear the previous route polyline and border polyline if they exist
             if (currentRoutePolyline != null) {
                 currentRoutePolyline.remove();
@@ -250,6 +278,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
             if (currentBorderPolyline != null) {
                 currentBorderPolyline.remove();
             }
+             */
 
             // Get the destination coordinates (latitude and longitude) of the clicked marker
             LatLng destinationLatLng = marker.getPosition();
@@ -298,6 +327,19 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
 
                                     // Move the camera to the user's location
                                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(originLatLng, 19));   //19
+
+
+
+                                    Button overviewButton = getView().findViewById(R.id.overviewButton);
+                                    overviewButton.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 250));
+                                        }
+
+                                    });
+
+
                                 }
                             },
                             error -> {
@@ -419,6 +461,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
             // Add markers to the Google Map
             Marker marker = mMap.addMarker(markerOptions);
 
+            /*
             // Clear the previous route polyline and border polyline if they exist
             if (currentRoutePolyline != null) {
                 currentRoutePolyline.remove();
@@ -426,6 +469,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
             if (currentBorderPolyline != null) {
                 currentBorderPolyline.remove();
             }
+            */
 
             // Get the destination coordinates (latitude and longitude) of the clicked marker
             LatLng destinationLatLng = marker.getPosition();
@@ -615,8 +659,8 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                         textViewDistance.setText(distanceSample);
                     }
 
-
-
+                    double totalDistanceKm = 0.0;
+                    int totalDurationMinutes = 0;
 
                     for (int i = 0; i < routes.length(); i++) {
                         JSONObject route = routes.getJSONObject(i);
@@ -636,12 +680,34 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                                 String duration = step.getJSONObject("duration").getString("text");
                                 String htmlInstructions = step.getString("html_instructions");
 
+                                // Extract and add up the distance and duration for each leg
+                                totalDistanceKm += step.getJSONObject("distance").getDouble("value") / 1000.0; // Convert meters to kilometers
+                                totalDurationMinutes += step.getJSONObject("duration").getInt("value") / 60; // Convert seconds to minutes
+
+                                //String[] splitDistance = distance.split(" ");
+                                //String[] splitTime = duration.split(" ");
+
+                                //Toast.makeText(getContext(), splitTime[0], Toast.LENGTH_LONG).show();
+
+                                //double doubleDistance = Double.parseDouble(splitDistance[0]);
+                                //int intMinutes = Integer.parseInt(splitTime[0]);
+
+                                //totalDistance += doubleDistance;
+                                //totalTime += intMinutes;
+
                                 //Toast.makeText(getContext(), distance, Toast.LENGTH_LONG).show();
 
                                 // You can now use the extracted information as needed
                             }
                         }
                     }
+
+                    // Format totalDistanceKm with 2 decimal places
+                    String formattedDistance = String.format("%.2f", totalDistanceKm);
+
+                    TextView textViewTotal = getView().findViewById(R.id.textViewTotalMinKm);
+                    textViewTotal.setText(formattedDistance + " km • " + totalDurationMinutes + " mins");
+
                 } else {
                     // Handle the case when the API request returns a status other than "OK"
                 }
