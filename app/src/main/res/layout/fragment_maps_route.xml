@@ -11,9 +11,10 @@
         android:id="@+id/directionsCont"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#49454f"
         android:orientation="horizontal"
-        android:padding="5dp"
 
+        android:padding="5dp"
         tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="5dp">
 
@@ -39,6 +40,7 @@
                 android:layout_weight="1"
                 android:gravity="center_vertical"
                 android:text="Distance"
+                android:textColor="#FFFFFF"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -48,7 +50,8 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center_vertical"
-                android:text="Direction" />
+                android:text="Direction"
+                android:textColor="#FFFFFF" />
         </LinearLayout>
 
     </LinearLayout>
@@ -60,7 +63,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
 
-        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintBottom_toTopOf="@id/overviewCont"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/directionsCont"
@@ -73,6 +76,61 @@
 
     </androidx.fragment.app.FragmentContainerView>
 
+    <!-- 706b78 -->
+    <LinearLayout
+        android:id="@+id/overviewCont"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#49454f"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="5dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView">
+
+        <ImageView
+            android:id="@+id/imageViewOverviewButton"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center_vertical"
+            app:srcCompat="@drawable/btn_add_photo" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingLeft="10dp">
+
+            <TextView
+                android:id="@+id/textViewRecenter"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="Re-Center"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textViewTotalMinKm"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="Minutes - Kilometers"
+                android:textColor="#FFFFFF" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/overviewButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Overview" />
+
+    </LinearLayout>
+
     <!-- Bottom Navigation View -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
@@ -80,7 +138,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         app:menu="@menu/bottom_navigation_menu"
-        app:layout_constraintBottom_toBottomOf="parent">
-    </com.google.android.material.bottomnavigation.BottomNavigationView>
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
