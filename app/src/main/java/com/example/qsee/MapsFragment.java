@@ -32,6 +32,7 @@ import com.google.android.libraries.places.api.model.*;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -106,6 +107,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
+        //BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
+        //bottomNavigationView.setVisibility(View.INVISIBLE);
+
         ImageButton filterMenuBar = view.findViewById(R.id.filterMenuBar);
         filterMenuBar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -134,6 +138,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                     bundle.putString("categoryName", categoryName);
                     fragment.setArguments(bundle);
                 }
+
+                else {
+
+                }
+
+                BottomNavigationView bottomNavigationView = getView().findViewById(R.id.bottomNavigationView);
+                bottomNavigationView.setVisibility(View.GONE);
 
                 // Show the PlaceDetailDialogFragment as a dialog
                 fragment.show(getChildFragmentManager(), "FilterCategories");
@@ -282,6 +293,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                                                     args.putString("destinationLongitude", parts[6]);
                                                     fragment.setArguments(args);
 
+                                                    BottomNavigationView bottomNavigationView = getView().findViewById(R.id.bottomNavigationView);
+                                                    bottomNavigationView.setVisibility(View.GONE);
+
                                                     // Show the PlaceDetailDialogFragment as a dialog
                                                     fragment.show(getChildFragmentManager(), "PlaceDetailDialogFragment");
 
@@ -343,7 +357,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 }
 
                 else {
-
+                    populateMap();
                 }
 
             }

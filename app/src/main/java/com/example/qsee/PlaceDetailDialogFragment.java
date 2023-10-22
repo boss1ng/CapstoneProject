@@ -1,5 +1,6 @@
 package com.example.qsee;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
@@ -20,6 +21,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.squareup.picasso.Picasso;
 
 public class PlaceDetailDialogFragment extends DialogFragment {
@@ -86,6 +88,8 @@ public class PlaceDetailDialogFragment extends DialogFragment {
 
                 dismiss(); // Dismiss the dialog
 
+                BottomNavigationView bottomNavigationView = getView().findViewById(R.id.bottomNavigationView);
+
                 // In the fragment or activity where you want to navigate
                 FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
 
@@ -99,6 +103,9 @@ public class PlaceDetailDialogFragment extends DialogFragment {
                 bundle.putString("destinationLatitude", destinationLat);
                 bundle.putString("destinationLongitude", destinationLong);
                 fragmentConfirmation.setArguments(bundle);
+
+                //BottomNavigationView bottomNavigationView = getView().findViewById(R.id.bottomNavigationView);
+                //bottomNavigationView.setVisibility(View.GONE);
 
                 // Replace the current fragment with the receiving fragment
                 transaction.replace(R.id.maps, fragmentConfirmation);
