@@ -3,7 +3,6 @@ package com.example.qsee;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
@@ -15,7 +14,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -46,19 +44,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import android.os.AsyncTask;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -83,14 +78,6 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
     Marker currentLocMarker;
     Marker destinationLocMarker;
 
-    /*
-    PolylineOptions borderOptions;
-    PolylineOptions routeOptions;
-
-    PolylineOptions borderOptionsSecond;
-    PolylineOptions routeOptionsSecond;
-     */
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -102,12 +89,12 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.mapsRoute);
+
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
 
         return view;
-
     }
 
     @Override
@@ -152,9 +139,93 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
         });
          */
 
+        ImageView viewCurrent = getView().findViewById(R.id.imageViewOverviewButton);
+        viewCurrent.setImageResource(R.drawable.currentloc);
+
+        ImageView viewInstructions = getView().findViewById(R.id.btnShowInstructions);
+        viewInstructions.setImageResource(R.drawable.navigate_up_arrow);
+        viewInstructions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // Create a new PlaceDetailDialogFragment and pass the place details as arguments
+                MapsInstructions fragment = new MapsInstructions();
+
+                // Retrieve selected categories from Bundle arguments
+                Bundle getBundle = getArguments();
+
+                // Use Bundle to pass values
+                Bundle bundle = new Bundle();
+
+                if (getBundle != null) {
+                    String placeName = getBundle.getString("placeName");
+                    Double passedCurrentUserLocationLat = getBundle.getDouble("userCurrentLatitude");
+                    Double passedCurrentUserLocationLong = getBundle.getDouble("userCurrentLongitude");
+                    String destinationLatitude = getBundle.getString("destinationLatitude");
+                    String destinationLongitude = getBundle.getString("destinationLongitude");
+
+                    bundle.putString("placeName", placeName);
+                    bundle.putDouble("userCurrentLatitude", passedCurrentUserLocationLat);
+                    bundle.putDouble("userCurrentLongitude", passedCurrentUserLocationLong);
+                    bundle.putString("destinationLatitude", destinationLatitude);
+                    bundle.putString("destinationLongitude", destinationLongitude);
+
+                    fragment.setArguments(bundle);
+                }
+
+                // Show the PlaceDetailDialogFragment as a dialog
+                fragment.show(getChildFragmentManager(), "MapsArrived");
+            }
+        });
+
+        Button btnFinishRoute = getView().findViewById(R.id.btnDone);
+        btnFinishRoute.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // In the fragment or activity where you want to navigate
+                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+
+                MapsFragmentArrived mapsFragment = new MapsFragmentArrived();
+
+                // Retrieve selected categories from Bundle arguments
+                Bundle getBundle = getArguments();
+
+                // Use Bundle to pass values
+                Bundle bundle = new Bundle();
+
+                if (getBundle != null) {
+                    String placeName = getBundle.getString("placeName");
+                    Double passedCurrentUserLocationLat = getBundle.getDouble("userCurrentLatitude");
+                    Double passedCurrentUserLocationLong = getBundle.getDouble("userCurrentLongitude");
+                    String destinationLatitude = getBundle.getString("destinationLatitude");
+                    String destinationLongitude = getBundle.getString("destinationLongitude");
+
+                    bundle.putString("placeName", placeName);
+                    bundle.putDouble("userCurrentLatitude", passedCurrentUserLocationLat);
+                    bundle.putDouble("userCurrentLongitude", passedCurrentUserLocationLong);
+                    bundle.putString("destinationLatitude", destinationLatitude);
+                    bundle.putString("destinationLongitude", destinationLongitude);
+                    mapsFragment.setArguments(bundle);
+                }
+
+                LinearLayout linearLayoutDirections = getView().findViewById(R.id.directionsCont);
+                linearLayoutDirections.setVisibility(View.GONE);
+
+                LinearLayout linearLayoutOverview = getView().findViewById(R.id.overviewCont);
+                linearLayoutOverview.setVisibility(View.GONE);
+
+                BottomNavigationView bottomNavigationView = getView().findViewById(R.id.bottomNavigationView);
+                bottomNavigationView.setVisibility(View.GONE);
+
+                // Replace the current fragment with the receiving fragment
+                transaction.replace(R.id.mapsRoute, mapsFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+        });
+
         updateMap();
-
-
 
         // Use a Handler to refresh the map every second
         final int INTERVAL = 1000; // 1000 milliseconds = 1 second
@@ -959,6 +1030,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
 
                     // Populate UI elements with place details
                     TextView textViewDistance = getView().findViewById(R.id.textViewDistance);
+                    Button buttonFinish = getView().findViewById(R.id.btnDone);
                     //textViewDistance.setText(distanceSample);
                     //Toast.makeText(getContext(), distanceSample, Toast.LENGTH_LONG).show();
 
@@ -987,7 +1059,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                     // Get the maneuver from your API response
                     // Retrieve maneuver if it's present, or provide a default value
                     String maneuverType = stepSamp.optString("maneuver", "No Maneuver");
-                    Toast.makeText(getContext(), maneuverType, Toast.LENGTH_LONG).show();
+                    //Toast.makeText(getContext(), maneuverType, Toast.LENGTH_LONG).show();
 
                     // Create a variable to store the drawable resource ID
                     int drawableResource = R.drawable.straight; // Default drawable
@@ -1111,6 +1183,21 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
 
                     // Format totalDistanceKm with 2 decimal places
                     String formattedDistance = String.format("%.2f", totalDistanceKm);
+
+                    double thresholdDistance = 1.2; // 0.015=15 meters threshold    1.2
+                    if (totalDistanceKm <= thresholdDistance) {
+                        textViewDistance.setText("You have arrived at your destination.");
+                        textViewDirection.setVisibility(View.GONE);
+                        buttonFinish.setVisibility(View.VISIBLE);
+                        buttonFinish.setText("Done");
+                        imageViewDirections.setImageResource(R.drawable.arrived);
+                    }
+
+                    else {
+                        textViewDirection.setVisibility(View.VISIBLE);
+                        buttonFinish.setVisibility(View.GONE);
+                        imageViewDirections.setImageResource(drawableResource);
+                    }
 
                     TextView textViewTotal = getView().findViewById(R.id.textViewTotalMinKm);
                     textViewTotal.setText(formattedDistance + " km • " + totalDurationMinutes + " mins");

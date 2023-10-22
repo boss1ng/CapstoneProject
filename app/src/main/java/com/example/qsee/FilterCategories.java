@@ -169,6 +169,29 @@ public class FilterCategories extends DialogFragment {
             }
         }
 
+        else {
+            databaseReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                    for (DataSnapshot categorySnapshot : dataSnapshot.getChildren()) {
+                        String categoryName = categorySnapshot.child("Category").getValue(String.class);
+                        categories.add(categoryName);
+                    }
+
+                    // Now, you have the list of categories, you can display them as checkboxes.
+                    ArrayAdapter<Object> adapter= new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_multiple_choice, categories);
+                    listView.setAdapter(adapter);
+                    listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    // Handle any errors here
+                }
+            });
+        }
+
 
 
         // Customize the dialog's appearance and position
