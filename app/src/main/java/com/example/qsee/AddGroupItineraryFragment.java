@@ -117,21 +117,27 @@ public class AddGroupItineraryFragment extends Fragment {
         ImageView addActivityButton = view.findViewById(R.id.addActivity);
         ImageView deleteActivityButton = view.findViewById(R.id.remActivity);
 
-        // Add "Add" functionality to the "Add" button
+        final int[] addCounter = {0};
+
         addActivityButton.setOnClickListener(v -> {
-            ItineraryItem newItem = new ItineraryItem("", "", ""); // Create a new ItineraryItem
-            dayItineraryAdapter.addItem(newItem); // Add the new item to the RecyclerView
-        });
-
-
-
-        deleteActivityButton.setOnClickListener(v -> {
-            int lastIndex = dayItineraryAdapter.getItemCount() - 1;
-            if (lastIndex >= 0) {
-                dayItineraryAdapter.removeItem(lastIndex);
+            if (addCounter[0] < 3) {
+                ItineraryItem newItem = new ItineraryItem("", "", ""); // Create a new ItineraryItem
+                dayItineraryAdapter.addItem(newItem); // Add the new item to the RecyclerView
+                addCounter[0]++;
+            } else {
+                Toast.makeText(getContext(), "Maximum activities for a day reached.\nYou can add more in the edit option later.", Toast.LENGTH_SHORT).show();
             }
         });
 
+        deleteActivityButton.setOnClickListener(v -> {
+            if (addCounter[0] > 0) {
+                int lastIndex = dayItineraryAdapter.getItemCount() - 1;
+                if (lastIndex >= 0) {
+                    dayItineraryAdapter.removeItem(lastIndex);
+                    addCounter[0]--;
+                }
+            }
+        });
 
 
         // Find the "Add Itinerary" button in the default form layout
@@ -470,18 +476,28 @@ public class AddGroupItineraryFragment extends Fragment {
             ImageView addActivityButton = newFormView.findViewById(R.id.addActivity);
             ImageView deleteActivityButton = newFormView.findViewById(R.id.remActivity);
 
-            // Add "Add" functionality to the "Add" button
+            final int[] addCounter = {0};
+
             addActivityButton.setOnClickListener(v -> {
-                ItineraryItem newItem = new ItineraryItem("", "", ""); // Create a new ItineraryItem
-                dayItineraryAdapter.addItem(newItem); // Add the new item to the RecyclerView
+                if (addCounter[0] < 3) {
+                    ItineraryItem newItem = new ItineraryItem("", "", ""); // Create a new ItineraryItem
+                    dayItineraryAdapter.addItem(newItem); // Add the new item to the RecyclerView
+                    addCounter[0]++;
+                } else {
+                    Toast.makeText(getContext(), "Maximum activities for a day reached.\nYou can add more in the edit option later.", Toast.LENGTH_SHORT).show();
+                }
             });
 
             deleteActivityButton.setOnClickListener(v -> {
-                int lastIndex = dayItineraryAdapter.getItemCount() - 1;
-                if (lastIndex >= 0) {
-                    dayItineraryAdapter.removeItem(lastIndex);
+                if (addCounter[0] > 0) {
+                    int lastIndex = dayItineraryAdapter.getItemCount() - 1;
+                    if (lastIndex >= 0) {
+                        dayItineraryAdapter.removeItem(lastIndex);
+                        addCounter[0]--;
+                    }
                 }
             });
+
 
             dynamicFormContainer.addView(newFormView);
             formViews.add(newFormView);
