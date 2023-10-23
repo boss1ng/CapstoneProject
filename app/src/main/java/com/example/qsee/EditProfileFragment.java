@@ -1,6 +1,7 @@
 package com.example.qsee;
 
 import android.app.DatePickerDialog;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.util.Log;
@@ -48,7 +49,7 @@ public class EditProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_editprofile, container, false);
-
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         // Initialize TextInputLayout variables
         firstNameEditText = view.findViewById(R.id.firstName);
         lastNameEditText = view.findViewById(R.id.lastName);

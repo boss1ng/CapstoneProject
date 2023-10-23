@@ -3,6 +3,7 @@ package com.example.qsee;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -45,6 +46,7 @@ public class PlaceDetailDialogFragment extends DialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Inflate the custom layout for this dialog fragment
         View view = inflater.inflate(R.layout.fragment_place_detail, container, false);
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // Retrieve place details from arguments
         String placeName = getArguments().getString("placeName");

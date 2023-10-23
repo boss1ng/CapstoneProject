@@ -1,6 +1,7 @@
 package com.example.qsee;
 
 import android.app.Dialog;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.SparseBooleanArray;
@@ -46,7 +47,7 @@ public class FilterCategories extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_filter_categories, container, false);
-
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         //String categoryName = "Accomodations+Shopping";
 
         // For Reading the Database

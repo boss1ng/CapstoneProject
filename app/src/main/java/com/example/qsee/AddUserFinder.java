@@ -1,5 +1,6 @@
 package com.example.qsee;
 
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.util.Log;
@@ -56,7 +57,7 @@ public class AddUserFinder extends DialogFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.adduserfinder, container, false);
-
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         // Initialize UI components from the layout
         TextInputEditText userIdTextView = view.findViewById(R.id.editTextUserId);
         Button inviteBtn = view.findViewById(R.id.inviteBtn);

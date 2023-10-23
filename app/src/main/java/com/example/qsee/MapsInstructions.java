@@ -1,6 +1,7 @@
 package com.example.qsee;
 
 import android.app.Dialog;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
@@ -55,6 +56,7 @@ public class MapsInstructions extends DialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Inflate the custom layout for this dialog fragment
         View view = inflater.inflate(R.layout.fragment_maps_instructions, container, false);
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // Retrieve selected categories from Bundle arguments
         Bundle getBundle = getArguments();

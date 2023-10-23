@@ -1,5 +1,6 @@
 package com.example.qsee;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.os.Bundle;
@@ -46,7 +47,7 @@ public class AddUserToGroup extends DialogFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.addgroup, container, false);
-
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // Initialize UI components from the layout
         Button inviteBtn = view.findViewById(R.id.inviteBtn);

@@ -2,6 +2,7 @@ package com.example.qsee;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,6 +42,7 @@ public class MapsFragmentArrivedDialog extends DialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Inflate the custom layout for this dialog fragment
         View view = inflater.inflate(R.layout.fragment_maps_arrived_dialog, container, false);
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // Retrieve selected categories from Bundle arguments
         Bundle getBundle = getArguments();

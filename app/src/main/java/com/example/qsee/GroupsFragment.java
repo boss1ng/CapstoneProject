@@ -1,5 +1,6 @@
 package com.example.qsee;
 
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -36,7 +37,7 @@ public class GroupsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the default layout for this fragment
         View view = inflater.inflate(R.layout.fragment_grouplist, container, false);
-
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         // Initialize RecyclerView
         RecyclerView recyclerView = view.findViewById(R.id.groupRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));

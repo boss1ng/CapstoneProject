@@ -5,6 +5,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -53,7 +54,7 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the fragment_profile.xml layout
         View rootView = inflater.inflate(R.layout.fragment_profile, container, false);
-
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         context = getActivity(); // Get the context
 
         // Retrieve the username from the arguments
@@ -86,6 +87,11 @@ public class ProfileFragment extends Fragment {
             public void onClick(View v) {
                 // Create an instance of the AddGlimpseFragment
                 AddGlimpseFragment addGlimpseFragment = new AddGlimpseFragment();
+
+                // Create a Bundle to pass the userId as an argument
+                Bundle args = new Bundle();
+                args.putString("userId", userId); // Replace "your_user_id_here" with the actual user ID
+                addGlimpseFragment.setArguments(args);
 
                 // Show the AddGlimpseFragment as a dialog
                 FragmentManager fragmentManager = getChildFragmentManager();
