@@ -1,6 +1,7 @@
 package com.example.qsee;
 
 import android.annotation.SuppressLint;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,6 +50,7 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         textView = view.findViewById(R.id.textView);
         dateText = view.findViewById(R.id.date);
@@ -157,14 +159,14 @@ public class HomeFragment extends Fragment {
         } catch (JSONException | ParseException e) {
             e.printStackTrace();
         }
-        return "Not available"; // Default value if rain percentage cannot be determined
+        return "☀️0"; // Default value if rain percentage cannot be determined
     }
 
     // Define a function to map rain percentages to icons
     private String getRainIcon(int rainPercentage) {
-        // You can define your own logic for mapping rain percentages to icons here.
-        // Here's a simple example using a few ranges:
-        if (rainPercentage < 20) {
+        if (rainPercentage <= 0) {
+            return "☀️"; // No Rain icon (Clear weather)
+        } else if (rainPercentage < 20) {
             return "☔️"; // Light rain icon
         } else if (rainPercentage < 60) {
             return "🌧️"; // Moderate rain icon
@@ -172,6 +174,7 @@ public class HomeFragment extends Fragment {
             return "⛈️"; // Heavy rain icon
         }
     }
+
 
     private String getWeatherCondition(String date, JSONArray forecasts) {
         try {
@@ -199,7 +202,7 @@ public class HomeFragment extends Fragment {
         } catch (JSONException | ParseException e) {
             e.printStackTrace();
         }
-        return "Not available"; // Default value if weather icon cannot be determined
+        return "Not Available"; // Default value if weather icon cannot be determined
     }
 
     // Define a function to map weather descriptions to icons

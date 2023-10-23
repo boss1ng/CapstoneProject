@@ -2,6 +2,7 @@ package com.example.qsee;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -10,7 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -34,6 +37,7 @@ import com.google.android.libraries.places.api.model.*;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -60,9 +64,19 @@ public class MapsFragmentConfirmation extends Fragment implements OnMapReadyCall
     Double currentUserLocationLat;
     Double currentUserLocationLong;
 
+    String placeName;
+
+    String userDestinationLat;
+
+    String userDestinationLong;
+
+    Double passedCurrentUserLocationLat;
+    Double passedCurrentUserLocationLong;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maps_confirmation, container, false);
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // Initialize the FusedLocationProviderClient
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
@@ -71,7 +85,9 @@ public class MapsFragmentConfirmation extends Fragment implements OnMapReadyCall
         Bundle bundle = getArguments();
         if (bundle != null) {
             // DESTINATION LOCATION
-            String placeName = bundle.getString("placeName");
+            placeName = bundle.getString("placeName");
+            userDestinationLat = bundle.getString("destinationLatitude");
+            userDestinationLong = bundle.getString("destinationLongitude");
 
             // Populate UI elements with place details
             TextView textViewName = view.findViewById(R.id.textViewName);
@@ -84,6 +100,9 @@ public class MapsFragmentConfirmation extends Fragment implements OnMapReadyCall
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
+
+        BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setVisibility(View.GONE);
 
         Button cancelButton = view.findViewById(R.id.btnCancel);
         cancelButton.setOnClickListener(new View.OnClickListener() {
@@ -113,16 +132,23 @@ public class MapsFragmentConfirmation extends Fragment implements OnMapReadyCall
 
                 MapsFragmentRoute mapsFragmentRoute = new MapsFragmentRoute();
 
-                /*
                 // Use Bundle to pass values
                 Bundle bundle = new Bundle();
                 bundle.putString("placeName", placeName);
-                bundle.putDouble("userCurrentLatitude", currentUserLat);
-                bundle.putDouble("userCurrentLongitude", currentUserLong);
-                bundle.putString("destinationLatitude", destinationLat);
-                bundle.putString("destinationLongitude", destinationLong);
-                fragmentConfirmation.setArguments(bundle);
-                 */
+                bundle.putDouble("userCurrentLatitude", passedCurrentUserLocationLat);
+                bundle.putDouble("userCurrentLongitude", passedCurrentUserLocationLong);
+                bundle.putString("destinationLatitude", userDestinationLat);
+                bundle.putString("destinationLongitude", userDestinationLong);
+                mapsFragmentRoute.setArguments(bundle);
+
+                LinearLayout linearLayoutLocation = getView().findViewById(R.id.layoutLocation);
+                linearLayoutLocation.setVisibility(View.GONE);
+
+                LinearLayout linearLayoutButtons = getView().findViewById(R.id.layoutButtons);
+                linearLayoutButtons.setVisibility(View.GONE);
+
+                BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
+                bottomNavigationView.setVisibility(View.GONE);
 
                 // Replace the current fragment with the receiving fragment
                 transaction.replace(R.id.fragment_container, mapsFragmentRoute);
@@ -137,6 +163,7 @@ public class MapsFragmentConfirmation extends Fragment implements OnMapReadyCall
         return view;
     }
 
+    @SuppressLint("PotentialBehaviorOverride")
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
@@ -184,8 +211,8 @@ public class MapsFragmentConfirmation extends Fragment implements OnMapReadyCall
         Bundle bundle = getArguments();
         if (bundle != null) {
             // CURRENT USER LOCATION
-            Double userCurrentLatitude = bundle.getDouble("userCurrentLatitude");
-            Double userCurrentLongitude = bundle.getDouble("userCurrentLongitude");
+            passedCurrentUserLocationLat = bundle.getDouble("userCurrentLatitude");
+            passedCurrentUserLocationLong = bundle.getDouble("userCurrentLongitude");
 
             // DESTINATION LOCATION
             String placeName = bundle.getString("placeName");
@@ -199,8 +226,8 @@ public class MapsFragmentConfirmation extends Fragment implements OnMapReadyCall
             LatLng marketLocation = new LatLng(destLatitude, destLongitude);
 
             MarkerOptions markerOptions = new MarkerOptions()
-                    .position(marketLocation)
-                    .title(placeName);
+                    .position(marketLocation);
+                    //.title(placeName);
 
             // Add markers to the Google Map
             Marker marker = mMap.addMarker(markerOptions);
@@ -273,6 +300,7 @@ public class MapsFragmentConfirmation extends Fragment implements OnMapReadyCall
             // return true;
         }
 
+        /*
         // Set a click listener for each marker
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @SuppressLint("MissingPermission")
@@ -346,7 +374,7 @@ public class MapsFragmentConfirmation extends Fragment implements OnMapReadyCall
                 return true;
             }
         });
-
+        */
 
 
         // ROUTES

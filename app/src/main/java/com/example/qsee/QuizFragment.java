@@ -1,6 +1,7 @@
 package com.example.qsee;
 
 import android.content.DialogInterface;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -48,6 +49,7 @@ public class QuizFragment extends Fragment {
         Q2 = rootView.findViewById(R.id.Q2);
         Q3 = rootView.findViewById(R.id.Q3);
         Q4 = rootView.findViewById(R.id.Q4);
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // Initialize the quiz questions
         initializeQuizQuestions();

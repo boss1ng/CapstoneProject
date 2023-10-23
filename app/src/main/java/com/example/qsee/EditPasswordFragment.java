@@ -1,6 +1,7 @@
 package com.example.qsee;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -41,7 +42,7 @@ public class EditPasswordFragment extends Fragment {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         View view = inflater.inflate(R.layout.fragment_changepass, container, false);
         // Find the TextInputEditText for the current password
         currentPasswordEditText = view.findViewById(R.id.currentPwd);

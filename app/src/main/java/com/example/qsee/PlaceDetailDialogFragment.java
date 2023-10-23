@@ -1,7 +1,9 @@
 package com.example.qsee;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -20,6 +22,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.squareup.picasso.Picasso;
 
 public class PlaceDetailDialogFragment extends DialogFragment {
@@ -43,6 +46,7 @@ public class PlaceDetailDialogFragment extends DialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Inflate the custom layout for this dialog fragment
         View view = inflater.inflate(R.layout.fragment_place_detail, container, false);
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // Retrieve place details from arguments
         String placeName = getArguments().getString("placeName");
@@ -86,6 +90,8 @@ public class PlaceDetailDialogFragment extends DialogFragment {
 
                 dismiss(); // Dismiss the dialog
 
+                BottomNavigationView bottomNavigationView = getView().findViewById(R.id.bottomNavigationView);
+
                 // In the fragment or activity where you want to navigate
                 FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
 
@@ -99,6 +105,9 @@ public class PlaceDetailDialogFragment extends DialogFragment {
                 bundle.putString("destinationLatitude", destinationLat);
                 bundle.putString("destinationLongitude", destinationLong);
                 fragmentConfirmation.setArguments(bundle);
+
+                //BottomNavigationView bottomNavigationView = getView().findViewById(R.id.bottomNavigationView);
+                //bottomNavigationView.setVisibility(View.GONE);
 
                 // Replace the current fragment with the receiving fragment
                 transaction.replace(R.id.maps, fragmentConfirmation);

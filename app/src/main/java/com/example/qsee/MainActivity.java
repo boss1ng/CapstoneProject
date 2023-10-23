@@ -3,6 +3,7 @@ package com.example.qsee;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
@@ -29,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.login);
         unameInputLayout = findViewById(R.id.unameInput);
         passInputLayout = findViewById(R.id.passInput);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // Find the "Create an Account" button by its ID
         View createAccountButton = findViewById(R.id.createAccount);
