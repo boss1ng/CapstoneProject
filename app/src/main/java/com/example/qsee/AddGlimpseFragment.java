@@ -55,7 +55,6 @@ public class AddGlimpseFragment extends DialogFragment {
         usernameTextView = rootView.findViewById(R.id.username_Tv);
 
         ImageView cameraImage = rootView.findViewById(R.id.imageView28);
-        TextView cameraText = rootView.findViewById(R.id.textView24);
         cameraImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -63,12 +62,6 @@ public class AddGlimpseFragment extends DialogFragment {
             }
         });
 
-        cameraText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openCamera();
-            }
-        });
 
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
