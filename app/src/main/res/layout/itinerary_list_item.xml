@@ -6,6 +6,16 @@
     android:orientation="horizontal"
     android:padding="8dp">
 
+    <TextView
+        android:id="@+id/locationTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:textSize="18sp"
+        android:text="15:00"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"/>
+
     <ImageView
         android:id="@+id/locationIcon"
         android:layout_width="48dp"
@@ -15,6 +25,7 @@
     <TextView
         android:id="@+id/locationName"
         android:layout_width="wrap_content"
+        android:text="Quezon Memorial Circle"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:textSize="18sp"
@@ -22,27 +33,23 @@
         android:layout_weight="1"/>
 
     <ImageView
-        android:id="@+id/download"
+        android:id="@+id/edit"
         android:layout_width="29dp"
         android:layout_height="25dp"
         android:layout_marginStart="8dp"
-        app:srcCompat="@drawable/btn_download"
+        app:srcCompat="@drawable/edit"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="8dp"
         android:clickable="true"/>
 
     <ImageView
-        android:id="@+id/options"
+        android:id="@+id/delete"
         android:layout_width="29dp"
         android:layout_height="25dp"
         android:layout_marginStart="8dp"
-        app:srcCompat="@drawable/btn_more"
+        app:srcCompat="@drawable/delete"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="8dp"
         android:clickable="true"/>
-
-
-
-
 
 </LinearLayout>

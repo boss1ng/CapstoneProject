@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Qsee</string>
+    <string name="day_count">Day %1$d of %2$d</string>
 </resources>

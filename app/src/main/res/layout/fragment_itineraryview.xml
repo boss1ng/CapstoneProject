@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/locName"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:text="Itinerary"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.207"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.009" />
+
+        <TextView
+            android:id="@+id/dateDuration"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:text="Dates"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.207"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/locName"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <TextView
+            android:id="@+id/dayTitle1"
+            android:layout_width="412dp"
+            android:layout_height="37dp"
+            android:layout_marginTop="4dp"
+            android:background="?attr/colorPrimary"
+            android:padding="6dp"
+            android:text="Day 1"
+            android:textColor="@android:color/white"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dateDuration" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/day1Recycler"
+            android:layout_width="377dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="1dp"
+            android:layout_marginEnd="1dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dayTitle1"
+            app:layout_constraintVertical_bias="0.0"
+            tools:listitem="@layout/itinerary_list_item" />
+
+        <TextView
+            android:id="@+id/dayTitle2"
+            android:layout_width="412dp"
+            android:layout_height="37dp"
+            android:background="?attr/colorPrimary"
+            android:padding="6dp"
+            android:text="Day 2"
+            android:textColor="@android:color/white"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.057"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/day1Recycler" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/day2Recycler"
+            android:layout_width="377dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="1dp"
+            android:layout_marginEnd="1dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dayTitle2"
+            app:layout_constraintVertical_bias="0"
+            tools:listitem="@layout/itinerary_list_item" />
+
+        <TextView
+            android:id="@+id/dayTitle3"
+            android:layout_width="412dp"
+            android:layout_height="37dp"
+            android:background="?attr/colorPrimary"
+            android:padding="6dp"
+            android:text="Day 3"
+            android:textColor="@android:color/white"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/day2Recycler"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/day3Recycler"
+            android:layout_width="377dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="1dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dayTitle3"
+            app:layout_constraintVertical_bias="0.0"
+            tools:listitem="@layout/itinerary_list_item" />
+
+        <TextView
+            android:id="@+id/dayTitle4"
+            android:layout_width="412dp"
+            android:layout_height="37dp"
+            android:background="?attr/colorPrimary"
+            android:padding="6dp"
+            android:text="Day 4"
+            android:textColor="@android:color/white"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/day3Recycler" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/day4Recycler"
+            android:layout_width="377dp"
+            android:layout_height="wrap_content"
+            app:flow_verticalBias="0.0"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dayTitle4"
+            tools:listitem="@layout/itinerary_list_item" />
+
+        <TextView
+            android:id="@+id/dayTitle5"
+            android:layout_width="412dp"
+            android:layout_height="37dp"
+            android:background="?attr/colorPrimary"
+            android:padding="6dp"
+            android:text="Day 5"
+            android:textColor="@android:color/white"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.057"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/day4Recycler" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/day5Recycler"
+            android:layout_width="377dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="1dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dayTitle5"
+            app:layout_constraintVertical_bias="0.0"
+            android:layout_marginBottom="80dp"
+            tools:listitem="@layout/itinerary_list_item" />
+
+        <ImageView
+            android:id="@+id/optD1"
+            android:layout_width="20dp"
+            android:layout_height="22dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/dayTitle1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.955"
+            app:layout_constraintStart_toStartOf="@+id/dayTitle1"
+            app:srcCompat="@drawable/btn_add_white" />
+
+        <ImageView
+            android:id="@+id/optD2"
+            android:layout_width="20dp"
+            android:layout_height="22dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/dayTitle2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.955"
+            app:layout_constraintStart_toStartOf="@+id/dayTitle2"
+            app:srcCompat="@drawable/btn_add_white" />
+
+        <ImageView
+            android:id="@+id/optD3"
+            android:layout_width="20dp"
+            android:layout_height="22dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/dayTitle3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.955"
+            app:layout_constraintStart_toStartOf="@+id/dayTitle3"
+            app:srcCompat="@drawable/btn_add_white" />
+
+        <ImageView
+            android:id="@+id/optD4"
+            android:layout_width="20dp"
+            android:layout_height="22dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/dayTitle4"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.955"
+            app:layout_constraintStart_toStartOf="@+id/dayTitle4"
+            app:srcCompat="@drawable/btn_add_white" />
+
+        <ImageView
+            android:id="@+id/optD5"
+            android:layout_width="20dp"
+            android:layout_height="22dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/dayTitle5"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.955"
+            app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@drawable/btn_add_white" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
