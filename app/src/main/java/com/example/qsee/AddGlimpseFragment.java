@@ -31,6 +31,7 @@ public class AddGlimpseFragment extends DialogFragment {
     private Context context;
     private String userId;
     private TextView usernameTextView;
+    private TextView cancel;
     private ImageView imageView16; // Reference to your image view
     private static final int CAMERA_REQUEST_CODE = 100; // Define your request code here
 
@@ -46,6 +47,7 @@ public class AddGlimpseFragment extends DialogFragment {
         // Initialize your views
         context = getActivity();
         userId = getArguments().getString("userId");
+        cancel = rootView.findViewById(R.id.textView23);
         imageView16 = rootView.findViewById(R.id.imageView16); // Initialize imageView16
 
         DatabaseReference usersReference = FirebaseDatabase.getInstance().getReference("MobileUsers");
@@ -59,6 +61,13 @@ public class AddGlimpseFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 openCamera();
+            }
+        });
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
             }
         });
 
