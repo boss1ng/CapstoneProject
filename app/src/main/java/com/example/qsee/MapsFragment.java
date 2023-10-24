@@ -48,6 +48,10 @@ import java.util.Locale;
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    // Create a LatLngBounds that includes Quezon City, Philippines.
+    private LatLngBounds QUEZON_CITY = new LatLngBounds(
+            new LatLng(14.65, 121.03),      // SW bounds
+            new LatLng(14.70, 121.07));     // NE bounds
     private FusedLocationProviderClient fusedLocationProviderClient;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private PlacesClient placesClient;
@@ -165,6 +169,16 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setZoomGesturesEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
+
+        // Constrain the camera target to the Quezon City bounds.
+        mMap.setLatLngBoundsForCameraTarget(QUEZON_CITY);
+
+        float minZoomLevel = 13;
+        float maxZoomLevel = 16;
+
+        // Set the minimum and maximum zoom levels.
+        mMap.setMinZoomPreference(minZoomLevel); // Set the minimum desired zoom level.
+        mMap.setMaxZoomPreference(maxZoomLevel); // Set the maximum desired zoom level.
 
         // Check if location permission is granted
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
