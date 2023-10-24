@@ -8,6 +8,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -84,8 +85,13 @@ public class EditItineraryAdapter extends RecyclerView.Adapter<EditItineraryAdap
         StyleSpan italicSpan = new StyleSpan(Typeface.ITALIC);
         spannableString.setSpan(italicSpan, location.length() + 1, location.length() + 1 + activity.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
+        // Reducing the size of the activity text
+        float relativeSize = 0.8f; // Adjust the size as needed
+        spannableString.setSpan(new RelativeSizeSpan(relativeSize), location.length() + 1, spannableString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
         // Setting the formatted text to the TextView
         holder.locationTextView.setText(spannableString);
+
 
     }
 

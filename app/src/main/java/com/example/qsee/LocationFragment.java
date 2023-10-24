@@ -67,7 +67,9 @@ public class LocationFragment extends Fragment {
                 for (DataSnapshot locationSnapshot : dataSnapshot.getChildren()) {
                     if (locationSnapshot.child("admin").getValue(String.class).equals(userId)) {
                         String iterName = locationSnapshot.child("iterName").getValue(String.class);
+                        String admin = locationSnapshot.child("admin").getValue(String.class);
                         Location location = new Location();
+                        location.setLocationAdmin(admin);
                         location.setLocationName(iterName);
                         locationList.add(location);
                     }

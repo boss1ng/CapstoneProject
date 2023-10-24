@@ -3,7 +3,13 @@ package com.example.qsee;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,8 +25,11 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
@@ -46,7 +55,57 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
     @Override
     public void onBindViewHolder(@NonNull LocationViewHolder holder, int position) {
         Location location = locationList.get(position);
-        holder.locationNameTextView.setText(location.getLocationName());
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference itineraryRef = database.getReference("Itinerary");
+
+        itineraryRef.child(location.getLocationName()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String adminId = dataSnapshot.child("admin").getValue(String.class);
+                if (adminId != null) {
+                    DatabaseReference usersRef = database.getReference("MobileUsers");
+                    usersRef.child(adminId).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            String username = dataSnapshot.child("username").getValue(String.class);
+                            if (username != null) {
+                                // Perform necessary actions with the username
+                                // For example, you can pass it to your AESUtils for decryption
+                                String decryptedUsername = AESUtils.decrypt(username);
+
+                                // Adding the "Owner: " prefix
+                                String displayText = "Owner: " + decryptedUsername;
+
+                                // Apply formatting to the text
+                                SpannableString spannableString = new SpannableString(location.getLocationName() + "\n" + displayText);
+                                spannableString.setSpan(new StyleSpan(Typeface.BOLD), 0, location.getLocationName().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                spannableString.setSpan(new StyleSpan(Typeface.ITALIC), location.getLocationName().length() + 1, spannableString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                                // Set the formatted text to the TextView
+                                holder.locationNameTextView.setText(spannableString);
+
+                                // Adjust the text size for the username
+                                int usernameStart = spannableString.toString().indexOf(displayText);
+                                int usernameEnd = usernameStart + displayText.length();
+                                spannableString.setSpan(new RelativeSizeSpan(0.8f), usernameStart, usernameEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE); // Adjust the size as needed
+                                holder.locationNameTextView.setText(spannableString);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError error) {
+                            // Handle error
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Handle error
+            }
+        });
+
 
         // Set click listener for options icon
         holder.optionsIcon.setOnClickListener(v -> showPopupMenu(holder.optionsIcon, position));

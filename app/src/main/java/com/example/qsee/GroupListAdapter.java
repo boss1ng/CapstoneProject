@@ -2,6 +2,11 @@ package com.example.qsee;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Typeface;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,7 +55,51 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Groups group = groupList.get(position);
-        holder.groupNameTextView.setText(group.getGroupName()); // Use getGroupName() to access the group name
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference usersRef = database.getReference("MobileUsers");
+
+        usersRef.child(group.getAdmin()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String username = dataSnapshot.child("username").getValue(String.class);
+                if (username != null) {
+                    // Perform necessary actions with the username
+                    // For example, you can pass it to your AESUtils for decryption
+                    String decryptedUsername = AESUtils.decrypt(username);
+
+                    // Adding the "Owner: " prefix
+                    String displayText = "Owner: " + decryptedUsername;
+
+                    // Apply formatting to the text
+                    SpannableString spannableString = new SpannableString(group.getGroupName() + "\n" + displayText);
+                    spannableString.setSpan(new StyleSpan(Typeface.BOLD), 0, group.getGroupName().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    spannableString.setSpan(new StyleSpan(Typeface.ITALIC), group.getGroupName().length() + 1, spannableString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                    // Set the formatted text to the TextView
+                    holder.groupNameTextView.setText(spannableString);
+
+                    // Adjust the text size for the username
+                    int usernameStart = spannableString.toString().indexOf(displayText);
+                    int usernameEnd = usernameStart + displayText.length();
+                    spannableString.setSpan(new RelativeSizeSpan(0.8f), usernameStart, usernameEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE); // Adjust the size as needed
+                    holder.groupNameTextView.setText(spannableString);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Handle error
+            }
+        });
+
+
+
+
+
+
+
+
 
         // Set click listeners for the icons
         holder.addUserImageView.setOnClickListener(new View.OnClickListener() {
