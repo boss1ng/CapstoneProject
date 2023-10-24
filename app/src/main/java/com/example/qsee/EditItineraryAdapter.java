@@ -1,6 +1,7 @@
 package com.example.qsee;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -184,6 +185,7 @@ public class EditItineraryAdapter extends RecyclerView.Adapter<EditItineraryAdap
                 activityQuery.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        boolean noMoreDaysLeft = true;
                         for (DataSnapshot daySnapshot : dataSnapshot.getChildren()) {
                             for (DataSnapshot timeSnapshot : daySnapshot.getChildren()) {
                                 String retrievedLoc = timeSnapshot.child("location").getValue(String.class);
@@ -195,7 +197,42 @@ public class EditItineraryAdapter extends RecyclerView.Adapter<EditItineraryAdap
                                                 public void onSuccess(Void aVoid) {
                                                     dataList.remove(position);
                                                     notifyItemRemoved(position);
-                                                    Toast.makeText(context, "Item deleted successfully", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(context, "Itinerary deleted", Toast.LENGTH_SHORT).show();
+
+                                                    TextView dayTitleTextView = null;
+                                                    ImageView optD = null;
+                                                    switch (daySnapshot.getKey()) {
+                                                        case "Day1":
+                                                            dayTitleTextView = ((Activity) context).findViewById(R.id.dayTitle1);
+                                                            optD = ((Activity) context).findViewById(R.id.optD1);
+                                                            break;
+                                                        case "Day2":
+                                                            dayTitleTextView = ((Activity) context).findViewById(R.id.dayTitle2);
+                                                            optD = ((Activity) context).findViewById(R.id.optD2);
+                                                            break;
+                                                        case "Day3":
+                                                            dayTitleTextView = ((Activity) context).findViewById(R.id.dayTitle3);
+                                                            optD = ((Activity) context).findViewById(R.id.optD3);
+                                                            break;
+                                                        case "Day4":
+                                                            dayTitleTextView = ((Activity) context).findViewById(R.id.dayTitle4);
+                                                            optD = ((Activity) context).findViewById(R.id.optD4);
+                                                            break;
+                                                        case "Day5":
+                                                            dayTitleTextView = ((Activity) context).findViewById(R.id.dayTitle5);
+                                                            optD = ((Activity) context).findViewById(R.id.optD5);
+                                                            break;
+                                                        default:
+                                                            break;
+                                                    }
+                                                    if (dayTitleTextView != null) {
+                                                        dayTitleTextView.setVisibility(View.GONE);
+                                                        optD.setVisibility(View.GONE);
+                                                        // Remove the day from the database
+                                                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Itinerary").child(iterName);
+                                                        databaseReference.child(daySnapshot.getKey()).removeValue();
+                                                        // Check if daySnapshot is null
+                                                    }
                                                 }
                                             })
                                             .addOnFailureListener(new OnFailureListener() {
@@ -206,6 +243,31 @@ public class EditItineraryAdapter extends RecyclerView.Adapter<EditItineraryAdap
                                             });
                                 }
                             }
+                            if (daySnapshot.getChildrenCount() > 0) {
+                                noMoreDaysLeft = false; // Set flag to false if there are still days left
+                            }
+                        }
+
+                        // If there are no more days left, delete the entire itinerary
+                        if (noMoreDaysLeft) {
+                            databaseReference.child(iterName).removeValue()
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            // Notify user and handle UI accordingly
+                                            Toast.makeText(context, "There are no more items, Itinerary will be deleted", Toast.LENGTH_SHORT).show();
+
+                                            // Pop back the fragment when the itinerary is deleted
+                                            FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
+                                            fragmentManager.popBackStack();
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Toast.makeText(context, "Itinerary not deleted successfully", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
                         }
                     }
 

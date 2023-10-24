@@ -52,6 +52,7 @@ public class LocationDialogFragment extends DialogFragment {
                 transaction.replace(R.id.fragment_container, addItineraryFragment);
                 transaction.addToBackStack(null); // Optional: Add transaction to back stack
                 transaction.commit();
+                dismiss();
             }
         });
 
@@ -77,6 +78,7 @@ public class LocationDialogFragment extends DialogFragment {
                 transaction.replace(R.id.fragment_container, addGroupItineraryFragment);
                 transaction.addToBackStack(null); // Optional: Add transaction to back stack
                 transaction.commit();
+                dismiss();
             }
         });
 
