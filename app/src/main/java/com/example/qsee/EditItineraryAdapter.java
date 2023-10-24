@@ -1,9 +1,14 @@
 package com.example.qsee;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -58,13 +63,30 @@ public class EditItineraryAdapter extends RecyclerView.Adapter<EditItineraryAdap
         return new EditItineraryViewHolder(view);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull EditItineraryViewHolder holder, int position) {
         // Bind data to your views here
         Itinerary data = dataList.get(position);
-        // Example of setting data to TextViews
         holder.timeTextView.setText(data.getTime());
-        holder.locationTextView.setText(data.getLocation());
+        // Assuming holder.locationTextView is your TextView
+        String location = data.getLocation();
+        String activity = data.getActivity();
+
+        // Creating a SpannableString with the location in bold and activity in italic
+        SpannableString spannableString = new SpannableString(location + "\n" + activity);
+
+        // Setting the span for bold text
+        StyleSpan boldSpan = new StyleSpan(Typeface.BOLD);
+        spannableString.setSpan(boldSpan, 0, location.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        // Setting the span for italic text
+        StyleSpan italicSpan = new StyleSpan(Typeface.ITALIC);
+        spannableString.setSpan(italicSpan, location.length() + 1, location.length() + 1 + activity.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        // Setting the formatted text to the TextView
+        holder.locationTextView.setText(spannableString);
+
     }
 
     @Override

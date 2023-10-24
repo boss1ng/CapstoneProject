@@ -99,7 +99,8 @@ public class UpdateItineraryFragment extends Fragment {
                                     SimpleDateFormat formatter = new SimpleDateFormat("hh:mm a", Locale.getDefault());
                                     String formattedTime = formatter.format(time);
                                     String location = timeSnapshot.child("location").getValue(String.class);
-                                    itineraryList.add(new Itinerary(formattedTime, location));
+                                    String activity = timeSnapshot.child("activity").getValue(String.class);
+                                    itineraryList.add(new Itinerary(formattedTime, location, activity));
                                 }
                             }
                         }
