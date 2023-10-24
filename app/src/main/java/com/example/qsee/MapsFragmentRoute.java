@@ -152,6 +152,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
 
                 // Create a new PlaceDetailDialogFragment and pass the place details as arguments
                 MapsInstructions fragment = new MapsInstructions();
+                //fragment.setCancelable(true);
 
                 // Retrieve selected categories from Bundle arguments
                 Bundle getBundle = getArguments();
@@ -1131,6 +1132,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
 
                         default:
                             // Handle unknown maneuver types or use a default drawable
+                            drawableResource = R.drawable.straight;
                             break;
                     }
                     // Set the selected drawable to the ImageView
@@ -1186,7 +1188,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                     // Format totalDistanceKm with 2 decimal places
                     String formattedDistance = String.format("%.2f", totalDistanceKm);
 
-                    double thresholdDistance = 1.2; // 0.015=15 meters threshold    1.2
+                    double thresholdDistance = 0.015; // 0.015=15 meters threshold    1.2
                     if (totalDistanceKm <= thresholdDistance) {
                         textViewDistance.setText("You have arrived at your destination.");
                         textViewDirection.setVisibility(View.GONE);

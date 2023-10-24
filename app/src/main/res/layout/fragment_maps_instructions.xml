@@ -1,9 +1,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_margin="50dp"
     android:background="#000000"
     android:orientation="vertical">
 
@@ -19,10 +18,14 @@
             android:textStyle="bold"
             tools:text="ROUTES" />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#CCCCCC" />
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="wrap_content" >
 
         <LinearLayout
                 android:id="@+id/instructionsCont"
@@ -30,6 +33,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+<!--
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -39,12 +43,12 @@
                 tools:ignore="MissingConstraints,UselessParent"
                 tools:layout_editor_absoluteX="5dp">
 
-                <!--
+
                         <ListView
                             android:id="@+id/directionsListView"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent" />
--->
+
 
                 <ImageView
                     android:id="@+id/imageViewDirections"
@@ -91,8 +95,8 @@
                         android:visibility="gone" />
                 </LinearLayout>
 
-
             </LinearLayout>
+-->
             </LinearLayout>
     </ScrollView>
 
