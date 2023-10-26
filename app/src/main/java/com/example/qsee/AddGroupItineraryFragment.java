@@ -30,9 +30,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 public class AddGroupItineraryFragment extends Fragment {
@@ -140,6 +144,8 @@ public class AddGroupItineraryFragment extends Fragment {
         });
 
 
+
+
         // Find the "Add Itinerary" button in the default form layout
         ImageView addItineraryButton = view.findViewById(R.id.addItinerary);
         if (addItineraryButton != null) {
@@ -208,12 +214,11 @@ public class AddGroupItineraryFragment extends Fragment {
 
         submitItineraryButton.setOnClickListener(v -> {
             String itineraryName = Objects.requireNonNull(itineraryNameTextInput.getEditText()).getText().toString();
-            String groupName = Objects.requireNonNull(groupNameTextInput.getEditText()).getText().toString();
+            String groupName = Objects.requireNonNull(groupNameTextInput.getEditText().getText().toString());
 
             if (itineraryName.isEmpty()) {
                 Toast.makeText(getContext(), "Please fill in all fields for Day 1", Toast.LENGTH_SHORT).show();
             } else {
-
                 itineraryRef.orderByChild("iterName").equalTo(itineraryName).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -301,18 +306,20 @@ public class AddGroupItineraryFragment extends Fragment {
                                 defaultDayRef.child("date").setValue(defaultDate);
                                 for (int j = 0; j < Objects.requireNonNull(defaultLayoutManager).getChildCount(); j++) {
                                     View itemView = Objects.requireNonNull(defaultLayoutManager).getChildAt(j);
-                                    Log.d("OBJ","ey " + Objects.requireNonNull(defaultLayoutManager).getChildCount());
 
                                     if (itemView != null) {
                                         TextInputLayout timeInputLayout = itemView.findViewById(R.id.timeInput);
                                         TextInputLayout activityInputLayout = itemView.findViewById(R.id.activityInput);
                                         TextInputLayout locationInputLayout = itemView.findViewById(R.id.locationInput);
 
+                                        String standardTime = Objects.requireNonNull(timeInputLayout.getEditText()).getText().toString();
+                                        String militaryTime = convertToMilitaryTime(standardTime); // convert to military time
+
                                         String time = Objects.requireNonNull(timeInputLayout.getEditText()).getText().toString();
                                         String activity = Objects.requireNonNull(activityInputLayout.getEditText()).getText().toString();
                                         String location = Objects.requireNonNull(locationInputLayout.getEditText()).getText().toString();
 
-                                        DatabaseReference itemRef = defaultDayRef.child(time);
+                                        DatabaseReference itemRef = defaultDayRef.child(militaryTime);
                                         itemRef.child("status").setValue("incomplete");
                                         itemRef.child("activity").setValue(activity);
                                         itemRef.child("location").setValue(location);
@@ -336,19 +343,22 @@ public class AddGroupItineraryFragment extends Fragment {
                                             TextInputLayout activityInputLayout = itemView.findViewById(R.id.activityInput);
                                             TextInputLayout locationInputLayout = itemView.findViewById(R.id.locationInput);
 
-                                            String time = Objects.requireNonNull(timeInputLayout.getEditText()).getText().toString();
+                                            String standardTime = Objects.requireNonNull(timeInputLayout.getEditText()).getText().toString();
+                                            String militaryTime = convertToMilitaryTime(standardTime); // convert to military time
+
                                             String activity = Objects.requireNonNull(activityInputLayout.getEditText()).getText().toString();
                                             String location = Objects.requireNonNull(locationInputLayout.getEditText()).getText().toString();
 
                                             DatabaseReference dayRef = userRef.child("Day" + (i + 2));
                                             dayRef.child("date").setValue(date);
-                                            DatabaseReference itemRef = dayRef.child(time);
+                                            DatabaseReference itemRef = dayRef.child(militaryTime);
                                             itemRef.child("status").setValue("incomplete");
                                             itemRef.child("activity").setValue(activity);
                                             itemRef.child("location").setValue(location);
                                         }
                                     }
                                 }
+
 
                                 Toast.makeText(getContext(), "Itinerary saved to Firebase", Toast.LENGTH_SHORT).show();
                                 FragmentManager fragmentManager = getParentFragmentManager();
@@ -364,10 +374,22 @@ public class AddGroupItineraryFragment extends Fragment {
                 });
             }
         });
-
-
-
     }
+
+    private String convertToMilitaryTime(String standardTime) {
+        try {
+            SimpleDateFormat standardFormat = new SimpleDateFormat("hh:mm a", Locale.US);
+            Date date = standardFormat.parse(standardTime);
+            if (date != null) {
+                SimpleDateFormat militaryFormat = new SimpleDateFormat("HH:mm", Locale.US);
+                return militaryFormat.format(date);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return ""; // Return empty string if conversion fails
+    }
+
 
     @SuppressLint("SetTextI18n")
     private void addNewForm(int dayCount) {
