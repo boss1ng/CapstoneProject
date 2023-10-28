@@ -1,5 +1,7 @@
 package com.example.qsee;
 
+import static android.app.PendingIntent.getActivity;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -21,6 +23,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -185,7 +188,6 @@ public class EditItineraryAdapter extends RecyclerView.Adapter<EditItineraryAdap
                 activityQuery.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        boolean noMoreDaysLeft = true;
                         for (DataSnapshot daySnapshot : dataSnapshot.getChildren()) {
                             for (DataSnapshot timeSnapshot : daySnapshot.getChildren()) {
                                 String retrievedLoc = timeSnapshot.child("location").getValue(String.class);
@@ -197,7 +199,7 @@ public class EditItineraryAdapter extends RecyclerView.Adapter<EditItineraryAdap
                                                 public void onSuccess(Void aVoid) {
                                                     dataList.remove(position);
                                                     notifyItemRemoved(position);
-                                                    Toast.makeText(context, "Itinerary deleted", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(context, "Activity deleted", Toast.LENGTH_SHORT).show();
 
                                                     TextView dayTitleTextView = null;
                                                     ImageView optD = null;
@@ -225,13 +227,18 @@ public class EditItineraryAdapter extends RecyclerView.Adapter<EditItineraryAdap
                                                         default:
                                                             break;
                                                     }
-                                                    if (dayTitleTextView != null) {
-                                                        dayTitleTextView.setVisibility(View.GONE);
-                                                        optD.setVisibility(View.GONE);
-                                                        // Remove the day from the database
-                                                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Itinerary").child(iterName);
-                                                        databaseReference.child(daySnapshot.getKey()).removeValue();
-                                                        // Check if daySnapshot is null
+
+
+                                                    // Check if the daySnapshot has only the date and no other child nodes
+                                                    if (daySnapshot.getChildrenCount() == 2) {
+                                                        if (dayTitleTextView != null) {
+                                                            dayTitleTextView.setVisibility(View.GONE);
+                                                            optD.setVisibility(View.GONE);
+                                                            // Remove the day from the database
+                                                            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Itinerary").child(iterName);
+                                                            databaseReference.child(daySnapshot.getKey()).removeValue();
+
+                                                        }
                                                     }
                                                 }
                                             })
@@ -243,32 +250,19 @@ public class EditItineraryAdapter extends RecyclerView.Adapter<EditItineraryAdap
                                             });
                                 }
                             }
-                            if (daySnapshot.getChildrenCount() > 0) {
-                                noMoreDaysLeft = false; // Set flag to false if there are still days left
-                            }
+                        }
+                        if (dataSnapshot.getChildrenCount() == 2) {
+                            // Remove the day from the database
+                            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Itinerary");
+                            databaseReference.child(iterName).removeValue();
+
+                            Toast.makeText(context, "Last activity removed, The Itinerary will be deleted.", Toast.LENGTH_SHORT).show();
+
+                            // Pop back the fragment when the itinerary is deleted
+                            FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
+                            fragmentManager.popBackStack();
                         }
 
-                        // If there are no more days left, delete the entire itinerary
-                        if (noMoreDaysLeft) {
-                            databaseReference.child(iterName).removeValue()
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            // Notify user and handle UI accordingly
-                                            Toast.makeText(context, "There are no more items, Itinerary will be deleted", Toast.LENGTH_SHORT).show();
-
-                                            // Pop back the fragment when the itinerary is deleted
-                                            FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
-                                            fragmentManager.popBackStack();
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Toast.makeText(context, "Itinerary not deleted successfully", Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                        }
                     }
 
                     @Override

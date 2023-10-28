@@ -49,7 +49,18 @@ public class ItineraryAdapter extends RecyclerView.Adapter<ItineraryAdapter.Acti
 
         TimePickerDialog timePickerDialog = new TimePickerDialog(textInputLayout.getContext(),
                 (TimePicker view, int selectedHour, int selectedMinute) -> {
-                    String selectedTime = String.format("%02d:%02d", selectedHour, selectedMinute);
+                    String selectedTime;
+                    if (selectedHour >= 12) {
+                        if (selectedHour > 12) {
+                            selectedHour -= 12;
+                        }
+                        selectedTime = String.format("%02d:%02d PM", selectedHour, selectedMinute);
+                    } else {
+                        if (selectedHour == 0) {
+                            selectedHour = 12;
+                        }
+                        selectedTime = String.format("%02d:%02d AM", selectedHour, selectedMinute);
+                    }
                     if (textInputLayout.getEditText() != null) {
                         textInputLayout.getEditText().setText(selectedTime);
                     }
@@ -57,6 +68,7 @@ public class ItineraryAdapter extends RecyclerView.Adapter<ItineraryAdapter.Acti
 
         timePickerDialog.show();
     }
+
 
 
     @Override

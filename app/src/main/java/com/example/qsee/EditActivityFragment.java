@@ -35,6 +35,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 
 public class EditActivityFragment extends Fragment {
 
@@ -51,6 +52,17 @@ public class EditActivityFragment extends Fragment {
             String location = bundle.getString("location");
             String iterName = bundle.getString("iterName");
 
+
+            TextView EditName = rootView.findViewById(R.id.editAct);
+            EditName.setText("Edit " + location);
+
+            // Find the TextInputLayout for location and set the text
+            TextInputLayout locationTextInputLayout = rootView.findViewById(R.id.locName);
+            locationTextInputLayout.getEditText().setText(location);
+
+            TextInputLayout timeTextInputLayout = rootView.findViewById(R.id.locTime);
+            timeTextInputLayout.getEditText().setText(time);
+
             // Convert the retrieved time to military time format
             try {
                 SimpleDateFormat givenFormat = new SimpleDateFormat("hh:mm a", Locale.US);
@@ -64,19 +76,10 @@ public class EditActivityFragment extends Fragment {
                 e.printStackTrace();
             }
 
-            TextView EditName = rootView.findViewById(R.id.editAct);
-            EditName.setText("Edit " + location);
-
-            // Find the TextInputLayout for location and set the text
-            TextInputLayout locationTextInputLayout = rootView.findViewById(R.id.locName);
-            locationTextInputLayout.getEditText().setText(location);
-
-            TextInputLayout timeTextInputLayout = rootView.findViewById(R.id.locTime);
-            timeTextInputLayout.getEditText().setText(time);
             timeTextInputLayout.getEditText().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    showTimePickerDialog(timeTextInputLayout.getEditText());
+                    showTimePicker(timeTextInputLayout);
                 }
             });
 
@@ -131,10 +134,12 @@ public class EditActivityFragment extends Fragment {
                             String updatedLocation = locationTextInputLayout.getEditText().getText().toString();
 
                             TextInputLayout timeTextInputLayout = rootView.findViewById(R.id.locTime);
-                            String updatedTime = timeTextInputLayout.getEditText().getText().toString();
 
                             TextInputLayout activityTextInputLayout = rootView.findViewById(R.id.locActivity);
                             String updatedActivity = activityTextInputLayout.getEditText().getText().toString();
+
+                            String standardTime = Objects.requireNonNull(timeTextInputLayout.getEditText()).getText().toString();
+                            String militaryTime = convertToMilitaryTime(standardTime); // convert to military time
 
                             // Update the location and time in the database
                             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Itinerary");
@@ -150,7 +155,7 @@ public class EditActivityFragment extends Fragment {
                                                 timeSnapshot.getRef().removeValue();
 
                                                     // Add a new timeSnapshot with the updatedTime as the key
-                                                    DatabaseReference newTimeSnapshot = daySnapshot.child(updatedTime).getRef();
+                                                    DatabaseReference newTimeSnapshot = daySnapshot.child(militaryTime).getRef();
                                                     newTimeSnapshot.child("location").setValue(updatedLocation);
                                                     newTimeSnapshot.child("activity").setValue(updatedActivity);
                                                     newTimeSnapshot.child("status").setValue("incomplete");
@@ -206,21 +211,44 @@ public class EditActivityFragment extends Fragment {
         return rootView;
     }
 
+    private String convertToMilitaryTime(String standardTime) {
+        try {
+            SimpleDateFormat standardFormat = new SimpleDateFormat("hh:mm a", Locale.US);
+            Date date = standardFormat.parse(standardTime);
+            if (date != null) {
+                SimpleDateFormat militaryFormat = new SimpleDateFormat("HH:mm", Locale.US);
+                return militaryFormat.format(date);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return ""; // Return empty string if conversion fails
+    }
+
     // Method to show the time picker dialog
-    private void showTimePickerDialog(final EditText editText) {
-        // Get the current hour and minute
-        Calendar calendar = Calendar.getInstance();
+    private void showTimePicker(TextInputLayout textInputLayout) {
+        final Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
 
-        // Create a new instance of TimePickerDialog and show it
-        TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
-            @Override
-            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                String selectedTime = String.format(Locale.getDefault(), "%02d:%02d", hourOfDay, minute);
-                editText.setText(selectedTime);
-            }
-        }, hour, minute, false);
+        TimePickerDialog timePickerDialog = new TimePickerDialog(textInputLayout.getContext(),
+                (TimePicker view, int selectedHour, int selectedMinute) -> {
+                    String selectedTime;
+                    if (selectedHour >= 12) {
+                        if (selectedHour > 12) {
+                            selectedHour -= 12;
+                        }
+                        selectedTime = String.format("%02d:%02d PM", selectedHour, selectedMinute);
+                    } else {
+                        if (selectedHour == 0) {
+                            selectedHour = 12;
+                        }
+                        selectedTime = String.format("%02d:%02d AM", selectedHour, selectedMinute);
+                    }
+                    if (textInputLayout.getEditText() != null) {
+                        textInputLayout.getEditText().setText(selectedTime);
+                    }
+                }, hour, minute, false);
 
         timePickerDialog.show();
     }
