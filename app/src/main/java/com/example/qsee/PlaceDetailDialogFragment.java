@@ -1,16 +1,12 @@
 package com.example.qsee;
 
-import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,8 +14,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -29,6 +23,7 @@ public class PlaceDetailDialogFragment extends DialogFragment {
 
 
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+
         // Create a new Dialog instance
         Dialog dialog = super.onCreateDialog(savedInstanceState);
 
@@ -49,6 +44,14 @@ public class PlaceDetailDialogFragment extends DialogFragment {
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // Retrieve place details from arguments
+        Bundle getBundle = getArguments();
+
+        if (getBundle != null) {
+            String userID = getBundle.getString("userId");
+            String placeName = getBundle.getString("placeName");
+            Toast.makeText(getContext(), userID, Toast.LENGTH_SHORT).show();
+        }
+
         String placeName = getArguments().getString("placeName");
         String placeAddress = getArguments().getString("placeAddress");
         String placeDescription = getArguments().getString("placeDescription");
@@ -62,6 +65,9 @@ public class PlaceDetailDialogFragment extends DialogFragment {
         String destinationLat = getArguments().getString("destinationLatitude");
         String destinationLong = getArguments().getString("destinationLongitude");
 
+        //String userID = getArguments().getString("userId");
+        //Toast.makeText(getContext(), userID, Toast.LENGTH_SHORT).show();
+
         // Toast.makeText(getContext(), String.valueOf(destinationLat), Toast.LENGTH_LONG).show();
 
         // Populate UI elements with place details
@@ -70,7 +76,8 @@ public class PlaceDetailDialogFragment extends DialogFragment {
         TextView descriptionTextView = view.findViewById(R.id.placeDescriptionTextView);
         TextView ratingTextView = view.findViewById(R.id.placeRatingTextView);
         Button directionsButton = view.findViewById(R.id.directionsButton);
-        ImageButton reportButton = view.findViewById(R.id.reportButton);
+        ImageView reportButton = view.findViewById(R.id.reportButton);
+        reportButton.setImageResource(R.drawable.report);
         ImageView imageViewLocation = view.findViewById(R.id.imageViewLocation);
         TextView priceTextView = view.findViewById(R.id.placePriceTextView);
 
@@ -124,6 +131,21 @@ public class PlaceDetailDialogFragment extends DialogFragment {
                 // Handle report button click here
                 // You can implement the report functionality as needed
                 // For example, open a dialog for reporting the place
+
+                MapsFragmentReportDialog mapsFragmentReportDialog = new MapsFragmentReportDialog();
+
+                if (getBundle != null) {
+                    String userID = getBundle.getString("userId");
+                    String placeName = getBundle.getString("placeName");
+
+                    // Use Bundle to pass values
+                    Bundle bundle = new Bundle();
+                    bundle.putString("userId", userID);
+                    bundle.putString("placeName", placeName);
+                    mapsFragmentReportDialog.setArguments(bundle);
+                }
+
+                mapsFragmentReportDialog.show(getChildFragmentManager(), "MapsFragmentReportDialog");
             }
         });
 

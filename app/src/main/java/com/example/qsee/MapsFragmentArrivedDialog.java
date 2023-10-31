@@ -1,6 +1,5 @@
 package com.example.qsee;
 
-import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
@@ -9,17 +8,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.FragmentContainerView;
 import androidx.fragment.app.FragmentTransaction;
-
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MapsFragmentArrivedDialog extends DialogFragment {
 
@@ -120,5 +114,7 @@ public class MapsFragmentArrivedDialog extends DialogFragment {
 
 
     About sa unstable connection, resulting to pause and not able to refresh anymore, check if Permission is included in the loop.
+
+    Add Stop Routing.
 
  */

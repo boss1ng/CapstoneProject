@@ -9,17 +9,13 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -28,8 +24,16 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -211,9 +215,67 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        // Retrieve selected categories from Bundle arguments
+        Bundle getBundle = getArguments();
 
+        if (getBundle != null) {
+            String userID = getBundle.getString("userId");
+            Toast.makeText(getContext(), userID, Toast.LENGTH_SHORT).show();
+        }
+
+        BottomNavigationView bottomNavigationView = rootView.findViewById(R.id.bottomNavigationView);
+        // Set the default item as highlighted
+        MenuItem defaultItem = bottomNavigationView.getMenu().findItem(R.id.action_profile);
+        defaultItem.setChecked(true);
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int itemId = item.getItemId();
+                if (itemId == R.id.action_home) {
+                    loadFragment(new HomeFragment());
+                    bottomNavigationView.setVisibility(View.GONE);
+                } else if (itemId == R.id.action_search) {
+                    loadFragment(new SearchFragment());
+                    bottomNavigationView.setVisibility(View.GONE);
+                } else if (itemId == R.id.action_maps) {
+                    loadFragment(new MapsFragment());
+                    //BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+                    bottomNavigationView.setVisibility(View.GONE);
+                } else if (itemId == R.id.action_quiz) {
+                    loadFragment(new StartQuizFragment());
+                    bottomNavigationView.setVisibility(View.GONE);
+                } else if (itemId == R.id.action_profile) {
+                    loadFragment(new ProfileFragment());
+                    bottomNavigationView.setVisibility(View.GONE);
+                }
+                return true;
+            }
+        });
 
         return rootView;
+    }
+
+    private void loadFragment(Fragment fragment) {
+        //Bundle bundle = new Bundle();
+        //bundle.putString("userId", userId);
+        //fragment.setArguments(bundle);
+
+        // Use Bundle to pass values
+        Bundle bundle = new Bundle();
+
+        // Retrieve selected categories from Bundle arguments
+        Bundle getBundle = getArguments();
+
+        if (getBundle != null) {
+            String userID = getBundle.getString("userId");
+            bundle.putString("userId", userID);
+            fragment.setArguments(bundle);
+        }
+
+        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
     // Update the notification count in your showNotificationCount method

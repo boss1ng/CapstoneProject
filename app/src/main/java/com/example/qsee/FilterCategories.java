@@ -50,6 +50,14 @@ public class FilterCategories extends DialogFragment {
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         //String categoryName = "Accomodations+Shopping";
 
+        // Retrieve selected categories from Bundle arguments
+        Bundle getBundle = getArguments();
+
+        if (getBundle != null) {
+            String userID = getBundle.getString("userId");
+            Toast.makeText(getContext(), userID, Toast.LENGTH_SHORT).show();
+        }
+
         // For Reading the Database
         // Initialize Firebase Database reference
         // Reference to the "Location" node in Firebase
@@ -59,7 +67,7 @@ public class FilterCategories extends DialogFragment {
         ArrayAdapter<Object> adapter= new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_multiple_choice, categories);
 
         // Retrieve selected categories from Bundle arguments
-        Bundle getBundle = getArguments();
+        //Bundle getBundle = getArguments();
         if (getBundle != null) {
             String categoryName = getBundle.getString("categoryName");
             //Toast.makeText(view.getContext(), categoryName, Toast.LENGTH_SHORT).show();
@@ -250,8 +258,16 @@ public class FilterCategories extends DialogFragment {
                       selectedItem = TextUtils.join("+", selectedItems);
                   }
 
-                  bundle.putString("categoryName", selectedItem);
-                  mapsFragment.setArguments(bundle);
+                  // Retrieve selected categories from Bundle arguments
+                  Bundle getBundle = getArguments();
+
+                  if (getBundle != null) {
+                      String userID = getBundle.getString("userId");
+                      bundle.putString("isVisited", "YES");
+                      bundle.putString("userId", userID);
+                      bundle.putString("categoryName", selectedItem);
+                      mapsFragment.setArguments(bundle);
+                  }
 
                   // Replace the current fragment with the receiving fragment
                   transaction.replace(R.id.fragment_container, mapsFragment);

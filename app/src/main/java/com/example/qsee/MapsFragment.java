@@ -3,21 +3,19 @@ package com.example.qsee;
 import android.Manifest;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Geocoder;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentContainerView;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.common.api.Status;
@@ -27,9 +25,13 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.*;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.*;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.TypeFilter;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
@@ -40,10 +42,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
@@ -66,8 +65,67 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        // Retrieve selected categories from Bundle arguments
+        Bundle getBundle = getArguments();
+
+        if (getBundle != null) {
+            String userID = getBundle.getString("userId");
+            Toast.makeText(getContext(), userID, Toast.LENGTH_SHORT).show();
+            // Toast.makeText(getContext(), getBundle.getString("isVisited"), Toast.LENGTH_SHORT).show();
+        }
+
+        BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
+        // Set the default item as highlighted
+        MenuItem defaultItem = bottomNavigationView.getMenu().findItem(R.id.action_maps);
+        defaultItem.setChecked(true);
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int itemId = item.getItemId();
+                if (itemId == R.id.action_home) {
+                    loadFragment(new HomeFragment());
+                    bottomNavigationView.setVisibility(View.GONE);
+                    LinearLayout layoutFilter = view.findViewById(R.id.filterMenu);
+                    layoutFilter.setVisibility(View.GONE);
+                    FragmentContainerView fragmentContainerView = view.findViewById(R.id.maps);
+                    fragmentContainerView.setVisibility(View.GONE);
+                } else if (itemId == R.id.action_search) {
+                    loadFragment(new SearchFragment());
+                    bottomNavigationView.setVisibility(View.GONE);
+                    LinearLayout layoutFilter = view.findViewById(R.id.filterMenu);
+                    layoutFilter.setVisibility(View.GONE);
+                    FragmentContainerView fragmentContainerView = view.findViewById(R.id.maps);
+                    fragmentContainerView.setVisibility(View.GONE);
+                } else if (itemId == R.id.action_maps) {
+                    loadFragment(new MapsFragment());
+                    //BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+                    bottomNavigationView.setVisibility(View.GONE);
+                    LinearLayout layoutFilter = view.findViewById(R.id.filterMenu);
+                    layoutFilter.setVisibility(View.GONE);
+                    FragmentContainerView fragmentContainerView = view.findViewById(R.id.maps);
+                    fragmentContainerView.setVisibility(View.GONE);
+                } else if (itemId == R.id.action_quiz) {
+                    loadFragment(new StartQuizFragment());
+                    bottomNavigationView.setVisibility(View.GONE);
+                    LinearLayout layoutFilter = view.findViewById(R.id.filterMenu);
+                    layoutFilter.setVisibility(View.GONE);
+                    FragmentContainerView fragmentContainerView = view.findViewById(R.id.maps);
+                    fragmentContainerView.setVisibility(View.GONE);
+                } else if (itemId == R.id.action_profile) {
+                    loadFragment(new ProfileFragment());
+                    bottomNavigationView.setVisibility(View.GONE);
+                    LinearLayout layoutFilter = view.findViewById(R.id.filterMenu);
+                    layoutFilter.setVisibility(View.GONE);
+                    FragmentContainerView fragmentContainerView = view.findViewById(R.id.maps);
+                    fragmentContainerView.setVisibility(View.GONE);
+                }
+                return true;
+            }
+        });
 
         // Initialize the FusedLocationProviderClient
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
@@ -100,7 +158,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         // Set up a PlaceSelectionListener to handle selected places
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
-            public void onPlaceSelected(@NonNull com.google.android.libraries.places.api.model.Place place) {
+            public void onPlaceSelected(@NonNull Place place) {
                 // Handle the selected place
                 LatLng location = place.getLatLng();
                 // Move the camera to the selected place
@@ -142,6 +200,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 if (getBundle != null) {
                     String categoryName = getBundle.getString("categoryName");
                     bundle.putString("categoryName", categoryName);
+
+                    String userID = getBundle.getString("userId");
+                    bundle.putString("userId", userID);
                     fragment.setArguments(bundle);
                 }
 
@@ -152,6 +213,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 BottomNavigationView bottomNavigationView = getView().findViewById(R.id.bottomNavigationView);
                 bottomNavigationView.setVisibility(View.GONE);
 
+
+                //LinearLayout layoutFilter = view.findViewById(R.id.filterMenu);
+                //layoutFilter.setVisibility(View.GONE);
+
+                //FragmentContainerView fragmentContainerView = view.findViewById(R.id.maps);
+                //fragmentContainerView.setVisibility(View.GONE);
+
+
                 // Show the PlaceDetailDialogFragment as a dialog
                 fragment.show(getChildFragmentManager(), "FilterCategories");
 
@@ -160,6 +229,25 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         });
 
         return view;
+    }
+
+    private void loadFragment(Fragment fragment) {
+        // Use Bundle to pass values
+        Bundle bundle = new Bundle();
+
+        // Retrieve selected categories from Bundle arguments
+        Bundle getBundle = getArguments();
+
+        if (getBundle != null) {
+            String userID = getBundle.getString("userId");
+            bundle.putString("userId", userID);
+            fragment.setArguments(bundle);
+        }
+
+        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
     @Override
@@ -179,6 +267,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         // Set the minimum and maximum zoom levels.
         mMap.setMinZoomPreference(minZoomLevel); // Set the minimum desired zoom level.
         mMap.setMaxZoomPreference(maxZoomLevel); // Set the maximum desired zoom level.
+
+        // Get the maximum zoom level available on the map.
+        //float maxZoomLevel = mMap.getMaxZoomLevel();
+
+        // Create a CameraUpdate object to set the zoom level to the maximum.
+        //CameraUpdate zoomOut = CameraUpdateFactory.newLatLngZoom(mMap.getCameraPosition().target, maxZoomLevel);
+
+        // Apply the zoomOut update to the map.
+        //mMap.animateCamera(zoomOut);
 
         // Check if location permission is granted
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
@@ -210,7 +307,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 // mMap.addMarker(new MarkerOptions().position(userLocation).title("Your Location"));
 
                 // Move the camera to the user's location
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
+                //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
             }
         });
 
@@ -228,7 +325,19 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 Bundle bundle = getArguments();
                 if (bundle != null) {
 
+                    String visited = bundle.getString("isVisited");
                     String categoryName = bundle.getString("categoryName");
+
+                    if (visited == "YES") {
+                        Toast.makeText(getContext(), bundle.getString("isVisited"), Toast.LENGTH_SHORT).show();
+
+                        LinearLayout layoutFilter = getView().findViewById(R.id.filterMenu);
+                        layoutFilter.setVisibility(View.GONE);
+
+                        FragmentContainerView fragmentContainerView = getView().findViewById(R.id.maps);
+                        fragmentContainerView.setVisibility(View.GONE);
+                    }
+
                     if (categoryName != "") {
 
                         if (categoryName != null) {
@@ -296,7 +405,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
                                                     // Create a new PlaceDetailDialogFragment and pass the place details as arguments
                                                     PlaceDetailDialogFragment fragment = new PlaceDetailDialogFragment();
+
+                                                    // Use Bundle to pass values
                                                     Bundle args = new Bundle();
+
+                                                    String userID = bundle.getString("userId");
+                                                    args.putString("userId", userID);
+
                                                     args.putString("placeName", marker.getTitle());
                                                     args.putString("placeAddress", parts[0]); // Use the snippet as address
                                                     args.putString("placeRating", parts[1]); // Replace with actual rating
@@ -307,10 +422,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                                                     args.putDouble("userLongitude", currentUserLocationLong);
                                                     args.putString("destinationLatitude", parts[5]);
                                                     args.putString("destinationLongitude", parts[6]);
+
                                                     fragment.setArguments(args);
 
-                                                    BottomNavigationView bottomNavigationView = getView().findViewById(R.id.bottomNavigationView);
-                                                    bottomNavigationView.setVisibility(View.GONE);
+                                                    //BottomNavigationView bottomNavigationView = getView().findViewById(R.id.bottomNavigationView);
+                                                    //bottomNavigationView.setVisibility(View.GONE);
 
                                                     // Show the PlaceDetailDialogFragment as a dialog
                                                     fragment.show(getChildFragmentManager(), "PlaceDetailDialogFragment");
@@ -441,18 +557,29 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
                                 // Create a new PlaceDetailDialogFragment and pass the place details as arguments
                                 PlaceDetailDialogFragment fragment = new PlaceDetailDialogFragment();
+
+                                // Use Bundle to pass values
                                 Bundle args = new Bundle();
-                                args.putString("placeName", marker.getTitle());
-                                args.putString("placeAddress", parts[0]); // Use the snippet as address
-                                args.putString("placeRating", parts[1]); // Replace with actual rating
-                                args.putString("placeDescription", parts[2]);
-                                args.putString("placeLink", parts[3]);
-                                args.putString("placePrice", parts[4]);
-                                args.putDouble("userLatitude", currentUserLocationLat);
-                                args.putDouble("userLongitude", currentUserLocationLong);
-                                args.putString("destinationLatitude", parts[5]);
-                                args.putString("destinationLongitude", parts[6]);
-                                fragment.setArguments(args);
+
+                                // Retrieve place details from arguments
+                                Bundle getBundle = getArguments();
+
+                                if (getBundle != null) {
+                                    String userID = getBundle.getString("userId");
+                                    args.putString("userId", userID);
+
+                                    args.putString("placeName", marker.getTitle());
+                                    args.putString("placeAddress", parts[0]); // Use the snippet as address
+                                    args.putString("placeRating", parts[1]); // Replace with actual rating
+                                    args.putString("placeDescription", parts[2]);
+                                    args.putString("placeLink", parts[3]);
+                                    args.putString("placePrice", parts[4]);
+                                    args.putDouble("userLatitude", currentUserLocationLat);
+                                    args.putDouble("userLongitude", currentUserLocationLong);
+                                    args.putString("destinationLatitude", parts[5]);
+                                    args.putString("destinationLongitude", parts[6]);
+                                    fragment.setArguments(args);
+                                }
 
                                 // Show the PlaceDetailDialogFragment as a dialog
                                 fragment.show(getChildFragmentManager(), "PlaceDetailDialogFragment");

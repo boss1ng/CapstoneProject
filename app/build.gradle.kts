@@ -90,6 +90,16 @@ dependencies {
     // ImageView from Firebase
     implementation ("com.squareup.picasso:picasso:2.71828")
 
+    // FirebaseStorage
+    // Import the BoM for the Firebase platform
+    implementation(platform("com.google.firebase:firebase-bom:32.4.1"))
+
+    // Add the dependency for the Cloud Storage library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation("com.google.firebase:firebase-storage")
+
+    // classpath 'com.google.gms:google-services:4.3.10' // Replace with the latest version
+
     // implementation("androidx.fragment:fragment:1.5.0")
 
     // implementation("com.google.android.gms:play-services-maps:17.0.0")

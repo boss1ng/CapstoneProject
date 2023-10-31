@@ -8,12 +8,12 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -24,25 +24,22 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.*;
-import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.*;
-import com.google.android.libraries.places.api.net.PlacesClient;
-import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
-import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.android.gms.maps.model.Dash;
+import com.google.android.gms.maps.model.Gap;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PatternItem;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -78,6 +75,35 @@ public class MapsFragmentConfirmation extends Fragment implements OnMapReadyCall
         View view = inflater.inflate(R.layout.fragment_maps_confirmation, container, false);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
+        // Set the default item as highlighted
+        MenuItem defaultItem = bottomNavigationView.getMenu().findItem(R.id.action_maps);
+        defaultItem.setChecked(true);
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int itemId = item.getItemId();
+                if (itemId == R.id.action_home) {
+                    loadFragment(new HomeFragment());
+                    bottomNavigationView.setVisibility(View.GONE);
+                } else if (itemId == R.id.action_search) {
+                    loadFragment(new SearchFragment());
+                    bottomNavigationView.setVisibility(View.GONE);
+                } else if (itemId == R.id.action_maps) {
+                    loadFragment(new MapsFragment());
+                    //BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+                    bottomNavigationView.setVisibility(View.GONE);
+                } else if (itemId == R.id.action_quiz) {
+                    loadFragment(new StartQuizFragment());
+                    bottomNavigationView.setVisibility(View.GONE);
+                } else if (itemId == R.id.action_profile) {
+                    loadFragment(new ProfileFragment());
+                    bottomNavigationView.setVisibility(View.GONE);
+                }
+                return true;
+            }
+        });
+
         // Initialize the FusedLocationProviderClient
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
 
@@ -101,7 +127,7 @@ public class MapsFragmentConfirmation extends Fragment implements OnMapReadyCall
             mapFragment.getMapAsync(this);
         }
 
-        BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
+        //BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setVisibility(View.GONE);
 
         Button cancelButton = view.findViewById(R.id.btnCancel);
@@ -113,6 +139,21 @@ public class MapsFragmentConfirmation extends Fragment implements OnMapReadyCall
                 FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
 
                 MapsFragment mapsFragment = new MapsFragment();
+
+                // Use Bundle to pass values
+                Bundle bundle = new Bundle();
+
+                // Retrieve selected categories from Bundle arguments
+                Bundle getBundle = getArguments();
+
+                if (getBundle != null) {
+                    String userID = getBundle.getString("userId");
+                    bundle.putString("userId", userID);
+                    mapsFragment.setArguments(bundle);
+                }
+
+                //BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
+                bottomNavigationView.setVisibility(View.GONE);
 
                 // Replace the current fragment with the receiving fragment
                 transaction.replace(R.id.fragment_container, mapsFragment);
@@ -147,7 +188,7 @@ public class MapsFragmentConfirmation extends Fragment implements OnMapReadyCall
                 LinearLayout linearLayoutButtons = getView().findViewById(R.id.layoutButtons);
                 linearLayoutButtons.setVisibility(View.GONE);
 
-                BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
+                //BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
                 bottomNavigationView.setVisibility(View.GONE);
 
                 // Replace the current fragment with the receiving fragment
@@ -158,9 +199,30 @@ public class MapsFragmentConfirmation extends Fragment implements OnMapReadyCall
 
         });
 
-
-
         return view;
+    }
+
+    private void loadFragment(Fragment fragment) {
+        //Bundle bundle = new Bundle();
+        //bundle.putString("userId", userId);
+        //fragment.setArguments(bundle);
+
+        // Use Bundle to pass values
+        Bundle bundle = new Bundle();
+
+        // Retrieve selected categories from Bundle arguments
+        Bundle getBundle = getArguments();
+
+        if (getBundle != null) {
+            String userID = getBundle.getString("userId");
+            bundle.putString("userId", userID);
+            fragment.setArguments(bundle);
+        }
+
+        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
     @SuppressLint("PotentialBehaviorOverride")

@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Html;
@@ -12,17 +11,15 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,13 +30,27 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MapsInstructions extends DialogFragment {
 
 
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+        /*
+        // Retrieve the screen resolution
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        WindowManager windowManager = (WindowManager) requireContext().getSystemService(Context.WINDOW_SERVICE);
+        if (windowManager != null) {
+            windowManager.getDefaultDisplay().getMetrics(displayMetrics);
+            int screenWidth = displayMetrics.widthPixels;
+            int screenHeight = displayMetrics.heightPixels;
+
+            ScrollView scrollView = new ScrollView(getActivity());
+            scrollView.setLayoutParams(new ScrollView.LayoutParams(
+                    screenWidth - 50, screenHeight - 100
+            ));
+        }
+         */
 
         setCancelable(true);
 
@@ -54,6 +65,8 @@ public class MapsInstructions extends DialogFragment {
         dialog.getWindow().setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
         //dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
+
+
         return dialog;
     }
     @Nullable
@@ -64,6 +77,69 @@ public class MapsInstructions extends DialogFragment {
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         //setCancelable(true); // Allow canceling on outside click
+
+        Button btnStopRoute = view.findViewById(R.id.btnStop);
+        btnStopRoute.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dismiss(); // Dismiss the dialog
+
+                // In the fragment or activity where you want to navigate
+                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+
+                MapsFragment mapsFragment = new MapsFragment();
+
+                /*
+                BottomNavigationView bottomNavigationView = getView().findViewById(R.id.bottomNavigationView);
+                bottomNavigationView.setVisibility(View.GONE);
+
+                LinearLayout llFilter = getView().findViewById(R.id.filterMenu);
+                llFilter.setVisibility(View.GONE);
+
+                LinearLayout llLoc = getView().findViewById(R.id.directionsCont);
+                llLoc.setVisibility(View.GONE);
+
+                LinearLayout llButt = getView().findViewById(R.id.overviewCont);
+                llButt.setVisibility(View.GONE);
+                 */
+
+                /*
+                    // Retrieve selected categories from Bundle arguments
+                    Bundle getBundle = getArguments();
+
+                    if (getBundle != null) {
+                        String isStop = getBundle.getString("isStop");
+                        if (isStop.equals("STOP")) {
+
+                            Toast.makeText(getContext(), "STOPPED", Toast.LENGTH_SHORT).show();
+
+                            BottomNavigationView bottomNavigationView = getView().findViewById(R.id.bottomNavigationView);
+                            bottomNavigationView.setVisibility(View.GONE);
+
+                            LinearLayout llFilter = getView().findViewById(R.id.filterMenu);
+                            llFilter.setVisibility(View.GONE);
+
+                            LinearLayout llLoc = getView().findViewById(R.id.directionsCont);
+                            llLoc.setVisibility(View.GONE);
+
+                            LinearLayout llButt = getView().findViewById(R.id.overviewCont);
+                            llButt.setVisibility(View.GONE);
+                        }
+                    }
+                 */
+
+                // Use Bundle to pass values
+                Bundle bundle = new Bundle();
+                bundle.putString("isStop", "STOP");
+                mapsFragment.setArguments(bundle);
+
+                // Replace the current fragment with the receiving fragment
+                transaction.replace(R.id.fragment_container, mapsFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+        });
 
         // Retrieve selected categories from Bundle arguments
         Bundle getBundle = getArguments();
@@ -95,6 +171,8 @@ public class MapsInstructions extends DialogFragment {
             DirectionsTask directionsTask = new DirectionsTask(url);
             directionsTask.execute();
         }
+
+
 
         /*
         LinearLayout dynamicLayoutContainer = view.findViewById(R.id.instructionsCont); // Replace with your container ID
@@ -205,110 +283,6 @@ public class MapsInstructions extends DialogFragment {
                 String status = jsonResponse.getString("status");
                 if (status.equals("OK")) {
                     JSONArray routes = jsonResponse.getJSONArray("routes");
-
-                    /*
-                    // Extract the numerical value from the distance string
-                    double distanceValue = Double.parseDouble(distanceSample.replaceAll("[^0-9.]+", ""));
-
-                    if (distanceSample.contains("km") && distanceValue < 1.0) {
-                        // Convert the distance to meters
-                        int meters = (int) (distanceValue * 1000);
-                        String distanceInMeters = meters + " m";
-                        // Use distanceInMeters as needed
-                        textViewDistance.setText(distanceInMeters);
-                    } else {
-                        // Use the original distance string (it's already in meters or more than 1 km)
-                        textViewDistance.setText(distanceSample);
-                    }
-                     */
-
-
-                    /*
-                    // Get the maneuver from your API response
-                    // Retrieve maneuver if it's present, or provide a default value
-                    //String maneuverType = stepSamp.optString("maneuver", "No Maneuver");
-                    String maneuverType = null;
-                    //Toast.makeText(getContext(), maneuverType, Toast.LENGTH_LONG).show();
-
-                    // Create a variable to store the drawable resource ID
-                    int drawableResource = R.drawable.straight; // Default drawable
-
-                    // Map maneuver types to corresponding drawable resource IDs
-                    switch (maneuverType) {
-                        case "keep-left":
-                            drawableResource = R.drawable.keep_left;
-                            break;
-                        case "keep-right":
-                            drawableResource = R.drawable.keep_right;
-                            break;
-                        case "ferry":
-                            drawableResource = R.drawable.ferry;
-                            break;
-                        case "ferry-train":
-                            drawableResource = R.drawable.ferry_train;
-                            break;
-                        case "fork-left":
-                            drawableResource = R.drawable.fork_left;
-                            break;
-                        case "fork-right":
-                            drawableResource = R.drawable.fork_right;
-                            break;
-                        case "merge":
-                            drawableResource = R.drawable.merge;
-                            break;
-                        case "ramp-left":
-                            drawableResource = R.drawable.ramp_left;
-                            break;
-                        case "ramp-right":
-                            drawableResource = R.drawable.ramp_right;
-                            break;
-                        case "roundabout-left":
-                            drawableResource = R.drawable.roundabout_left;
-                            break;
-                        case "roundabout-right":
-                            drawableResource = R.drawable.roundabout_right;
-                            break;
-                        case "straight":
-                            drawableResource = R.drawable.straight;
-                            break;
-                        case "turn-right":
-                            drawableResource = R.drawable.turn_right;
-                            break;
-                        case "turn-left":
-                            drawableResource = R.drawable.turn_left;
-                            break;
-                        case "turn-sharp-right":
-                            drawableResource = R.drawable.turn_sharp_right;
-                            break;
-                        case "turn-sharp-left":
-                            drawableResource = R.drawable.turn_sharp_left;
-                            break;
-                        case "turn-slight-right":
-                            drawableResource = R.drawable.turn_slight_right;
-                            break;
-                        case "turn-slight-left":
-                            drawableResource = R.drawable.turn_slight_left;
-                            break;
-                        case "uturn-right":
-                            drawableResource = R.drawable.uturn_right;
-                            break;
-                        case "uturn-left":
-                            drawableResource = R.drawable.uturn_left;
-                            break;
-
-                        default:
-                            // Handle unknown maneuver types or use a default drawable
-                            break;
-                    }
-
-                    // Set the selected drawable to the ImageView
-                    imageViewDirections.setImageResource(drawableResource);
-                     */
-
-
-
-
-
 
                     LinearLayout dynamicLayoutContainer = getView().findViewById(R.id.instructionsCont); // Replace with your container ID
 
@@ -448,7 +422,21 @@ public class MapsInstructions extends DialogFragment {
                                             LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
                                     ));
                                     //textView1.setText("Text1");
-                                    textView1.setText(distance);
+                                    //textView1.setText(distance);
+                                    // Extract the numerical value from the distance string
+                                    double distanceValue = Double.parseDouble(distance.replaceAll("[^0-9.]+", ""));
+
+                                    if (distance.contains("km") && distanceValue < 1.0) {
+                                        // Convert the distance to meters
+                                        int meters = (int) (distanceValue * 1000);
+                                        String distanceInMeters = meters + " m";
+                                        // Use distanceInMeters as needed
+                                        textView1.setText(distanceInMeters);
+                                    } else {
+                                        // Use the original distance string (it's already in meters or more than 1 km)
+                                        textView1.setText(distance);
+                                    }
+
                                     textView1.setTextColor(Color.WHITE); // Set the text color to white
                                     textView1.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD)); // Make it bold
                                     textView1.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16); // Set font size to 16sp

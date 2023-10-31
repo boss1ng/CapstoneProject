@@ -105,21 +105,23 @@
             tools:ignore="SpeakableTextPresentCheck" />
     </FrameLayout>
 
+<!--
+    android:layout_marginBottom="130dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    bottomNavigationView
+-->
+
     <ScrollView
         android:layout_width="409dp"
         android:layout_height="488dp"
-        android:layout_marginBottom="130dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/infoContainer"
         app:layout_constraintVertical_bias="0.0">
 
         <LinearLayout
-            android:paddingTop="10dp"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp"
-            android:paddingBottom="5dp"
+            android:layout_margin="10dp"
             android:id="@+id/feedDisplayLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -129,9 +131,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="#efefef">
-
                 >
-
 
                 <ImageView
                     android:id="@+id/imageView15"
@@ -185,10 +185,16 @@
             </FrameLayout>
         </LinearLayout>
 
-
-
-
-
     </ScrollView>
+
+    <!-- Bottom Navigation View -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:menu="@menu/bottom_navigation_menu"
+        app:layout_constraintBottom_toBottomOf="parent">
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
