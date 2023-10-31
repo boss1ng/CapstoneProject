@@ -3,20 +3,44 @@
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
-    android:layout_marginTop="50dp"
-    android:layout_marginLeft="20dp"
-    android:layout_marginRight="20dp">
+    android:layout_margin="20dp">
 
-        <ImageView
-            android:id="@+id/reportButton"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_gravity="right"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
-            android:backgroundTint="#FFFFFF"
-            android:src="@android:drawable/btn_star"
-            tools:src="@android:drawable/ic_menu_info_details" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_weight="1"
+                    android:layout_margin="5dp"
+                    >
+
+                        <ImageView
+                            android:id="@+id/exitPlaceDetails"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:src="@android:drawable/btn_star"
+                            tools:src="@android:drawable/ic_menu_info_details" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_margin="5dp"
+                    >
+
+                        <ImageView
+                            android:id="@+id/reportButton"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:src="@android:drawable/btn_star"
+                            tools:src="@android:drawable/ic_menu_info_details" />
+                </LinearLayout>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"

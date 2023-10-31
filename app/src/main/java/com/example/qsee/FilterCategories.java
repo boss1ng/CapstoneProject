@@ -2,6 +2,9 @@ package com.example.qsee;
 
 import android.app.Dialog;
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.SparseBooleanArray;
@@ -11,11 +14,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -30,6 +37,12 @@ import java.util.List;
 
 public class FilterCategories extends DialogFragment {
 
+    private Bitmap screenshotMapView;
+
+    public FilterCategories(Bitmap screenshotMap) {
+        this.screenshotMapView = screenshotMap;
+    }
+
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         // Create a new Dialog instance
@@ -39,7 +52,10 @@ public class FilterCategories extends DialogFragment {
         dialog.setContentView(R.layout.fragment_filter_categories);
 
         // Customize the width of the dialog (75% of screen width)
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+
+        // Remove any margin
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
 
         return dialog;
     }
@@ -49,6 +65,12 @@ public class FilterCategories extends DialogFragment {
         View view = inflater.inflate(R.layout.fragment_filter_categories, container, false);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         //String categoryName = "Accomodations+Shopping";
+
+        //ImageView imageView = view.findViewById(R.id.screenshotRootView);
+        //imageView.setImageBitmap(screenshotRootView);
+
+        ImageView imageView1 = view.findViewById(R.id.screenshotMapView);
+        imageView1.setImageBitmap(screenshotMapView);
 
         // Retrieve selected categories from Bundle arguments
         Bundle getBundle = getArguments();
@@ -201,81 +223,89 @@ public class FilterCategories extends DialogFragment {
             });
         }
 
-
-
+/*
         // Customize the dialog's appearance and position
         Window window = getDialog().getWindow();
         if (window != null) {
             window.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
-                // window.setGravity(Gravity.TOP | Gravity.START);
-            window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            // window.setGravity(Gravity.TOP | Gravity.START);
+            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
-            /*
+            /
             WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
             layoutParams.copyFrom(window.getAttributes());
             layoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
             layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT; // Adjust as needed
             layoutParams.gravity = Gravity.START; // Optional: Set gravity to your preference
             window.setAttributes(layoutParams);
-             */
+             /
         }
-
-
+*/
 
         ImageButton backButton = view.findViewById(R.id.backButton);
         backButton.setOnClickListener(new View.OnClickListener() {
-              @Override
-              public void onClick(View v) {
-                  dismiss();
+            @Override
+            public void onClick(View v) {
+                dismiss();
 
-                  // In the fragment or activity where you want to navigate
-                  FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+                // In the fragment or activity where you want to navigate
+                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
 
-                  MapsFragment mapsFragment = new MapsFragment();
+                MapsFragment mapsFragment = new MapsFragment();
 
-                  // Retrieve the selected categories
-                  SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
-                  ArrayList<String> selectedItems = new ArrayList<>();
+                // Retrieve the selected categories
+                SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
+                ArrayList<String> selectedItems = new ArrayList<>();
 
-                  // Concatenate selected categories
-                  String selectedItem = "";
+                // Concatenate selected categories
+                String selectedItem = "";
 
-                  // Use Bundle to pass values
-                  Bundle bundle = new Bundle();
-                  for (int i = 0; i < checkedItems.size(); i++) {
-                      int position = checkedItems.keyAt(i); // Get the position of the checked item
-                      boolean isChecked = checkedItems.valueAt(i); // Get whether the item is checked
+                // Use Bundle to pass values
+                Bundle bundle = new Bundle();
+                for (int i = 0; i < checkedItems.size(); i++) {
+                    int position = checkedItems.keyAt(i); // Get the position of the checked item
+                    boolean isChecked = checkedItems.valueAt(i); // Get whether the item is checked
 
-                      if (isChecked) {
-                          String category = (String) categories.get(position); // Replace with your list of categories
-                          //category += "+";
-                          selectedItems.add(category); // Add selected category to the list
-                      }
-                  }
+                    if (isChecked) {
+                        String category = (String) categories.get(position); // Replace with your list of categories
+                        //category += "+";
+                        selectedItems.add(category); // Add selected category to the list
+                    }
+                }
 
-                  // Concatenate the selected categories into a single string
-                  if (!selectedItems.isEmpty()) {
-                      selectedItem = TextUtils.join("+", selectedItems);
-                  }
+                // Concatenate the selected categories into a single string
+                if (!selectedItems.isEmpty()) {
+                    selectedItem = TextUtils.join("+", selectedItems);
+                }
 
-                  // Retrieve selected categories from Bundle arguments
-                  Bundle getBundle = getArguments();
+                // Retrieve selected categories from Bundle arguments
+                Bundle getBundle = getArguments();
 
-                  if (getBundle != null) {
-                      String userID = getBundle.getString("userId");
-                      bundle.putString("isVisited", "YES");
-                      bundle.putString("userId", userID);
-                      bundle.putString("categoryName", selectedItem);
-                      mapsFragment.setArguments(bundle);
-                  }
+                if (getBundle != null) {
+                    String userID = getBundle.getString("userId");
+                    bundle.putString("isVisited", "YES");
+                    bundle.putString("userId", userID);
+                    bundle.putString("categoryName", selectedItem);
+                    mapsFragment.setArguments(bundle);
+                }
 
-                  // Replace the current fragment with the receiving fragment
-                  transaction.replace(R.id.fragment_container, mapsFragment);
-                  transaction.addToBackStack(null);
-                  transaction.commit();
+                //FrameLayout frameLayout = view.findViewById(R.id.parent_container);
+                //frameLayout.setVisibility(View.GONE);
 
-              }
+                //ConstraintLayout constraintLayout = view.findViewById(R.id.fragment_container);
+                //constraintLayout.setVisibility(View.GONE);
+
+                //LinearLayout linearLayout = view.findViewById(R.id.filterContainer);
+                //linearLayout.setVisibility(View.GONE);
+
+
+                // Replace the current fragment with the receiving fragment
+                transaction.replace(R.id.fragment_container, mapsFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
         });
+
 
         return view;
     }

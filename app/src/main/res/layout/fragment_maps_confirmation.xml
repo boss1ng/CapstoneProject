@@ -1,40 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/constraintParent"
     android:background="#4B849D">
 
-    <!-- Map Fragment -->
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/maps"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+    <LinearLayout
+        android:id="@+id/filterMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#FFFFFF"
+        tools:ignore="MissingConstraints"
+        >
 
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="80dp"
-        android:layout_marginRight="15dp"
-        android:layout_marginBottom="20dp"
+        <ImageButton
+            android:id="@+id/filterMenuBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FFFFFF"
+            android:src="@android:drawable/ic_menu_sort_by_size"
+            android:contentDescription="TODO" />
 
-        android:paddingBottom="60dp"
+    </LinearLayout>
 
-        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-    </androidx.fragment.app.FragmentContainerView>
 
     <LinearLayout
         android:id="@+id/layoutLocation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
+        android:layout_marginTop="20dp"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@id/maps"
+        app:layout_constraintTop_toBottomOf="@id/filterMenu"
         tools:ignore="MissingConstraints">
 
         <TextView
@@ -46,6 +47,27 @@
             android:textSize="22sp"
             android:textStyle="bold" />
     </LinearLayout>
+
+    <!-- Map Fragment -->
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/maps"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginBottom="20dp"
+
+        android:paddingBottom="60dp"
+
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layoutLocation">
+
+    </androidx.fragment.app.FragmentContainerView>
 
     <LinearLayout
         android:id="@+id/layoutButtons"
