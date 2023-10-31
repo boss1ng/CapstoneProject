@@ -12,7 +12,7 @@
 
         <TextView
             android:id="@+id/locName"
-            android:layout_width="300dp"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:gravity="left"
             android:text="Itinerary"
@@ -20,7 +20,22 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.207"
+            app:layout_constraintHorizontal_bias="0.109"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.009" />
+
+        <TextView
+            android:id="@+id/groupName"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:text="GroupName"
+            android:textSize="20dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.938"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.009" />

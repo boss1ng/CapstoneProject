@@ -54,6 +54,7 @@ public class UpdateItineraryFragment extends Fragment {
     private void setLocNameFromFirebase(String locationName) {
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Itinerary");
         databaseReference.orderByChild("iterName").equalTo(locationName).addListenerForSingleValueEvent(new ValueEventListener() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Date startDate = null;
@@ -63,6 +64,12 @@ public class UpdateItineraryFragment extends Fragment {
                     TextView locNameTextView = requireView().findViewById(R.id.locName);
                     String capitalizedLocName = iterName.substring(0, 1).toUpperCase() + iterName.substring(1);
                     locNameTextView.setText(capitalizedLocName);
+
+                    String groupName = childSnapshot.child("groupName").getValue(String.class);
+
+                    if (groupName != null){
+                        locNameTextView.setText(capitalizedLocName+ " - "+groupName);
+                    }
 
                     for (int i = 1; i <= 5; i++) {
                         String dayKey = "Day" + i;
