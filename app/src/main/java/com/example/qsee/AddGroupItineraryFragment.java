@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -174,11 +175,21 @@ public class AddGroupItineraryFragment extends Fragment {
 
         deleteActivityButton.setOnClickListener(v -> {
             if (addCounter[0] > 0) {
-                int lastIndex = dayItineraryAdapter.getItemCount() - 1;
-                if (lastIndex >= 0) {
-                    dayItineraryAdapter.removeItem(lastIndex);
-                    addCounter[0]--;
-                }
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setMessage("Are you sure you want to delete an activity?");
+                builder.setPositiveButton("Yes", (dialog, which) -> {
+                    int lastIndex = dayItineraryAdapter.getItemCount() - 1;
+                    if (lastIndex >= 0) {
+                        dayItineraryAdapter.removeItem(lastIndex);
+                        addCounter[0]--;
+                    }
+                });
+                builder.setNegativeButton("No", (dialog, which) -> {
+                    // If user cancels the deletion, dismiss the dialog
+                    dialog.dismiss();
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
             }
         });
 
@@ -254,6 +265,10 @@ public class AddGroupItineraryFragment extends Fragment {
         submitItineraryButton.setOnClickListener(v -> {
             String itineraryName = Objects.requireNonNull(itineraryNameTextInput.getEditText()).getText().toString();
             String groupName = Objects.requireNonNull(groupNameTextInput.getEditText().getText().toString());
+            groupsRef.child(groupName).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
 
             if (itineraryName.isEmpty()) {
                 Toast.makeText(getContext(), "Please fill in all fields for Day 1", Toast.LENGTH_SHORT).show();
@@ -278,7 +293,6 @@ public class AddGroupItineraryFragment extends Fragment {
                                 for (int j = 0; j < 5; j++) {
                                     assert defaultLayoutManager != null;
                                     View itemView = defaultLayoutManager.getChildAt(j);
-                                    Log.d("Kinuha ko ang","eto" + defaultLayoutManager.getChildAt(j));
 
                                     if (itemView != null) {
                                         TextInputLayout timeInputLayout = itemView.findViewById(R.id.timeInput);
@@ -412,6 +426,17 @@ public class AddGroupItineraryFragment extends Fragment {
                     }
                 });
             }
+                    } else {
+                        Toast.makeText(getContext(), "Group with the name " + groupName + " does not exist.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    // Handle potential errors that may occur during the database query
+                    Log.e("GroupCheck", "Error checking group name: " + databaseError.getMessage());
+                }
+            });
         });
     }
 
@@ -551,11 +576,21 @@ public class AddGroupItineraryFragment extends Fragment {
 
             deleteActivityButton.setOnClickListener(v -> {
                 if (addCounter[0] > 0) {
-                    int lastIndex = dayItineraryAdapter.getItemCount() - 1;
-                    if (lastIndex >= 0) {
-                        dayItineraryAdapter.removeItem(lastIndex);
-                        addCounter[0]--;
-                    }
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setMessage("Are you sure you want to delete an activity?");
+                    builder.setPositiveButton("Yes", (dialog, which) -> {
+                        int lastIndex = dayItineraryAdapter.getItemCount() - 1;
+                        if (lastIndex >= 0) {
+                            dayItineraryAdapter.removeItem(lastIndex);
+                            addCounter[0]--;
+                        }
+                    });
+                    builder.setNegativeButton("No", (dialog, which) -> {
+                        // If user cancels the deletion, dismiss the dialog
+                        dialog.dismiss();
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
                 }
             });
 

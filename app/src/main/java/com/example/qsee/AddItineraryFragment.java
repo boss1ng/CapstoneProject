@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -134,13 +135,24 @@ public class AddItineraryFragment extends Fragment {
 
         deleteActivityButton.setOnClickListener(v -> {
             if (addCounter[0] > 0) {
-                int lastIndex = dayItineraryAdapter.getItemCount() - 1;
-                if (lastIndex >= 0) {
-                    dayItineraryAdapter.removeItem(lastIndex);
-                    addCounter[0]--;
-                }
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setMessage("Are you sure you want to delete an activity?");
+                builder.setPositiveButton("Yes", (dialog, which) -> {
+                    int lastIndex = dayItineraryAdapter.getItemCount() - 1;
+                    if (lastIndex >= 0) {
+                        dayItineraryAdapter.removeItem(lastIndex);
+                        addCounter[0]--;
+                    }
+                });
+                builder.setNegativeButton("No", (dialog, which) -> {
+                    // If user cancels the deletion, dismiss the dialog
+                    dialog.dismiss();
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
             }
         });
+
 
 
 
@@ -509,11 +521,21 @@ public class AddItineraryFragment extends Fragment {
 
             deleteActivityButton.setOnClickListener(v -> {
                 if (addCounter[0] > 0) {
-                    int lastIndex = dayItineraryAdapter.getItemCount() - 1;
-                    if (lastIndex >= 0) {
-                        dayItineraryAdapter.removeItem(lastIndex);
-                        addCounter[0]--;
-                    }
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setMessage("Are you sure you want to delete an activity?");
+                    builder.setPositiveButton("Yes", (dialog, which) -> {
+                        int lastIndex = dayItineraryAdapter.getItemCount() - 1;
+                        if (lastIndex >= 0) {
+                            dayItineraryAdapter.removeItem(lastIndex);
+                            addCounter[0]--;
+                        }
+                    });
+                    builder.setNegativeButton("No", (dialog, which) -> {
+                        // If user cancels the deletion, dismiss the dialog
+                        dialog.dismiss();
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
                 }
             });
 
