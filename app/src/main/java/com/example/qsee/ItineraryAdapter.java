@@ -4,6 +4,8 @@ import android.app.TimePickerDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
@@ -11,6 +13,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -96,19 +103,18 @@ public class ItineraryAdapter extends RecyclerView.Adapter<ItineraryAdapter.Acti
     static class ActivityViewHolder extends RecyclerView.ViewHolder {
         private TextInputLayout timeInputLayout;
         private TextInputLayout activityInputLayout;
-        private TextInputLayout locationInputLayout;
+        private TextInputLayout locationInputLayout; // Changed to TextInputLayout
 
         public ActivityViewHolder(@NonNull View itemView) {
             super(itemView);
             timeInputLayout = itemView.findViewById(R.id.timeInput);
             activityInputLayout = itemView.findViewById(R.id.activityInput);
-            locationInputLayout = itemView.findViewById(R.id.locationInput);
+            locationInputLayout = itemView.findViewById(R.id.locationInput); // Changed to TextInputLayout
         }
 
         public void bind(ItineraryItem item) {
             TextInputEditText timeEditText = (TextInputEditText) timeInputLayout.getEditText();
             TextInputEditText activityEditText = (TextInputEditText) activityInputLayout.getEditText();
-            TextInputEditText locationEditText = (TextInputEditText) locationInputLayout.getEditText();
 
             if (timeEditText != null) {
                 if (timeEditText.getText().toString().isEmpty()) {
@@ -122,11 +128,44 @@ public class ItineraryAdapter extends RecyclerView.Adapter<ItineraryAdapter.Acti
                 }
             }
 
-            if (locationEditText != null) {
-                if (locationEditText.getText().toString().isEmpty()) {
-                    locationEditText.setText(item.getLocation());
+            // Getting text from AutoCompleteTextView directly
+            if (locationInputLayout.getEditText() instanceof AutoCompleteTextView) {
+                AutoCompleteTextView locationAutoCompleteTextView = (AutoCompleteTextView) locationInputLayout.getEditText(); // Get the AutoCompleteTextView
+                String locationText = locationAutoCompleteTextView.getText().toString(); // Get the text from AutoCompleteTextView
+
+                // Fetch data from Firebase Realtime Database
+                DatabaseReference locationsRef = FirebaseDatabase.getInstance().getReference().child("Location");
+                locationsRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        List<String> locationsList = new ArrayList<>();
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            String Location = snapshot.child("Location").getValue(String.class);
+                            locationsList.add(Location);
+                        }
+
+                        // Set up the adapter for the AutoCompleteTextView
+                        ArrayAdapter<String> adapter = new ArrayAdapter<>(locationAutoCompleteTextView.getContext(), android.R.layout.simple_dropdown_item_1line, locationsList);
+                        locationAutoCompleteTextView.setAdapter(adapter);
+
+                        // Set the existing location text
+                        String locationText = locationAutoCompleteTextView.getText().toString();
+                        if (locationText.isEmpty()) {
+                            locationAutoCompleteTextView.setText(item.getLocation());
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        // Handle any errors
+                    }
+                });
+
+                if (locationText.isEmpty()) {
+                    locationAutoCompleteTextView.setText(item.getLocation());
                 }
             }
         }
+
     }
 }

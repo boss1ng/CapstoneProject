@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -20,13 +22,18 @@ import androidx.fragment.app.Fragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -48,6 +55,32 @@ public class AddItineraryActivity extends Fragment {
 
             TextInputLayout activityTextInputLayout = rootView.findViewById(R.id.locActivity);
             TextInputLayout locationTextInputLayout = rootView.findViewById(R.id.locName);
+            AutoCompleteTextView locationAutoCompleteTextView = (AutoCompleteTextView) Objects.requireNonNull(locationTextInputLayout.getEditText()); // Get the AutoCompleteTextView
+
+            // Fetch data from Firebase Realtime Database
+            DatabaseReference locationsRef = FirebaseDatabase.getInstance().getReference().child("Location");
+            locationsRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    List<String> locationsList = new ArrayList<>();
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        String Location = snapshot.child("Location").getValue(String.class);
+                        if (Location != null) {
+                            locationsList.add(Location);
+                        }
+                    }
+                    // Set up the adapter for the AutoCompleteTextView
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, locationsList);
+                    locationAutoCompleteTextView.setAdapter(adapter);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    // Handle any errors
+                }
+            });
+
+
             TextInputLayout timeTextInputLayout = rootView.findViewById(R.id.locTime);
 
             Button saveButton = rootView.findViewById(R.id.saveBt);

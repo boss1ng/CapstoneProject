@@ -60,10 +60,13 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="351dp"
-                android:layout_height="53dp"
-                android:hint="Group Name" />
+            <AutoCompleteTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Group Name"
+                android:textSize="16.5dp"
+                android:padding="16dp"
+                android:inputType="text"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <LinearLayout

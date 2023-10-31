@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -69,9 +71,46 @@ public class AddGroupItineraryFragment extends Fragment {
             userId = args.getString("userId");
         }
 
+
         // Replace this with the actual reference to the TextInputLayout for the itinerary name
         TextInputLayout itineraryNameTextInput = view.findViewById(R.id.textInputLayout);
         TextInputLayout groupNameTextInput = view.findViewById(R.id.textInputLayout6);
+
+        // Find the AutoCompleteTextView for the group name
+        AutoCompleteTextView groupNameAutoComplete = (AutoCompleteTextView) groupNameTextInput.getEditText();
+
+        // Query the "Groups" node in Firebase to find the group the user belongs to
+        DatabaseReference groupsRef = FirebaseDatabase.getInstance().getReference().child("Groups");
+        groupsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                List<String> groupNames = new ArrayList<>();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    for (int i = 1; i <= 50; i++) { // Assuming there are up to 50 members
+                        String member = snapshot.child("member" + i).getValue(String.class);
+                        if (member != null && member.equals(userId)) {
+                            // Assuming the group name is stored as a child of each group node
+                            String groupName = snapshot.child("groupName").getValue(String.class);
+                            if (groupName != null) {
+                                groupNames.add(groupName);
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                // Set up the AutoCompleteTextView adapter with the retrieved group names
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_dropdown_item_1line, groupNames);
+                groupNameAutoComplete.setAdapter(adapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle any errors that may occur during the database operation
+                Log.e("FirebaseError", "Error retrieving group information: " + databaseError.getMessage());
+            }
+        });
+
 
         dynamicFormContainer = view.findViewById(R.id.dynamicFormContainer);
         dayView = view.findViewById(R.id.dayView);

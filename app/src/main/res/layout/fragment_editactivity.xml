@@ -33,10 +33,13 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.085">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="341dp"
+        <AutoCompleteTextView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Location Name" />
+            android:hint="Location Name"
+            android:textSize="16.5dp"
+            android:padding="16dp"
+            android:inputType="text"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout

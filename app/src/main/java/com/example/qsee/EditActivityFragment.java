@@ -10,6 +10,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -32,8 +34,10 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -58,7 +62,31 @@ public class EditActivityFragment extends Fragment {
 
             // Find the TextInputLayout for location and set the text
             TextInputLayout locationTextInputLayout = rootView.findViewById(R.id.locName);
-            locationTextInputLayout.getEditText().setText(location);
+            AutoCompleteTextView locationAutoCompleteTextView = (AutoCompleteTextView) Objects.requireNonNull(locationTextInputLayout.getEditText()); // Get the AutoCompleteTextView
+            locationAutoCompleteTextView.setText(location);
+
+            // Fetch data from Firebase Realtime Database
+            DatabaseReference locationsRef = FirebaseDatabase.getInstance().getReference().child("Location");
+            locationsRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    List<String> locationsList = new ArrayList<>();
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        String Location = snapshot.child("Location").getValue(String.class);
+                        if (Location != null) {
+                            locationsList.add(Location);
+                        }
+                    }
+                    // Set up the adapter for the AutoCompleteTextView
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, locationsList);
+                    locationAutoCompleteTextView.setAdapter(adapter);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    // Handle any errors
+                }
+            });
 
             TextInputLayout timeTextInputLayout = rootView.findViewById(R.id.locTime);
             timeTextInputLayout.getEditText().setText(time);
