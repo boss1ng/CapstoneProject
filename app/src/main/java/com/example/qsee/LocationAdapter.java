@@ -156,25 +156,48 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
     }
 
     private void showDeleteConfirmationDialog(int position) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setMessage("Are you sure you want to delete this location?")
-                .setPositiveButton("Yes", (dialog, which) -> {
-                    // Delete the item from the database and the list
-                    Location location = locationList.get(position);
-                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Itinerary");
-                    databaseReference.child(location.getLocationName()).removeValue();
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference itineraryRef = database.getReference("Itinerary");
 
-                    locationList.remove(position);
-                    notifyItemRemoved(position);
-                    notifyItemRangeChanged(position, locationList.size());
+        Location location = locationList.get(position);
+        String locationName = location.getLocationName();
 
-                    // Display a toast message
-                    Toast.makeText(context, "Itinerary deleted", Toast.LENGTH_SHORT).show();
-                })
-                .setNegativeButton("No", (dialog, which) -> dialog.dismiss());
+        itineraryRef.child(locationName).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String adminId = dataSnapshot.child("admin").getValue(String.class);
+                if (adminId != null && adminId.equals(userId)) {
+                    // Current user is the admin, show delete confirmation dialog
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setMessage("Are you sure you want to delete this location?")
+                            .setPositiveButton("Yes", (dialog, which) -> {
+                                // Delete the item from the database and the list
+                                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Itinerary");
+                                databaseReference.child(locationName).removeValue();
 
-        builder.create().show();
+                                locationList.remove(position);
+                                notifyItemRemoved(position);
+                                notifyItemRangeChanged(position, locationList.size());
+
+                                // Display a toast message
+                                Toast.makeText(context, "Itinerary deleted", Toast.LENGTH_SHORT).show();
+                            })
+                            .setNegativeButton("No", (dialog, which) -> dialog.dismiss());
+
+                    builder.create().show();
+                } else {
+                    // Current user is not the admin, show a toast message or any other notification
+                    Toast.makeText(context, "Only the owner can delete the itinerary", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Handle error
+            }
+        });
     }
+
 
 
     @Override
