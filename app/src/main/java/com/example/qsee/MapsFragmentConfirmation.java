@@ -12,12 +12,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentContainerView;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.android.volley.Request;
@@ -86,19 +89,101 @@ public class MapsFragmentConfirmation extends Fragment implements OnMapReadyCall
                 if (itemId == R.id.action_home) {
                     loadFragment(new HomeFragment());
                     bottomNavigationView.setVisibility(View.GONE);
-                } else if (itemId == R.id.action_search) {
+
+                    ConstraintLayout constraintLayout = getView().findViewById(R.id.constraintParent);
+                    constraintLayout.setVisibility(View.GONE);
+
+                    LinearLayout linearLayout = getView().findViewById(R.id.filterMenu);
+                    linearLayout.setVisibility(View.GONE);
+
+                    LinearLayout linearLayoutLocation = getView().findViewById(R.id.layoutLocation);
+                    linearLayoutLocation.setVisibility(View.GONE);
+
+                    LinearLayout linearLayoutButtons = getView().findViewById(R.id.layoutButtons);
+                    linearLayoutButtons.setVisibility(View.GONE);
+
+                    FragmentContainerView fragmentContainerView = getView().findViewById(R.id.maps);
+                    fragmentContainerView.setVisibility(View.GONE);
+                }
+
+                else if (itemId == R.id.action_search) {
                     loadFragment(new SearchFragment());
                     bottomNavigationView.setVisibility(View.GONE);
-                } else if (itemId == R.id.action_maps) {
+
+                    ConstraintLayout constraintLayout = getView().findViewById(R.id.constraintParent);
+                    constraintLayout.setVisibility(View.GONE);
+
+                    LinearLayout linearLayout = getView().findViewById(R.id.filterMenu);
+                    linearLayout.setVisibility(View.GONE);
+
+                    LinearLayout linearLayoutLocation = getView().findViewById(R.id.layoutLocation);
+                    linearLayoutLocation.setVisibility(View.GONE);
+
+                    LinearLayout linearLayoutButtons = getView().findViewById(R.id.layoutButtons);
+                    linearLayoutButtons.setVisibility(View.GONE);
+
+                    FragmentContainerView fragmentContainerView = getView().findViewById(R.id.maps);
+                    fragmentContainerView.setVisibility(View.GONE);
+                }
+
+                else if (itemId == R.id.action_maps) {
                     loadFragment(new MapsFragment());
-                    //BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
                     bottomNavigationView.setVisibility(View.GONE);
-                } else if (itemId == R.id.action_quiz) {
+
+                    ConstraintLayout constraintLayout = getView().findViewById(R.id.constraintParent);
+                    constraintLayout.setVisibility(View.GONE);
+
+                    LinearLayout linearLayout = getView().findViewById(R.id.filterMenu);
+                    linearLayout.setVisibility(View.GONE);
+
+                    LinearLayout linearLayoutLocation = getView().findViewById(R.id.layoutLocation);
+                    linearLayoutLocation.setVisibility(View.GONE);
+
+                    LinearLayout linearLayoutButtons = getView().findViewById(R.id.layoutButtons);
+                    linearLayoutButtons.setVisibility(View.GONE);
+
+                    FragmentContainerView fragmentContainerView = getView().findViewById(R.id.maps);
+                    fragmentContainerView.setVisibility(View.GONE);
+                }
+
+                else if (itemId == R.id.action_quiz) {
                     loadFragment(new StartQuizFragment());
                     bottomNavigationView.setVisibility(View.GONE);
-                } else if (itemId == R.id.action_profile) {
+
+                    ConstraintLayout constraintLayout = getView().findViewById(R.id.constraintParent);
+                    constraintLayout.setVisibility(View.GONE);
+
+                    LinearLayout linearLayout = getView().findViewById(R.id.filterMenu);
+                    linearLayout.setVisibility(View.GONE);
+
+                    LinearLayout linearLayoutLocation = getView().findViewById(R.id.layoutLocation);
+                    linearLayoutLocation.setVisibility(View.GONE);
+
+                    LinearLayout linearLayoutButtons = getView().findViewById(R.id.layoutButtons);
+                    linearLayoutButtons.setVisibility(View.GONE);
+
+                    FragmentContainerView fragmentContainerView = getView().findViewById(R.id.maps);
+                    fragmentContainerView.setVisibility(View.GONE);
+                }
+
+                else if (itemId == R.id.action_profile) {
                     loadFragment(new ProfileFragment());
                     bottomNavigationView.setVisibility(View.GONE);
+
+                    ConstraintLayout constraintLayout = getView().findViewById(R.id.constraintParent);
+                    constraintLayout.setVisibility(View.GONE);
+
+                    LinearLayout linearLayout = getView().findViewById(R.id.filterMenu);
+                    linearLayout.setVisibility(View.GONE);
+
+                    LinearLayout linearLayoutLocation = getView().findViewById(R.id.layoutLocation);
+                    linearLayoutLocation.setVisibility(View.GONE);
+
+                    LinearLayout linearLayoutButtons = getView().findViewById(R.id.layoutButtons);
+                    linearLayoutButtons.setVisibility(View.GONE);
+
+                    FragmentContainerView fragmentContainerView = getView().findViewById(R.id.maps);
+                    fragmentContainerView.setVisibility(View.GONE);
                 }
                 return true;
             }
@@ -127,8 +212,8 @@ public class MapsFragmentConfirmation extends Fragment implements OnMapReadyCall
             mapFragment.getMapAsync(this);
         }
 
-        //BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
-        bottomNavigationView.setVisibility(View.GONE);
+        ImageButton imageButton = view.findViewById(R.id.filterMenuBar);
+        imageButton.setEnabled(false);
 
         Button cancelButton = view.findViewById(R.id.btnCancel);
         cancelButton.setOnClickListener(new View.OnClickListener() {
@@ -152,6 +237,21 @@ public class MapsFragmentConfirmation extends Fragment implements OnMapReadyCall
                     mapsFragment.setArguments(bundle);
                 }
 
+                ConstraintLayout constraintLayout = getView().findViewById(R.id.constraintParent);
+                constraintLayout.setVisibility(View.GONE);
+
+                LinearLayout linearLayout = getView().findViewById(R.id.filterMenu);
+                linearLayout.setVisibility(View.GONE);
+
+                LinearLayout linearLayoutLocation = getView().findViewById(R.id.layoutLocation);
+                linearLayoutLocation.setVisibility(View.GONE);
+
+                LinearLayout linearLayoutButtons = getView().findViewById(R.id.layoutButtons);
+                linearLayoutButtons.setVisibility(View.GONE);
+
+                FragmentContainerView fragmentContainerView = getView().findViewById(R.id.maps);
+                fragmentContainerView.setVisibility(View.GONE);
+
                 //BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
                 bottomNavigationView.setVisibility(View.GONE);
 
@@ -173,20 +273,37 @@ public class MapsFragmentConfirmation extends Fragment implements OnMapReadyCall
 
                 MapsFragmentRoute mapsFragmentRoute = new MapsFragmentRoute();
 
-                // Use Bundle to pass values
-                Bundle bundle = new Bundle();
-                bundle.putString("placeName", placeName);
-                bundle.putDouble("userCurrentLatitude", passedCurrentUserLocationLat);
-                bundle.putDouble("userCurrentLongitude", passedCurrentUserLocationLong);
-                bundle.putString("destinationLatitude", userDestinationLat);
-                bundle.putString("destinationLongitude", userDestinationLong);
-                mapsFragmentRoute.setArguments(bundle);
+                // Retrieve place details from arguments
+                Bundle getBundle = getArguments();
+
+                if (getBundle != null) {
+                    String userID = getBundle.getString("userId");
+
+                    // Use Bundle to pass values
+                    Bundle bundle = new Bundle();
+                    bundle.putString("userId", userID);
+                    bundle.putString("placeName", placeName);
+                    bundle.putDouble("userCurrentLatitude", passedCurrentUserLocationLat);
+                    bundle.putDouble("userCurrentLongitude", passedCurrentUserLocationLong);
+                    bundle.putString("destinationLatitude", userDestinationLat);
+                    bundle.putString("destinationLongitude", userDestinationLong);
+                    mapsFragmentRoute.setArguments(bundle);
+                }
+
+                ConstraintLayout constraintLayout = getView().findViewById(R.id.constraintParent);
+                constraintLayout.setVisibility(View.GONE);
+
+                LinearLayout linearLayout = getView().findViewById(R.id.filterMenu);
+                linearLayout.setVisibility(View.GONE);
 
                 LinearLayout linearLayoutLocation = getView().findViewById(R.id.layoutLocation);
                 linearLayoutLocation.setVisibility(View.GONE);
 
                 LinearLayout linearLayoutButtons = getView().findViewById(R.id.layoutButtons);
                 linearLayoutButtons.setVisibility(View.GONE);
+
+                FragmentContainerView fragmentContainerView = getView().findViewById(R.id.maps);
+                fragmentContainerView.setVisibility(View.GONE);
 
                 //BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
                 bottomNavigationView.setVisibility(View.GONE);

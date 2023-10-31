@@ -96,7 +96,19 @@ public class MapsFragmentReportDialog extends DialogFragment {
             @Override
             public void onClick(View v) {
 
-                dismiss(); // Dismiss the dialog
+                buttonClosed.setEnabled(false);
+                buttonNonExist.setEnabled(false);
+                reportEstablishment();
+
+                // Use a Handler to refresh the map every second
+                Handler handler = new Handler();
+                Runnable mapRefreshRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        dismiss(); // Dismiss the dialog
+                    }
+                };
+                handler.postDelayed(mapRefreshRunnable, 2000); // Schedule it to run after 1 second
             }
         });
 
@@ -212,9 +224,6 @@ public class MapsFragmentReportDialog extends DialogFragment {
                                                             // Handle the error here
                                                         }
                                                     });
-
-
-
                                                 }
                                             }
                                         }

@@ -1,13 +1,16 @@
 package com.example.qsee;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +39,16 @@ public class PlaceDetailDialogFragment extends DialogFragment {
 
         return dialog;
     }
+
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        super.onDismiss(dialog);
+
+        // Re-enable the ImageButton
+        ImageButton filterMenuBar = getParentFragment().getView().findViewById(R.id.filterMenuBar);
+        filterMenuBar.setEnabled(true);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -97,24 +110,30 @@ public class PlaceDetailDialogFragment extends DialogFragment {
 
                 dismiss(); // Dismiss the dialog
 
-                BottomNavigationView bottomNavigationView = getView().findViewById(R.id.bottomNavigationView);
-
                 // In the fragment or activity where you want to navigate
                 FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
 
                 MapsFragmentConfirmation fragmentConfirmation = new MapsFragmentConfirmation();
 
-                // Use Bundle to pass values
-                Bundle bundle = new Bundle();
-                bundle.putString("placeName", placeName);
-                bundle.putDouble("userCurrentLatitude", currentUserLat);
-                bundle.putDouble("userCurrentLongitude", currentUserLong);
-                bundle.putString("destinationLatitude", destinationLat);
-                bundle.putString("destinationLongitude", destinationLong);
-                fragmentConfirmation.setArguments(bundle);
+                if (getBundle != null) {
+                    String userID = getBundle.getString("userId");
 
-                //BottomNavigationView bottomNavigationView = getView().findViewById(R.id.bottomNavigationView);
-                //bottomNavigationView.setVisibility(View.GONE);
+                    // Use Bundle to pass values
+                    Bundle bundle = new Bundle();
+                    bundle.putString("userId", userID);
+                    bundle.putString("placeName", placeName);
+                    bundle.putDouble("userCurrentLatitude", currentUserLat);
+                    bundle.putDouble("userCurrentLongitude", currentUserLong);
+                    bundle.putString("destinationLatitude", destinationLat);
+                    bundle.putString("destinationLongitude", destinationLong);
+                    fragmentConfirmation.setArguments(bundle);
+                }
+
+                BottomNavigationView bottomNavigationView = getParentFragment().getView().findViewById(R.id.bottomNavigationView);
+                bottomNavigationView.setVisibility(View.GONE);
+
+                LinearLayout linearLayout = getParentFragment().getView().findViewById(R.id.filterMenu);
+                linearLayout.setVisibility(View.GONE);
 
                 // Replace the current fragment with the receiving fragment
                 transaction.replace(R.id.maps, fragmentConfirmation);

@@ -3,6 +3,7 @@ package com.example.qsee;
 import android.Manifest;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -13,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
@@ -145,6 +147,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             mapFragment.getMapAsync(this);
         }
 
+        /*
         // Initialize AutocompleteSupportFragment
         AutocompleteSupportFragment autocompleteFragment =
                 (AutocompleteSupportFragment) getChildFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
@@ -170,6 +173,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 // Handle any errors
             }
         });
+         */
 
         //BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
         //bottomNavigationView.setVisibility(View.INVISIBLE);
@@ -187,8 +191,83 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 }
                  */
 
+                final Bitmap[] bitmap = {null};
+
+                mapFragment.getMapAsync(new OnMapReadyCallback() {
+                    @Override
+                    public void onMapReady(GoogleMap googleMap) {
+                        // Capture the screenshot of the map
+                        googleMap.snapshot(new GoogleMap.SnapshotReadyCallback() {
+                            @Override
+                            public void onSnapshotReady(Bitmap snapshot) {
+                                // Combine this map snapshot with the parent layout's screenshot
+
+                                FilterCategories fragment = new FilterCategories(snapshot);
+                                fragment.setCancelable(false);
+
+                                // Retrieve selected categories from Bundle arguments
+                                Bundle getBundle = getArguments();
+
+                                // Use Bundle to pass values
+                                Bundle bundle = new Bundle();
+
+                                if (getBundle != null) {
+                                    String categoryName = getBundle.getString("categoryName");
+                                    bundle.putString("categoryName", categoryName);
+
+                                    String userID = getBundle.getString("userId");
+                                    bundle.putString("userId", userID);
+                                    fragment.setArguments(bundle);
+                                }
+
+                                else {
+
+                                }
+
+                                BottomNavigationView bottomNavigationView = getView().findViewById(R.id.bottomNavigationView);
+                                bottomNavigationView.setVisibility(View.GONE);
+
+                                LinearLayout layoutFilter = view.findViewById(R.id.filterMenu);
+                                layoutFilter.setVisibility(View.GONE);
+
+                                FragmentContainerView fragmentContainerView = view.findViewById(R.id.maps);
+                                fragmentContainerView.setVisibility(View.GONE);
+
+                                // Show the PlaceDetailDialogFragment as a dialog
+                                fragment.show(getChildFragmentManager(), "FilterCategories");
+
+                            }
+                        });
+                    }
+                });
+
+                /*
+                FragmentContainerView constraintLayout = view.findViewById(R.id.maps);
+                constraintLayout.setDrawingCacheEnabled(true);
+                Bitmap screenshot = Bitmap.createBitmap(constraintLayout.getDrawingCache());
+                constraintLayout.setDrawingCacheEnabled(false);
+
+                // Assuming you have a reference to the FragmentContainerView
+                FragmentContainerView fragmentContainerView = view.findViewById(R.id.maps);
+                // Capture the screenshot of the FragmentContainerView and other relevant views
+                fragmentContainerView.setDrawingCacheEnabled(true);
+                Bitmap screenshot = Bitmap.createBitmap(fragmentContainerView.getDrawingCache());
+                fragmentContainerView.setDrawingCacheEnabled(false);
+
+                ConstraintLayout constraintLayout = view.findViewById(R.id.fragment_container);
+                constraintLayout.setDrawingCacheEnabled(true);
+                Bitmap screenshot = Bitmap.createBitmap(constraintLayout.getDrawingCache());
+                constraintLayout.setDrawingCacheEnabled(false);
+
+                View viewToCapture = view.findViewById(R.id.fragment_container);; // Replace with the actual view you want to capture
+                viewToCapture.setDrawingCacheEnabled(true);
+                Bitmap bitmap = Bitmap.createBitmap(viewToCapture.getDrawingCache());
+                viewToCapture.setDrawingCacheEnabled(false);
+                 */
+
+                /*
                 // Create a new PlaceDetailDialogFragment and pass the place details as arguments
-                FilterCategories fragment = new FilterCategories();
+                FilterCategories fragment = new FilterCategories(bitmap[0]);
                 fragment.setCancelable(false);
 
                 // Retrieve selected categories from Bundle arguments
@@ -223,6 +302,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
                 // Show the PlaceDetailDialogFragment as a dialog
                 fragment.show(getChildFragmentManager(), "FilterCategories");
+                 */
 
             }
 
@@ -328,6 +408,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                     String visited = bundle.getString("isVisited");
                     String categoryName = bundle.getString("categoryName");
 
+                    /*
                     if (visited == "YES") {
                         Toast.makeText(getContext(), bundle.getString("isVisited"), Toast.LENGTH_SHORT).show();
 
@@ -337,6 +418,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                         FragmentContainerView fragmentContainerView = getView().findViewById(R.id.maps);
                         fragmentContainerView.setVisibility(View.GONE);
                     }
+                     */
 
                     if (categoryName != "") {
 
@@ -427,6 +509,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
                                                     //BottomNavigationView bottomNavigationView = getView().findViewById(R.id.bottomNavigationView);
                                                     //bottomNavigationView.setVisibility(View.GONE);
+
+                                                    ImageButton filterMenuBar = getView().findViewById(R.id.filterMenuBar);
+                                                    filterMenuBar.setEnabled(false);
+
+                                                    //LinearLayout linearLayout = getView().findViewById(R.id.filterMenu);
+                                                    //linearLayout.setVisibility(View.GONE);
 
                                                     // Show the PlaceDetailDialogFragment as a dialog
                                                     fragment.show(getChildFragmentManager(), "PlaceDetailDialogFragment");
@@ -580,6 +668,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                                     args.putString("destinationLongitude", parts[6]);
                                     fragment.setArguments(args);
                                 }
+
+                                ImageButton filterMenuBar = getView().findViewById(R.id.filterMenuBar);
+                                filterMenuBar.setEnabled(false);
 
                                 // Show the PlaceDetailDialogFragment as a dialog
                                 fragment.show(getChildFragmentManager(), "PlaceDetailDialogFragment");

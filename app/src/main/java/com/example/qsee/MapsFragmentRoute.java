@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -17,8 +18,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentContainerView;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.android.volley.Request;
@@ -54,6 +57,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import android.os.AsyncTask;
+import android.widget.Toast;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -79,11 +84,118 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
     Marker currentLocMarker;
     Marker destinationLocMarker;
 
+    // Declare a boolean flag to control execution
+    private boolean isRunning = true;
+    Handler handler;
+
+    Runnable mapRefreshRunnable;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_maps_route, container, false);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
+        // Set the default item as highlighted
+        MenuItem defaultItem = bottomNavigationView.getMenu().findItem(R.id.action_maps);
+        defaultItem.setChecked(true);
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int itemId = item.getItemId();
+                if (itemId == R.id.action_home) {
+                    isRunning = false;
+                    Toast.makeText(getContext(), "Exiting...", Toast.LENGTH_LONG).show();
+
+                    // Use a Handler to refresh the map every second
+                    Handler handlerDelay = new Handler();
+                    Runnable runnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            handler.removeCallbacks(mapRefreshRunnable); // Remove any pending callbacks // Dismiss the dialog
+                        }
+                    };
+                    handlerDelay.postDelayed(runnable, 1000); // Schedule it to run after 1 second
+
+                    bottomNavigationView.setVisibility(View.GONE);
+                    loadFragment(new HomeFragment());
+                }
+
+                else if (itemId == R.id.action_search) {
+                    isRunning = false;
+                    Toast.makeText(getContext(), "Exiting...", Toast.LENGTH_LONG).show();
+
+                    // Use a Handler to refresh the map every second
+                    Handler handlerDelay = new Handler();
+                    Runnable runnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            handler.removeCallbacks(mapRefreshRunnable); // Remove any pending callbacks // Dismiss the dialog
+                        }
+                    };
+                    handlerDelay.postDelayed(runnable, 1000); // Schedule it to run after 1 second
+
+                    bottomNavigationView.setVisibility(View.GONE);
+                    loadFragment(new SearchFragment());
+                }
+
+                else if (itemId == R.id.action_maps) {
+                    isRunning = false;
+                    Toast.makeText(getContext(), "Exiting...", Toast.LENGTH_LONG).show();
+
+                    // Use a Handler to refresh the map every second
+                    Handler handlerDelay = new Handler();
+                    Runnable runnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            handler.removeCallbacks(mapRefreshRunnable); // Remove any pending callbacks // Dismiss the dialog
+                        }
+                    };
+                    handlerDelay.postDelayed(runnable, 1000); // Schedule it to run after 1 second
+
+                    bottomNavigationView.setVisibility(View.GONE);
+                    loadFragment(new MapsFragment());
+                }
+
+                else if (itemId == R.id.action_quiz) {
+                    isRunning = false;
+                    Toast.makeText(getContext(), "Exiting...", Toast.LENGTH_LONG).show();
+
+                    // Use a Handler to refresh the map every second
+                    Handler handlerDelay = new Handler();
+                    Runnable runnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            handler.removeCallbacks(mapRefreshRunnable); // Remove any pending callbacks // Dismiss the dialog
+                        }
+                    };
+                    handlerDelay.postDelayed(runnable, 1000); // Schedule it to run after 1 second
+
+                    bottomNavigationView.setVisibility(View.GONE);
+                    loadFragment(new QuizFragment());
+                }
+
+                else if (itemId == R.id.action_profile) {
+                    isRunning = false;
+                    Toast.makeText(getContext(), "Exiting...", Toast.LENGTH_LONG).show();
+
+                    // Use a Handler to refresh the map every second
+                    Handler handlerDelay = new Handler();
+                    Runnable runnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            handler.removeCallbacks(mapRefreshRunnable); // Remove any pending callbacks // Dismiss the dialog
+                        }
+                    };
+                    handlerDelay.postDelayed(runnable, 1000); // Schedule it to run after 1 second
+
+                    bottomNavigationView.setVisibility(View.GONE);
+                    loadFragment(new ProfileFragment());
+                }
+                return true;
+            }
+        });
 
         // Initialize the FusedLocationProviderClient
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
@@ -97,6 +209,29 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
         }
 
         return view;
+    }
+
+    private void loadFragment(Fragment fragment) {
+        //Bundle bundle = new Bundle();
+        //bundle.putString("userId", userId);
+        //fragment.setArguments(bundle);
+
+        // Use Bundle to pass values
+        Bundle bundle = new Bundle();
+
+        // Retrieve selected categories from Bundle arguments
+        Bundle getBundle = getArguments();
+
+        if (getBundle != null) {
+            String userID = getBundle.getString("userId");
+            bundle.putString("userId", userID);
+            fragment.setArguments(bundle);
+        }
+
+        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
     @Override
@@ -232,12 +367,17 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
 
         // Use a Handler to refresh the map every second
         final int INTERVAL = 1000; // 1000 milliseconds = 1 second
-        Handler handler = new Handler();
-        Runnable mapRefreshRunnable = new Runnable() {
+        handler = new Handler();
+        mapRefreshRunnable = new Runnable() {
             @Override
             public void run() {
                 //updateMap(); // Call the method to update the map
                 //reUpdateMap();
+
+                if (!isRunning) {
+                    // Stop the execution if the flag is false
+                    return;
+                }
 
                 //updateMap();
                 if (currentRoutePolyline != null && currentBorderPolyline != null) {

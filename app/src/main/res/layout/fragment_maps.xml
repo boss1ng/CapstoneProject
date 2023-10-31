@@ -13,6 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:background="#FFFFFF"
         tools:ignore="MissingConstraints">
 
         <ImageButton
@@ -38,16 +39,6 @@
     </androidx.fragment.app.FragmentContainerView>
 
     <!-- Place Autocomplete Fragment -->
-    <fragment
-        android:id="@+id/place_autocomplete_fragment"
-        android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        app:layout_constraintTop_toBottomOf="@id/maps"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-    </fragment>
 
     <!-- Bottom Navigation View -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -60,3 +51,19 @@
     </com.google.android.material.bottomnavigation.BottomNavigationView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+<!--
+
+Place Autocomplete Fragment
+<fragment
+android:id="@+id/place_autocomplete_fragment"
+android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
+android:layout_width="0dp"
+android:layout_height="wrap_content"
+android:layout_gravity="top"
+app:layout_constraintTop_toBottomOf="@id/maps"
+app:layout_constraintStart_toStartOf="parent"
+app:layout_constraintEnd_toEndOf="parent">
+</fragment>
+
+-->
