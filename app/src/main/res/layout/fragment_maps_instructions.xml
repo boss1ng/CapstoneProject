@@ -8,15 +8,6 @@
     android:orientation="vertical"
     >
 
-<!--
-
-    android:layout_marginLeft="20dp"
-    android:layout_marginRight="20dp"
-    android:layout_marginTop="50dp"
-    android:layout_marginBottom="50dp"
-
--->
-
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -41,8 +32,11 @@
                 android:background="#CCCCCC" />
 
             <ScrollView
+                android:id="@+id/scrollCont"
                 android:layout_width="match_parent"
-                android:layout_height="500dp" >
+                android:layout_height="wrap_content"
+                 >
+                <!-- android:layout_height="500dp" -->
 
                 <LinearLayout
                     android:id="@+id/instructionsCont"
@@ -58,77 +52,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
-                android:layout_marginRight="20dp"
-                android:layout_marginBottom="20dp"
+                android:layout_margin="20dp"
                 android:backgroundTint="#FF0000"
                 android:gravity="center"
                 android:text="Stop" />
 
-
-            <!--
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#49454f"
-                android:orientation="horizontal"
-                android:padding="15dp"
-                tools:ignore="MissingConstraints,UselessParent"
-                tools:layout_editor_absoluteX="5dp">
-
-
-                        <ListView
-                            android:id="@+id/directionsListView"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent" />
-
-
-                <ImageView
-                    android:id="@+id/imageViewDirections"
-                    android:layout_width="120dp"
-                    android:layout_height="60dp"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/btn_add_photo" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="15dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/textViewDistance"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center_vertical"
-                        android:text="Distance"
-                        android:textColor="#FFFFFF"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/textViewDirection"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center_vertical"
-                        android:text="Direction"
-                        android:textColor="#FFFFFF" />
-
-                    <Button
-                        android:id="@+id/btnDone"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="end"
-                        android:layout_weight="1"
-                        android:text="Button"
-                        android:visibility="gone" />
-                </LinearLayout>
-
-            </LinearLayout>
--->
             </LinearLayout>
 
 </ScrollView>

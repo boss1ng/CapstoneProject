@@ -1,6 +1,8 @@
 package com.example.qsee;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -141,6 +143,8 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                 }
 
                 else if (itemId == R.id.action_maps) {
+
+                    /*
                     isRunning = false;
                     Toast.makeText(getContext(), "Exiting...", Toast.LENGTH_LONG).show();
 
@@ -156,6 +160,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
 
                     bottomNavigationView.setVisibility(View.GONE);
                     loadFragment(new MapsFragment());
+                     */
                 }
 
                 else if (itemId == R.id.action_quiz) {
@@ -206,6 +211,29 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
 
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
+        }
+
+        // Retrieve selected categories from Bundle arguments
+        Bundle getBundle = getArguments();
+
+        if (getBundle != null) {
+            String userID = getBundle.getString("userId");
+            String destinationLatitude = getBundle.getString("destinationLatitude");
+            String destinationLongitude = getBundle.getString("destinationLongitude");
+            Double passedCurrentUserLocationLat = getBundle.getDouble("userCurrentLatitude");
+            Double passedCurrentUserLocationLong = getBundle.getDouble("userCurrentLongitude");
+
+            // STORE ORIGIN-DESTINATION DATA FOR COME BACK WHEN APP IS CLOSED OR NAVIGATED TO OTHER OPTIONS
+            SharedPreferences sharedPreferences = getContext().getSharedPreferences("MyAppPreferences", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+
+            // editor.putString("user_destLat_destLong", userID + "&" + destinationLatitude + "&" + destinationLongitude);
+            editor.putString("user", userID);
+            editor.putString("destinationLatitude", destinationLatitude);
+            editor.putString("destinationLongitude", destinationLongitude);
+            editor.putString("originLatitude", String.valueOf(passedCurrentUserLocationLat));
+            editor.putString("originLongitude", String.valueOf(passedCurrentUserLocationLong));
+            editor.apply();
         }
 
         return view;
@@ -1412,7 +1440,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                     // Format totalDistanceKm with 2 decimal places
                     String formattedDistance = String.format("%.2f", totalDistanceKm);
 
-                    double thresholdDistance = 1.2; // 0.015=15 meters threshold    1.2
+                    double thresholdDistance = 0.015; // 0.015=15 meters threshold    1.2
                     if (totalDistanceKm <= thresholdDistance) {
                         textViewDistance.setText("You have arrived at your destination.");
                         textViewDirection.setVisibility(View.GONE);

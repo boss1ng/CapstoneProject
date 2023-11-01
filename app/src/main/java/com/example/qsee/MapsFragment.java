@@ -1,6 +1,8 @@
 package com.example.qsee;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -240,73 +242,45 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                         });
                     }
                 });
-
-                /*
-                FragmentContainerView constraintLayout = view.findViewById(R.id.maps);
-                constraintLayout.setDrawingCacheEnabled(true);
-                Bitmap screenshot = Bitmap.createBitmap(constraintLayout.getDrawingCache());
-                constraintLayout.setDrawingCacheEnabled(false);
-
-                // Assuming you have a reference to the FragmentContainerView
-                FragmentContainerView fragmentContainerView = view.findViewById(R.id.maps);
-                // Capture the screenshot of the FragmentContainerView and other relevant views
-                fragmentContainerView.setDrawingCacheEnabled(true);
-                Bitmap screenshot = Bitmap.createBitmap(fragmentContainerView.getDrawingCache());
-                fragmentContainerView.setDrawingCacheEnabled(false);
-
-                ConstraintLayout constraintLayout = view.findViewById(R.id.fragment_container);
-                constraintLayout.setDrawingCacheEnabled(true);
-                Bitmap screenshot = Bitmap.createBitmap(constraintLayout.getDrawingCache());
-                constraintLayout.setDrawingCacheEnabled(false);
-
-                View viewToCapture = view.findViewById(R.id.fragment_container);; // Replace with the actual view you want to capture
-                viewToCapture.setDrawingCacheEnabled(true);
-                Bitmap bitmap = Bitmap.createBitmap(viewToCapture.getDrawingCache());
-                viewToCapture.setDrawingCacheEnabled(false);
-                 */
-
-                /*
-                // Create a new PlaceDetailDialogFragment and pass the place details as arguments
-                FilterCategories fragment = new FilterCategories(bitmap[0]);
-                fragment.setCancelable(false);
-
-                // Retrieve selected categories from Bundle arguments
-                Bundle getBundle = getArguments();
-
-                // Use Bundle to pass values
-                Bundle bundle = new Bundle();
-
-                if (getBundle != null) {
-                    String categoryName = getBundle.getString("categoryName");
-                    bundle.putString("categoryName", categoryName);
-
-                    String userID = getBundle.getString("userId");
-                    bundle.putString("userId", userID);
-                    fragment.setArguments(bundle);
-                }
-
-                else {
-
-                }
-
-                BottomNavigationView bottomNavigationView = getView().findViewById(R.id.bottomNavigationView);
-                bottomNavigationView.setVisibility(View.GONE);
-
-
-                //LinearLayout layoutFilter = view.findViewById(R.id.filterMenu);
-                //layoutFilter.setVisibility(View.GONE);
-
-                //FragmentContainerView fragmentContainerView = view.findViewById(R.id.maps);
-                //fragmentContainerView.setVisibility(View.GONE);
-
-
-                // Show the PlaceDetailDialogFragment as a dialog
-                fragment.show(getChildFragmentManager(), "FilterCategories");
-                 */
-
             }
-
         });
+
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("MyAppPreferences", Context.MODE_PRIVATE);
+        String userID = sharedPreferences.getString("user", "0");
+        String destinationLatitude = sharedPreferences.getString("destinationLatitude", "0.0");
+        String destinationLongitude = sharedPreferences.getString("destinationLongitude", "0.0");
+        String originLatitude = sharedPreferences.getString("originLatitude", "0.0");
+        String originLongitude = sharedPreferences.getString("originLongitude", "0.0");
+
+        //Toast.makeText(getContext(), "UserID: " + userID, Toast.LENGTH_LONG).show();
+        //Toast.makeText(getContext(), "Dest LATITUDE: " + destinationLatitude, Toast.LENGTH_LONG).show();
+        //Toast.makeText(getContext(), "Dest LONGITUDE: " + destinationLongitude, Toast.LENGTH_LONG).show();
+
+        if (!(userID.equals("0")) && !(destinationLatitude.equals("0.0")) && !(destinationLongitude.equals("0.0")) && !(originLatitude.equals("0.0")) && !(originLongitude.equals("0.0"))) {
+
+            if (getBundle != null) {
+                String passUserID = getBundle.getString("userId");
+
+                if (passUserID.equals(userID)) {
+                    MapsFragmentResume mapsFragmentResume = new MapsFragmentResume();
+                    mapsFragmentResume.setCancelable(false);
+
+                    String placeName = getBundle.getString("placeName");
+
+                    // Use Bundle to pass values
+                    Bundle bundle = new Bundle();
+                    bundle.putString("userId", passUserID);
+                    bundle.putString("placeName", placeName);
+                    bundle.putString("userCurrentLatitude", originLatitude);
+                    bundle.putString("userCurrentLongitude", originLongitude);
+                    bundle.putString("destinationLatitude", destinationLatitude);
+                    bundle.putString("destinationLongitude", destinationLongitude);
+                    mapsFragmentResume.setArguments(bundle);
+
+                    mapsFragmentResume.show(getChildFragmentManager(), "MapsFragmentResume");
+                }
+            }
+        }
 
         return view;
     }

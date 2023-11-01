@@ -1,6 +1,8 @@
 package com.example.qsee;
 
 import android.app.Dialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -14,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -87,51 +90,17 @@ public class MapsInstructions extends DialogFragment {
             @Override
             public void onClick(View v) {
 
+                SharedPreferences sharedPreferences = getContext().getSharedPreferences("MyAppPreferences", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.clear();
+                editor.apply(); // Apply the changes
+
                 dismiss(); // Dismiss the dialog
 
                 // In the fragment or activity where you want to navigate
                 FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
 
                 MapsFragment mapsFragment = new MapsFragment();
-
-                /*
-                BottomNavigationView bottomNavigationView = getView().findViewById(R.id.bottomNavigationView);
-                bottomNavigationView.setVisibility(View.GONE);
-
-                LinearLayout llFilter = getView().findViewById(R.id.filterMenu);
-                llFilter.setVisibility(View.GONE);
-
-                LinearLayout llLoc = getView().findViewById(R.id.directionsCont);
-                llLoc.setVisibility(View.GONE);
-
-                LinearLayout llButt = getView().findViewById(R.id.overviewCont);
-                llButt.setVisibility(View.GONE);
-                 */
-
-                /*
-                    // Retrieve selected categories from Bundle arguments
-                    Bundle getBundle = getArguments();
-
-                    if (getBundle != null) {
-                        String isStop = getBundle.getString("isStop");
-                        if (isStop.equals("STOP")) {
-
-                            Toast.makeText(getContext(), "STOPPED", Toast.LENGTH_SHORT).show();
-
-                            BottomNavigationView bottomNavigationView = getView().findViewById(R.id.bottomNavigationView);
-                            bottomNavigationView.setVisibility(View.GONE);
-
-                            LinearLayout llFilter = getView().findViewById(R.id.filterMenu);
-                            llFilter.setVisibility(View.GONE);
-
-                            LinearLayout llLoc = getView().findViewById(R.id.directionsCont);
-                            llLoc.setVisibility(View.GONE);
-
-                            LinearLayout llButt = getView().findViewById(R.id.overviewCont);
-                            llButt.setVisibility(View.GONE);
-                        }
-                    }
-                 */
 
                 // Use Bundle to pass values
                 Bundle bundle = new Bundle();
@@ -195,51 +164,6 @@ public class MapsInstructions extends DialogFragment {
             DirectionsTask directionsTask = new DirectionsTask(url);
             directionsTask.execute();
         }
-
-
-
-        /*
-        LinearLayout dynamicLayoutContainer = view.findViewById(R.id.instructionsCont); // Replace with your container ID
-
-        int numberOfIterations = 5; // Set the desired number of iterations
-
-        for (int i = 0; i < numberOfIterations; i++) {
-            // Create a new LinearLayout for each iteration
-            LinearLayout linearLayout = new LinearLayout(getActivity());
-            linearLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
-            ));
-            linearLayout.setOrientation(LinearLayout.HORIZONTAL);
-
-            // Create an ImageView
-            ImageView imageView = new ImageView(getActivity());
-            imageView.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
-            ));
-            //imageView.setImageResource(R.drawable.your_image); // Set your image resource
-
-            // Create two TextViews
-            TextView textView1 = new TextView(getActivity());
-            textView1.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
-            ));
-            textView1.setText("Text1");
-
-            TextView textView2 = new TextView(getActivity());
-            textView2.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
-            ));
-            textView2.setText("Text2");
-
-            // Add the ImageView and TextViews to the LinearLayout
-            linearLayout.addView(imageView);
-            linearLayout.addView(textView1);
-            linearLayout.addView(textView2);
-
-            // Add the new LinearLayout to the container
-            dynamicLayoutContainer.addView(linearLayout);
-        }
-         */
 
         return view;
     }
@@ -309,6 +233,7 @@ public class MapsInstructions extends DialogFragment {
                     JSONArray routes = jsonResponse.getJSONArray("routes");
 
                     LinearLayout dynamicLayoutContainer = getView().findViewById(R.id.instructionsCont); // Replace with your container ID
+                    ScrollView scrollView = getView().findViewById(R.id.scrollCont);
 
                     int numberOfIterations = 10; // Set the desired number of iterations
 
@@ -485,6 +410,32 @@ public class MapsInstructions extends DialogFragment {
                                 // Add the new LinearLayout to the container
                                 dynamicLayoutContainer.addView(linearLayout);
                                 dynamicLayoutContainer.addView(horizontalLine);
+
+                                // Measure the total height of the LinearLayout
+                                dynamicLayoutContainer.measure(
+                                        View.MeasureSpec.UNSPECIFIED, // Width constraint
+                                        View.MeasureSpec.UNSPECIFIED  // Height constraint
+                                );
+
+                                int linearLayoutHeight = dynamicLayoutContainer.getMeasuredHeight();
+
+                                // Calculate the height in pixels of 500dp
+                                int dp500 = (int) TypedValue.applyDimension(
+                                        TypedValue.COMPLEX_UNIT_DIP, 500, getResources().getDisplayMetrics()
+                                );
+
+                                // Set the ScrollView's height based on the calculation
+                                if (linearLayoutHeight < dp500) {
+                                    // If the LinearLayout's height is less than 500dp, set the ScrollView's height to WRAP_CONTENT
+                                    scrollView.getLayoutParams().height = LinearLayout.LayoutParams.WRAP_CONTENT;
+                                } else {
+                                    // Otherwise, set the ScrollView's height to 500dp
+                                    scrollView.getLayoutParams().height = dp500;
+                                }
+
+                                // Request layout to apply the new height
+                                scrollView.requestLayout();
+
                             }
                         }
                     }
