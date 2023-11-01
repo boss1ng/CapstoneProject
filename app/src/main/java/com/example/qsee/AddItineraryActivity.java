@@ -100,22 +100,28 @@ public class AddItineraryActivity extends Fragment {
                                 String activity = activityTextInputLayout.getEditText().getText().toString();
                                 String location = locationTextInputLayout.getEditText().getText().toString();
 
-                                String standardTime = Objects.requireNonNull(time);
-                                String militaryTime = convertToMilitaryTime(standardTime); // convert to military time
+                                // Check if any of the fields are empty
+                                if (time.isEmpty() || activity.isEmpty() || location.isEmpty()) {
+                                    Toast.makeText(getContext(), "Please fill all fields", Toast.LENGTH_SHORT).show();
+                                } else {
 
-                                databaseReference.child(militaryTime).child("activity").setValue(activity);
-                                databaseReference.child(militaryTime).child("status").setValue("incomplete");
-                                databaseReference.child(militaryTime).child("location").setValue(location)
-                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-                                                if (task.isSuccessful()) {
-                                                    Toast.makeText(getContext(), "Activity added to " + day, Toast.LENGTH_SHORT).show();
-                                                } else {
-                                                    Toast.makeText(getContext(), "Failed to save data", Toast.LENGTH_SHORT).show();
+                                    String standardTime = Objects.requireNonNull(time);
+                                    String militaryTime = convertToMilitaryTime(standardTime); // convert to military time
+
+                                    databaseReference.child(militaryTime).child("activity").setValue(activity);
+                                    databaseReference.child(militaryTime).child("status").setValue("incomplete");
+                                    databaseReference.child(militaryTime).child("location").setValue(location)
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if (task.isSuccessful()) {
+                                                        Toast.makeText(getContext(), "Activity added to " + day, Toast.LENGTH_SHORT).show();
+                                                    } else {
+                                                        Toast.makeText(getContext(), "Failed to save data", Toast.LENGTH_SHORT).show();
+                                                    }
                                                 }
-                                            }
-                                        });
+                                            });
+                                }
                             })
                             .setNegativeButton("No", null)
                             .show();

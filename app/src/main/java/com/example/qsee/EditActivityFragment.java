@@ -169,6 +169,11 @@ public class EditActivityFragment extends Fragment {
                             String standardTime = Objects.requireNonNull(timeTextInputLayout.getEditText()).getText().toString();
                             String militaryTime = convertToMilitaryTime(standardTime); // convert to military time
 
+                            // Check if any of the fields are empty
+                            if (updatedLocation.isEmpty() || standardTime.isEmpty() || updatedActivity.isEmpty()) {
+                                Toast.makeText(getContext(), "Please fill all fields", Toast.LENGTH_SHORT).show();
+                            } else {
+
                             // Update the location and time in the database
                             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Itinerary");
                             Query activityQuery = databaseReference.child(iterName);
@@ -206,6 +211,7 @@ public class EditActivityFragment extends Fragment {
                             // Show a toast to confirm the save
                             Toast.makeText(getContext(), "Changes saved successfully", Toast.LENGTH_SHORT).show();
                             dialog.dismiss();
+                        }
                         }
                     });
                     builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
