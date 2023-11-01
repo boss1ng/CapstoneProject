@@ -87,8 +87,8 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
     // Declare a boolean flag to control execution
     private boolean isRunning = true;
     Handler handler;
-
     Runnable mapRefreshRunnable;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -173,7 +173,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                     handlerDelay.postDelayed(runnable, 1000); // Schedule it to run after 1 second
 
                     bottomNavigationView.setVisibility(View.GONE);
-                    loadFragment(new QuizFragment());
+                    loadFragment(new StartQuizFragment());
                 }
 
                 else if (itemId == R.id.action_profile) {
@@ -285,34 +285,65 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
             @Override
             public void onClick(View v) {
 
-                // Create a new PlaceDetailDialogFragment and pass the place details as arguments
-                MapsInstructions fragment = new MapsInstructions();
-                //fragment.setCancelable(true);
+                // Check if location permission is granted
+                if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED
+                        && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
 
-                // Retrieve selected categories from Bundle arguments
-                Bundle getBundle = getArguments();
-
-                // Use Bundle to pass values
-                Bundle bundle = new Bundle();
-
-                if (getBundle != null) {
-                    String placeName = getBundle.getString("placeName");
-                    Double passedCurrentUserLocationLat = getBundle.getDouble("userCurrentLatitude");
-                    Double passedCurrentUserLocationLong = getBundle.getDouble("userCurrentLongitude");
-                    String destinationLatitude = getBundle.getString("destinationLatitude");
-                    String destinationLongitude = getBundle.getString("destinationLongitude");
-
-                    bundle.putString("placeName", placeName);
-                    bundle.putDouble("userCurrentLatitude", passedCurrentUserLocationLat);
-                    bundle.putDouble("userCurrentLongitude", passedCurrentUserLocationLong);
-                    bundle.putString("destinationLatitude", destinationLatitude);
-                    bundle.putString("destinationLongitude", destinationLongitude);
-
-                    fragment.setArguments(bundle);
+                    // Request location permission if not granted
+                    requestPermissions(new String[]{
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                    }, LOCATION_PERMISSION_REQUEST_CODE);
+                    return;
                 }
 
-                // Show the PlaceDetailDialogFragment as a dialog
-                fragment.show(getChildFragmentManager(), "MapsArrived");
+                // Get the user's last known location and move the camera there
+                fusedLocationProviderClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
+
+                    double latitude = 0;
+                    double longitude = 0;
+                            
+                    if (location != null) {
+                        latitude = location.getLatitude();
+                        longitude = location.getLongitude();
+                    }
+                    
+                    // Create a new PlaceDetailDialogFragment and pass the place details as arguments
+                    MapsInstructions fragment = new MapsInstructions();
+                    //fragment.setCancelable(true);
+
+                    // Retrieve selected categories from Bundle arguments
+                    Bundle getBundle = getArguments();
+
+                    // Use Bundle to pass values
+                    Bundle bundle = new Bundle();
+
+                    if (getBundle != null) {
+                        String placeName = getBundle.getString("placeName");
+
+                        Double passedCurrentUserLocationLat = getBundle.getDouble("userCurrentLatitude");
+                        Double passedCurrentUserLocationLong = getBundle.getDouble("userCurrentLongitude");
+
+                        String destinationLatitude = getBundle.getString("destinationLatitude");
+                        String destinationLongitude = getBundle.getString("destinationLongitude");
+
+                        String userID = getBundle.getString("userId");
+                        bundle.putString("userId", userID);
+
+                        bundle.putString("placeName", placeName);
+                        bundle.putDouble("userCurrentLatitude", latitude);
+                        bundle.putDouble("userCurrentLongitude", longitude);
+                        bundle.putString("destinationLatitude", destinationLatitude);
+                        bundle.putString("destinationLongitude", destinationLongitude);
+
+                        fragment.setArguments(bundle);
+                    }
+
+                    // Show the PlaceDetailDialogFragment as a dialog
+                    fragment.show(getChildFragmentManager(), "MapsInstructions");
+                });
             }
         });
 
@@ -320,6 +351,20 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
         btnFinishRoute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                isRunning = false;
+
+                // Use a Handler to refresh the map every second
+                Handler handlerDelay = new Handler();
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        handler.removeCallbacks(mapRefreshRunnable); // Remove any pending callbacks // Dismiss the dialog
+                    }
+                };
+                handlerDelay.postDelayed(runnable, 1000); // Schedule it to run after 1 second
+
+                //loadFragment(new MapsFragmentArrived());
 
                 // In the fragment or activity where you want to navigate
                 FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
@@ -339,6 +384,9 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                     String destinationLatitude = getBundle.getString("destinationLatitude");
                     String destinationLongitude = getBundle.getString("destinationLongitude");
 
+                    String userID = getBundle.getString("userId");
+                    bundle.putString("userId", userID);
+
                     bundle.putString("placeName", placeName);
                     bundle.putDouble("userCurrentLatitude", passedCurrentUserLocationLat);
                     bundle.putDouble("userCurrentLongitude", passedCurrentUserLocationLong);
@@ -350,6 +398,9 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                 LinearLayout linearLayoutDirections = getView().findViewById(R.id.directionsCont);
                 linearLayoutDirections.setVisibility(View.GONE);
 
+                FragmentContainerView fragmentContainerView = getView().findViewById(R.id.mapsRoute);
+                fragmentContainerView.setVisibility(View.GONE);
+
                 LinearLayout linearLayoutOverview = getView().findViewById(R.id.overviewCont);
                 linearLayoutOverview.setVisibility(View.GONE);
 
@@ -357,7 +408,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                 bottomNavigationView.setVisibility(View.GONE);
 
                 // Replace the current fragment with the receiving fragment
-                transaction.replace(R.id.mapsRoute, mapsFragment);
+                transaction.replace(R.id.fragment_container, mapsFragment);
                 transaction.addToBackStack(null);
                 transaction.commit();
             }
@@ -432,6 +483,11 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
     private void updateMap() {
         // Add your code here to update the map
         // This method will be called every time you want to refresh the map
+
+        if (!isRunning) {
+            // Stop execution of the method if isRunning is false
+            return;
+        }
 
         if (currentLocMarker != null) {
             currentLocMarker.remove();
@@ -667,6 +723,11 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
         // Add your code here to update the map
         // This method will be called every time you want to refresh the map
 
+        if (!isRunning) {
+            // Stop execution of the method if isRunning is false
+            return;
+        }
+
         if (currentLocMarker != null) {
             currentLocMarker.remove();
         }
@@ -857,6 +918,11 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
     private void reUpdateMapAgain() {
         // Add your code here to update the map
         // This method will be called every time you want to refresh the map
+
+        if (!isRunning) {
+            // Stop execution of the method if isRunning is false
+            return;
+        }
 
         if (currentLocMarker != null) {
             currentLocMarker.remove();
@@ -1099,6 +1165,12 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
 
         @Override
         protected String doInBackground(Void... voids) {
+
+            if (!isRunning) {
+                // Stop the execution if isRunning is false
+                return null;
+            }
+
             String jsonResponseString = null;
             HttpURLConnection urlConnection = null;
             /*
@@ -1150,6 +1222,12 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
 
         @Override
         protected void onPostExecute(String jsonResponseString) {
+
+            if (!isRunning) {
+                // Stop further processing if isRunning is false
+                return;
+            }
+
             // Use the jsonResponseString in your application as needed
 
             try {
@@ -1158,7 +1236,13 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
 
                 // Check the status of the response
                 String status = jsonResponse.getString("status");
-                if (status.equals("OK")) {
+
+                if (!isRunning || !status.equals("OK")) {
+                    // Stop processing if isRunning is false or status is not "OK"
+                    return;
+                }
+
+                else if (status.equals("OK")) {
                     JSONArray routes = jsonResponse.getJSONArray("routes");
 
                     JSONObject routeSample = routes.getJSONObject(0);
@@ -1328,7 +1412,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                     // Format totalDistanceKm with 2 decimal places
                     String formattedDistance = String.format("%.2f", totalDistanceKm);
 
-                    double thresholdDistance = 0.015; // 0.015=15 meters threshold    1.2
+                    double thresholdDistance = 1.2; // 0.015=15 meters threshold    1.2
                     if (totalDistanceKm <= thresholdDistance) {
                         textViewDistance.setText("You have arrived at your destination.");
                         textViewDirection.setVisibility(View.GONE);

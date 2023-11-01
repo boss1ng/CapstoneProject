@@ -18,8 +18,12 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentContainerView;
 import androidx.fragment.app.FragmentTransaction;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -131,8 +135,28 @@ public class MapsInstructions extends DialogFragment {
 
                 // Use Bundle to pass values
                 Bundle bundle = new Bundle();
-                bundle.putString("isStop", "STOP");
-                mapsFragment.setArguments(bundle);
+
+                // Retrieve selected categories from Bundle arguments
+                Bundle getBundle = getArguments();
+
+                if (getBundle != null) {
+                    String userID = getBundle.getString("userId");
+                    bundle.putString("userId", userID);
+                    //bundle.putString("isStop", "STOP");
+                    mapsFragment.setArguments(bundle);
+                }
+
+                BottomNavigationView bottomNavigationView = getParentFragment().getView().findViewById(R.id.bottomNavigationView);
+                bottomNavigationView.setVisibility(View.GONE);
+
+                LinearLayout llLoc = getParentFragment().getView().findViewById(R.id.directionsCont);
+                llLoc.setVisibility(View.GONE);
+
+                FragmentContainerView fragmentContainerView = getParentFragment().getView().findViewById(R.id.mapsRoute);
+                fragmentContainerView.setVisibility(View.GONE);
+
+                LinearLayout llButt = getParentFragment().getView().findViewById(R.id.overviewCont);
+                llButt.setVisibility(View.GONE);
 
                 // Replace the current fragment with the receiving fragment
                 transaction.replace(R.id.fragment_container, mapsFragment);

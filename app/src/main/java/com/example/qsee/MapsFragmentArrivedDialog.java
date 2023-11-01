@@ -8,12 +8,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentContainerView;
 import androidx.fragment.app.FragmentTransaction;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MapsFragmentArrivedDialog extends DialogFragment {
 
@@ -62,19 +66,31 @@ public class MapsFragmentArrivedDialog extends DialogFragment {
 
                 MapsFragment mapsFragment = new MapsFragment();
 
-                //BottomNavigationView bottomNavigationView = getView().findViewById(R.id.bottomNavigationView);
-                //bottomNavigationView.setVisibility(View.GONE);
+                BottomNavigationView bottomNavigationView = getParentFragment().getView().findViewById(R.id.bottomNavigationView);
+                bottomNavigationView.setVisibility(View.GONE);
 
-                /*
-                LinearLayout llFilter = getView().findViewById(R.id.filterMenu);
+                LinearLayout llFilter = getParentFragment().getView().findViewById(R.id.filterMenu);
                 llFilter.setVisibility(View.GONE);
 
-                LinearLayout llLoc = getView().findViewById(R.id.layoutLocation);
+                LinearLayout llLoc = getParentFragment().getView().findViewById(R.id.layoutLocation);
                 llLoc.setVisibility(View.GONE);
 
-                LinearLayout llButt = getView().findViewById(R.id.layoutButtons);
+                FragmentContainerView fragmentContainerView = getParentFragment().getView().findViewById(R.id.maps);
+                fragmentContainerView.setVisibility(View.GONE);
+
+                LinearLayout llButt = getParentFragment().getView().findViewById(R.id.layoutButtons);
                 llButt.setVisibility(View.GONE);
-                 */
+
+                // Retrieve selected categories from Bundle arguments
+                Bundle getBundle = getArguments();
+                // Use Bundle to pass values
+                Bundle bundle = new Bundle();
+
+                if (getBundle != null) {
+                    String userID = getBundle.getString("userId");
+                    bundle.putString("userId", userID);
+                    mapsFragment.setArguments(bundle);
+                }
 
                 // Replace the current fragment with the receiving fragment
                 transaction.replace(R.id.fragment_container_arrived, mapsFragment);

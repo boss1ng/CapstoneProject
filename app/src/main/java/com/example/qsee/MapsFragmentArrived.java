@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -70,6 +71,11 @@ public class MapsFragmentArrived extends Fragment implements OnMapReadyCallback 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maps_arrived, container, false);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
+        // Set the default item as highlighted
+        MenuItem defaultItem = bottomNavigationView.getMenu().findItem(R.id.action_maps);
+        defaultItem.setChecked(true);
 
         // Initialize the FusedLocationProviderClient
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
@@ -167,8 +173,8 @@ public class MapsFragmentArrived extends Fragment implements OnMapReadyCallback 
 
             // DESTINATION LOCATION
             String placeName = bundle.getString("placeName");
-            //String destinationLatitude = bundle.getString("destinationLatitude");
-            //String destinationLongitude = bundle.getString("destinationLongitude");
+            String destinationLatitude = bundle.getString("destinationLatitude");
+            String destinationLongitude = bundle.getString("destinationLongitude");
 
             Double destLatitude = Double.parseDouble(destinationLatitude);
             Double destLongitude = Double.parseDouble(destinationLongitude);
@@ -263,6 +269,7 @@ public class MapsFragmentArrived extends Fragment implements OnMapReadyCallback 
         //bottomNavigationView.setVisibility(View.INVISIBLE);
 
 
+
         // Create a new PlaceDetailDialogFragment and pass the place details as arguments
         MapsFragmentArrivedDialog fragment = new MapsFragmentArrivedDialog();
         fragment.setCancelable(false);
@@ -274,16 +281,16 @@ public class MapsFragmentArrived extends Fragment implements OnMapReadyCallback 
 
         if (getBundle != null) {
             String placeName = getBundle.getString("placeName");
+            String userID = getBundle.getString("userId");
+            bundlePass.putString("userId", userID);
             bundlePass.putString("placeName", placeName);
 
-            fragment.setArguments(bundle);
+            fragment.setArguments(bundlePass);
         }
-
-        BottomNavigationView bottomNavigationView = getView().findViewById(R.id.bottomNavigationView);
-        bottomNavigationView.setVisibility(View.GONE);
 
         // Show the PlaceDetailDialogFragment as a dialog
         fragment.show(getChildFragmentManager(), "MapsFragmentArrivedDialog");
+
 
 
         /*
