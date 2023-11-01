@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -109,6 +110,34 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
 
         // Set click listener for options icon
         holder.optionsIcon.setOnClickListener(v -> showPopupMenu(holder.optionsIcon, position));
+
+        holder.locationNameTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Create the fragment you want to replace in the fragment_container
+                ItineraryViewFragment itineraryViewFragment = new ItineraryViewFragment();
+
+                // Pass the userId to the fragment
+                Bundle bundle = new Bundle();
+                bundle.putString("userId", userId);
+                bundle.putString("locationName", location.getLocationName());
+                itineraryViewFragment.setArguments(bundle);
+
+                // Get the parent FragmentActivity's FragmentManager
+                FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
+
+                // Begin the fragment transaction
+                FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+                // Replace the fragment_container with the new fragment
+                transaction.replace(R.id.fragment_container, itineraryViewFragment);
+                transaction.addToBackStack(null); // Optional: Add transaction to back stack
+                transaction.commit();
+
+            }
+        });
+
+
     }
 
     private void showPopupMenu(View view, int position) {

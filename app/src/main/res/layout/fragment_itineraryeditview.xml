@@ -10,7 +10,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-
         <ImageView
             android:id="@+id/backButton"
             android:layout_width="34dp"
@@ -53,20 +52,6 @@
             app:layout_constraintTop_toBottomOf="@+id/locName"
             app:layout_constraintVertical_bias="0.0" />
 
-        <TextView
-            android:id="@+id/groupName"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:gravity="right"
-            android:text="GroupName"
-            android:textSize="20dp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.938"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.009" />
 
         <TextView
             android:id="@+id/dayTitle1"
@@ -95,7 +80,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dayTitle1"
             app:layout_constraintVertical_bias="0.0"
-            tools:listitem="@layout/itineraryview_list_item" />
+            tools:listitem="@layout/itinerary_list_item" />
 
         <TextView
             android:id="@+id/dayTitle2"
@@ -123,7 +108,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dayTitle2"
             app:layout_constraintVertical_bias="0"
-            tools:listitem="@layout/itineraryview_list_item" />
+            tools:listitem="@layout/itinerary_list_item" />
 
         <TextView
             android:id="@+id/dayTitle3"
@@ -152,7 +137,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dayTitle3"
             app:layout_constraintVertical_bias="0.0"
-            tools:listitem="@layout/itineraryview_list_item" />
+            tools:listitem="@layout/itinerary_list_item" />
 
         <TextView
             android:id="@+id/dayTitle4"
@@ -177,7 +162,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dayTitle4"
-            tools:listitem="@layout/itineraryview_list_item" />
+            tools:listitem="@layout/itinerary_list_item" />
 
         <TextView
             android:id="@+id/dayTitle5"
@@ -205,7 +190,63 @@
             app:layout_constraintTop_toBottomOf="@+id/dayTitle5"
             app:layout_constraintVertical_bias="0.0"
             android:layout_marginBottom="80dp"
-            tools:listitem="@layout/itineraryview_list_item" />
+            tools:listitem="@layout/itinerary_list_item" />
+
+        <ImageView
+            android:id="@+id/optD1"
+            android:layout_width="20dp"
+            android:layout_height="22dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/dayTitle1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.955"
+            app:layout_constraintStart_toStartOf="@+id/dayTitle1"
+            app:srcCompat="@drawable/btn_add_white" />
+
+        <ImageView
+            android:id="@+id/optD2"
+            android:layout_width="20dp"
+            android:layout_height="22dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/dayTitle2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.955"
+            app:layout_constraintStart_toStartOf="@+id/dayTitle2"
+            app:srcCompat="@drawable/btn_add_white" />
+
+        <ImageView
+            android:id="@+id/optD3"
+            android:layout_width="20dp"
+            android:layout_height="22dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/dayTitle3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.955"
+            app:layout_constraintStart_toStartOf="@+id/dayTitle3"
+            app:srcCompat="@drawable/btn_add_white" />
+
+        <ImageView
+            android:id="@+id/optD4"
+            android:layout_width="20dp"
+            android:layout_height="22dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/dayTitle4"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.955"
+            app:layout_constraintStart_toStartOf="@+id/dayTitle4"
+            app:srcCompat="@drawable/btn_add_white" />
+
+        <ImageView
+            android:id="@+id/optD5"
+            android:layout_width="20dp"
+            android:layout_height="22dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/dayTitle5"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.955"
+            app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@drawable/btn_add_white" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

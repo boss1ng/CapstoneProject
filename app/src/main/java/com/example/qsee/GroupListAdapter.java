@@ -3,6 +3,7 @@ package com.example.qsee;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Typeface;
+import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.RelativeSizeSpan;
@@ -125,11 +126,58 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
         holder.editImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Handle the edit group action here
-                // You can show an edit dialog or navigate to an edit screen
-                // You can access the group information using 'group'
+                String groupName = group.getGroupName();
+
+                // Check if the user is the admin
+                if (!group.getAdmin().equals(userId)) {
+                    // Show a toast message indicating that only admins can edit the group
+                    Toast.makeText(v.getContext(), "Only admins can edit the group", Toast.LENGTH_SHORT).show();
+                } else {
+                    // User is the admin, proceed with the edit action
+                    GroupEditFragment groupEditFragment = new GroupEditFragment();
+
+                    // Pass any necessary data to the fragment using Bundle
+                    Bundle args = new Bundle();
+                    args.putString("groupName", groupName);
+                    args.putString("userId",userId);
+                    groupEditFragment.setArguments(args);
+
+                    // Begin the transaction to replace the current fragment with GroupEditFragment
+                    AppCompatActivity activity = (AppCompatActivity) v.getContext();
+                    FragmentManager fragmentManager = activity.getSupportFragmentManager();
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.fragment_container, groupEditFragment) // Replace fragment_container with the ID of your container
+                            .addToBackStack(null) // Add the transaction to the back stack
+                            .commit();
+                }
             }
         });
+
+        holder.groupNameTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String groupName = group.getGroupName();
+
+                    // User is the admin, proceed with the edit action
+                    GroupViewFragment groupViewFragment = new GroupViewFragment();
+
+                    // Pass any necessary data to the fragment using Bundle
+                    Bundle args = new Bundle();
+                    args.putString("groupName", groupName);
+                    args.putString("userId",userId);
+                    groupViewFragment.setArguments(args);
+
+                    // Begin the transaction to replace the current fragment with GroupEditFragment
+                    AppCompatActivity activity = (AppCompatActivity) v.getContext();
+                    FragmentManager fragmentManager = activity.getSupportFragmentManager();
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.fragment_container, groupViewFragment) // Replace fragment_container with the ID of your container
+                            .addToBackStack(null) // Add the transaction to the back stack
+                            .commit();
+
+            }
+        });
+
 
         holder.deleteImageView.setOnClickListener(new View.OnClickListener() {
             @Override

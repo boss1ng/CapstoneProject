@@ -28,13 +28,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class UpdateItineraryFragment extends Fragment {
+public class ItineraryViewFragment extends Fragment {
 
     private String userId;
     private String locationName;
 
-    public static UpdateItineraryFragment newInstance(String userId, String locationName) {
-        UpdateItineraryFragment fragment = new UpdateItineraryFragment();
+    public static ItineraryViewFragment newInstance(String userId, String locationName) {
+        ItineraryViewFragment fragment = new ItineraryViewFragment();
         Bundle args = new Bundle();
         args.putString("userId", userId);
         args.putString("locationName", locationName);
@@ -115,19 +115,16 @@ public class UpdateItineraryFragment extends Fragment {
                         int recyclerViewId = getResources().getIdentifier("day" + i + "Recycler", "id", requireActivity().getPackageName());
                         RecyclerView recyclerView = requireView().findViewById(recyclerViewId);
                         // Inside UpdateItineraryFragment
-                        EditItineraryAdapter adapter = new EditItineraryAdapter(getContext(), itineraryList, userId, iterName);
+                        ItineraryViewAdapter adapter = new ItineraryViewAdapter(getContext(), itineraryList, userId, iterName);
                         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
                         recyclerView.setAdapter(adapter);
 
                         // Hide the day title if there are no items in the RecyclerView
                         TextView dayTitleTextView = requireView().findViewById(getResources().getIdentifier("dayTitle" + i, "id", requireActivity().getPackageName()));
-                        ImageView dayOpt = requireView().findViewById(getResources().getIdentifier("optD" + i, "id", requireActivity().getPackageName()));
                         if (itineraryList.isEmpty()) {
                             dayTitleTextView.setVisibility(View.GONE);
-                            dayOpt.setVisibility(View.GONE);
                         } else {
                             dayTitleTextView.setVisibility(View.VISIBLE);
-                            dayOpt.setVisibility(View.VISIBLE);
                             if (!dateText.isEmpty()) {
                                 dayTitleTextView.setText(dateText);
                             }
@@ -156,7 +153,7 @@ public class UpdateItineraryFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_itineraryeditview, container, false);
+        return inflater.inflate(R.layout.fragment_itineraryview, container, false);
     }
 
     @Override
@@ -165,7 +162,6 @@ public class UpdateItineraryFragment extends Fragment {
         if (locationName != null) {
             setLocNameFromFirebase(locationName);
         }
-
         // Handle the back button click to pop the back stack
         ImageView backButton = view.findViewById(R.id.backButton);
         backButton.setOnClickListener(new View.OnClickListener() {
@@ -176,130 +172,5 @@ public class UpdateItineraryFragment extends Fragment {
             }
         });
 
-        ImageView optD1 = view.findViewById(R.id.optD1);
-        ImageView optD2 = view.findViewById(R.id.optD2);
-        ImageView optD3 = view.findViewById(R.id.optD3);
-        ImageView optD4 = view.findViewById(R.id.optD4);
-        ImageView optD5 = view.findViewById(R.id.optD5);
-
-        optD1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Perform action for optD1 click
-                // For example, open the AddItineraryActivity fragment for Day 1
-                AddItineraryActivity addItineraryActivity = new AddItineraryActivity();
-
-                // Create a bundle to pass data
-                Bundle args = new Bundle();
-                args.putString("iterName", locationName); // Pass the iterName
-                args.putString("day", "Day 1"); // Pass the day
-                addItineraryActivity.setArguments(args);
-
-                FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragment_container, addItineraryActivity);
-                transaction.addToBackStack(null); // Optional, to add the transaction to the back stack
-                transaction.commit();
-            }
-        });
-
-        optD1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Perform action for optD1 click
-                // For example, open the AddItineraryActivity fragment for Day 1
-                AddItineraryActivity addItineraryActivity = new AddItineraryActivity();
-
-                // Create a bundle to pass data
-                Bundle args = new Bundle();
-                args.putString("iterName", locationName); // Pass the iterName
-                args.putString("day", "Day1"); // Pass the day
-                addItineraryActivity.setArguments(args);
-
-                FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragment_container, addItineraryActivity);
-                transaction.addToBackStack(null); // Optional, to add the transaction to the back stack
-                transaction.commit();
-            }
-        });
-
-        optD2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Perform action for optD1 click
-                // For example, open the AddItineraryActivity fragment for Day 1
-                AddItineraryActivity addItineraryActivity = new AddItineraryActivity();
-
-                // Create a bundle to pass data
-                Bundle args = new Bundle();
-                args.putString("iterName", locationName); // Pass the iterName
-                args.putString("day", "Day2"); // Pass the day
-                addItineraryActivity.setArguments(args);
-
-                FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragment_container, addItineraryActivity);
-                transaction.addToBackStack(null); // Optional, to add the transaction to the back stack
-                transaction.commit();
-            }
-        });
-
-        optD3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Perform action for optD1 click
-                // For example, open the AddItineraryActivity fragment for Day 1
-                AddItineraryActivity addItineraryActivity = new AddItineraryActivity();
-
-                // Create a bundle to pass data
-                Bundle args = new Bundle();
-                args.putString("iterName", locationName); // Pass the iterName
-                args.putString("day", "Day3"); // Pass the day
-                addItineraryActivity.setArguments(args);
-
-                FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragment_container, addItineraryActivity);
-                transaction.addToBackStack(null); // Optional, to add the transaction to the back stack
-                transaction.commit();
-            }
-        });
-
-        optD4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Perform action for optD1 click
-                // For example, open the AddItineraryActivity fragment for Day 1
-                AddItineraryActivity addItineraryActivity = new AddItineraryActivity();
-
-                // Create a bundle to pass data
-                Bundle args = new Bundle();
-                args.putString("iterName", locationName); // Pass the iterName
-                args.putString("day", "Day4"); // Pass the day
-                addItineraryActivity.setArguments(args);
-
-                FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragment_container, addItineraryActivity);
-                transaction.addToBackStack(null); // Optional, to add the transaction to the back stack
-                transaction.commit();
-            }
-        });
-
-        optD5.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Perform action for optD1 click
-                // For example, open the AddItineraryActivity fragment for Day 1
-                AddItineraryActivity addItineraryActivity = new AddItineraryActivity();
-
-                // Create a bundle to pass data
-                Bundle args = new Bundle();
-                args.putString("iterName", locationName); // Pass the iterName
-                args.putString("day", "Day5"); // Pass the day
-                addItineraryActivity.setArguments(args);
-
-                FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragment_container, addItineraryActivity);
-                transaction.addToBackStack(null); // Optional, to add the transaction to the back stack
-                transaction.commit();
-            }
-        });
     }
 }
