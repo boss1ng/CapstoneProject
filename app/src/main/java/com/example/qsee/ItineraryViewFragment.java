@@ -1,13 +1,20 @@
 package com.example.qsee;
 
 import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.pdf.PdfDocument;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,6 +29,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -172,5 +182,60 @@ public class ItineraryViewFragment extends Fragment {
             }
         });
 
+        // Add the download button functionality
+        ImageView downloadBtn = view.findViewById(R.id.downloadBtn);
+        downloadBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Call the method to generate and download the PDF
+                generatePDF();
+            }
+        });
+
+    }
+    private void generatePDF() {
+        // Get the root view
+        final View rootView = requireView();
+
+        // Get the height of the whole content in the ScrollView
+        int height = 0;
+        for (int i = 0; i < ((ViewGroup) rootView).getChildCount(); i++) {
+            height += ((ViewGroup) rootView).getChildAt(i).getHeight();
+        }
+        int width = rootView.getWidth();
+
+        // Create a bitmap and a canvas to draw the content
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        rootView.draw(canvas);
+
+        // Create a PDF document
+        PdfDocument document = new PdfDocument();
+        PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(width, height, 1).create();
+        PdfDocument.Page page = document.startPage(pageInfo);
+        Canvas pdfCanvas = page.getCanvas();
+        Paint paint = new Paint();
+        pdfCanvas.drawBitmap(bitmap, 0, 0, paint);
+        document.finishPage(page);
+
+        // Define the file path for the PDF
+        String fileName = locationName + " - " + "itinerary.pdf";
+        File file = new File(requireContext().getFilesDir(), fileName);
+
+        // Create a file output stream
+        try {
+            FileOutputStream outputStream = new FileOutputStream(file);
+            document.writeTo(outputStream);
+            outputStream.flush();
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Close the document
+        document.close();
+
+        // Show a toast indicating that the PDF has been saved
+        Toast.makeText(requireContext(), "PDF saved to " + file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
     }
 }

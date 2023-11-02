@@ -22,16 +22,6 @@
         android:layout_weight="1"/>
 
     <ImageView
-        android:id="@+id/download"
-        android:layout_width="29dp"
-        android:layout_height="25dp"
-        android:layout_marginStart="8dp"
-        app:srcCompat="@drawable/btn_download"
-        android:layout_gravity="center_vertical"
-        android:layout_marginLeft="8dp"
-        android:clickable="true"/>
-
-    <ImageView
         android:id="@+id/options"
         android:layout_width="29dp"
         android:layout_height="25dp"
