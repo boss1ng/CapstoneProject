@@ -1,12 +1,16 @@
 package com.example.qsee;
 
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
 import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.pdf.PdfDocument;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +22,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -42,6 +48,7 @@ public class ItineraryViewFragment extends Fragment {
 
     private String userId;
     private String locationName;
+    private static final int REQUEST_CODE_WRITE_EXTERNAL_STORAGE = 101;
 
     public static ItineraryViewFragment newInstance(String userId, String locationName) {
         ItineraryViewFragment fragment = new ItineraryViewFragment();
@@ -187,8 +194,18 @@ public class ItineraryViewFragment extends Fragment {
         downloadBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Call the method to generate and download the PDF
-                generatePDF();
+                // Check for the permission
+                if (ContextCompat.checkSelfPermission(requireContext(), WRITE_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    // Permission is not granted, request it
+                    ActivityCompat.requestPermissions(requireActivity(),
+                            new String[]{WRITE_EXTERNAL_STORAGE},
+                            REQUEST_CODE_WRITE_EXTERNAL_STORAGE);
+                } else {
+                    // Permission has already been granted, proceed with the PDF generation and saving
+                    generatePDF();
+                }
+
             }
         });
 
@@ -220,7 +237,9 @@ public class ItineraryViewFragment extends Fragment {
 
         // Define the file path for the PDF
         String fileName = locationName + " - " + "itinerary.pdf";
-        File file = new File(requireContext().getFilesDir(), fileName);
+        File downloadsFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        File file = new File(downloadsFolder, fileName);
+        String filePath = file.getAbsolutePath();
 
         // Create a file output stream
         try {
@@ -236,6 +255,6 @@ public class ItineraryViewFragment extends Fragment {
         document.close();
 
         // Show a toast indicating that the PDF has been saved
-        Toast.makeText(requireContext(), "PDF saved to " + file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(requireContext(), "PDF saved to " + filePath, Toast.LENGTH_SHORT).show();
     }
 }
