@@ -107,6 +107,8 @@ public class PlaceDetailDialogFragment extends DialogFragment {
             directionsButton.setEnabled(true);
         else
             directionsButton.setEnabled(false);
+        //directionsButton.setEnabled(true);
+
 
         // Add a click listener to the Directions button
         directionsButton.setOnClickListener(new View.OnClickListener() {

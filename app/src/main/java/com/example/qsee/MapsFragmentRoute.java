@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
@@ -118,7 +120,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                             handler.removeCallbacks(mapRefreshRunnable); // Remove any pending callbacks // Dismiss the dialog
                         }
                     };
-                    handlerDelay.postDelayed(runnable, 1000); // Schedule it to run after 1 second
+                    handlerDelay.postDelayed(runnable, 900); // Schedule it to run after 1 second
 
                     bottomNavigationView.setVisibility(View.GONE);
                     loadFragment(new HomeFragment());
@@ -213,28 +215,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
             mapFragment.getMapAsync(this);
         }
 
-        // Retrieve selected categories from Bundle arguments
-        Bundle getBundle = getArguments();
 
-        if (getBundle != null) {
-            String userID = getBundle.getString("userId");
-            String destinationLatitude = getBundle.getString("destinationLatitude");
-            String destinationLongitude = getBundle.getString("destinationLongitude");
-            Double passedCurrentUserLocationLat = getBundle.getDouble("userCurrentLatitude");
-            Double passedCurrentUserLocationLong = getBundle.getDouble("userCurrentLongitude");
-
-            // STORE ORIGIN-DESTINATION DATA FOR COME BACK WHEN APP IS CLOSED OR NAVIGATED TO OTHER OPTIONS
-            SharedPreferences sharedPreferences = getContext().getSharedPreferences("MyAppPreferences", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-
-            // editor.putString("user_destLat_destLong", userID + "&" + destinationLatitude + "&" + destinationLongitude);
-            editor.putString("user", userID);
-            editor.putString("destinationLatitude", destinationLatitude);
-            editor.putString("destinationLongitude", destinationLongitude);
-            editor.putString("originLatitude", String.valueOf(passedCurrentUserLocationLat));
-            editor.putString("originLongitude", String.valueOf(passedCurrentUserLocationLong));
-            editor.apply();
-        }
 
         return view;
     }
@@ -252,8 +233,28 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
 
         if (getBundle != null) {
             String userID = getBundle.getString("userId");
+            String destinationLatitude = getBundle.getString("destinationLatitude");
+            String destinationLongitude = getBundle.getString("destinationLongitude");
+            Double passedCurrentUserLocationLat = getBundle.getDouble("userCurrentLatitude");
+            Double passedCurrentUserLocationLong = getBundle.getDouble("userCurrentLongitude");
+
             bundle.putString("userId", userID);
             fragment.setArguments(bundle);
+
+            // STORE ORIGIN-DESTINATION DATA FOR COME BACK WHEN APP IS CLOSED OR NAVIGATED TO OTHER OPTIONS
+            SharedPreferences sharedPreferences = getContext().getSharedPreferences("MyAppPreferences", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+
+            editor.clear();
+            editor.apply(); // Apply the changes
+
+            // editor.putString("user_destLat_destLong", userID + "&" + destinationLatitude + "&" + destinationLongitude);
+            editor.putString("user", userID);
+            editor.putString("destinationLatitude", destinationLatitude);
+            editor.putString("destinationLongitude", destinationLongitude);
+            editor.putString("originLatitude", String.valueOf(passedCurrentUserLocationLat));
+            editor.putString("originLongitude", String.valueOf(passedCurrentUserLocationLong));
+            editor.apply();
         }
 
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
@@ -457,49 +458,26 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                     // Stop the execution if the flag is false
                     return;
                 }
-
+//ADDED
+                // Check network connectivity
+                ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+                if (networkInfo == null || !networkInfo.isConnected()) {
+                    handler.postDelayed(this, 1000);
+                }
+//
                 //updateMap();
                 if (currentRoutePolyline != null && currentBorderPolyline != null) {
                     //updateMap();
                     reUpdateMapAgain();
                     handler.postDelayed(this, 1000);
-
-                    /*
-                    currentRoutePolyline.remove();
-                    currentBorderPolyline.remove();
-                    currentRoutePolyline = null;
-                    currentBorderPolyline = null;
-                    */
                 }
 
                 else if (previousCurrentRoutePolyline != null && previousCurrentBorderPolyline != null) {
                     //manualMap();
                     reUpdateMap();
                     handler.postDelayed(this, 1000);
-
-                    /*
-                    previousCurrentRoutePolyline.remove();
-                    previousCurrentBorderPolyline.remove();
-                    previousCurrentRoutePolyline = null;
-                    previousCurrentBorderPolyline = null;
-                    */
                 }
-
-                //manualMap();
-                //reUpdateMap();
-                //handler.postDelayed(this, 1000); // Schedule the next execution after 1 second
-
-                /*
-                Runnable mapRefreshRunnable1 = new Runnable() {
-                    @Override
-                    public void run() {
-                        updateMap();
-                        handler.postDelayed(this, 2000);
-                    }
-                };
-                handler.postDelayed(mapRefreshRunnable1, 2000); // Schedule it to run again in 1 second
-                */
-
             }
         };
 
