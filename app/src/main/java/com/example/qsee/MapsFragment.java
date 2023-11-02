@@ -7,6 +7,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,6 +30,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -52,15 +54,32 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     // Create a LatLngBounds that includes Quezon City, Philippines.
-    private LatLngBounds QUEZON_CITY = new LatLngBounds(
-            new LatLng(14.65, 121.03),      // SW bounds
-            new LatLng(14.70, 121.07));     // NE bounds
+
+    // 13
+    private LatLngBounds QUEZON_CITY_13 = new LatLngBounds(
+            new LatLng(14.637, 121.02),      // SW bounds
+            new LatLng(14.7289, 121.103));     // NE bounds
+    // 14
+    private LatLngBounds QUEZON_CITY_14 = new LatLngBounds(
+            new LatLng(14.61, 121.004),      // SW bounds      .. bawas->bababa .. bawas->kakaliwa
+            new LatLng(14.757, 121.123));     // NE bounds     .. dagdag->tataas .. dagdag->kakanan
+    // 15
+    private LatLngBounds QUEZON_CITY_15 = new LatLngBounds(
+            new LatLng(14.597, 120.995),      // SW bounds
+            new LatLng(14.7675, 121.129));     // NE bounds
+    // 16
+    private LatLngBounds QUEZON_CITY_16 = new LatLngBounds(
+            new LatLng(14.592, 120.99),      // SW bounds
+            new LatLng(14.7735, 121.133));     // NE bounds
+
     private FusedLocationProviderClient fusedLocationProviderClient;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private PlacesClient placesClient;
 
     Double currentUserLocationLat;
     Double currentUserLocationLong;
+
+    boolean isUserInQuezonCity = true;
 
     public MapsFragment() {
         // Required empty public constructor
@@ -176,9 +195,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             }
         });
          */
-
-        //BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
-        //bottomNavigationView.setVisibility(View.INVISIBLE);
 
         ImageButton filterMenuBar = view.findViewById(R.id.filterMenuBar);
         filterMenuBar.setOnClickListener(new View.OnClickListener() {
@@ -313,7 +329,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         mMap.getUiSettings().setCompassEnabled(true);
 
         // Constrain the camera target to the Quezon City bounds.
-        mMap.setLatLngBoundsForCameraTarget(QUEZON_CITY);
+        //mMap.setLatLngBoundsForCameraTarget(QUEZON_CITY);
 
         float minZoomLevel = 13;
         float maxZoomLevel = 16;
@@ -322,14 +338,44 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         mMap.setMinZoomPreference(minZoomLevel); // Set the minimum desired zoom level.
         mMap.setMaxZoomPreference(maxZoomLevel); // Set the maximum desired zoom level.
 
-        // Get the maximum zoom level available on the map.
-        //float maxZoomLevel = mMap.getMaxZoomLevel();
+        // Get the current zoom level from the GoogleMap object (mMap)
+        //float currentZoomLevel = mMap.getCameraPosition().zoom;
+        //currentZoomLevel = mMap.getCameraPosition().zoom;
+        //Toast.makeText(getContext(), String.valueOf(currentZoomLevel), Toast.LENGTH_SHORT).show();
 
-        // Create a CameraUpdate object to set the zoom level to the maximum.
-        //CameraUpdate zoomOut = CameraUpdateFactory.newLatLngZoom(mMap.getCameraPosition().target, maxZoomLevel);
+        /*
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // Code to be executed after a 2-second delay
+                float currentZoomLevel = mMap.getCameraPosition().zoom;
+                Toast.makeText(getContext(), String.valueOf(currentZoomLevel), Toast.LENGTH_SHORT).show();
+            }
+        }, 2000); // 2000 milliseconds (2 seconds)
+         */
 
-        // Apply the zoomOut update to the map.
-        //mMap.animateCamera(zoomOut);
+        mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
+            float currentZoomLevel = mMap.getCameraPosition().zoom;
+            @Override
+            public void onCameraMove() {
+                CameraPosition cameraPosition = mMap.getCameraPosition();
+                if(cameraPosition.zoom >= 13.0 && cameraPosition.zoom < 14.0) {
+                    mMap.setLatLngBoundsForCameraTarget(QUEZON_CITY_13);
+                }
+
+                else if(cameraPosition.zoom >= 14.0 && cameraPosition.zoom < 15.0) {
+                    mMap.setLatLngBoundsForCameraTarget(QUEZON_CITY_14);
+                }
+
+                else if(cameraPosition.zoom >= 15.0 && cameraPosition.zoom < 16.0) {
+                    mMap.setLatLngBoundsForCameraTarget(QUEZON_CITY_15);
+                }
+
+                else {
+                    mMap.setLatLngBoundsForCameraTarget(QUEZON_CITY_16);
+                }
+            }
+        });
 
         // Check if location permission is granted
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
@@ -361,7 +407,31 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 // mMap.addMarker(new MarkerOptions().position(userLocation).title("Your Location"));
 
                 // Move the camera to the user's location
-                //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
+                //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 13));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, minZoomLevel));
+
+                isUserInQuezonCity = QUEZON_CITY_13.contains(new LatLng(latitude, longitude));
+
+                if (isUserInQuezonCity) {
+                    // The user is within Quezon City
+                    // You can perform specific actions or display messages as needed.
+                    //Toast.makeText(getContext(), "WITHIN", Toast.LENGTH_SHORT).show();
+                } else {
+                    // The user is outside Quezon City
+                    // You can handle this case accordingly.
+                    //Toast.makeText(getContext(), "OUTSIDE", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "You are outside Quezon City.", Toast.LENGTH_LONG).show();
+
+                    // Create a Handler to introduce a delay
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            // Display the second Toast with LENGTH_LONG duration after a delay
+                            Toast.makeText(getContext(), "You won't be able to route.", Toast.LENGTH_LONG).show();
+                        }
+                    }, 3500); // 2000 milliseconds (2 seconds) delay
+                }
             }
         });
 
@@ -478,6 +548,21 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                                                     args.putDouble("userLongitude", currentUserLocationLong);
                                                     args.putString("destinationLatitude", parts[5]);
                                                     args.putString("destinationLongitude", parts[6]);
+
+                                                    args.putString("isUserInQuezonCity", String.valueOf(isUserInQuezonCity));
+
+                                                    /*
+                                                    if (isUserInQuezonCity) {
+                                                        // The user is within Quezon City
+                                                        // You can perform specific actions or display messages as needed.
+                                                        Toast.makeText(getContext(), "WITHIN", Toast.LENGTH_SHORT).show();
+                                                        args.putString("isUserInQuezonCity", "MISS KO NA KAT");
+                                                    } else {
+                                                        // The user is outside Quezon City
+                                                        // You can handle this case accordingly.
+                                                        args.putString("isUserInQuezonCity", "FALSE");
+                                                    }
+                                                     */
 
                                                     fragment.setArguments(args);
 
@@ -640,6 +725,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                                     args.putDouble("userLongitude", currentUserLocationLong);
                                     args.putString("destinationLatitude", parts[5]);
                                     args.putString("destinationLongitude", parts[6]);
+
+                                    args.putString("isUserInQuezonCity", String.valueOf(isUserInQuezonCity));
+
                                     fragment.setArguments(args);
                                 }
 

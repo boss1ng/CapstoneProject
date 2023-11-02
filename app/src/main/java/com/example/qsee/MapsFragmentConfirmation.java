@@ -476,6 +476,9 @@ public class MapsFragmentConfirmation extends Fragment implements OnMapReadyCall
                 }
             });
 
+            Button proceedButton = getView().findViewById(R.id.btnProceed);
+            proceedButton.setEnabled(true);
+
             // return true;
         }
 

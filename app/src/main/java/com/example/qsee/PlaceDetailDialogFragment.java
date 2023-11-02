@@ -78,9 +78,6 @@ public class PlaceDetailDialogFragment extends DialogFragment {
         String destinationLat = getArguments().getString("destinationLatitude");
         String destinationLong = getArguments().getString("destinationLongitude");
 
-        //String userID = getArguments().getString("userId");
-        //Toast.makeText(getContext(), userID, Toast.LENGTH_SHORT).show();
-
         // Toast.makeText(getContext(), String.valueOf(destinationLat), Toast.LENGTH_LONG).show();
 
         // Populate UI elements with place details
@@ -102,6 +99,14 @@ public class PlaceDetailDialogFragment extends DialogFragment {
                 .load(placeLink)
                 .into(imageViewLocation);
         priceTextView.setText(placePrice);
+
+        String isUserInQuezonCity = getArguments().getString("isUserInQuezonCity");
+        //Toast.makeText(getContext(), isUserInQuezonCity, Toast.LENGTH_LONG).show();
+
+        if (isUserInQuezonCity.equals("true"))
+            directionsButton.setEnabled(true);
+        else
+            directionsButton.setEnabled(false);
 
         // Add a click listener to the Directions button
         directionsButton.setOnClickListener(new View.OnClickListener() {
