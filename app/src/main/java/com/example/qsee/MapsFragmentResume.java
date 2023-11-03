@@ -76,10 +76,14 @@ public class MapsFragmentResume extends DialogFragment {
 
         Button buttonResume = view.findViewById(R.id.btnYes);
         Button buttonStop = view.findViewById(R.id.btnNo);
-
         buttonResume.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                SharedPreferences sharedPreferences = getContext().getSharedPreferences("MyAppPreferences", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.clear();
+                editor.apply(); // Apply the changes
+
                 dismiss();
 
                 FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
@@ -101,6 +105,8 @@ public class MapsFragmentResume extends DialogFragment {
 
                     String userID = getBundle.getString("userId");
                     bundle.putString("userId", userID);
+
+                    bundle.putString("isResume", "Resume Route");
 
                     bundle.putString("placeName", placeName);
                     bundle.putDouble("userCurrentLatitude", passedCurrentUserLocationLat);

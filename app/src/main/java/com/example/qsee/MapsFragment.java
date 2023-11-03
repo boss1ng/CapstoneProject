@@ -272,7 +272,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         //Toast.makeText(getContext(), "Dest LATITUDE: " + destinationLatitude, Toast.LENGTH_LONG).show();
         //Toast.makeText(getContext(), "Dest LONGITUDE: " + destinationLongitude, Toast.LENGTH_LONG).show();
 
-        if (!(userID.equals("0")) && !(destinationLatitude.equals("0.0")) && !(destinationLongitude.equals("0.0")) && !(originLatitude.equals("0.0")) && !(originLongitude.equals("0.0"))) {
+        if (!(userID.equals("0")) || !(destinationLatitude.equals("0.0")) || !(destinationLongitude.equals("0.0")) || !(originLatitude.equals("0.0")) || !(originLongitude.equals("0.0"))) {
 
             if (getBundle != null) {
                 String passUserID = getBundle.getString("userId");
@@ -354,6 +354,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         }, 2000); // 2000 milliseconds (2 seconds)
          */
 
+
         mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
             float currentZoomLevel = mMap.getCameraPosition().zoom;
             @Override
@@ -408,6 +409,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
                 // Move the camera to the user's location
                 //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 13));
+
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, minZoomLevel));
 
                 isUserInQuezonCity = QUEZON_CITY_13.contains(new LatLng(latitude, longitude));
@@ -432,6 +434,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                         }
                     }, 3500); // 2000 milliseconds (2 seconds) delay
                 }
+
             }
         });
 
