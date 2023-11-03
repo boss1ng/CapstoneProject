@@ -106,8 +106,8 @@ public class PlaceDetailDialogFragment extends DialogFragment {
         if (isUserInQuezonCity.equals("true"))
             directionsButton.setEnabled(true);
         else
-            directionsButton.setEnabled(false);
-        //directionsButton.setEnabled(true);
+            directionsButton.setEnabled(true);
+        //directionsButton.setEnabled(false);
 
 
         // Add a click listener to the Directions button

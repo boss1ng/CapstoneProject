@@ -2,14 +2,19 @@ package com.example.qsee;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +29,12 @@ import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -54,6 +65,7 @@ public class HomeFragment extends Fragment {
     private JSONArray forecasts;
     private int currentDayIndex = 0; // Track the currently displayed day index.
     private final Map<String, List<Double>> dailyForecasts = new HashMap<>(); // Declare dailyForecasts as a class-level variable
+    private String postUsername;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -103,7 +115,7 @@ public class HomeFragment extends Fragment {
 
         if (getBundle != null) {
             String userID = getBundle.getString("userId");
-            Toast.makeText(getContext(), userID, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getContext(), userID, Toast.LENGTH_SHORT).show();
         }
 
         BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
@@ -135,7 +147,253 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        // For Reading the Database
+        // Initialize Firebase Database reference
+        // Reference to the "Location" node in Firebase
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Posts");
+        DatabaseReference mobileUsersReference = FirebaseDatabase.getInstance().getReference().child("MobileUsers");
+
+        // Create a list to store the retrieved data as maps
+        List<Map<String, String>> dataMapList = new ArrayList<>();
+
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                for (DataSnapshot placeSnapshot : snapshot.getChildren()) {
+
+                    // Extract user posts data
+                    String postCaption = placeSnapshot.child("caption").getValue(String.class);
+                    String postImage = placeSnapshot.child("imageUrl").getValue(String.class);
+                    Long postTimestamp = placeSnapshot.child("timestamp").getValue(Long.class);
+                    String postUserId = placeSnapshot.child("userId").getValue(String.class);
+
+                    // Create a data map and add the values
+                    Map<String, String> dataMap = new HashMap<>();
+                    dataMap.put("caption", postCaption);
+                    dataMap.put("imageUrl", postImage);
+                    dataMap.put("timestamp", String.valueOf(postTimestamp));
+                    dataMap.put("userId", postUserId);
+
+                    // Add the data map to the list
+                    dataMapList.add(dataMap);
+                }
+
+                // Reverse the list
+                Collections.reverse(dataMapList);
+
+                // Now, dataMapList contains the data in reverse order as maps
+                // You can iterate over it to access the data
+                for (Map<String, String> dataMap : dataMapList) {
+                    String caption = dataMap.get("caption");
+                    String imageUrl = dataMap.get("imageUrl");
+                    String timestamp = dataMap.get("timestamp");
+                    String userId = dataMap.get("userId");
+                    //String usernamePost = dataMap.get("username");
+
+                    final String[] username_post = new String[1];
+
+                    mobileUsersReference.orderByChild("userId").equalTo(userId)
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot mobileUsersSnapshot) {
+                            for (DataSnapshot userSnapshot : mobileUsersSnapshot.getChildren()) {
+                                username_post[0] = AESUtils.decrypt(userSnapshot.child("username").getValue(String.class));
+                                String profilePictureUrl = userSnapshot.child("profilePictureUrl").getValue(String.class);
+                                //Toast.makeText(getContext(), username_post[0], Toast.LENGTH_LONG).show();
+
+                                LinearLayout dynamicLayoutContainer = getView().findViewById(R.id.feedDisplayLayout); // Replace with your container ID
+
+                                LinearLayout innerLayout1 = new LinearLayout(getActivity());
+                                innerLayout1.setLayoutParams(new LinearLayout.LayoutParams(
+                                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+                                ));
+                                innerLayout1.setPadding(25, 25, 25, 25);
+                                innerLayout1.setOrientation(LinearLayout.HORIZONTAL);
+                                innerLayout1.setBackgroundColor(0xffefefef);
+
+                                // Get the existing layout parameters of innerLayout1
+                                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) innerLayout1.getLayoutParams();
+
+                                // Set the margins
+                                layoutParams.setMargins(0, 20, 0, 0);
+
+                                // Apply the layout parameters to innerLayout1
+                                innerLayout1.setLayoutParams(layoutParams);
+
+                                        LinearLayout innerLayout2 = new LinearLayout(getActivity());
+                                        innerLayout2.setLayoutParams(new LinearLayout.LayoutParams(
+                                                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                                        innerLayout2.setOrientation(LinearLayout.HORIZONTAL);
+                                        innerLayout2.setPadding(10, 10, 10, 10);
+
+                                                LinearLayout innerLayout3 = new LinearLayout(getActivity());
+                                                innerLayout3.setLayoutParams(new LinearLayout.LayoutParams(
+                                                        LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT));
+                                                innerLayout3.setOrientation(LinearLayout.HORIZONTAL);
+
+                                                            ImageView imageView15 = new ImageView(getActivity());
+                                                            imageView15.setId(View.generateViewId());
+                                                            imageView15.setLayoutParams(new LinearLayout.LayoutParams(150, 150));
+                                                            if (profilePictureUrl == null)
+                                                                imageView15.setImageResource(R.drawable.profilepicture);
+                                                            else
+                                                                loadUserPostImage(profilePictureUrl, imageView15);
+
+                                                            TextView userName = new TextView(getActivity());
+                                                            userName.setId(View.generateViewId());
+                                                            userName.setLayoutParams(new LinearLayout.LayoutParams(
+                                                                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                                                            userName.setPadding(10, 0, 0, 0);
+                                                            //userName.setText("Username");
+                                                            userName.setText(username_post[0]);
+                                                            userName.setTypeface(null, Typeface.BOLD);
+
+                                                LinearLayout innerLayout4 = new LinearLayout(getActivity());
+                                                innerLayout4.setLayoutParams(new LinearLayout.LayoutParams(
+                                                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+                                                innerLayout4.setOrientation(LinearLayout.HORIZONTAL);
+                                                innerLayout4.setGravity(Gravity.END);
+
+                                                            TextView time = new TextView(getActivity());
+                                                            time.setId(View.generateViewId());
+                                                            time.setLayoutParams(new LinearLayout.LayoutParams(
+                                                                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                                                            //time.setText("an hour ago");
+                                                            /*
+                                                            if (timestamp != null && !timestamp.equalsIgnoreCase("null") && !timestamp.isEmpty()) {
+                                                                long timestampLong = Long.parseLong(timestamp);
+                                                                String timeAgo = getTimeAgo(timestampLong);
+                                                                time.setText(timeAgo);
+                                                            }
+                                                             */
+                                                            time.setText(getTimeAgo(Long.parseLong(timestamp)));
+                                                            //time.setTypeface(null, Typeface.ITALIC);
+                                                            time.setTypeface(Typeface.defaultFromStyle(Typeface.ITALIC));
+
+                                LinearLayout innerLayout7 = new LinearLayout(getActivity());
+                                innerLayout7.setLayoutParams(new LinearLayout.LayoutParams(
+                                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+                                ));
+                                innerLayout7.setPadding(0, 20, 0, 0);
+                                innerLayout7.setOrientation(LinearLayout.VERTICAL);
+                                innerLayout7.setBackgroundColor(0xffefefef);
+
+                                        LinearLayout innerLayout5 = new LinearLayout(getActivity());
+                                        innerLayout5.setLayoutParams(new LinearLayout.LayoutParams(
+                                                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                                        innerLayout5.setOrientation(LinearLayout.VERTICAL);
+                                        innerLayout5.setPadding(10, 10, 10, 10);
+
+                                                ImageView postView = new ImageView(getActivity());
+                                                //loadUserPostImage(postImage, postView);
+                                                postView.setId(View.generateViewId());
+                                                postView.setLayoutParams(new LinearLayout.LayoutParams(
+                                                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+                                                postView.setPadding(0, 10, 0, 10);
+                                                //postView.setImageResource(R.drawable.logo);
+                                                loadUserPostImage(imageUrl, postView);
+
+                                                            LinearLayout innerLayout6 = new LinearLayout(getActivity());
+                                                            innerLayout6.setLayoutParams(new LinearLayout.LayoutParams(
+                                                                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+                                                            innerLayout6.setOrientation(LinearLayout.HORIZONTAL);
+                                                            innerLayout6.setPadding(25, 25, 25, 25);
+
+                                                                        TextView userNameBelow = new TextView(getActivity());
+                                                                        userNameBelow.setId(View.generateViewId());
+                                                                        userNameBelow.setLayoutParams(new LinearLayout.LayoutParams(
+                                                                                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT));
+                                                                        //userNameBelow.setText("Username");
+                                                                        userNameBelow.setText(username_post[0]);
+                                                                        //userNameBelow.setTypeface(null, Typeface.BOLD);
+                                                                        userNameBelow.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+
+                                                                        TextView descriptionView = new TextView(getActivity());
+                                                                        descriptionView.setId(View.generateViewId());
+                                                                        descriptionView.setLayoutParams(new LinearLayout.LayoutParams(
+                                                                                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+                                                                        descriptionView.setPadding(20, 0, 0, 0);
+                                                                        //descriptionView.setText("Hello, this is a description here...");
+                                                                        descriptionView.setText(caption);
+
+                                // Add views to their respective parent layouts
+                                dynamicLayoutContainer.addView(innerLayout1);
+                                innerLayout1.addView(innerLayout2);
+                                    innerLayout2.addView(innerLayout3);
+                                        innerLayout3.addView(imageView15);
+                                        innerLayout3.addView(userName);
+                                    innerLayout2.addView(innerLayout4);
+                                        innerLayout4.addView(time);
+
+                                dynamicLayoutContainer.addView(innerLayout7);
+                                innerLayout7.addView(innerLayout5);
+                                    innerLayout5.addView(postView);
+                                    innerLayout5.addView(innerLayout6);
+                                        innerLayout6.addView(userNameBelow);
+                                        innerLayout6.addView(descriptionView);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            // Handle database query errors for MobileUsers
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
+
         return view;
+    }
+
+    private void loadUserPostImage(String imageUrl, ImageView postView) {
+        // Use a library like Picasso or Glide to load and display the image
+        if (getContext() != null && imageUrl != null) {
+            Picasso.get().load(imageUrl).into(postView);
+        }
+    }
+
+    public String getTimeAgo(long timestamp) {
+        long currentTime = System.currentTimeMillis();
+        long timeDifference = currentTime - timestamp;
+
+        // Define time intervals in milliseconds
+        long minuteInMillis = 60 * 1000;
+        long hourInMillis = 60 * minuteInMillis;
+        long dayInMillis = 24 * hourInMillis;
+        long weekInMillis = 7 * dayInMillis;
+
+        if (timeDifference < minuteInMillis) {
+            // Less than a minute ago
+            return "just now";
+        } else if (timeDifference < hourInMillis) {
+            // Minutes ago
+            int minutesAgo = (int) (timeDifference / minuteInMillis);
+            return minutesAgo + " " + (minutesAgo == 1 ? "min" : "mins") + " ago";
+        } else if (timeDifference < dayInMillis) {
+            // Hours ago
+            int hoursAgo = (int) (timeDifference / hourInMillis);
+            return hoursAgo + " " + (hoursAgo == 1 ? "hour" : "hours") + " ago";
+        } else if (timeDifference < weekInMillis) {
+            // Days ago
+            int daysAgo = (int) (timeDifference / dayInMillis);
+            return daysAgo + " " + (daysAgo == 1 ? "day" : "days") + " ago";
+        } else {
+            // More than a week ago, return the date
+            Date date = new Date(timestamp);
+            // Format the date as needed, e.g., using SimpleDateFormat
+            // SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
+            // return dateFormat.format(date);
+            return date.toString();
+        }
     }
 
     private void loadFragment(Fragment fragment) {

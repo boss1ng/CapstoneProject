@@ -44,7 +44,11 @@
                     android:layout_weight="1"
                     android:text="Yes"
                     android:textSize="17sp"
-                    android:layout_margin="10dp"/>
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    />
 
                 <Button
                     android:id="@+id/btnNo"
@@ -53,7 +57,11 @@
                     android:layout_weight="1"
                     android:text="No"
                     android:textSize="17sp"
-                    android:layout_margin="10dp"/>
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    />
         </LinearLayout>
 
 </LinearLayout>

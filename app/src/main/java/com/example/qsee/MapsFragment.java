@@ -354,7 +354,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         }, 2000); // 2000 milliseconds (2 seconds)
          */
 
-
+        /*
         mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
             float currentZoomLevel = mMap.getCameraPosition().zoom;
             @Override
@@ -377,6 +377,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 }
             }
         });
+         */
 
         // Check if location permission is granted
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
@@ -408,8 +409,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 // mMap.addMarker(new MarkerOptions().position(userLocation).title("Your Location"));
 
                 // Move the camera to the user's location
-                //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 13));
-
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 13));
+                /*
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, minZoomLevel));
 
                 isUserInQuezonCity = QUEZON_CITY_13.contains(new LatLng(latitude, longitude));
@@ -434,6 +435,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                         }
                     }, 3500); // 2000 milliseconds (2 seconds) delay
                 }
+                 */
 
             }
         });
