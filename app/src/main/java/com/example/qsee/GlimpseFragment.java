@@ -19,6 +19,8 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class GlimpseFragment extends Fragment implements MyAdapter.OnPostItemClickListener {
@@ -29,6 +31,7 @@ public class GlimpseFragment extends Fragment implements MyAdapter.OnPostItemCli
         private String caption;
         private String category;
         private String location;
+        private long timestamp;
 
         public Post() {
             // Default constructor required for Firebase
@@ -40,6 +43,7 @@ public class GlimpseFragment extends Fragment implements MyAdapter.OnPostItemCli
             this.caption = caption;
             this.category = category;
             this.location = location;
+            this.timestamp = timestamp;
         }
 
         public String getImageURL() {
@@ -61,6 +65,7 @@ public class GlimpseFragment extends Fragment implements MyAdapter.OnPostItemCli
         public String getLocation() {
             return location;
         }
+        public long getTimestamp() {return timestamp; }
     }
 
     @Override
@@ -76,6 +81,7 @@ public class GlimpseFragment extends Fragment implements MyAdapter.OnPostItemCli
 
         // Modify the query to filter posts by the specific user's ID
         Query query = databaseReference.orderByChild("userId").equalTo(currentUser);
+        long currentTimestamp = System.currentTimeMillis();
 
         query.addValueEventListener(new ValueEventListener() {
             @Override
@@ -87,7 +93,13 @@ public class GlimpseFragment extends Fragment implements MyAdapter.OnPostItemCli
                         postList.add(post);
                     }
                 }
-
+                Collections.sort(postList, new Comparator<Post>() {
+                    @Override
+                    public int compare(Post post1, Post post2) {
+                        // Compare the timestamps in descending order
+                        return Long.compare(post2.getTimestamp(), post1.getTimestamp());
+                    }
+                });
                 // Create and set your RecyclerView adapter here
                 RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
                 int numberOfColumns = 3;
@@ -106,7 +118,7 @@ public class GlimpseFragment extends Fragment implements MyAdapter.OnPostItemCli
     }
 
     @Override
-    public void onPostItemClick(String imageUrl, String caption, String category, String location) {
+    public void onPostItemClick(String imageUrl, String caption, String category, String location, Long timestamp) {
         PostDetailsDialog dialog = new PostDetailsDialog();
         dialog.setData(imageUrl, caption, category, location);
         dialog.show(getFragmentManager(), "PostDetailsDialog");

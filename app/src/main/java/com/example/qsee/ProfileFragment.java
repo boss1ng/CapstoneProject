@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +35,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +49,7 @@ public class ProfileFragment extends Fragment {
     private TextView notificationBadge;
     private NotificationAdapter notificationAdapter;
     private int notificationCount = 0;
+    private ImageView Pfp;
 
 
     public ProfileFragment() {
@@ -69,8 +72,31 @@ public class ProfileFragment extends Fragment {
 
         // Initialize the notificationBadge
         notificationBadge = rootView.findViewById(R.id.notificationBadge);
-
+        Pfp = rootView.findViewById(R.id.profilePic);
         TextView uname = rootView.findViewById(R.id.ProfileUsername);
+
+        // Retrieve the profile picture URL from Firebase
+        DatabaseReference usersReference = FirebaseDatabase.getInstance().getReference("MobileUsers");
+        Query query = usersReference.orderByChild("userId").equalTo(userId);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                        // Get the profile picture URL from Firebase
+                        String profilePictureUrl = userSnapshot.child("profilePictureUrl").getValue(String.class);
+
+                        // Load and display the profile picture
+                        loadProfilePicture(profilePictureUrl);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle error if needed
+            }
+        });
 
         uname.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -174,10 +200,6 @@ public class ProfileFragment extends Fragment {
                 }
             }
         });
-
-        // Retrieve user's data from Firebase based on the username
-        DatabaseReference usersReference = FirebaseDatabase.getInstance().getReference("MobileUsers");
-        Query query = usersReference.orderByChild("userId").equalTo(userId);
 
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -476,5 +498,11 @@ public class ProfileFragment extends Fragment {
                             break;
                     }
                 }).attach();
+    }
+    private void loadProfilePicture(String profilePictureUrl) {
+        // Use a library like Picasso or Glide to load and display the image
+        if (getContext() != null && profilePictureUrl != null) {
+            Picasso.get().load(profilePictureUrl).into(Pfp);
+        }
     }
 }

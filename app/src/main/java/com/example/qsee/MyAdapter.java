@@ -17,7 +17,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.PostViewHolder> {
     private OnPostItemClickListener itemClickListener;
 
     public interface OnPostItemClickListener {
-        void onPostItemClick(String imageUrl, String caption, String category, String location);
+        void onPostItemClick(String imageUrl, String caption, String category, String location, Long timestamp);
     }
 
     public MyAdapter(List<GlimpseFragment.Post> postList, OnPostItemClickListener itemClickListener) {
@@ -46,7 +46,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.PostViewHolder> {
                         post.getImageURL(),
                         post.getCaption(),
                         post.getCategory(),
-                        post.getLocation()
+                        post.getLocation(),
+                        post.getTimestamp()
                 );
             }
         });
