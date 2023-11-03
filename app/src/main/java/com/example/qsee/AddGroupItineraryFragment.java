@@ -2,7 +2,9 @@ package com.example.qsee;
 
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -285,6 +287,24 @@ public class AddGroupItineraryFragment extends Fragment {
                             // Validation for default form
                             TextInputLayout defaultDateInputLayout = view.findViewById(R.id.dateInput);
                             String defaultDate = Objects.requireNonNull(defaultDateInputLayout.getEditText()).getText().toString();
+
+                            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+                            try {
+                                Date date = sdf.parse(defaultDate);
+                                Calendar cal = Calendar.getInstance();
+                                cal.setTime(date);
+
+                                Intent intent = new Intent(Intent.ACTION_INSERT)
+                                        .setData(CalendarContract.Events.CONTENT_URI)
+                                        .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, cal.getTimeInMillis())
+                                        .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, cal.getTimeInMillis() + 60 * 60 * 1000) // 1 hour
+                                        .putExtra(CalendarContract.Events.TITLE, itineraryName)
+                                        .putExtra(CalendarContract.Events.ALL_DAY, true);
+
+                                startActivityForResult(intent, 1);
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
 
                             if (defaultDate.isEmpty()) {
                                 Toast.makeText(getContext(), "Please fill in all fields for Day 1", Toast.LENGTH_SHORT).show();
