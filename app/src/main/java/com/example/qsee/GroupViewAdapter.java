@@ -20,6 +20,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -51,12 +52,20 @@ public class GroupViewAdapter extends RecyclerView.Adapter<GroupViewAdapter.View
                 if (dataSnapshot.exists()) {
                     String encryptedFirstName = dataSnapshot.child("firstName").getValue(String.class);
                     String encryptedLastName = dataSnapshot.child("lastName").getValue(String.class);
+                    String profilePictureUrl = dataSnapshot.child("profilePictureUrl").getValue(String.class);
+
                     if (encryptedFirstName != null && encryptedLastName != null) {
                         String firstName = AESUtils.decrypt(encryptedFirstName); // Decrypt the first name
                         String lastName = AESUtils.decrypt(encryptedLastName); // Decrypt the last name
+
                         if (firstName != null && lastName != null) {
                             String fullName = firstName + " " + lastName;
                             holder.memberNametextView.setText(fullName);
+
+                            if (profilePictureUrl == null)
+                                holder.userProfile.setImageResource(R.drawable.profilepicture);
+                            else
+                                loadUserPostImage(profilePictureUrl, holder.userProfile);
                         }
                     }
                 }
@@ -70,6 +79,13 @@ public class GroupViewAdapter extends RecyclerView.Adapter<GroupViewAdapter.View
 
     }
 
+    private void loadUserPostImage(String imageUrl, ImageView profilePic) {
+        // Use a library like Picasso or Glide to load and display the image
+        if (profilePic.getContext() != null && imageUrl != null) {
+            Picasso.get().load(imageUrl).into(profilePic);
+        }
+    }
+
     @Override
     public int getItemCount() {
         return memberList.size();
@@ -78,11 +94,13 @@ public class GroupViewAdapter extends RecyclerView.Adapter<GroupViewAdapter.View
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView deleteButton;
         TextView memberNametextView;
+        ImageView userProfile;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             deleteButton = itemView.findViewById(R.id.delete);
             memberNametextView = itemView.findViewById(R.id.memberName);
+            userProfile = itemView.findViewById(R.id.groupIcon);
         }
     }
 

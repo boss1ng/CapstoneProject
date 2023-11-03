@@ -39,6 +39,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -74,6 +75,31 @@ public class AddGlimpseFragment extends DialogFragment {
         imageUri = null;
         categorySpinner = rootView.findViewById(R.id.categorySpinner);
 
+        ImageView profilePic = rootView.findViewById(R.id.imageView19);
+
+        DatabaseReference userReference = FirebaseDatabase.getInstance().getReference().child("MobileUsers");
+
+        userReference.orderByChild("userId").equalTo(userId)
+        .addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot mobileUsersSnapshot) {
+                for (DataSnapshot userSnapshot : mobileUsersSnapshot.getChildren()) {
+                    String profilePictureUrl = userSnapshot.child("profilePictureUrl").getValue(String.class);
+
+                    if (profilePictureUrl == null)
+                        profilePic.setImageResource(R.drawable.profilepicture);
+                    else
+                        loadUserPostImage(profilePictureUrl, profilePic);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
         // Retrieve categories from Firebase and populate the Spinner
         retrieveCategoriesFromFirebase();
 
@@ -100,6 +126,13 @@ public class AddGlimpseFragment extends DialogFragment {
         });
 
         return rootView;
+    }
+
+    private void loadUserPostImage(String imageUrl, ImageView profilePic) {
+        // Use a library like Picasso or Glide to load and display the image
+        if (profilePic.getContext() != null && imageUrl != null) {
+            Picasso.get().load(imageUrl).into(profilePic);
+        }
     }
 
     private void openCamera() {

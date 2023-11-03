@@ -338,22 +338,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         mMap.setMinZoomPreference(minZoomLevel); // Set the minimum desired zoom level.
         mMap.setMaxZoomPreference(maxZoomLevel); // Set the maximum desired zoom level.
 
-        // Get the current zoom level from the GoogleMap object (mMap)
-        //float currentZoomLevel = mMap.getCameraPosition().zoom;
-        //currentZoomLevel = mMap.getCameraPosition().zoom;
-        //Toast.makeText(getContext(), String.valueOf(currentZoomLevel), Toast.LENGTH_SHORT).show();
-
-        /*
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // Code to be executed after a 2-second delay
-                float currentZoomLevel = mMap.getCameraPosition().zoom;
-                Toast.makeText(getContext(), String.valueOf(currentZoomLevel), Toast.LENGTH_SHORT).show();
-            }
-        }, 2000); // 2000 milliseconds (2 seconds)
-         */
-
         /*
         mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
             float currentZoomLevel = mMap.getCameraPosition().zoom;
