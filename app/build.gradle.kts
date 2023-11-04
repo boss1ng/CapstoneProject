@@ -70,6 +70,8 @@ dependencies {
     implementation ("com.google.maps.android:android-maps-utils:3.5.3")
     implementation ("com.squareup.okhttp3:okhttp:4.+")
 
+    implementation ("com.google.firebase:firebase-analytics")
+
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:adapter-rxjava2:2.9.0")

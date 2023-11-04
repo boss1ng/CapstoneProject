@@ -3,6 +3,7 @@ package com.example.qsee;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.view.View;
 import android.widget.Toast;
 
@@ -19,7 +20,8 @@ import com.google.firebase.database.ValueEventListener;
 public class ForgotPass extends AppCompatActivity {
 
     private TextInputLayout contactNoInput;
-    private DatabaseReference databaseReference; // Add this reference
+    private DatabaseReference databaseReference; // Add this referenc
+    private static final int MAX_LENGTH = 11;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,6 +31,9 @@ public class ForgotPass extends AppCompatActivity {
         String username = getIntent().getStringExtra("userId");
 
         contactNoInput = findViewById(R.id.contactNoInput);
+
+        // Set an InputFilter to limit the input length to 11 digits
+        contactNoInput.getEditText().setFilters(new InputFilter[] { new InputFilter.LengthFilter(MAX_LENGTH) });
         databaseReference = FirebaseDatabase.getInstance().getReference(); // Initialize the reference
         // Query the database for the user's contact number
         databaseReference.child("MobileUsers").orderByChild("userId").equalTo(username)
@@ -71,10 +76,13 @@ public class ForgotPass extends AppCompatActivity {
     public void forgotPassSubmit(View view) {
 
         String contactNumber = contactNoInput.getEditText().getText().toString();
+        // Retrieve the username from the intent's extras
+        String username = getIntent().getStringExtra("userId");
 
         // Handle the "Submit" button click here
         Intent intent = new Intent(this, sendOtp.class); // Change OTPInputActivity to your OTP input activity class
         intent.putExtra("contactNumber", contactNumber);
+        intent.putExtra("username", username);
         startActivity(intent);
     }
 
