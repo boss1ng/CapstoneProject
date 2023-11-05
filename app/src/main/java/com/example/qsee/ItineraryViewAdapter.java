@@ -28,9 +28,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestOptions;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputLayout;
@@ -40,15 +38,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Random;
 
 public class ItineraryViewAdapter extends RecyclerView.Adapter<ItineraryViewAdapter.ItineraryViewHolder> {
     private List<Itinerary> dataList;
@@ -70,9 +65,7 @@ public class ItineraryViewAdapter extends RecyclerView.Adapter<ItineraryViewAdap
     @Override
     public ItineraryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.itineraryview_list_item, parent, false);
-
         return new ItineraryViewHolder(view);
-
     }
 
     @SuppressLint("SetTextI18n")
@@ -81,15 +74,12 @@ public class ItineraryViewAdapter extends RecyclerView.Adapter<ItineraryViewAdap
         // Bind data to your views here
         Itinerary data = dataList.get(position);
         holder.timeTextView.setText(data.getTime());
-
         // Assuming holder.locationTextView is your TextView
         String location = data.getLocation();
         String activity = data.getActivity();
 
         // Creating a SpannableString with the location in bold and activity in italic
         SpannableString spannableString = new SpannableString(location + "\n" + activity);
-        // Load a random image from Firebase Storage into the locationIcon ImageView (Di pa gumagana)
-        //loadRandomImageIntoImageView(holder.locationIcon);
 
         // Setting the span for bold text
         StyleSpan boldSpan = new StyleSpan(Typeface.BOLD);
@@ -108,51 +98,23 @@ public class ItineraryViewAdapter extends RecyclerView.Adapter<ItineraryViewAdap
 
 
     }
-    /*
-    // Load an image from Firebase Storage and display it in the locationIcon ImageView
-    private void loadRandomImageIntoImageView(ImageView locationIcon) {
-        // Replace 'specific-image.jpg' with the actual image file name
-        try {
 
-        StorageReference imageRef = FirebaseStorage.getInstance().getReference().child("Icons/birds.png");
-
-        imageRef.getDownloadUrl()
-                .addOnSuccessListener(uri -> {
-                    // Load the specific image into the ImageView using Glide
-                    RequestOptions requestOptions = new RequestOptions()
-                            .diskCacheStrategy(DiskCacheStrategy.ALL); // Adjust caching strategy as needed
-                    Glide.with(context)
-                            .load(uri)
-                            .apply(requestOptions)
-                            .into(locationIcon);
-                })
-                .addOnFailureListener(e -> {
-                    // Handle the failure to get the download URL
-                    Log.e("FirebaseStorage", "Failed to get download URL: " + e.getMessage());
-                });
-        } catch (Exception e) {
-            Log.e("FirebaseStorage", "Error loading image: " + e.getMessage());
-        }
-    }
     @Override
     public int getItemCount() {
         return dataList.size();
     }
 
-     */
-
     // Create a ViewHolder
     public class ItineraryViewHolder extends RecyclerView.ViewHolder {
         TextView timeTextView;
         TextView locationTextView;
-        ImageView locationIcon;
 
 
         public ItineraryViewHolder(View itemView) {
             super(itemView);
             timeTextView = itemView.findViewById(R.id.locationTime); // Replace with your TextView ID
             locationTextView = itemView.findViewById(R.id.locationName); // Replace with your TextView ID
-            locationIcon = itemView.findViewById(R.id.locationIcon); //for image replace --- not working
+
         }
     }
 }

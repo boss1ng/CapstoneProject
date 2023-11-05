@@ -251,9 +251,9 @@ public class EditProfileFragment extends Fragment {
                     profilePictureImageView.setImageBitmap(imageBitmap);
 
                     // Resize the image to the target dimensions (100x100dp)
-                    Bitmap scaledImage = scaleImageToTargetDimensions(imageBitmap, TARGET_WIDTH_DP, TARGET_HEIGHT_DP);
+                    //Bitmap scaledImage = scaleImageToTargetDimensions(imageBitmap, TARGET_WIDTH_DP, TARGET_HEIGHT_DP);
 
-                    selectedProfilePictureUri = getImageUri(requireContext(), scaledImage);
+                    //selectedProfilePictureUri = getImageUri(requireContext(), scaledImage);
                 } else {
                     Toast.makeText(requireContext(), "Failed to capture the image", Toast.LENGTH_SHORT).show();
                 }
