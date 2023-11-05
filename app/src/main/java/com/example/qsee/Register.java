@@ -1,16 +1,19 @@
 package com.example.qsee;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.text.InputFilter;
-import android.text.Spanned;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.app.DatePickerDialog;
 import android.widget.EditText;
@@ -18,11 +21,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.FirebaseApp;
 
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.FirebaseOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -61,6 +61,7 @@ public class Register extends AppCompatActivity {
 
         View registerButton = findViewById(R.id.RegisterButton);
         View regLoginButton = findViewById(R.id.regLogin);
+        CheckBox consentCheckbox = findViewById(R.id.consentCheckbox);
 
         // Find the EditText associated with contactNoInputLayout
         EditText contactNoEditText = contactNoInputLayout.getEditText();
@@ -74,6 +75,41 @@ public class Register extends AppCompatActivity {
             contactNoEditText.setFilters(filters);
         }
 
+        consentCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    // Show the dialog when the checkbox is checked
+                    AlertDialog.Builder builder = new AlertDialog.Builder(Register.this);
+                    LayoutInflater inflater = getLayoutInflater();
+                    View dialogView = inflater.inflate(R.layout.tos, null);
+                    builder.setView(dialogView);
+
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+
+                    Button acceptBtn = dialogView.findViewById(R.id.AcceptBtn);
+                    acceptBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            consentCheckbox.setChecked(true); // Check the checkbox when the accept button is clicked
+                            dialog.dismiss(); // Close the dialog
+                        }
+                    });
+
+                    // Uncheck the checkbox if the user does not accept the terms
+                    Button declineBtn = dialogView.findViewById(R.id.DeclineBtn);
+                    declineBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            consentCheckbox.setChecked(false); // Uncheck the checkbox
+                            dialog.dismiss(); // Close the dialog
+                        }
+                    });
+                }
+            }
+        });
+
 
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,10 +122,21 @@ public class Register extends AppCompatActivity {
                 String username = unameregInputLayout.getEditText().getText().toString().toLowerCase();
                 String password = passregInputLayout.getEditText().getText().toString();
                 String reTypedPassword = repassregInputLayout.getEditText().getText().toString();
-                CheckBox consentCheckbox = findViewById(R.id.consentCheckbox);
+
+
 
                 // Define the regex pattern
                 String passwordPattern = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}$";
+
+                // Check if any of the input fields are empty
+                if (TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) ||
+                        TextUtils.isEmpty(contactNumber) || TextUtils.isEmpty(birthdate) ||
+                        TextUtils.isEmpty(username) || TextUtils.isEmpty(password)) {
+
+                    // Show an error Toast message if any field is empty
+                    Toast.makeText(Register.this, "Please fill all the fields", Toast.LENGTH_SHORT).show();
+                    return; // Don't proceed with registration
+                }
 
                 // Check if the password matches the pattern
                 if (password.matches(passwordPattern)) {
@@ -99,16 +146,6 @@ public class Register extends AppCompatActivity {
                     // Password is not valid
                     // Show an error message
                     Toast.makeText(Register.this, "Password must be at least 8 characters and include at least one uppercase letter, one lowercase letter, one special character, and one numeric character.", Toast.LENGTH_SHORT).show();
-                    return; // Don't proceed with registration
-                }
-
-                // Check if any of the input fields are empty
-                if (TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) ||
-                        TextUtils.isEmpty(contactNumber) || TextUtils.isEmpty(birthdate) ||
-                        TextUtils.isEmpty(username) || TextUtils.isEmpty(password)) {
-
-                    // Show an error Toast message if any field is empty
-                    Toast.makeText(Register.this, "All fields must be filled out", Toast.LENGTH_SHORT).show();
                     return; // Don't proceed with registration
                 }
 

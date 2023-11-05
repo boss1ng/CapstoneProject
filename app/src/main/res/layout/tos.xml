@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/textView12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:text="Terms &amp; Conditions"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ScrollView
+        android:id="@+id/tocBody"
+        android:layout_width="308dp"
+        android:layout_height="300dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginHorizontal="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView12">
+
+        <TextView
+            android:id="@+id/termsAndConditionsTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="I. Introduction\nThese terms and conditions govern the use of data and personal information in compliance with the Data Privacy Act of 2012 (Republic Act No. 10173).\n\nBy using this platform or service, you agree to adhere to the terms and conditions outlined herein.
+\n\nII. Data Collection and Use\na. We collect personal information for specific, legitimate, and defined purposes and process it in a lawful and fair manner.
+\n\nb. The collected data will be used solely for the purposes stated explicitly at the time of collection, and only with the consent of the data subject.
+\n\nIII. Data Security\na. We implement appropriate organizational, physical, and technical security measures to protect personal information against any unauthorized or unlawful processing, accidental loss, destruction, or damage.
+\n\nb. We ensure that only authorized personnel have access to personal information and that they are under strict obligations of confidentiality.
+\n\nIV. Data Subject Rights\na. Data subjects have the right to be informed, to object, to access, to rectify, to erase or block, to secure data portability, and to file a complaint regarding any personal information processed.
+\n\nb. We will facilitate the exercise of these rights in accordance with the provisions of the Data Privacy Act of 2012.
+\n\nV. Data Sharing and Disclosure\na. We may share personal information with third parties only with the explicit consent of the data subject or when required by law.
+\n\nb. We will ensure that any third party that processes personal information on our behalf provides sufficient guarantees regarding the implementation of appropriate technical and organizational measures to ensure the protection of the data subjects' rights.
+\n\nVI. Data Retention\na. We retain personal information only for as long as necessary for the fulfillment of the purposes for which it was collected, or as required by law.
+\n\nb. We securely dispose of or anonymize personal information that is no longer necessary for the purposes for which it was collected.
+\n\nVII. Compliance and Cooperation\na. We commit to complying with the provisions of the Data Privacy Act of 2012 and any other applicable data protection laws.
+\n\nb. We will cooperate with the National Privacy Commission (NPC) and other regulatory authorities in the event of inquiries or investigations regarding data protection and privacy practices.
+\n\nVIII. Updates to the Terms and Conditions\nWe reserve the right to update or modify these terms and conditions to reflect changes in our data handling practices or changes in the regulatory framework. We encourage users to review these terms periodically for any updates.
+\n\nIX. Contact Information\nFor any inquiries or concerns regarding these terms and conditions or data privacy practices, please contact us.
+\n\nX. Effective Date\nThese terms and conditions are effective as of 11/5/2023."
+            android:justificationMode="inter_word"
+            android:textAlignment="viewStart"
+            android:textSize="16sp" />
+
+
+    </ScrollView>
+
+
+    <Button
+        android:id="@+id/DeclineBtn"
+        android:layout_width="135dp"
+        android:layout_height="53dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp"
+        android:backgroundTint="#E47473"
+        android:clickable="true"
+        android:text="Decline"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintHorizontal_bias="0.702"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tocBody" />
+
+    <Button
+        android:id="@+id/AcceptBtn"
+        android:layout_width="135dp"
+        android:layout_height="53dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp"
+
+        android:backgroundTint="#79BF49"
+        android:clickable="true"
+        android:text="Accept"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.301"
+        app:layout_constraintStart_toEndOf="@+id/guideline"
+        app:layout_constraintTop_toBottomOf="@+id/tocBody" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
