@@ -22,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="261dp"
             android:alpha=".9"
-            android:src="@drawable/qcbg" />
+            android:src="@drawable/bg_quezonmemorialcircle" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/searchText"
@@ -32,21 +32,21 @@
             android:layout_marginTop="200dp"
             android:layout_marginBottom="160dp"
             android:background="@drawable/rounded_edittext_background"
+            android:clickable="true"
             android:drawableEnd="@android:drawable/ic_menu_search"
             android:drawablePadding="8dp"
             android:drawableTint="@color/black"
             android:elevation="20dp"
             android:hint="Explore Now"
-            android:clickable="true"
 
-            android:padding="16dp" >
+            android:padding="16dp">
 
             <AutoCompleteTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="20dp"
+                android:inputType="text"
                 android:padding="5dp"
-                android:inputType="text"/>
+                android:textSize="20dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
 
@@ -71,11 +71,11 @@
 
     <HorizontalScrollView
         android:id="@+id/horizontalScrollView"
-        android:layout_width="match_parent"
+        android:layout_width="409dp"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchTab"
         app:layout_constraintVertical_bias="0.11">
@@ -87,18 +87,41 @@
 
             android:orientation="horizontal">
 
+            <!--ACCOMMODATIONS -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginRight="20dp"
+                android:layout_marginLeft="5dp"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:layout_width="75dp"
+                    android:layout_height="75dp"
+                    android:background="@drawable/sbtn_accomodation" />
+
+                <TextView
+                    android:id="@+id/textView1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="Accommodations"
+                    android:textSize="10sp" />
+
+            </LinearLayout>
+
+            <!--RESTAURANTS and CAFES -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginRight="20dp"
                 android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/Button1"
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
-                    android:backgroundTint="#005CD6"
-                    android:drawableEnd="@drawable/ic_building" />
+                <ImageButton
+                    android:layout_width="75dp"
+                    android:layout_height="75dp"
+                    android:background="@drawable/sbtn_restaurant" />
 
                 <TextView
                     android:id="@+id/textView2"
@@ -106,22 +129,21 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:gravity="center"
-                    android:text="Hotels" />
+                    android:text="Restaurants"
+                    android:textSize="10sp" />
             </LinearLayout>
 
+            <!--SHOPPING-->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginRight="20dp"
                 android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/Button2"
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
-                    android:backgroundTint="#005CD6"
-                    android:drawableTop="@drawable/ic_church"
-                    app:layout_constraintBaseline_toBottomOf="parent" />
+                <ImageButton
+                    android:layout_width="75dp"
+                    android:layout_height="75dp"
+                    android:background="@drawable/sbtn_shopping" />
 
                 <TextView
                     android:id="@+id/textView3"
@@ -129,8 +151,11 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:gravity="center"
-                    android:text="Culture" />
+                    android:text="Shopping"
+                    android:textSize="10sp" />
             </LinearLayout>
+
+            <!--RELIGIOUS SITES-->
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -138,13 +163,10 @@
                 android:layout_marginRight="20dp"
                 android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/Button3"
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
-                    android:backgroundTint="#005CD6"
-                    android:drawableEnd="@drawable/ic_food"
-                    app:layout_constraintBaseline_toBottomOf="parent" />
+                <ImageButton
+                    android:layout_width="75dp"
+                    android:layout_height="75dp"
+                    android:background="@drawable/sbtn_church" />
 
                 <TextView
                     android:id="@+id/textView4"
@@ -152,8 +174,11 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:gravity="center"
-                    android:text="Food" />
+                    android:text="Religious Sites"
+                    android:textSize="10sp" />
             </LinearLayout>
+
+            <!--SPORTS AND RECREATION-->
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -161,23 +186,90 @@
                 android:layout_marginRight="20dp"
                 android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/Button4"
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
-                    android:backgroundTint="#005CD6"
-                    android:drawableEnd="@drawable/ic_shop"
-                    app:layout_constraintBaseline_toBottomOf="parent" />
+                <ImageButton
+                    android:layout_width="75dp"
+                    android:layout_height="75dp"
+                    android:background="@drawable/sbtn_sports" />
 
                 <TextView
                     android:id="@+id/textView5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-
                     android:gravity="center"
-                    android:text="Shopping" />
+                    android:text="Recreation"
+                    android:textSize="10sp" />
             </LinearLayout>
+
+            <!--Health and Wellness-->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginRight="20dp"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:layout_width="75dp"
+                    android:layout_height="75dp"
+                    android:background="@drawable/sbtn_hospital" />
+
+                <TextView
+                    android:id="@+id/textView6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="Hospitals"
+                    android:textSize="10sp" />
+            </LinearLayout>
+
+            <!--Schools-->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginRight="20dp"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:layout_width="75dp"
+                    android:layout_height="75dp"
+                    android:background="@drawable/sbtn_school" />
+
+                <TextView
+                    android:id="@+id/textView7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="Schools"
+                    android:textSize="10sp" />
+            </LinearLayout>
+
+            <!--Attractions-->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginRight="25dp"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:layout_width="75dp"
+                    android:layout_height="75dp"
+                    android:background="@drawable/sbtn_attractions" />
+
+                <TextView
+                    android:id="@+id/textView8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="Attractions"
+                    android:textSize="10sp" />
+            </LinearLayout>
+
         </LinearLayout>
     </HorizontalScrollView>
 
@@ -214,7 +306,7 @@
                     tools:ignore="NotSibling" />
 
                 <TextView
-                    android:id="@+id/textView7"
+                    android:id="@+id/textView9"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -247,7 +339,7 @@
                     tools:ignore="NotSibling" />
 
                 <TextView
-                    android:id="@+id/textView6"
+                    android:id="@+id/textView12"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -280,7 +372,7 @@
                     android:src="@drawable/starbs" />
 
                 <TextView
-                    android:id="@+id/textView8"
+                    android:id="@+id/textView13"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -290,7 +382,7 @@
                     android:text="4.5 " />
 
                 <TextView
-                    android:id="@+id/textView9"
+                    android:id="@+id/textView14"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -306,15 +398,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        app:menu="@menu/bottom_navigation_menu"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:menu="@menu/bottom_navigation_menu">
 
     </com.google.android.material.bottomnavigation.BottomNavigationView>
 
     <TextView
         android:id="@+id/plainText2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="237dp"
+        android:layout_height="29dp"
         android:ems="10"
         android:fontFamily="@font/open_sans"
         android:inputType="text"
@@ -326,10 +418,10 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/horizontalScrollView2"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.12"
+        app:layout_constraintHorizontal_bias="0.091"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView"
-        app:layout_constraintVertical_bias="0.65"
+        app:layout_constraintVertical_bias="0.658"
         tools:ignore="MissingConstraints,NotSibling" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -14,7 +14,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-
+import android.widget.AdapterView; // Add this import for AdapterView
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.database.DataSnapshot;
@@ -33,9 +33,7 @@ public class SearchFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search, container, false);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
@@ -77,13 +75,18 @@ public class SearchFragment extends Fragment {
                     // Handle any errors
                     Log.e("SearchFragment", "Firebase Database Error: " + databaseError.getMessage());
                 }
+            });
 
+            // Add an item click listener to open the place_detail_fragment
+            locationAutoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    String selectedLocation = (String) parent.getItemAtPosition(position);
+                    openPlaceDetailFragment(selectedLocation);
+                }
             });
         } else {
-            // Handle the case where locationAutoCompleteTextView is null.
             Log.e("SearchFragment", "locationAutoCompleteTextView is null");
-            // You can also show a user-friendly message:
-            // Toast.makeText(getContext(), "Error occurred while initializing search functionality.", Toast.LENGTH_SHORT).show();
         }
 
         BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
@@ -131,6 +134,22 @@ public class SearchFragment extends Fragment {
 
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+    private void openPlaceDetailFragment(String selectedLocation) {
+        // Create the PlaceDetailFragment
+        PlaceDetailFragment placeDetailFragment = new PlaceDetailFragment();
+
+        // Pass the selected location to the PlaceDetailFragment
+        Bundle bundle = new Bundle();
+        bundle.putString("selectedLocation", selectedLocation);
+        placeDetailFragment.setArguments(bundle);
+
+        // Replace the current fragment with the PlaceDetailFragment
+        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, placeDetailFragment);
         transaction.addToBackStack(null);
         transaction.commit();
     }
