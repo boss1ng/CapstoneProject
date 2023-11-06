@@ -57,8 +57,8 @@ import java.util.List;
 
 public class AddGlimpseFragment extends DialogFragment {
     static final int CAMERA_REQUEST_CODE = 100;
-    private static final int TARGET_WIDTH = 240;
-    private static final int TARGET_HEIGHT = 180;
+    private static final int TARGET_WIDTH = 1000;
+    private static final int TARGET_HEIGHT = 1000;
     private static final int LOCATION_PERMISSION_REQUEST = 1;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private DatabaseReference databaseReference;
@@ -153,7 +153,7 @@ public class AddGlimpseFragment extends DialogFragment {
     private void loadUserPostImage(String imageUrl, ImageView profilePic) {
         // Use a library like Picasso or Glide to load and display the image
         if (profilePic.getContext() != null && imageUrl != null) {
-            Picasso.get().load(imageUrl).into(profilePic);
+            Picasso.get().load(imageUrl).fit().into(profilePic);
         }
     }
 
@@ -291,7 +291,7 @@ public class AddGlimpseFragment extends DialogFragment {
 
                     else {
                         postDetails(userLocation, downloadUrl, textCaption, selectedCategory);
-                        postRss(userLocation); // downloadUrl selectedCategory
+                        postRss(userLocation, selectedCategory); // downloadUrl selectedCategory
                     }
                 }
 
@@ -356,7 +356,7 @@ public class AddGlimpseFragment extends DialogFragment {
         });
     }
 
-    private void postRss(String userLocation) {
+    private void postRss(String userLocation, String selectedCategory) {
 
         final String[] pushKey = {null};
         final Boolean[] isUserExisting = {false};
@@ -433,9 +433,12 @@ public class AddGlimpseFragment extends DialogFragment {
 
                                         // Append a new child node under "Users" with the key as "UserId" and the value as the user ID
                                         pushKeyRef.push().setValue(userId);
+
+                                        if (intNumReports == 20) {
+                                            // 
+                                        }
+
                                     }
-
-
                                 }
                             }
 
@@ -461,15 +464,17 @@ public class AddGlimpseFragment extends DialogFragment {
                                         DatabaseReference rssPost = databaseReference.push();
 
                                         rssPost.child("EstablishmentName").setValue(userLocation);
-                                        rssPost.child("numPosts").setValue("1");
                                         //rssPost.child("userId").setValue(userId);
-                                        rssPost.child("Users").push().setValue(userId);
+                                        rssPost.child("numPosts").setValue("1");
 
                                         rssPost.child("completeAddress").setValue(completeAddress);
                                         rssPost.child("city").setValue(city);
                                         rssPost.child("state").setValue(state);
                                         rssPost.child("postalCode").setValue(postalCode);
                                         rssPost.child("country").setValue(country);
+
+                                        rssPost.child("Users").push().setValue(userId);
+                                        rssPost.child("Category").push().setValue(selectedCategory);
 
                                     } else {
                                         // Geocoder couldn't find an address for the given latitude and longitude

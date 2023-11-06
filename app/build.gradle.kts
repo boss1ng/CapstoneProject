@@ -107,4 +107,7 @@ dependencies {
 
     // implementation("com.google.android.gms:play-services-maps:17.0.0")
     // implementation("com.google.android.gms:play-services-location:18.0.0") // If you need location services
+
+    //SMS
+    implementation("androidx.browser:browser:1.3.0")
 }

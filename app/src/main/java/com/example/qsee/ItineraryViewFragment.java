@@ -255,6 +255,6 @@ public class ItineraryViewFragment extends Fragment {
         document.close();
 
         // Show a toast indicating that the PDF has been saved
-        Toast.makeText(requireContext(), "PDF saved to " + filePath, Toast.LENGTH_SHORT).show();
+        Toast.makeText(requireContext(), "Itinerary saved to Downloads", Toast.LENGTH_SHORT).show();
     }
 }
