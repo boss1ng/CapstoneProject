@@ -309,19 +309,18 @@ public class HomeFragment extends Fragment {
                                             innerLayout7.setPadding(0, 20, 0, 0);
                                             innerLayout7.setOrientation(LinearLayout.VERTICAL);
                                             innerLayout7.setBackgroundColor(0xffefefef);
-
                                                     LinearLayout innerLayout5 = new LinearLayout(getActivity());
                                                     innerLayout5.setLayoutParams(new LinearLayout.LayoutParams(
-                                                            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                                                            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
                                                     innerLayout5.setOrientation(LinearLayout.VERTICAL);
                                                     innerLayout5.setPadding(10, 10, 10, 10);
 
                                                             ImageView postView = new ImageView(getActivity());
                                                             //loadUserPostImage(postImage, postView);
                                                             postView.setId(View.generateViewId());
-                                                            postView.setLayoutParams(new LinearLayout.LayoutParams(
-                                                                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+                                                            postView.setLayoutParams(new LinearLayout.LayoutParams(1000, 1000));
                                                             postView.setPadding(0, 10, 0, 10);
+                                                            postView.setForegroundGravity(Gravity.CENTER);
                                                             //postView.setImageResource(R.drawable.logo);
                                                             loadUserPostImage(imageUrl, postView);
 
@@ -414,7 +413,7 @@ public class HomeFragment extends Fragment {
     private void loadUserPostImage(String imageUrl, ImageView postView) {
         // Use a library like Picasso or Glide to load and display the image
         if (getContext() != null && imageUrl != null) {
-            Picasso.get().load(imageUrl).into(postView);
+            Picasso.get().load(imageUrl).fit().into(postView);
         }
     }
 

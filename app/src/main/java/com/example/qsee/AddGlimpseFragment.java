@@ -57,8 +57,8 @@ import java.util.List;
 
 public class AddGlimpseFragment extends DialogFragment {
     static final int CAMERA_REQUEST_CODE = 100;
-    private static final int TARGET_WIDTH = 240;
-    private static final int TARGET_HEIGHT = 180;
+    private static final int TARGET_WIDTH = 1000;
+    private static final int TARGET_HEIGHT = 1000;
     private static final int LOCATION_PERMISSION_REQUEST = 1;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private DatabaseReference databaseReference;
@@ -153,7 +153,7 @@ public class AddGlimpseFragment extends DialogFragment {
     private void loadUserPostImage(String imageUrl, ImageView profilePic) {
         // Use a library like Picasso or Glide to load and display the image
         if (profilePic.getContext() != null && imageUrl != null) {
-            Picasso.get().load(imageUrl).into(profilePic);
+            Picasso.get().load(imageUrl).fit().into(profilePic);
         }
     }
 
