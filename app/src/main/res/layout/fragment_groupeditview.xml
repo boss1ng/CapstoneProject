@@ -7,7 +7,7 @@
 
     <TextView
         android:id="@+id/groupName"
-        android:layout_width="73dp"
+        android:layout_width="wrap_content"
         android:layout_height="27dp"
         android:layout_marginStart="175dp"
         android:layout_marginTop="20dp"
