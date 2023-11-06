@@ -154,6 +154,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         app:menu="@menu/bottom_navigation_menu"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:itemRippleColor="@color/white"
+        app:itemActiveIndicatorStyle="@color/white"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

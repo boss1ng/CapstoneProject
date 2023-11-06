@@ -285,6 +285,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:menu="@menu/bottom_navigation_menu"></com.google.android.material.bottomnavigation.BottomNavigationView>
+        app:menu="@menu/bottom_navigation_menu"
+        app:itemRippleColor="@color/white"
+        app:itemActiveIndicatorStyle="@color/white"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
