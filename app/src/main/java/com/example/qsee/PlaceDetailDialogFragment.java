@@ -65,21 +65,6 @@ public class PlaceDetailDialogFragment extends DialogFragment {
             Toast.makeText(getContext(), userID, Toast.LENGTH_SHORT).show();
         }
 
-        String placeName = getArguments().getString("placeName");
-        String placeAddress = getArguments().getString("placeAddress");
-        String placeDescription = getArguments().getString("placeDescription");
-        String placeRating = getArguments().getString("placeRating");
-        Double doubleRating = Double.parseDouble(placeRating);
-        String placeLink = getArguments().getString("placeLink");
-        String placePrice = getArguments().getString("placePrice");
-
-        Double currentUserLat = getArguments().getDouble("userLatitude");
-        Double currentUserLong = getArguments().getDouble("userLongitude");
-        String destinationLat = getArguments().getString("destinationLatitude");
-        String destinationLong = getArguments().getString("destinationLongitude");
-
-        // Toast.makeText(getContext(), String.valueOf(destinationLat), Toast.LENGTH_LONG).show();
-
         // Populate UI elements with place details
         TextView nameTextView = view.findViewById(R.id.placeNameTextView);
         TextView addressTextView = view.findViewById(R.id.placeAddressTextView);
@@ -91,6 +76,34 @@ public class PlaceDetailDialogFragment extends DialogFragment {
         ImageView imageViewLocation = view.findViewById(R.id.imageViewLocation);
         TextView priceTextView = view.findViewById(R.id.placePriceTextView);
 
+        String placeName = getArguments().getString("placeName");
+        String placeAddress = getArguments().getString("placeAddress");
+        String placeDescription;
+        if (getArguments().getString("placeDescription").equals("-"))
+            placeDescription = " ";
+        else
+            placeDescription = getArguments().getString("placeDescription");
+
+        String placeRating = getArguments().getString("placeRating");
+        Double doubleRating = Double.parseDouble(placeRating);
+        String placeLink = getArguments().getString("placeLink");
+
+        String placePrice;
+        if (getArguments().getString("placePrice").equals("-")) {
+            priceTextView.setVisibility(View.INVISIBLE);
+        }
+        else {
+            placePrice = getArguments().getString("placePrice");
+            priceTextView.setText(placePrice);
+        }
+
+        Double currentUserLat = getArguments().getDouble("userLatitude");
+        Double currentUserLong = getArguments().getDouble("userLongitude");
+        String destinationLat = getArguments().getString("destinationLatitude");
+        String destinationLong = getArguments().getString("destinationLongitude");
+
+        // Toast.makeText(getContext(), String.valueOf(destinationLat), Toast.LENGTH_LONG).show();
+
         nameTextView.setText(placeName);
         addressTextView.setText(placeAddress);
         descriptionTextView.setText(placeDescription);
@@ -98,7 +111,7 @@ public class PlaceDetailDialogFragment extends DialogFragment {
         Picasso.get()
                 .load(placeLink)
                 .into(imageViewLocation);
-        priceTextView.setText(placePrice);
+
 
         String isUserInQuezonCity = getArguments().getString("isUserInQuezonCity");
         //Toast.makeText(getContext(), isUserInQuezonCity, Toast.LENGTH_LONG).show();

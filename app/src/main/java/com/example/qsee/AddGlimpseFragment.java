@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,7 +35,16 @@ import androidx.fragment.app.FragmentTransaction;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.PlaceLikelihood;
+import com.google.android.libraries.places.api.net.FetchPlaceRequest;
+import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
+import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
+import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -53,6 +63,8 @@ import org.w3c.dom.Text;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class AddGlimpseFragment extends DialogFragment {
@@ -75,6 +87,16 @@ public class AddGlimpseFragment extends DialogFragment {
     private Spinner categorySpinner;
 
     private Boolean isEstablishmentExisting = false;
+
+    private String filename;
+    private String uniqueId;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        // Initialize the Places API here
+        Places.initialize(context, getString(R.string.google_maps_api_key));
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -202,10 +224,10 @@ public class AddGlimpseFragment extends DialogFragment {
         String userId = getArguments().getString("userId"); // Replace with the actual user ID
 
         // Generate a unique ID for the image file (e.g., timestamp)
-        String uniqueId = String.valueOf(System.currentTimeMillis());
+        uniqueId = String.valueOf(System.currentTimeMillis());
 
         // Create a filename using the user's ID and the unique ID
-        String filename = userId + "_" + uniqueId + ".png";
+        filename = userId + "_" + uniqueId + ".png";
 
         // Initialize Firebase Storage with the correct bucket name.
         FirebaseStorage storage = FirebaseStorage.getInstance("gs://capstone-project-ffe21.appspot.com");
@@ -280,19 +302,24 @@ public class AddGlimpseFragment extends DialogFragment {
                     for (DataSnapshot placeSnapshot : snapshot.getChildren()) {
                         String name = placeSnapshot.child("Location").getValue(String.class);
 
-                        if (name.equals(userLocation)) {
-                            isEstablishmentExisting = true;
+                        if (name != null) {
+                            if (name.equals(userLocation)) {
+                                isEstablishmentExisting = true;
+                                break;
+                            }
                         }
                     }
 
+                    /*
                     if (isEstablishmentExisting) {
                         postDetails(userLocation, downloadUrl, textCaption, selectedCategory);
                     }
 
                     else {
                         postDetails(userLocation, downloadUrl, textCaption, selectedCategory);
-                        postRss(userLocation, selectedCategory); // downloadUrl selectedCategory
+                        postRss(userLocation, selectedCategory, downloadUrl);
                     }
+                     */
                 }
 
                 else {
@@ -304,23 +331,39 @@ public class AddGlimpseFragment extends DialogFragment {
 
             }
         });
+
+        if (isEstablishmentExisting) {
+            postDetails(userLocation, downloadUrl, textCaption, selectedCategory);
+        }
+
+        else {
+            postDetails(userLocation, downloadUrl, textCaption, selectedCategory);
+            postRss(userLocation, selectedCategory, downloadUrl);
+        }
     }
 
     private void postDetails(String userLocation, String downloadUrl, String textCaption, String selectedCategory) {
 
-        // Check if location permission is granted
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
+        if (isAdded()) {
+            // The fragment is attached to a context, so it's safe to use requireContext().
+            // Check if location permission is granted
+            if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
 
-            // Request location permission if not granted
-            requestPermissions(new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-            }, LOCATION_PERMISSION_REQUEST_CODE);
-            return;
+                // Request location permission if not granted
+                requestPermissions(new String[]{
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                }, LOCATION_PERMISSION_REQUEST_CODE);
+                return;
+            }
+
+        } else {
+            // Handle the case where the fragment is not attached to a context.
         }
+
         fusedLocationClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
@@ -356,25 +399,31 @@ public class AddGlimpseFragment extends DialogFragment {
         });
     }
 
-    private void postRss(String userLocation, String selectedCategory) {
+    private void postRss(String userLocation, String selectedCategory, String downloadUrl) {
 
         final String[] pushKey = {null};
         final Boolean[] isUserExisting = {false};
+        final Boolean[] isCategoryExisting = {false};
+        final Boolean[] isWithinRadius = {false};
 
-        Geocoder geocoder = new Geocoder(context);
+        if (isAdded()) {
+            // The fragment is attached to a context, so it's safe to use requireContext().
+            // Check if location permission is granted
+            if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
 
-        // Check if location permission is granted
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
+                // Request location permission if not granted
+                requestPermissions(new String[]{
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                }, LOCATION_PERMISSION_REQUEST_CODE);
+                return;
+            }
 
-            // Request location permission if not granted
-            requestPermissions(new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-            }, LOCATION_PERMISSION_REQUEST_CODE);
-            return;
+        } else {
+            // Handle the case where the fragment is not attached to a context.
         }
 
         fusedLocationClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
@@ -399,13 +448,13 @@ public class AddGlimpseFragment extends DialogFragment {
 
                                     pushKey[0] = postSnapshot.getKey();
 
-                                    String numberPostsFirebase = postSnapshot.child("numPosts").getValue(String.class);
+                                    String numberPostsFirebase = postSnapshot.child("NumPosts").getValue(String.class);
                                     //Toast.makeText(getContext(), numberReportsFirebase, Toast.LENGTH_SHORT).show();
 
-                                    // Access the "Users" node under the specific report
+                                    // Access the "Users" node under the specific rss
                                     DataSnapshot usersSnapshot = postSnapshot.child("Users");
 
-                                    // Iterate through the "Users" under this report
+                                    // Iterate through the "Users"
                                     for (DataSnapshot userSnapshot : usersSnapshot.getChildren()) {
                                         String key = userSnapshot.getKey(); // Get the key ("-NhtkyoZUylTyqoeHvLQ")
                                         String value = userSnapshot.getValue(String.class); // Get the value ("5456073013")
@@ -415,6 +464,7 @@ public class AddGlimpseFragment extends DialogFragment {
 
                                         if (value.equals(userId)) {
                                             isUserExisting[0] = true;
+                                            break;
                                         }
                                     }
 
@@ -423,66 +473,139 @@ public class AddGlimpseFragment extends DialogFragment {
 
                                     }
 
-                                    else {
-                                        // Convert numReports to an integer, update it, and set it back
-                                        int intNumReports = Integer.parseInt(numberPostsFirebase);
-                                        intNumReports++;
-                                        postSnapshot.getRef().child("NumReports").setValue(String.valueOf(intNumReports));
+                                    else { // User not yet posting an initial RSS feed
 
-                                        DatabaseReference pushKeyRef = databaseReference.child(pushKey[0]).child("Users");
+                                        // Verify if current loc is within the 0.000807 (90m) radius
+                                        Double firebaseLat = postSnapshot.child("Latitude").getValue(Double.class);
+                                        Double firebaseLong = postSnapshot.child("Longitude").getValue(Double.class);
 
-                                        // Append a new child node under "Users" with the key as "UserId" and the value as the user ID
-                                        pushKeyRef.push().setValue(userId);
+                                        double radius = 0.000807; // 90 meters in degrees
+                                        double lowerBound = firebaseLat - radius;
+                                        double upperBound = firebaseLat + radius;
+                                        double leftBound = firebaseLong - radius;
+                                        double rightBound = firebaseLong + radius;
 
-                                        if (intNumReports == 20) {
-                                            // 
+                                        if ((latitude >= lowerBound || latitude <= upperBound) && (longitude >= leftBound || longitude <= rightBound)) {
+                                            //Toast.makeText(context, "WITHIN 90", Toast.LENGTH_LONG).show();
+
+                                            isWithinRadius[0] = true;
+
+                                            // Access the "Category" node under the specific report
+                                            DataSnapshot categoriesSnapshot = postSnapshot.child("Category");
+
+                                            // Iterate through the "Category"
+                                            for (DataSnapshot catSnapshot : categoriesSnapshot.getChildren()) {
+                                                String key = catSnapshot.getKey(); // Get the key ("Accommodations")
+                                                String value = catSnapshot.getValue(String.class); // Get the value ("1")
+
+                                                int intNumCategories = Integer.parseInt(value);
+                                                intNumCategories++;
+
+                                                //Toast.makeText(context, key, Toast.LENGTH_SHORT).show();
+                                                //Toast.makeText(context, value, Toast.LENGTH_SHORT).show();
+
+                                                if (key.equals(selectedCategory)) {
+                                                    isCategoryExisting[0] = true;
+
+                                                    DatabaseReference pushKeyCatRef = databaseReference.child(pushKey[0]).child("Category");
+                                                    // Append a new child node under "Category" with the key as "selectedCategory" and the value as the incremented
+                                                    pushKeyCatRef.child(selectedCategory).setValue(String.valueOf(intNumCategories));
+
+                                                    // Convert numReports to an integer, update it, and set it back
+                                                    int intNumPosts = Integer.parseInt(numberPostsFirebase);
+                                                    intNumPosts++;
+                                                    postSnapshot.getRef().child("NumPosts").setValue(String.valueOf(intNumPosts));
+
+                                                    DatabaseReference pushKeyRef = databaseReference.child(pushKey[0]).child("Users");
+
+                                                    // Append a new child node under "Users" with the key as "UserId" and the value as the user ID
+                                                    pushKeyRef.push().setValue(userId);
+
+                                                    if (intNumPosts == 20) {
+                                                        //reachThresholdPostLocation(firebaseLat, firebaseLong, categoriesSnapshot, downloadUrl, userLocation);
+                                                        Toast.makeText(context, "ADD RSS FEED TO LOCATION", Toast.LENGTH_LONG).show();
+                                                    }
+
+                                                    break;
+                                                }
+                                            }
+
+                                            if (isCategoryExisting[0]) {
+
+                                            }
+
+                                            else {
+
+                                                DatabaseReference pushKeyCatRef = databaseReference.child(pushKey[0]).child("Category");
+                                                pushKeyCatRef.child(selectedCategory).setValue("1");
+
+                                                // Convert numReports to an integer, update it, and set it back
+                                                int intNumPosts = Integer.parseInt(numberPostsFirebase);
+                                                intNumPosts++;
+                                                postSnapshot.getRef().child("NumPosts").setValue(String.valueOf(intNumPosts));
+
+                                                DatabaseReference pushKeyRef = databaseReference.child(pushKey[0]).child("Users");
+
+                                                // Append a new child node under "Users" with the key as "UserId" and the value as the user ID
+                                                pushKeyRef.push().setValue(userId);
+
+                                                if (intNumPosts == 20) {
+                                                    //reachThresholdPostLocation(firebaseLat, firebaseLong, categoriesSnapshot, downloadUrl, userLocation);
+                                                    Toast.makeText(context, "ADD RSS FEED TO LOCATION", Toast.LENGTH_LONG).show();
+
+                                                    // Register the RSS Feed to Location table from Firebase
+                                                    DatabaseReference newLocation = FirebaseDatabase.getInstance().getReference("Location");
+                                                    //DatabaseReference newLocation = FirebaseDatabase.getInstance().getReference("Location");
+
+                                                    // Save the data to the Firebase Realtime Database
+                                                    DatabaseReference rssPostNewLoc = newLocation.push();
+
+                                                    // Identify Category with highest posts
+                                                    String highestCategory = null;
+                                                    int previousValue = 0;
+                                                    // Iterate through the "Category"
+                                                    for (DataSnapshot catSnapshot : categoriesSnapshot.getChildren()) {
+                                                        String key = catSnapshot.getKey(); // Get the key ("Accommodations")
+                                                        String value = catSnapshot.getValue(String.class); // Get the value ("1")
+
+                                                        if (Integer.parseInt(value) > previousValue) {
+                                                            previousValue = Integer.parseInt(value);
+                                                            highestCategory = key;
+                                                        }
+                                                    }
+
+                                                    reachThresholdPostLocation(firebaseLat, firebaseLong, rssPostNewLoc, downloadUrl, userLocation, highestCategory);
+
+                                                    break;
+                                                }
+                                            }
+
+                                        } else {
+                                            //Toast.makeText(context, "OUTSIDE", Toast.LENGTH_LONG).show();
+
                                         }
 
                                     }
                                 }
+
+                                // end of for loop here
+
                             }
 
                             // Add report on existing rss
                             else {
                                 // new record of RSS
-                                try {
-                                    List<android.location.Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
 
-                                    if (addresses != null && addresses.size() > 0) {
-                                        Address address = addresses.get(0);
+                                // Save the data to the Firebase Realtime Database
+                                DatabaseReference rssPost = databaseReference.push();
 
-                                        // You can now extract address components
-                                        String completeAddress = address.getAddressLine(0); // Full street address
-                                        String city = address.getLocality();
-                                        String state = address.getAdminArea();
-                                        String postalCode = address.getPostalCode();
-                                        String country = address.getCountryName();
-
-                                        // Do something with the address components
-
-                                        // Save the data to the Firebase Realtime Database
-                                        DatabaseReference rssPost = databaseReference.push();
-
-                                        rssPost.child("EstablishmentName").setValue(userLocation);
-                                        //rssPost.child("userId").setValue(userId);
-                                        rssPost.child("numPosts").setValue("1");
-
-                                        rssPost.child("completeAddress").setValue(completeAddress);
-                                        rssPost.child("city").setValue(city);
-                                        rssPost.child("state").setValue(state);
-                                        rssPost.child("postalCode").setValue(postalCode);
-                                        rssPost.child("country").setValue(country);
-
-                                        rssPost.child("Users").push().setValue(userId);
-                                        rssPost.child("Category").push().setValue(selectedCategory);
-
-                                    } else {
-                                        // Geocoder couldn't find an address for the given latitude and longitude
-                                    }
-                                } catch (IOException e) {
-                                    // Handle geocoding errors (e.g., network issues, service not available)
-                                    throw new RuntimeException(e);
-                                }
+                                rssPost.child("EstablishmentName").setValue(userLocation);
+                                //rssPost.child("userId").setValue(userId);
+                                rssPost.child("NumPosts").setValue("1");
+                                rssPost.child("Users").push().setValue(userId);
+                                rssPost.child("Category").child(selectedCategory).setValue("1");
+                                rssPost.child("Latitude").setValue(latitude);
+                                rssPost.child("Longitude").setValue(longitude);
 
                             }
                         }
@@ -494,6 +617,108 @@ public class AddGlimpseFragment extends DialogFragment {
 
                 }
             }
+        });
+    }
+
+    public void reachThresholdPostLocation(Double firebaseLat, Double firebaseLong, DatabaseReference rssPostNewLoc, String downloadUrl, String userLocation, String highestCategory) {
+
+        Geocoder geocoder = new Geocoder(context);
+
+        if (isAdded()) {
+            // The fragment is attached to a context, so it's safe to use requireContext().
+            // Check if location permission is granted
+            if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
+
+                // Request location permission if not granted
+                requestPermissions(new String[]{
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                }, LOCATION_PERMISSION_REQUEST_CODE);
+                return;
+            }
+
+        }
+
+        PlacesClient placesClient = Places.createClient(context);  // context   requireContext()
+
+        // Define the fields you want to retrieve
+        List<Place.Field> placeFields = Arrays.asList(Place.Field.ID);
+
+        // Define the fields you want to retrieve (e.g., contact number and description)
+        List<Place.Field> placeFieldsMore = Arrays.asList(Place.Field.PHONE_NUMBER, Place.Field.TYPES);
+
+        // Create a FindCurrentPlaceRequest for a place search near the specified location
+        FindCurrentPlaceRequest request = FindCurrentPlaceRequest.newInstance(placeFields);
+
+        // Use the request to find place details at the specified location
+        placesClient.findCurrentPlace(request).addOnSuccessListener((response) -> {
+            FindCurrentPlaceResponse findCurrentPlaceResponse = response;
+
+            // Retrieve place details including the placeId
+            List<PlaceLikelihood> placeLikelihoods = findCurrentPlaceResponse.getPlaceLikelihoods();
+            if (!placeLikelihoods.isEmpty()) {
+                Place place = placeLikelihoods.get(0).getPlace();
+                String placeId = place.getId();
+                // Use the placeId as needed
+
+                // Create a FetchPlaceRequest with the Place ID and desired fields
+                FetchPlaceRequest requestDetails = FetchPlaceRequest.builder(placeId, placeFieldsMore).build();
+
+                // Use the Places API client to fetch the details
+                placesClient.fetchPlace(requestDetails).addOnSuccessListener((responseDetails) -> {
+                    Place placeDetails = responseDetails.getPlace();
+                    String phoneNumber = placeDetails.getPhoneNumber();
+                    //String description = placeDetails.getName(); // This is just an example; you can retrieve a relevant description field
+
+                    //Toast.makeText(context, phoneNumber, Toast.LENGTH_LONG).show();
+                    //Toast.makeText(context, description, Toast.LENGTH_LONG).show();
+
+                    try {
+                        List<android.location.Address> addresses = geocoder.getFromLocation(firebaseLat, firebaseLong, 1);
+
+                        if (addresses != null && addresses.size() > 0) {
+                            Address address = addresses.get(0);
+
+                            // You can now extract address components
+                            String completeAddress = address.getAddressLine(0); // Full street address
+                            String city = address.getLocality();
+                            String state = address.getAdminArea();
+                            String postalCode = address.getPostalCode();
+                            String country = address.getCountryName();
+
+                            rssPostNewLoc.child("Address").setValue(completeAddress);
+                            rssPostNewLoc.child("AverageRate").setValue("0");
+                            rssPostNewLoc.child("Category").setValue(highestCategory);
+                            rssPostNewLoc.child("ContactNo").setValue(phoneNumber);
+                            rssPostNewLoc.child("CreatedBy").setValue("RSS");
+                            rssPostNewLoc.child("Description").setValue("");
+                            rssPostNewLoc.child("HighestPrice").setValue("");
+                            rssPostNewLoc.child("Image").setValue(filename);
+                            rssPostNewLoc.child("ImageDescription").setValue(""); // NULL
+                            rssPostNewLoc.child("Latitude").setValue(String.valueOf(firebaseLat));
+                            rssPostNewLoc.child("Link").setValue(downloadUrl);
+                            rssPostNewLoc.child("Location").setValue(userLocation);
+                            rssPostNewLoc.child("Longitude").setValue(String.valueOf(firebaseLong));
+                            rssPostNewLoc.child("LowestPrice").setValue("");
+
+                        } else {
+                            // Geocoder couldn't find an address for the given latitude and longitude
+                        }
+                    } catch (IOException e) {
+                        // Handle geocoding errors (e.g., network issues, service not available)
+                        throw new RuntimeException(e);
+                    }
+
+                    // Do something with the retrieved information
+                }).addOnFailureListener((exception) -> {
+                    // Handle any errors
+                });
+            }
+        }).addOnFailureListener((exception) -> {
+            // Handle any errors that occurred during the request
         });
     }
 

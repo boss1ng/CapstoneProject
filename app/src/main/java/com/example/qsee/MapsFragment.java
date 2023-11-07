@@ -470,6 +470,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                             for (int i = 0; i < categories.length; i++) {
 
                                 String passedCategory = categories[i];
+                                String description = null;
+                                String lowestPrice = null;
+                                String highestPrice = null;
+                                String placePrice = null;
 
                                 for (DataSnapshot placeSnapshot : dataSnapshot.getChildren()) {
 
@@ -480,11 +484,24 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                                     String latitude = placeSnapshot.child("Latitude").getValue(String.class);
                                     String longitude = placeSnapshot.child("Longitude").getValue(String.class);
                                     String stringRating = placeSnapshot.child("AverageRate").getValue(String.class);
-                                    String description = placeSnapshot.child("Description").getValue(String.class);
+
+                                    if (placeSnapshot.child("Description").getValue(String.class) == null)
+                                        description = "-";
+                                    else
+                                        description = placeSnapshot.child("Description").getValue(String.class);
+
+                                    if (placeSnapshot.child("LowestPrice").getValue(String.class) == null || placeSnapshot.child("HighestPrice").getValue(String.class) == null) {
+                                        lowestPrice = "-";
+                                        highestPrice = "-";
+                                        placePrice = "-";
+                                    }
+                                    else {
+                                        lowestPrice = placeSnapshot.child("LowestPrice").getValue(String.class);
+                                        highestPrice = placeSnapshot.child("HighestPrice").getValue(String.class);
+                                        placePrice = "₱" + lowestPrice + " - ₱" + highestPrice;
+                                    }
+
                                     String imageLink = placeSnapshot.child("Link").getValue(String.class);
-                                    String lowestPrice = placeSnapshot.child("LowestPrice").getValue(String.class);
-                                    String highestPrice = placeSnapshot.child("HighestPrice").getValue(String.class);
-                                    String placePrice = "₱" + lowestPrice + " - ₱" + highestPrice;
 
                                     if (category.equals(passedCategory)) {
 
@@ -649,6 +666,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
+                String description = null;
+                String lowestPrice = null;
+                String highestPrice = null;
+                String placePrice = null;
+
                 for (DataSnapshot placeSnapshot : dataSnapshot.getChildren()) {
                     // Extract place data (e.g., latitude, longitude, name) from placeSnapshot
                     String address = placeSnapshot.child("Address").getValue(String.class);
@@ -657,11 +679,24 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                     String latitude = placeSnapshot.child("Latitude").getValue(String.class);
                     String longitude = placeSnapshot.child("Longitude").getValue(String.class);
                     String stringRating = placeSnapshot.child("AverageRate").getValue(String.class);
-                    String description = placeSnapshot.child("Description").getValue(String.class);
+
+                    if (placeSnapshot.child("Description").getValue(String.class).equals(""))
+                        description = "-";
+                    else
+                        description = placeSnapshot.child("Description").getValue(String.class);
+
+                    if (placeSnapshot.child("LowestPrice").getValue(String.class).equals("") || placeSnapshot.child("HighestPrice").getValue(String.class).equals("")) {
+                        lowestPrice = "-";
+                        highestPrice = "-";
+                        placePrice = "-";
+                    }
+                    else {
+                        lowestPrice = placeSnapshot.child("LowestPrice").getValue(String.class);
+                        highestPrice = placeSnapshot.child("HighestPrice").getValue(String.class);
+                        placePrice = "₱" + lowestPrice + " - ₱" + highestPrice;
+                    }
+
                     String imageLink = placeSnapshot.child("Link").getValue(String.class);
-                    String lowestPrice = placeSnapshot.child("LowestPrice").getValue(String.class);
-                    String highestPrice = placeSnapshot.child("HighestPrice").getValue(String.class);
-                    String placePrice = "₱" + lowestPrice + " - ₱" + highestPrice;
 
                     try {
                         Double doubleLatitude = Double.parseDouble(latitude);
