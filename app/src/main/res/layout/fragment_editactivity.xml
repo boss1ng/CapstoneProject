@@ -91,7 +91,7 @@
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.42" />
+        app:layout_constraintVertical_bias="0.531" />
 
     <Button
         android:id="@+id/cancelBt"
@@ -105,4 +105,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/saveBt"
         app:layout_constraintVertical_bias="0.0" />
+
+    <Switch
+        android:id="@+id/completionSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="47dp"
+        android:text="Completed"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.118"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/locTime"
+        app:layout_constraintVertical_bias="0.047" />
 </androidx.constraintlayout.widget.ConstraintLayout>

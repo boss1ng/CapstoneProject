@@ -3,6 +3,7 @@ package com.example.qsee;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -22,12 +23,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -469,8 +475,45 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
             deleteImageView = itemView.findViewById(R.id.delete);
         }
     }
+/*
+    private void retrieveImagesFromStorageAndSetGroupIcon(String groupName, ViewHolder holder) {
+        // Retrieve the image reference for the specific group from your Firebase Realtime Database
+        DatabaseReference groupReference = databaseReference.child("Groups").child(groupName);
+        groupReference.child("groupIconRef").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String imageRef = dataSnapshot.getValue(String.class);
+                // Check if the imageRef is not null and fetch the image
+                if (imageRef != null) {
+                    // Get the reference to the image in Firebase Storage
+                    FirebaseStorage storage = FirebaseStorage.getInstance("gs://capstone-project-ffe21.appspot.com/");
+                    StorageReference imageStorageRef = storage.getReference().child("Icons").child(imageRef);
+                    // Fetch the image and set it to the groupIconImageView
+                    imageStorageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            // Load the image into the groupIconImageView
+                            Picasso.get().load(uri.toString()).into(holder.groupIconImageView);
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle any errors while getting the download URL
+                        }
+                    });
+                } else {
+                    // Handle the case when the image reference is missing in the database
+                    // You can display a placeholder image or take other actions
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle database error
+            }
+        });
+    }
 
-
+ */
     // Add a method to update the data
     public void updateData(List<Groups> newData) {
         groupList.clear();
