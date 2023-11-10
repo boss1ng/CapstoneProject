@@ -207,6 +207,12 @@ public class EditActivityFragment extends Fragment {
                                                 newTimeSnapshot.child("status").setValue("Completed");
                                                 //newTimeSnapshot.child("status").setValue("incomplete");
 
+                                                // Delete the entire itinerary if status is complete
+                                                if ("Completed".equals(status)) {
+                                                    DatabaseReference timeSnapshotRef = daySnapshot.child(finalTime).getRef();
+                                                    timeSnapshotRef.removeValue();
+                                                }
+
                                                 showRatingDialog();
                                                 // Show a toast to confirm the save
                                                 Toast.makeText(getContext(), "Changes saved successfully", Toast.LENGTH_SHORT).show();
@@ -221,6 +227,7 @@ public class EditActivityFragment extends Fragment {
                                     // Handle any errors that occur during the query
                                     Log.e("FirebaseError", "Error: " + databaseError.getMessage());
                                 }
+
                             });
                         } else {
                             // If the switch is not checked, set the status to "Incompleted" in the database
