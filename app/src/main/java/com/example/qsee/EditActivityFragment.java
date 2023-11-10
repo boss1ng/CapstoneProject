@@ -82,9 +82,13 @@ public class EditActivityFragment extends Fragment {
                             locationsList.add(Location);
                         }
                     }
-                    // Set up the adapter for the AutoCompleteTextView
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, locationsList);
-                    locationAutoCompleteTextView.setAdapter(adapter);
+
+                    // Check if the fragment is attached to a context before using requireContext()
+                    if (isAdded() && getContext() != null) {
+                        // Set up the adapter for the AutoCompleteTextView
+                        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, locationsList);
+                        locationAutoCompleteTextView.setAdapter(adapter);
+                    }
                 }
 
                 @Override
@@ -211,7 +215,16 @@ public class EditActivityFragment extends Fragment {
                                                 if ("Completed".equals(status)) {
                                                     DatabaseReference timeSnapshotRef = daySnapshot.child(finalTime).getRef();
                                                     timeSnapshotRef.removeValue();
+
+                                                    // Check if iterName is not null and has no children, then remove it
+                                                    if (iterName != null && !dataSnapshot.hasChildren()) {
+                                                        databaseReference.child(iterName).removeValue();
+                                                    }
                                                 }
+
+                                                //if(iterName == null){
+                                               //         databaseReference.child(iterName).removeValue();
+                                                //}
 
                                                 showRatingDialog();
                                                 // Show a toast to confirm the save

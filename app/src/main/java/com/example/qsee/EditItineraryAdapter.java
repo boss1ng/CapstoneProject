@@ -228,7 +228,6 @@ public class EditItineraryAdapter extends RecyclerView.Adapter<EditItineraryAdap
                                                             break;
                                                     }
 
-
                                                     // Check if the daySnapshot has only the date and no other child nodes
                                                     if (daySnapshot.getChildrenCount() == 2) {
                                                         if (dayTitleTextView != null) {
@@ -237,8 +236,22 @@ public class EditItineraryAdapter extends RecyclerView.Adapter<EditItineraryAdap
                                                             // Remove the day from the database
                                                             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Itinerary").child(iterName);
                                                             databaseReference.child(daySnapshot.getKey()).removeValue();
-
                                                         }
+                                                    }
+
+                                                    // Dapat madedelete din yung Itinerary sa list after mawala yung last day/activity sa itinerary
+                                                    // Check if iterName is not null and there are no more children in dataSnapshot
+                                                    if (iterName != null && !dataSnapshot.hasChildren()) {
+                                                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Itinerary");
+                                                        databaseReference.child(iterName).removeValue();
+                                                        dataList.remove(position);
+                                                        notifyItemRemoved(position);
+                                                        //Toast.makeText(context, "Activity deleted", Toast.LENGTH_SHORT).show();
+                                                        Toast.makeText(context, "Last activity removed, The Itinerary will be deleted.", Toast.LENGTH_SHORT).show();
+
+                                                        // Pop back the fragment when the itinerary is deleted
+                                                        FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
+                                                        fragmentManager.popBackStack();
                                                     }
                                                 }
                                             })
