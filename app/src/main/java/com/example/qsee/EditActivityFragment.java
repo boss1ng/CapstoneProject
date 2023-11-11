@@ -67,6 +67,8 @@ public class EditActivityFragment extends Fragment {
 
             // Find the TextInputLayout for location and set the text
             TextInputLayout locationTextInputLayout = rootView.findViewById(R.id.locName);
+            TextInputLayout originTextInputLayout = rootView.findViewById(R.id.originName);
+            AutoCompleteTextView originAutoCompleteTextView = (AutoCompleteTextView) Objects.requireNonNull(originTextInputLayout.getEditText());
             AutoCompleteTextView locationAutoCompleteTextView = (AutoCompleteTextView) Objects.requireNonNull(locationTextInputLayout.getEditText()); // Get the AutoCompleteTextView
             locationAutoCompleteTextView.setText(location);
 
@@ -87,6 +89,7 @@ public class EditActivityFragment extends Fragment {
                     if (isAdded() && getContext() != null) {
                         // Set up the adapter for the AutoCompleteTextView
                         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, locationsList);
+                        originAutoCompleteTextView.setAdapter(adapter);
                         locationAutoCompleteTextView.setAdapter(adapter);
                     }
                 }
@@ -135,10 +138,12 @@ public class EditActivityFragment extends Fragment {
                                 if (retrievedLoc != null && retrievedLoc.equals(location)) {
                                     // Retrieve the activity data
                                     String activity = timeSnapshot.child("activity").getValue(String.class);
+                                    String origin = timeSnapshot.child("origin").getValue(String.class);
 
                                     // Update the TextInputLayout in your activity layout
                                     TextInputLayout activityTextInputLayout = rootView.findViewById(R.id.locActivity);
                                     activityTextInputLayout.getEditText().setText(activity);
+                                    originAutoCompleteTextView.setText(origin);
                                 }
                             }
                         }
@@ -179,6 +184,9 @@ public class EditActivityFragment extends Fragment {
                             TextInputLayout activityTextInputLayout = rootView.findViewById(R.id.locActivity);
                             String updatedActivity = activityTextInputLayout.getEditText().getText().toString();
 
+                            TextInputLayout originTextInputLayout = rootView.findViewById(R.id.originName);
+                            String updatedOrigin = originTextInputLayout.getEditText().getText().toString();
+
                             String standardTime = Objects.requireNonNull(timeTextInputLayout.getEditText()).getText().toString();
                             String militaryTime = convertToMilitaryTime(standardTime); // convert to military time
 
@@ -208,6 +216,7 @@ public class EditActivityFragment extends Fragment {
                                                 DatabaseReference newTimeSnapshot = daySnapshot.child(militaryTime).getRef();
                                                 newTimeSnapshot.child("location").setValue(updatedLocation);
                                                 newTimeSnapshot.child("activity").setValue(updatedActivity);
+                                                newTimeSnapshot.child("origin").setValue(updatedOrigin);
                                                 newTimeSnapshot.child("status").setValue("Completed");
                                                 //newTimeSnapshot.child("status").setValue("incomplete");
 
@@ -260,6 +269,7 @@ public class EditActivityFragment extends Fragment {
                                                 DatabaseReference newTimeSnapshot = daySnapshot.child(militaryTime).getRef();
                                                 newTimeSnapshot.child("location").setValue(updatedLocation);
                                                 newTimeSnapshot.child("activity").setValue(updatedActivity);
+                                                newTimeSnapshot.child("origin").setValue(updatedOrigin);
                                                 newTimeSnapshot.child("status").setValue("Incomplete");
                                                 //newTimeSnapshot.child("status").setValue("incomplete");
 

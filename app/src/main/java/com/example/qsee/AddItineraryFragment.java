@@ -248,24 +248,6 @@ public class AddItineraryFragment extends Fragment {
                             TextInputLayout defaultDateInputLayout = view.findViewById(R.id.dateInput);
                             String defaultDate = Objects.requireNonNull(defaultDateInputLayout.getEditText()).getText().toString();
 
-                            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-                            try {
-                                Date date = sdf.parse(defaultDate);
-                                Calendar cal = Calendar.getInstance();
-                                cal.setTime(date);
-
-                                Intent intent = new Intent(Intent.ACTION_INSERT)
-                                        .setData(CalendarContract.Events.CONTENT_URI)
-                                        .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, cal.getTimeInMillis())
-                                        .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, cal.getTimeInMillis() + 60 * 60 * 1000) // 1 hour
-                                        .putExtra(CalendarContract.Events.TITLE, itineraryName)
-                                        .putExtra(CalendarContract.Events.ALL_DAY, true);
-
-                                startActivityForResult(intent, 1);
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                            }
-
                             if (defaultDate.isEmpty()) {
                                 Toast.makeText(getContext(), "Please fill in all fields for Day 1", Toast.LENGTH_SHORT).show();
                                 allFormsFilled = false;
@@ -273,18 +255,19 @@ public class AddItineraryFragment extends Fragment {
                                 for (int j = 0; j < 5; j++) {
                                     assert defaultLayoutManager != null;
                                     View itemView = defaultLayoutManager.getChildAt(j);
-                                    Log.d("Kinuha ko ang","eto" + defaultLayoutManager.getChildAt(j));
 
                                     if (itemView != null) {
                                         TextInputLayout timeInputLayout = itemView.findViewById(R.id.timeInput);
                                         TextInputLayout activityInputLayout = itemView.findViewById(R.id.activityInput);
                                         TextInputLayout locationInputLayout = itemView.findViewById(R.id.locationInput);
+                                        TextInputLayout originInputLayout = itemView.findViewById(R.id.originInput);
 
                                         String time = Objects.requireNonNull(timeInputLayout.getEditText()).getText().toString();
                                         String activity = Objects.requireNonNull(activityInputLayout.getEditText()).getText().toString();
                                         String location = Objects.requireNonNull(locationInputLayout.getEditText()).getText().toString();
+                                        String origin = Objects.requireNonNull(originInputLayout.getEditText()).getText().toString();
 
-                                        if (time.isEmpty() || activity.isEmpty() || location.isEmpty()) {
+                                        if (time.isEmpty() || activity.isEmpty() || location.isEmpty() || origin.isEmpty()) {
                                             Toast.makeText(getContext(), "Please fill in all fields for Day 1", Toast.LENGTH_SHORT).show();
                                             allFormsFilled = false;
                                             break;
@@ -315,12 +298,14 @@ public class AddItineraryFragment extends Fragment {
                                         TextInputLayout timeInputLayout = itemView.findViewById(R.id.timeInput);
                                         TextInputLayout activityInputLayout = itemView.findViewById(R.id.activityInput);
                                         TextInputLayout locationInputLayout = itemView.findViewById(R.id.locationInput);
+                                        TextInputLayout originInputLayout = itemView.findViewById(R.id.originInput);
 
                                         String time = Objects.requireNonNull(timeInputLayout.getEditText()).getText().toString();
                                         String activity = Objects.requireNonNull(activityInputLayout.getEditText()).getText().toString();
                                         String location = Objects.requireNonNull(locationInputLayout.getEditText()).getText().toString();
+                                        String origin = Objects.requireNonNull(originInputLayout.getEditText()).getText().toString();
 
-                                        if (time.isEmpty() || activity.isEmpty() || location.isEmpty()) {
+                                        if (time.isEmpty() || activity.isEmpty() || location.isEmpty() || origin.isEmpty()) {
                                             Toast.makeText(getContext(), "Please fill in all fields for Day " + (i + 2), Toast.LENGTH_SHORT).show();
                                             allFormsFilled = false;
                                             break;
@@ -344,6 +329,7 @@ public class AddItineraryFragment extends Fragment {
                                         TextInputLayout timeInputLayout = itemView.findViewById(R.id.timeInput);
                                         TextInputLayout activityInputLayout = itemView.findViewById(R.id.activityInput);
                                         TextInputLayout locationInputLayout = itemView.findViewById(R.id.locationInput);
+                                        TextInputLayout originInputLayout = itemView.findViewById(R.id.originInput);
 
                                         String standardTime = Objects.requireNonNull(timeInputLayout.getEditText()).getText().toString();
                                         String militaryTime = convertToMilitaryTime(standardTime); // convert to military time
@@ -351,11 +337,13 @@ public class AddItineraryFragment extends Fragment {
                                         String time = Objects.requireNonNull(timeInputLayout.getEditText()).getText().toString();
                                         String activity = Objects.requireNonNull(activityInputLayout.getEditText()).getText().toString();
                                         String location = Objects.requireNonNull(locationInputLayout.getEditText()).getText().toString();
+                                        String origin = Objects.requireNonNull(originInputLayout.getEditText()).getText().toString();
 
                                         DatabaseReference itemRef = defaultDayRef.child(militaryTime);
                                         itemRef.child("status").setValue("incomplete");
                                         itemRef.child("activity").setValue(activity);
                                         itemRef.child("location").setValue(location);
+                                        itemRef.child("origin").setValue(origin);
                                     }
                                 }
 
@@ -375,12 +363,14 @@ public class AddItineraryFragment extends Fragment {
                                             TextInputLayout timeInputLayout = itemView.findViewById(R.id.timeInput);
                                             TextInputLayout activityInputLayout = itemView.findViewById(R.id.activityInput);
                                             TextInputLayout locationInputLayout = itemView.findViewById(R.id.locationInput);
+                                            TextInputLayout originInputLayout = itemView.findViewById(R.id.originInput);
 
                                             String standardTime = Objects.requireNonNull(timeInputLayout.getEditText()).getText().toString();
                                             String militaryTime = convertToMilitaryTime(standardTime); // convert to military time
 
                                             String activity = Objects.requireNonNull(activityInputLayout.getEditText()).getText().toString();
                                             String location = Objects.requireNonNull(locationInputLayout.getEditText()).getText().toString();
+                                            String origin = Objects.requireNonNull(originInputLayout.getEditText()).getText().toString();
 
                                             DatabaseReference dayRef = userRef.child("Day" + (i + 2));
                                             dayRef.child("date").setValue(date);
@@ -388,10 +378,28 @@ public class AddItineraryFragment extends Fragment {
                                             itemRef.child("status").setValue("incomplete");
                                             itemRef.child("activity").setValue(activity);
                                             itemRef.child("location").setValue(location);
+                                            itemRef.child("origin").setValue(origin);
                                         }
                                     }
                                 }
 
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+                                try {
+                                    Date date = sdf.parse(defaultDate);
+                                    Calendar cal = Calendar.getInstance();
+                                    cal.setTime(date);
+
+                                    Intent intent = new Intent(Intent.ACTION_INSERT)
+                                            .setData(CalendarContract.Events.CONTENT_URI)
+                                            .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, cal.getTimeInMillis())
+                                            .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, cal.getTimeInMillis() + 60 * 60 * 1000) // 1 hour
+                                            .putExtra(CalendarContract.Events.TITLE, itineraryName)
+                                            .putExtra(CalendarContract.Events.ALL_DAY, true);
+
+                                    startActivityForResult(intent, 1);
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
 
                                 Toast.makeText(getContext(), "Itinerary saved to Firebase", Toast.LENGTH_SHORT).show();
                                 FragmentManager fragmentManager = getParentFragmentManager();

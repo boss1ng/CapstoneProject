@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -27,6 +28,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import org.w3c.dom.Text;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -55,6 +58,12 @@ public class AddItineraryActivity extends Fragment {
 
             TextInputLayout activityTextInputLayout = rootView.findViewById(R.id.locActivity);
             TextInputLayout locationTextInputLayout = rootView.findViewById(R.id.locName);
+            TextInputLayout originTextInputLayout = rootView.findViewById(R.id.originName);
+            Switch completionswitch = rootView.findViewById(R.id.completionSwitch);
+
+            completionswitch.setVisibility(View.GONE);
+
+            AutoCompleteTextView originAutoCompleteTextView = (AutoCompleteTextView) Objects.requireNonNull(originTextInputLayout.getEditText());
             AutoCompleteTextView locationAutoCompleteTextView = (AutoCompleteTextView) Objects.requireNonNull(locationTextInputLayout.getEditText()); // Get the AutoCompleteTextView
 
             // Fetch data from Firebase Realtime Database
@@ -74,6 +83,7 @@ public class AddItineraryActivity extends Fragment {
                     if (isAdded() && getContext() != null) {
                         // Set up the adapter for the AutoCompleteTextView
                         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, locationsList);
+                        originAutoCompleteTextView.setAdapter(adapter);
                         locationAutoCompleteTextView.setAdapter(adapter);
                     }
                 }
@@ -103,6 +113,7 @@ public class AddItineraryActivity extends Fragment {
                                 String time = timeTextInputLayout.getEditText().getText().toString();
                                 String activity = activityTextInputLayout.getEditText().getText().toString();
                                 String location = locationTextInputLayout.getEditText().getText().toString();
+                                String origin = originTextInputLayout.getEditText().getText().toString();
 
                                 // Check if any of the fields are empty
                                 if (time.isEmpty() || activity.isEmpty() || location.isEmpty()) {
@@ -114,6 +125,7 @@ public class AddItineraryActivity extends Fragment {
 
                                     databaseReference.child(militaryTime).child("activity").setValue(activity);
                                     databaseReference.child(militaryTime).child("status").setValue("incomplete");
+                                    databaseReference.child(militaryTime).child("origin").setValue(origin);
                                     databaseReference.child(militaryTime).child("location").setValue(location)
                                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                 @Override

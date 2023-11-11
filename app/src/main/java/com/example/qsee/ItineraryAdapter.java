@@ -104,12 +104,15 @@ public class ItineraryAdapter extends RecyclerView.Adapter<ItineraryAdapter.Acti
         private TextInputLayout timeInputLayout;
         private TextInputLayout activityInputLayout;
         private TextInputLayout locationInputLayout; // Changed to TextInputLayout
+        private TextInputLayout originInputLayout;
 
         public ActivityViewHolder(@NonNull View itemView) {
             super(itemView);
             timeInputLayout = itemView.findViewById(R.id.timeInput);
             activityInputLayout = itemView.findViewById(R.id.activityInput);
             locationInputLayout = itemView.findViewById(R.id.locationInput); // Changed to TextInputLayout
+            originInputLayout = itemView.findViewById(R.id.originInput);
+
         }
 
         public void bind(ItineraryItem item) {
@@ -125,6 +128,44 @@ public class ItineraryAdapter extends RecyclerView.Adapter<ItineraryAdapter.Acti
             if (activityEditText != null) {
                 if (activityEditText.getText().toString().isEmpty()) {
                     activityEditText.setText(item.getActivity());
+                }
+            }
+
+            // Getting text from AutoCompleteTextView directly
+            if (originInputLayout.getEditText() instanceof AutoCompleteTextView) {
+                AutoCompleteTextView originAutoCompleteTextView = (AutoCompleteTextView) originInputLayout.getEditText(); // Get the AutoCompleteTextView
+                String locationText = originAutoCompleteTextView.getText().toString(); // Get the text from AutoCompleteTextView
+
+                // Fetch data from Firebase Realtime Database
+                DatabaseReference locationsRef = FirebaseDatabase.getInstance().getReference().child("Location");
+                locationsRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        List<String> locationsList = new ArrayList<>();
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            String Location = snapshot.child("Location").getValue(String.class);
+                            locationsList.add(Location);
+                        }
+
+                        // Set up the adapter for the AutoCompleteTextView
+                        ArrayAdapter<String> adapter = new ArrayAdapter<>(originAutoCompleteTextView.getContext(), android.R.layout.simple_dropdown_item_1line, locationsList);
+                        originAutoCompleteTextView.setAdapter(adapter);
+
+                        // Set the existing location text
+                        String locationText = originAutoCompleteTextView.getText().toString();
+                        if (locationText.isEmpty()) {
+                            originAutoCompleteTextView.setText(item.getLocation());
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        // Handle any errors
+                    }
+                });
+
+                if (locationText.isEmpty()) {
+                    originAutoCompleteTextView.setText(item.getLocation());
                 }
             }
 
