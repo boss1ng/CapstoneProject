@@ -322,8 +322,26 @@
         }
 
         function changeSelected(categoryOption) {
-            const selectedCat = document.getElementById('selectedCategory'); 
+            const selectedCat = document.getElementById('selectedCategory');
+            var inputLocationHigh = document.querySelector("#estabHighPrice");
+            var inputLocationLow = document.querySelector("#estabLowPrice");
+
             selectedCat.value = categoryOption;
+
+            if (selectedCat.value == "Schools" || selectedCat.value == "Religious Sites") {
+                inputLocationHigh.disabled = true;
+                inputLocationHigh.value = "";
+                inputLocationLow.disabled = true;
+                inputLocationLow.value = "";
+            }
+
+            else {
+                inputLocationHigh.disabled = false;
+                inputLocationHigh.value = "";
+                inputLocationLow.disabled = false;
+                inputLocationLow.value = "";
+            }
+
             buttonSave.disabled = false;
         }
 
@@ -385,10 +403,10 @@
 
         const categoryIcon = document.getElementById('imageDatabase');
         var firebaseImage = null;
+        var isRSS = false;
 
         fetchAndPopulateCategory();
         fetchAndPopulate();
-        
 
         // Fetch data from the database and populate the table
         function fetchAndPopulate() {
@@ -399,6 +417,12 @@
                 if(snapshot.exists()) {
                     inputLocation.value = snapshot.val().Location;
                     inputLocationCat.value = snapshot.val().Category;
+
+                    if (inputLocationCat.value == "Religious Sites" || inputLocationCat.value == "Schools") {
+                        inputLocationHigh.disabled = true;
+                        inputLocationLow.disabled = true;
+                    }
+
                     inputLocationAdd.value = snapshot.val().Address;
                     inputLocationCont.value = snapshot.val().ContactNo;
                     inputLocationLat.value = snapshot.val().Latitude;
@@ -408,6 +432,11 @@
                     inputLocationHigh.value = snapshot.val().HighestPrice;
                     inputLocImageEdit.value = snapshot.val().Image;
                     inputLocationImageDesc.value = snapshot.val().ImageDescription;
+
+                    createdBy = snapshot.val().CreatedBy;
+                    if (createdBy == "RSS") {
+                        isRSS = true;
+                    }
 
                     firebaseImage = snapshot.val().Image;
 
@@ -488,6 +517,14 @@
             }
 
             else {
+
+                if (isRSS) {
+
+                }
+
+                else {
+                    
+                }
 
                 var uploadedFile = inputLocationImage.files[0]; // Get the selected file
                 var fileInputName = uploadedFile.name;

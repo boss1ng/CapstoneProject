@@ -60,6 +60,9 @@
 
         const locationToDelete = sessionStorage.getItem('locationID_ToDelete');
         var firebaseImage = null;
+        var createdBy = null;
+        var isRSS = false;
+        var establishName = null;
 
         fetchAndPopulate();
 
@@ -70,7 +73,12 @@
             get(child(dbref, "Location/" + locationToDelete))
             .then( (snapshot)=> {
                 if(snapshot.exists()) {
+                    establishName = snapshot.val().Location;
                     firebaseImage = snapshot.val().Image;
+                    createdBy = snapshot.val().CreatedBy;
+                    if (createdBy == "RSS") {
+                        isRSS = true;
+                    }
                 }
 
                 deletelocation(locationToDelete);
@@ -79,34 +87,76 @@
 
         function deletelocation(locationToDelete) {
 
-            // Initialize Cloud Storage
-            const storage = firebase.storage();
-            const storageRef = storage.ref();
+            const dbref = ref(db)
 
-            // Reference the specific file you want to delete
-            const fileRef = storageRef.child('Location/' + firebaseImage);
-
-            // Delete the file
-            fileRef.delete()
-            .then(() => {
-                // File has been successfully deleted
-                console.log('File deleted successfully.');
-
+            if (isRSS) {
                 remove(ref(db, 'Location/' + locationToDelete))
                 .then(() => {
+
+                    get(child(dbref, "RSS"))
+                    .then( (snapshot)=> {
+                        if(snapshot.exists()) {
+
+                            snapshot.forEach(childSnapshot => {
+
+                                if (establishName == childSnapshot.val().EstablishmentName) {
+                                    // delete the current record from RSS table
+                                    const childKey = childSnapshot.key;
+                                    //const rssRef = child(db, "RSS", childKey);
+                                    
+                                    // Remove the record
+                                    remove(ref(db, 'RSS/' + childKey))
+                                    .then(() => {
+                                        //console.log("Record deleted successfully");
+                                        sessionStorage.clear();
+                                        window.location.replace("places.html");
+                                    })
+                                    .catch((error) => {
+                                        //console.error("Error deleting record: ", error);
+                                    });
+                                }
+                            });
+                        }
+                    })
+
                     // alert("Record successfully removed.");
-                    sessionStorage.clear();
-                    window.location.replace("places.html");
+                    //sessionStorage.clear();
+                    //window.location.replace("places.html");
                 })
                 .catch((error) => {
                     alert(error);
                 });
-            })
-            .catch((error) => {
-                // Handle any errors that occur during deletion
-                console.error('Error deleting file:', error);
-            });
+            }
 
+            else {
+                // Initialize Cloud Storage
+                const storage = firebase.storage();
+                const storageRef = storage.ref();
+
+                // Reference the specific file you want to delete
+                const fileRef = storageRef.child('Location/' + firebaseImage);
+
+                // Delete the file
+                fileRef.delete()
+                .then(() => {
+                    // File has been successfully deleted
+                    console.log('File deleted successfully.');
+
+                    remove(ref(db, 'Location/' + locationToDelete))
+                    .then(() => {
+                        // alert("Record successfully removed.");
+                        sessionStorage.clear();
+                        window.location.replace("places.html");
+                    })
+                    .catch((error) => {
+                        alert(error);
+                    });
+                })
+                .catch((error) => {
+                    // Handle any errors that occur during deletion
+                    console.error('Error deleting file:', error);
+                });
+            }
         }
 
     </script>
