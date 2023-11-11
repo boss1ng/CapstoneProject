@@ -240,7 +240,7 @@ public class EditProfileFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == CAMERA_REQUEST_CODE) {
+        if (requestCode == CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
 
             if (data != null) {
                 // Get the captured image
@@ -251,9 +251,9 @@ public class EditProfileFragment extends Fragment {
                     profilePictureImageView.setImageBitmap(imageBitmap);
 
                     // Resize the image to the target dimensions (100x100dp)
-                    //Bitmap scaledImage = scaleImageToTargetDimensions(imageBitmap, TARGET_WIDTH_DP, TARGET_HEIGHT_DP);
+                    Bitmap scaledImage = scaleImageToTargetDimensions(imageBitmap, TARGET_WIDTH_DP, TARGET_HEIGHT_DP);
 
-                    //selectedProfilePictureUri = getImageUri(requireContext(), scaledImage);
+                    selectedProfilePictureUri = getImageUri(requireContext(), scaledImage);
                 } else {
                     Toast.makeText(requireContext(), "Failed to capture the image", Toast.LENGTH_SHORT).show();
                 }
