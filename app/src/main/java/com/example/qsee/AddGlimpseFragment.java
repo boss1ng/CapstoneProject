@@ -107,9 +107,10 @@ public class AddGlimpseFragment extends DialogFragment {
         context = getActivity();
         userId = getArguments().getString("userId");
         cameraButton = rootView.findViewById(R.id.cameraBT);
+
         caption = rootView.findViewById(R.id.comment);
         // Set maximum number of characters (e.g., 10 characters)
-        int maxLength = 20;
+        int maxLength = 250;
         InputFilter[] filters = new InputFilter[1];
         filters[0] = new InputFilter.LengthFilter(maxLength);
         caption.setFilters(filters);

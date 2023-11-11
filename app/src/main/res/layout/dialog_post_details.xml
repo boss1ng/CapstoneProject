@@ -1,20 +1,17 @@
 <!-- dialog_post_details.xml -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_gravity="center"
     android:orientation="vertical">
 
-
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
+        android:layout_margin="10dp"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <de.hdodenhof.circleimageview.CircleImageView
@@ -22,32 +19,81 @@
             android:layout_width="110px"
             android:layout_height="110px"
             android:layout_gravity="center"
-            android:layout_marginEnd="10dp" />
+            android:layout_marginEnd="10dp"
+            tools:ignore="MissingClass" />
 
-
-        <TextView
-            android:id="@+id/dialogUserTextView"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:layout_gravity="center"
-            android:layout_marginEnd="5dp"
-            android:text="Username"/>
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/dialogUserTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Username"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/dialogLocationTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:text="Location" />
+
+        </LinearLayout>
 
         <View
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <ImageView
-            android:id="@+id/options"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginEnd="10dp"
-            android:src="@drawable/btn_more"
-            android:layout_gravity="center"
-            android:layout_marginLeft="8dp"
-            android:clickable="true"/>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            >
+
+            <ImageView
+                android:id="@+id/options"
+                android:layout_width="17dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:layout_marginLeft="8dp"
+                android:clickable="true"
+                android:src="@drawable/btn_more"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:ignore="MissingConstraints" />
+
+            <LinearLayout
+                android:id="@+id/actionsLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                tools:ignore="MissingConstraints"
+                android:background="@android:color/black"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@+id/options"
+                >
+<!-- android:visibility="gone" -->
+
+                <Button
+                    android:id="@+id/button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Edit" />
+
+                <Button
+                    android:id="@+id/button2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Delete" />
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     </LinearLayout>
 
@@ -69,42 +115,51 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
-        android:orientation="horizontal">
+        android:orientation="vertical"
+        android:layout_margin="10dp"
+        >
 
-        <TextView
-            android:id="@+id/dialogUsernameTextView"
+        <LinearLayout
+            android:id="@+id/layoutUserCaption"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:layout_marginEnd="5dp"
-            android:text="Username"/>
+            android:layout_gravity="left"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/dialogUsernameTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:layout_marginEnd="5dp"
+                android:text="Username"/>
+
+            <TextView
+                android:id="@+id/dialogCaptionTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Caption"/>
+        </LinearLayout>
 
         <TextView
-            android:id="@+id/dialogCaptionTextView"
+            android:id="@+id/dialogTimePostedTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Caption"/>
+            android:layout_gravity="left"
+            android:text="Date Posted"
+            android:textStyle="italic" />
+
+        <TextView
+            android:id="@+id/dialogCategoryTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:text="Category"
+            android:visibility="gone"
+            />
+
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/dialogCategoryTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:layout_marginStart="10dp"
-        android:text="Category"
-        android:visibility="gone"/>
-
-    <TextView
-        android:id="@+id/dialogLocationTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:layout_marginStart="10dp"
-        android:layout_marginBottom="15dp"
-        android:text="Location" />
 </LinearLayout>

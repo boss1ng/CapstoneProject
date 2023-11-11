@@ -2,18 +2,28 @@ package com.example.qsee;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupMenu;
+import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -38,6 +48,8 @@ public class PostDetailsDialog extends DialogFragment {
     private String category;
     private String location;
     private String userId;
+
+    private ImageView optionsButton;
 
     public void setUserData(String userId) {
         this.userId = userId;
@@ -107,9 +119,60 @@ public class PostDetailsDialog extends DialogFragment {
         });
 
         // Set other data
-        dialogCaptionTextView.setText(caption);
-        dialogCategoryTextView.setText(category);
-        dialogLocationTextView.setText(location);
+        if (caption.equals(null) || caption.equals("")) {
+            LinearLayout linearLayout = view.findViewById(R.id.layoutUserCaption);
+            linearLayout.setVisibility(View.GONE);
+        }
+
+        else {
+            dialogCaptionTextView.setText(caption);
+            dialogCategoryTextView.setText(category);
+        }
+
+        if (location.equals(null) || location.equals(""))
+            dialogLocationTextView.setVisibility(View.GONE);
+        else
+            dialogLocationTextView.setText(location);
+
+        optionsButton = view.findViewById(R.id.options);
+        optionsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // Creating a PopupMenu
+                PopupMenu popupMenu = new PopupMenu(getActivity(), optionsButton);
+
+                // Inflate the menu from xml
+                popupMenu.getMenuInflater().inflate(R.menu.popup_menu, popupMenu.getMenu());
+
+                // Apply the custom style
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    popupMenu.setGravity(Gravity.END);
+                }
+
+                // Set the item click listener
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        // Handle menu item click
+
+                        if (menuItem.getItemId() == R.id.editPost) {
+                            Toast.makeText(getContext(), "EDIT PRESSED", Toast.LENGTH_SHORT).show();
+                        }
+
+                        else if (menuItem.getItemId() == R.id.deletePost) {
+                            Toast.makeText(getContext(), "DELETE PRESSED", Toast.LENGTH_SHORT).show();
+                        }
+
+                        return true;
+                    }
+                });
+
+                // Show the popup menu
+                popupMenu.show();
+
+            }
+        });
 
         return view;
     }
