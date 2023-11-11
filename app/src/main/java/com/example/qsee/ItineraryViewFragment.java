@@ -3,14 +3,20 @@ package com.example.qsee;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.pdf.PdfDocument;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.ParcelFileDescriptor;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,7 +54,10 @@ public class ItineraryViewFragment extends Fragment {
 
     private String userId;
     private String locationName;
+    private PdfDocument document;
+
     private static final int REQUEST_CODE_WRITE_EXTERNAL_STORAGE = 101;
+    private static final int REQUEST_CODE_SAVE_PDF = 102;
 
     public static ItineraryViewFragment newInstance(String userId, String locationName) {
         ItineraryViewFragment fragment = new ItineraryViewFragment();
@@ -214,6 +223,9 @@ public class ItineraryViewFragment extends Fragment {
         // Get the root view
         final View rootView = requireView();
 
+        // Create a PDF document
+        document = new PdfDocument();
+
         // Get the height of the whole content in the ScrollView
         int height = 0;
         for (int i = 0; i < ((ViewGroup) rootView).getChildCount(); i++) {
@@ -227,7 +239,7 @@ public class ItineraryViewFragment extends Fragment {
         rootView.draw(canvas);
 
         // Create a PDF document
-        PdfDocument document = new PdfDocument();
+        document = new PdfDocument();
         PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(width, height, 1).create();
         PdfDocument.Page page = document.startPage(pageInfo);
         Canvas pdfCanvas = page.getCanvas();
@@ -235,26 +247,44 @@ public class ItineraryViewFragment extends Fragment {
         pdfCanvas.drawBitmap(bitmap, 0, 0, paint);
         document.finishPage(page);
 
-        // Define the file path for the PDF
-        String fileName = locationName + " - " + "itinerary.pdf";
-        File downloadsFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        File file = new File(downloadsFolder, fileName);
-        String filePath = file.getAbsolutePath();
+        // Ask the user to choose a location to save the PDF
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("application/pdf");
+        intent.putExtra(Intent.EXTRA_TITLE, "itinerary.pdf");
 
-        // Create a file output stream
+        startActivityForResult(intent, REQUEST_CODE_SAVE_PDF);
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE_SAVE_PDF && resultCode == Activity.RESULT_OK && data != null) {
+            // Save the PDF content to the chosen location
+            Uri uri = data.getData();
+            savePdfToUri(uri);
+        }
+    }
+
+    private void savePdfToUri(Uri uri) {
         try {
-            FileOutputStream outputStream = new FileOutputStream(file);
-            document.writeTo(outputStream);
-            outputStream.flush();
-            outputStream.close();
+            ParcelFileDescriptor pfd = requireActivity().getContentResolver().openFileDescriptor(uri, "w");
+            if (pfd != null) {
+                FileOutputStream outputStream = new FileOutputStream(pfd.getFileDescriptor());
+                document.writeTo(outputStream);
+                outputStream.close();
+                pfd.close();
+
+                // Close the document
+                document.close();
+
+                // Show a toast indicating that the PDF has been saved
+                Toast.makeText(requireContext(), "Itinerary saved to chosen location", Toast.LENGTH_SHORT).show();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        // Close the document
-        document.close();
-
-        // Show a toast indicating that the PDF has been saved
-        Toast.makeText(requireContext(), "Itinerary saved to Downloads", Toast.LENGTH_SHORT).show();
     }
+
+
 }
