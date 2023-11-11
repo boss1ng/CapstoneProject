@@ -34,6 +34,10 @@ import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class PostDetailsDialog extends DialogFragment {
     private ImageView dialogImageView;
     private ImageView dialogUserImageView;
@@ -42,11 +46,13 @@ public class PostDetailsDialog extends DialogFragment {
     private TextView dialogLocationTextView;
     private TextView dialogUsernTextView;
     private TextView dialogUserTextView;
+    private TextView dialogTimePostedTextView;
 
     private String imageUrl;
     private String caption;
     private String category;
     private String location;
+    private long timestamp;
     private String userId;
 
     private ImageView optionsButton;
@@ -59,11 +65,12 @@ public class PostDetailsDialog extends DialogFragment {
         // Empty constructor is required.
     }
 
-    public void setData(String imageUrl, String caption, String category, String location) {
+    public void setData(String imageUrl, String caption, String category, String location, Long timestamp) {
         this.imageUrl = imageUrl;
         this.caption = caption;
         this.category = category;
         this.location = location;
+        this.timestamp = timestamp;
     }
 
     @NonNull
@@ -85,6 +92,7 @@ public class PostDetailsDialog extends DialogFragment {
         dialogUserTextView = view.findViewById(R.id.dialogUsernameTextView);
         dialogUsernTextView = view.findViewById(R.id.dialogUserTextView);
         dialogUserImageView = view.findViewById(R.id.dialogUserImageView);
+        dialogTimePostedTextView = view.findViewById(R.id.dialogTimePostedTextView);
 
         // Load the image using Picasso
         if (imageUrl != null) {
@@ -134,6 +142,16 @@ public class PostDetailsDialog extends DialogFragment {
         else
             dialogLocationTextView.setText(location);
 
+        // Set the timestamp text
+        if (timestamp != 0) {
+            String formattedTimestamp = formatTimestamp(timestamp); // Implement a method to format the timestamp
+            dialogTimePostedTextView.setText(formattedTimestamp);
+            dialogTimePostedTextView.setVisibility(View.VISIBLE); // Make the TextView visible
+        } else {
+            dialogTimePostedTextView.setVisibility(View.GONE); // Hide the TextView if timestamp is null
+        }
+
+
         optionsButton = view.findViewById(R.id.options);
         optionsButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -175,5 +193,21 @@ public class PostDetailsDialog extends DialogFragment {
         });
 
         return view;
+    }
+    private String formatTimestamp(long timestamp) {
+        long now = System.currentTimeMillis();
+        long differenceMillis = now - timestamp;
+
+        long seconds = differenceMillis / 1000;
+        long minutes = seconds / 60;
+        long hours = minutes / 60;
+
+        if (hours > 0) {
+            return hours + (hours == 1 ? " hour ago" : " hours ago");
+        } else if (minutes > 0) {
+            return minutes + (minutes == 1 ? " minute ago" : " minutes ago");
+        } else {
+            return "just now";
+        }
     }
 }

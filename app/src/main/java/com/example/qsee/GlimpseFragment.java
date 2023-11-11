@@ -120,7 +120,7 @@ public class GlimpseFragment extends Fragment implements MyAdapter.OnPostItemCli
     @Override
     public void onPostItemClick(String imageUrl, String caption, String category, String location, Long timestamp) {
         PostDetailsDialog dialog = new PostDetailsDialog();
-        dialog.setData(imageUrl, caption, category, location);
+        dialog.setData(imageUrl, caption, category, location, timestamp);
         String userId = getArguments().getString("userId");
         dialog.setUserData(userId);
         dialog.show(getFragmentManager(), "PostDetailsDialog");
