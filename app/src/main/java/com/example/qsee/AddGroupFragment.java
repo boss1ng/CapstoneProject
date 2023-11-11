@@ -23,12 +23,31 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Random;
+
 public class AddGroupFragment extends DialogFragment {
 
     private Button cancelBtn;
     private Button createBtn;
     private TextInputLayout grpName;
     private String userId;
+
+    private String Group1 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup%201.png?alt=media&token=a61202f9-0f6e-4f2b-a59b-0bdaf152903e";
+    private String Group2 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup%202.png?alt=media&token=9f547f1b-2db9-4746-b428-92b83a6d9183";
+    private String Group3 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup%203.png?alt=media&token=25a226c7-43f6-4d3d-813c-bc8024428570";
+    private String Group4 = "";
+    private String Group5 = "";
+    private String Group6 = "";
+    private String Group7 = "";
+    private String Group8 = "";
+    private String Group9 = "";
+    private String Group10 = "";
+    private String Group11 = "";
+    private String Group12 = "";
+    private String Group13 = "";
+    private String Group14 = "";
+    private String Group15 = "";
+
 
     // Constructor to accept the username as an argument
     public AddGroupFragment(String userId) {
@@ -52,6 +71,18 @@ public class AddGroupFragment extends DialogFragment {
         // Initialize and set up your dialog views and buttons here
 
         return view;
+    }
+
+    private String getRandomGroup() {
+        // Create an array of your URLs
+        String[] groupUrls = {Group1, Group2, Group3};
+
+        // Use Random to get a random index from the array
+        Random random = new Random();
+        int randomIndex = random.nextInt(groupUrls.length);
+
+        // Return the randomly chosen URL
+        return groupUrls[randomIndex];
     }
 
     @Override
@@ -117,6 +148,11 @@ public class AddGroupFragment extends DialogFragment {
 
                                             // Set the creator (userId) as member1
                                             newGroupReference.child("member1").setValue(userId);
+
+                                            // Image of the Group
+                                            // Call getRandomGroup to get a random URL
+                                            String randomUrl = getRandomGroup();
+                                            newGroupReference.child("GroupPhoto").setValue(randomUrl);
 
                                             // Display a Toast for successful group creation
                                             Toast.makeText(getActivity(), "Group created successfully", Toast.LENGTH_SHORT).show();

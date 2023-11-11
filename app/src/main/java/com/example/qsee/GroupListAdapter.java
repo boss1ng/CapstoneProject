@@ -59,6 +59,15 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
         return new ViewHolder(view);
     }
 
+// ADDED
+    private void loadUserPostImage(String imageUrl, ImageView groupPic) {
+        // Use a library like Picasso or Glide to load and display the image
+        if (groupPic.getContext() != null && imageUrl != null) {
+            Picasso.get().load(imageUrl).into(groupPic);
+        }
+    }
+// UNTIL HERE
+
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Groups group = groupList.get(position);
@@ -99,6 +108,28 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
                 // Handle error
             }
         });
+
+
+// ADDED
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Groups");
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    for (DataSnapshot groupSnapshot : snapshot.getChildren()) {
+                        String imageUrl = groupSnapshot.child("GroupPhoto").getValue(String.class);
+                        loadUserPostImage(imageUrl, holder.groupIconImageView);
+                    }
+                }
+
+
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+// UNTIL HERE
 
 
 
