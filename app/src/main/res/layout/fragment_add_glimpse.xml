@@ -9,7 +9,7 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
         android:layout_width="349dp"
-        android:layout_height="525dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -96,25 +96,37 @@
 
             </LinearLayout>
 
-            <EditText
-                android:id="@+id/comment"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/postContent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="10dp"
-                android:background="@color/white"
-                android:hint="What's on your mind?"
-                android:shadowColor="@color/white"
-                android:textColor="@color/black"
-                android:textColorHighlight="#FFFFFF"
-                android:textColorLink="#FFFFFF" />
+                android:orientation="vertical"
+                >
 
-            <ImageView
-                android:id="@+id/imageView16"
-                android:layout_width="271dp"
-                android:layout_height="204dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="50dp" />
+                <EditText
+                    android:id="@+id/comment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@color/white"
+                    android:hint="What's on your mind?"
+                    android:shadowColor="@color/white"
+                    android:textColor="@color/black"
+                    android:textColorHighlight="#FFFFFF"
+                    android:textColorLink="#FFFFFF" />
+
+                <ImageView
+                    android:id="@+id/imageView16"
+                    android:layout_width="271dp"
+                    android:layout_height="204dp"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="50dp"
+                    android:visibility="gone"
+                     />
+                    <!-- android:visibility="gone" -->
+
+            </LinearLayout>
 
             <View
                 android:id="@+id/view"
@@ -128,8 +140,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
                 android:orientation="horizontal"
-                android:paddingBottom="7.5dp">
+                android:gravity="center_vertical"
+                >
 
                 <ImageView
                     android:id="@+id/cameraBT"

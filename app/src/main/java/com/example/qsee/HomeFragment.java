@@ -21,6 +21,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.android.volley.Request;
@@ -29,6 +30,7 @@ import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -161,6 +163,33 @@ public class HomeFragment extends Fragment {
 
                 }
                 return true;
+            }
+        });
+
+        // Find the FloatingActionButton by ID
+        FloatingActionButton fab = view.findViewById(R.id.floatingAddButton);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Handle FAB click here
+                // You can perform actions like opening a new activity, showing a dialog, etc.
+                // Create an instance of the AddGlimpseFragment
+                AddGlimpseFragment addGlimpseFragment = new AddGlimpseFragment();
+
+                if (getBundle != null) {
+                    String userID = getBundle.getString("userId");
+
+                    // Create a Bundle to pass the userId as an argument
+                    Bundle args = new Bundle();
+                    args.putString("userId", userID); // Replace "your_user_id_here" with the actual user ID
+                    args.putString("fromHome", "From Home Fragment");
+                    addGlimpseFragment.setArguments(args);
+                }
+
+                // Show the AddGlimpseFragment as a dialog
+                FragmentManager fragmentManager = getChildFragmentManager();
+                FragmentTransaction transaction = fragmentManager.beginTransaction();
+                addGlimpseFragment.show(transaction, "add_glimpse_dialog"); // You can provide a tag for the dialog
             }
         });
 

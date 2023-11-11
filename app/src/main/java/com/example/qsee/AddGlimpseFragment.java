@@ -13,12 +13,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,6 +47,7 @@ import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -105,7 +108,28 @@ public class AddGlimpseFragment extends DialogFragment {
         userId = getArguments().getString("userId");
         cameraButton = rootView.findViewById(R.id.cameraBT);
         caption = rootView.findViewById(R.id.comment);
+        // Set maximum number of characters (e.g., 10 characters)
+        int maxLength = 20;
+        InputFilter[] filters = new InputFilter[1];
+        filters[0] = new InputFilter.LengthFilter(maxLength);
+        caption.setFilters(filters);
+
         imageDisplay = rootView.findViewById(R.id.imageView16);
+        imageDisplay.setVisibility(View.GONE);
+
+        // Your existing layout
+        LinearLayout linearLayout = rootView.findViewById(R.id.postContent);
+
+        // Set a minimum height in pixels
+        int minHeightInPixels = 400; // Set your desired minimum height
+        linearLayout.setMinimumHeight(minHeightInPixels);
+
+        // Alternatively, set a minimum height in density-independent pixels (dp)
+        int minHeightInDp = 100; // Set your desired minimum height in dp
+        int minHeightInPixelsDp = (int) (minHeightInDp * getResources().getDisplayMetrics().density);
+        linearLayout.setMinimumHeight(minHeightInPixelsDp);
+
+
         location = rootView.findViewById(R.id.location_ET);
         imageUri = null;
         categorySpinner = rootView.findViewById(R.id.categorySpinner);
@@ -200,6 +224,7 @@ public class AddGlimpseFragment extends DialogFragment {
                     Bitmap originalImage = (Bitmap) extras.get("data");
                     imageBitmap = adjustImage(originalImage);
                     imageDisplay.setImageBitmap(imageBitmap);
+                    imageDisplay.setVisibility(View.VISIBLE);
                 }
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 // Handle the user canceling the camera action
@@ -389,6 +414,38 @@ public class AddGlimpseFragment extends DialogFragment {
 
                     // Dismiss the dialog after a successful upload
                     dismiss();
+
+                    Bundle getBundle = getArguments();
+                    if (getBundle != null) {
+                        String fromHome = getBundle.getString("fromHome");
+                        if (fromHome != null) {
+                            HomeFragment homeFragment = new HomeFragment();
+
+                            // Use Bundle to pass values
+                            Bundle bundle = new Bundle();
+
+                            if (getBundle != null) {
+                                String userID = getBundle.getString("userId");
+                                bundle.putString("userId", userID);
+                                homeFragment.setArguments(bundle);
+                            }
+
+                            ScrollView scrollView = getParentFragment().getView().findViewById(R.id.homeContainer);
+                            scrollView.setVisibility(View.GONE);
+
+                            BottomNavigationView bottomNavigationView = getParentFragment().getView().findViewById(R.id.bottomNavigationView);
+                            bottomNavigationView.setVisibility(View.GONE);
+
+                            FloatingActionButton floatingActionButton = getParentFragment().getView().findViewById(R.id.floatingAddButton);
+                            floatingActionButton.setVisibility(View.GONE);
+
+                            FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+                            transaction.replace(R.id.homeFragmentContainer, homeFragment);
+                            transaction.addToBackStack(null);
+                            transaction.commit();
+                        }
+                    }
+
                 }
 
                 else {
@@ -397,6 +454,11 @@ public class AddGlimpseFragment extends DialogFragment {
                 }
             }
         });
+    }
+
+    public void refreshFragment() {
+        // Perform actions to refresh the fragment content
+        // For example, update UI elements, reload data, etc.
     }
 
     private void postRss(String userLocation, String selectedCategory, String downloadUrl) {
