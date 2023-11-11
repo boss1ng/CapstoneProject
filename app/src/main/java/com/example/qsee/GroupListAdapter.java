@@ -36,7 +36,9 @@ import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.ViewHolder> {
 
@@ -58,15 +60,6 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
 
         return new ViewHolder(view);
     }
-
-// ADDED
-    private void loadUserPostImage(String imageUrl, ImageView groupPic) {
-        // Use a library like Picasso or Glide to load and display the image
-        if (groupPic.getContext() != null && imageUrl != null) {
-            Picasso.get().load(imageUrl).into(groupPic);
-        }
-    }
-// UNTIL HERE
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
@@ -95,6 +88,25 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
                     // Set the formatted text to the TextView
                     holder.groupNameTextView.setText(spannableString);
 
+                    //Load Group Icons
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Groups").child(group.getGroupName());
+                    databaseReference.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if (snapshot.exists()) {
+                                // Assuming "GroupPhoto" is a direct child of the specified database reference
+                                String imageUrl = snapshot.child("GroupPhoto").getValue(String.class);
+                                holder.bindData(imageUrl);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            // Handle the error if needed
+                        }
+                    });
+
+
                     // Adjust the text size for the username
                     int usernameStart = spannableString.toString().indexOf(displayText);
                     int usernameEnd = usernameStart + displayText.length();
@@ -108,36 +120,6 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
                 // Handle error
             }
         });
-
-
-// ADDED
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Groups");
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    for (DataSnapshot groupSnapshot : snapshot.getChildren()) {
-                        String imageUrl = groupSnapshot.child("GroupPhoto").getValue(String.class);
-                        loadUserPostImage(imageUrl, holder.groupIconImageView);
-                    }
-                }
-
-
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-// UNTIL HERE
-
-
-
-
-
-
-
-
 
         // Set click listeners for the icons
         holder.addUserImageView.setOnClickListener(new View.OnClickListener() {
@@ -505,8 +487,14 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
             editImageView = itemView.findViewById(R.id.edit);
             deleteImageView = itemView.findViewById(R.id.delete);
         }
+
+        // Bind data to views
+        public void bindData(String url) {
+            Picasso.get().load(url).into(groupIconImageView);
+        }
     }
-/*
+
+    /*
     private void retrieveImagesFromStorageAndSetGroupIcon(String groupName, ViewHolder holder) {
         // Retrieve the image reference for the specific group from your Firebase Realtime Database
         DatabaseReference groupReference = databaseReference.child("Groups").child(groupName);

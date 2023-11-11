@@ -31,6 +31,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -81,6 +82,24 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
                                 SpannableString spannableString = new SpannableString(location.getLocationName() + "\n" + displayText);
                                 spannableString.setSpan(new StyleSpan(Typeface.BOLD), 0, location.getLocationName().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                                 spannableString.setSpan(new StyleSpan(Typeface.ITALIC), location.getLocationName().length() + 1, spannableString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                                //Load Itinerary Icons
+                                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Itinerary").child(location.getLocationName());
+                                databaseReference.addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        if (snapshot.exists()) {
+                                            // Assuming "GroupPhoto" is a direct child of the specified database reference
+                                            String imageUrl = snapshot.child("IterPhoto").getValue(String.class);
+                                            holder.bindData(imageUrl);
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+                                        // Handle the error if needed
+                                    }
+                                });
 
                                 // Set the formatted text to the TextView
                                 holder.locationNameTextView.setText(spannableString);
@@ -236,12 +255,18 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
 
     public static class LocationViewHolder extends RecyclerView.ViewHolder {
         TextView locationNameTextView;
+        ImageView locationIcon;
         ImageView optionsIcon;
 
         public LocationViewHolder(@NonNull View itemView) {
             super(itemView);
             locationNameTextView = itemView.findViewById(R.id.locationName);
             optionsIcon = itemView.findViewById(R.id.options);
+            locationIcon = itemView.findViewById(R.id.locationIcon);
+        }
+        // Bind data to views
+        public void bindData(String url) {
+            Picasso.get().load(url).into(locationIcon);
         }
     }
 }

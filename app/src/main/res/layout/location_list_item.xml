@@ -9,8 +9,7 @@
     <ImageView
         android:id="@+id/locationIcon"
         android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:background="@drawable/logo" />
+        android:layout_height="48dp" />
 
     <TextView
         android:id="@+id/locationName"
