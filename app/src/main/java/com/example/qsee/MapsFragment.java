@@ -680,20 +680,24 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                     String longitude = placeSnapshot.child("Longitude").getValue(String.class);
                     String stringRating = placeSnapshot.child("AverageRate").getValue(String.class);
 
-                    if (placeSnapshot.child("Description").getValue(String.class).equals(""))
-                        description = "-";
-                    else
-                        description = placeSnapshot.child("Description").getValue(String.class);
-
-                    if (placeSnapshot.child("LowestPrice").getValue(String.class).equals("") || placeSnapshot.child("HighestPrice").getValue(String.class).equals("")) {
-                        lowestPrice = "-";
-                        highestPrice = "-";
-                        placePrice = "-";
+                    if (placeSnapshot.child("Description").getValue(String.class) != null) {
+                        if (placeSnapshot.child("Description").getValue(String.class).equals(""))
+                            description = "-";
+                        else
+                            description = placeSnapshot.child("Description").getValue(String.class);
                     }
-                    else {
-                        lowestPrice = placeSnapshot.child("LowestPrice").getValue(String.class);
-                        highestPrice = placeSnapshot.child("HighestPrice").getValue(String.class);
-                        placePrice = "₱" + lowestPrice + " - ₱" + highestPrice;
+
+                    if (placeSnapshot.child("LowestPrice").getValue(String.class) != null && placeSnapshot.child("HighestPrice").getValue(String.class) != null) {
+                        if (placeSnapshot.child("LowestPrice").getValue(String.class).equals("") || placeSnapshot.child("HighestPrice").getValue(String.class).equals("")) {
+                            lowestPrice = "-";
+                            highestPrice = "-";
+                            placePrice = "-";
+                        }
+                        else {
+                            lowestPrice = placeSnapshot.child("LowestPrice").getValue(String.class);
+                            highestPrice = placeSnapshot.child("HighestPrice").getValue(String.class);
+                            placePrice = "₱" + lowestPrice + " - ₱" + highestPrice;
+                        }
                     }
 
                     String imageLink = placeSnapshot.child("Link").getValue(String.class);

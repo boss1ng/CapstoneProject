@@ -496,20 +496,23 @@ public class AddGlimpseFragment extends DialogFragment {
                                             // Iterate through the "Category"
                                             for (DataSnapshot catSnapshot : categoriesSnapshot.getChildren()) {
                                                 String key = catSnapshot.getKey(); // Get the key ("Accommodations")
-                                                String value = catSnapshot.getValue(String.class); // Get the value ("1")
-
-                                                int intNumCategories = Integer.parseInt(value);
-                                                intNumCategories++;
-
-                                                //Toast.makeText(context, key, Toast.LENGTH_SHORT).show();
-                                                //Toast.makeText(context, value, Toast.LENGTH_SHORT).show();
+                                                //String value = catSnapshot.getValue(String.class); // Get the value ("1")
 
                                                 if (key.equals(selectedCategory)) {
+                                                    //Toast.makeText(context, "Inside " + selectedCategory + " node.", Toast.LENGTH_LONG).show();
+
                                                     isCategoryExisting[0] = true;
 
-                                                    DatabaseReference pushKeyCatRef = databaseReference.child(pushKey[0]).child("Category");
+                                                    String numberPost = catSnapshot.child("Number").getValue(String.class);
+                                                    // Long timestampPosted = catSnapshot.child("Timestamp").getValue(Long.class);
+
+                                                    int intnumberPost = Integer.parseInt(numberPost);
+                                                    intnumberPost++;
+
+                                                    DatabaseReference pushKeyCatRef = databaseReference.child(pushKey[0]).child("Category").child(selectedCategory);
                                                     // Append a new child node under "Category" with the key as "selectedCategory" and the value as the incremented
-                                                    pushKeyCatRef.child(selectedCategory).setValue(String.valueOf(intNumCategories));
+                                                    pushKeyCatRef.child("Number").setValue(String.valueOf(intnumberPost));
+                                                    pushKeyCatRef.child("Timestamp").setValue(ServerValue.TIMESTAMP);
 
                                                     // Convert numReports to an integer, update it, and set it back
                                                     int intNumPosts = Integer.parseInt(numberPostsFirebase);
@@ -517,16 +520,58 @@ public class AddGlimpseFragment extends DialogFragment {
                                                     postSnapshot.getRef().child("NumPosts").setValue(String.valueOf(intNumPosts));
 
                                                     DatabaseReference pushKeyRef = databaseReference.child(pushKey[0]).child("Users");
-
-                                                    // Append a new child node under "Users" with the key as "UserId" and the value as the user ID
                                                     pushKeyRef.push().setValue(userId);
 
                                                     if (intNumPosts == 20) {
+
                                                         //reachThresholdPostLocation(firebaseLat, firebaseLong, categoriesSnapshot, downloadUrl, userLocation);
                                                         Toast.makeText(context, "ADD RSS FEED TO LOCATION", Toast.LENGTH_LONG).show();
+
+                                                        // Register the RSS Feed to Location table from Firebase
+                                                        DatabaseReference newLocation = FirebaseDatabase.getInstance().getReference("Location");
+                                                        //DatabaseReference newLocation = FirebaseDatabase.getInstance().getReference("Location");
+
+                                                        // Save the data to the Firebase Realtime Database
+                                                        DatabaseReference rssPostNewLoc = newLocation.push();
+
+                                                        // Identify Category with highest posts
+                                                        String highestCategory = null;
+                                                        int previousValue = 0;
+                                                        long previousTimestamp = 0;
+                                                        // Iterate through the "Category"
+                                                        for (DataSnapshot categorySnapshot : categoriesSnapshot.getChildren()) {
+                                                            String catKey = categorySnapshot.getKey(); // Get the key ("Accommodations")
+
+                                                            String catNumberPost = categorySnapshot.child("Number").getValue(String.class);
+                                                            Long catTimestampPosted = categorySnapshot.child("Timestamp").getValue(Long.class);
+
+                                                            if (Integer.parseInt(catNumberPost) > previousValue) {
+                                                                previousValue = Integer.parseInt(catNumberPost);
+                                                                highestCategory = key;
+                                                                previousTimestamp = catTimestampPosted;
+                                                            }
+
+                                                            else if (Integer.parseInt(catNumberPost) == previousValue) {
+                                                                if (previousTimestamp > catTimestampPosted) { // previousTimestamp more recent.
+                                                                    previousValue = Integer.parseInt(catNumberPost);
+                                                                    highestCategory = key;
+                                                                    previousTimestamp = catTimestampPosted;
+                                                                }
+
+                                                                else {
+
+                                                                }
+                                                            }
+                                                        }
+
+                                                        reachThresholdPostLocation(firebaseLat, firebaseLong, rssPostNewLoc, downloadUrl, userLocation, highestCategory);
+
+                                                        break;
+
                                                     }
 
-                                                    break;
+                                                    //Toast.makeText(context, selectedCategory + ": " + String.valueOf(timestampPosted), Toast.LENGTH_LONG).show();
+
                                                 }
                                             }
 
@@ -537,7 +582,8 @@ public class AddGlimpseFragment extends DialogFragment {
                                             else {
 
                                                 DatabaseReference pushKeyCatRef = databaseReference.child(pushKey[0]).child("Category");
-                                                pushKeyCatRef.child(selectedCategory).setValue("1");
+                                                pushKeyCatRef.child(selectedCategory).child("Timestamp").setValue(ServerValue.TIMESTAMP);
+                                                pushKeyCatRef.child(selectedCategory).child("Number").setValue("1");
 
                                                 // Convert numReports to an integer, update it, and set it back
                                                 int intNumPosts = Integer.parseInt(numberPostsFirebase);
@@ -563,14 +609,30 @@ public class AddGlimpseFragment extends DialogFragment {
                                                     // Identify Category with highest posts
                                                     String highestCategory = null;
                                                     int previousValue = 0;
+                                                    long previousTimestamp = 0;
                                                     // Iterate through the "Category"
                                                     for (DataSnapshot catSnapshot : categoriesSnapshot.getChildren()) {
                                                         String key = catSnapshot.getKey(); // Get the key ("Accommodations")
-                                                        String value = catSnapshot.getValue(String.class); // Get the value ("1")
 
-                                                        if (Integer.parseInt(value) > previousValue) {
-                                                            previousValue = Integer.parseInt(value);
+                                                        String numberPost = catSnapshot.child("Number").getValue(String.class);
+                                                        Long timestampPosted = catSnapshot.child("Timestamp").getValue(Long.class);
+
+                                                        if (Integer.parseInt(numberPost) > previousValue) {
+                                                            previousValue = Integer.parseInt(numberPost);
                                                             highestCategory = key;
+                                                            previousTimestamp = timestampPosted;
+                                                        }
+
+                                                        else if (Integer.parseInt(numberPost) == previousValue) {
+                                                            if (previousTimestamp > timestampPosted) { // previousTimestamp more recent.
+
+                                                            }
+
+                                                            else {
+                                                                previousValue = Integer.parseInt(numberPost);
+                                                                highestCategory = key;
+                                                                previousTimestamp = timestampPosted;
+                                                            }
                                                         }
                                                     }
 
@@ -603,7 +665,8 @@ public class AddGlimpseFragment extends DialogFragment {
                                 //rssPost.child("userId").setValue(userId);
                                 rssPost.child("NumPosts").setValue("1");
                                 rssPost.child("Users").push().setValue(userId);
-                                rssPost.child("Category").child(selectedCategory).setValue("1");
+                                rssPost.child("Category").child(selectedCategory).child("Timestamp").setValue(ServerValue.TIMESTAMP);
+                                rssPost.child("Category").child(selectedCategory).child("Number").setValue("1");
                                 rssPost.child("Latitude").setValue(latitude);
                                 rssPost.child("Longitude").setValue(longitude);
 
