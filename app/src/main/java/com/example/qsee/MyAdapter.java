@@ -1,6 +1,6 @@
 package com.example.qsee;
 
-import android.support.annotation.NonNull;
+//import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,15 +25,14 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.PostViewHolder> {
         this.itemClickListener = itemClickListener;
     }
 
-    @NonNull
     @Override
-    public PostViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public PostViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_post, parent, false);
         return new PostViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
+    public void onBindViewHolder(PostViewHolder holder, int position) {
         GlimpseFragment.Post post = postList.get(position);
 
         // Load the post's image into the ImageView using a library like Picasso or Glide
