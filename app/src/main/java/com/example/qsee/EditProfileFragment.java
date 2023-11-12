@@ -44,6 +44,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -128,6 +129,7 @@ public class EditProfileFragment extends Fragment {
                         String encryptedContactNumber = userSnapshot.child("contactNumber").getValue(String.class);
                         String encryptedBirthdate = userSnapshot.child("birthdate").getValue(String.class);
                         String encryptedUsername = userSnapshot.child("username").getValue(String.class);
+                        String profilePic = userSnapshot.child("profilePictureUrl").getValue(String.class);
 
                         String firstName = AESUtils.decrypt(encryptedFirstName);
                         String lastName = AESUtils.decrypt(encryptedLastName);
@@ -140,6 +142,7 @@ public class EditProfileFragment extends Fragment {
                         contactNoInputLayout.getEditText().setText(contactNumber);
                         birthdateEditText.getEditText().setText(birthdate);
                         usernameEditText.getEditText().setText(username);
+                        bindData(profilePic);
                     }
                 } else {
                     Log.e("EditProfileFragment", "User with username not found.");
@@ -237,6 +240,10 @@ public class EditProfileFragment extends Fragment {
         });
 
         return view;
+    }
+
+    public void bindData(String url) {
+        Picasso.get().load(url).into(profilePictureImageView);
     }
 
     public static EditProfileFragment newInstance(String userId) {
