@@ -152,8 +152,8 @@ public class AddGroupFragment extends DialogFragment {
                                             // Image of the Group
                                             // Call getRandomGroup to get a random URL among 15 choices
                                             String randomUrl = getRandomGroup();
-                                            newGroupReference.child("GroupPhoto").setValue(randomUrl);
-
+                                            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Icons").child(group.getGroupName());
+                                            databaseReference.child("GroupPhoto").setValue(randomUrl);
                                             // Display a Toast for successful group creation
                                             Toast.makeText(getActivity(), "Group created successfully", Toast.LENGTH_SHORT).show();
 
