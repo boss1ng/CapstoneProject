@@ -150,7 +150,7 @@ public class AddGroupFragment extends DialogFragment {
                                             newGroupReference.child("member1").setValue(userId);
 
                                             // Image of the Group
-                                            // Call getRandomGroup to get a random URL
+                                            // Call getRandomGroup to get a random URL among 15 choices
                                             String randomUrl = getRandomGroup();
                                             newGroupReference.child("GroupPhoto").setValue(randomUrl);
 

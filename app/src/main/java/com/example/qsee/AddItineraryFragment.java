@@ -45,6 +45,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Random;
 
 public class AddItineraryFragment extends Fragment {
 
@@ -59,11 +60,39 @@ public class AddItineraryFragment extends Fragment {
     // Define a global variable to store the selected dates
     private List<String> selectedDates = new ArrayList<>();
 
+    private String Itinerary1 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/ItineraryPhoto%2FItinerary%201.png?alt=media&token=14ec1289-0cf4-41d6-abb5-2f46fe4855e4";
+    private String Itinerary2 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/ItineraryPhoto%2FItinerary%202.png?alt=media&token=5152587b-a0e9-4a84-ae17-78e0ad315350";
+    private String Itinerary3 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/ItineraryPhoto%2FItinerary%203.png?alt=media&token=ad55130a-4b46-4784-95c5-9175112110a0";
+    private String Itinerary4 = "";
+    private String Itinerary5 = "";
+    private String Itinerary6 = "";
+    private String Itinerary7 = "";
+    private String Itinerary8 = "";
+    private String Itinerary9 = "";
+    private String Itinerary10 = "";
+    private String Itinerary11 = "";
+    private String Itinerary12 = "";
+    private String Itinerary13 = "";
+    private String Itinerary14 = "";
+    private String Itinerary15 = "";
+
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_add_itinerary, container, false);
+    }
+
+    private String getRandomGroup() {
+        // Create an array of your URLs
+        String[] groupUrls = {Itinerary1, Itinerary2, Itinerary3};
+
+        // Use Random to get a random index from the array
+        Random random = new Random();
+        int randomIndex = random.nextInt(groupUrls.length);
+
+        // Return the randomly chosen URL
+        return groupUrls[randomIndex];
     }
 
     @SuppressLint("SetTextI18n")
@@ -318,6 +347,11 @@ public class AddItineraryFragment extends Fragment {
                                 DatabaseReference userRef = itineraryRef.child(itineraryName);
                                 userRef.child("admin").setValue(userId);
                                 userRef.child("iterName").setValue(itineraryName);
+
+                                // Image of the Group
+                                // Call getRandomGroup to get a random URL among 15 choices
+                                String randomUrl = getRandomGroup();
+                                userRef.child("IterPhoto").setValue(randomUrl);
 
                                 // Saving logic for default form
                                 DatabaseReference defaultDayRef = userRef.child("Day1");
