@@ -1,9 +1,11 @@
 package com.example.qsee;
 
+import static android.app.Activity.RESULT_OK;
 import static com.example.qsee.AddGlimpseFragment.CAMERA_REQUEST_CODE;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -42,6 +44,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -64,6 +68,8 @@ public class EditProfileFragment extends Fragment {
     private StorageReference storageReference;
     private Context context;
     private String userId;
+    private Uri imageUri; // Declare this as a member variable
+
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int REQUEST_IMAGE_PICK = 2;
     private static final int TARGET_SIZE = 2;
@@ -244,44 +250,37 @@ public class EditProfileFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (context != null) {
-            if (requestCode == CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-                if (data != null && data.getExtras() != null && data.getExtras().containsKey("data")) {
-                    Bitmap imageBitmap = (Bitmap) data.getExtras().get("data");
-
-                    if (imageBitmap != null) {
-                        profilePictureImageView.setImageBitmap(imageBitmap);
-
-                        // Get the image URI
-                        selectedProfilePictureUri = getImageUri(requireContext(), imageBitmap);
-
-                        // Resize the image to the target dimensions
-                        Bitmap scaledImage = scaleImageToTargetDimensions(imageBitmap, TARGET_WIDTH_DP, TARGET_HEIGHT_DP, selectedProfilePictureUri);
-                        selectedProfilePictureUri = getImageUri(requireContext(), scaledImage);
-                    } else {
-                        Toast.makeText(requireContext(), "Failed to capture the image", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Toast.makeText(requireContext(), "No data received from the camera", Toast.LENGTH_SHORT).show();
-                }
-            } else if (requestCode == REQUEST_IMAGE_PICK && resultCode == Activity.RESULT_OK && data != null) {
-                selectedProfilePictureUri = data.getData();
-                Toast.makeText(requireContext(), "Profile picture selected", Toast.LENGTH_SHORT).show();
-
-                if (selectedProfilePictureUri != null) {
-                    try {
-                        Bitmap selectedImage = MediaStore.Images.Media.getBitmap(requireContext().getContentResolver(), selectedProfilePictureUri);
-                        profilePictureImageView.setImageBitmap(selectedImage);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        Log.e("EditProfileFragment", "Error loading the selected image: " + e.getMessage());
-                    }
-                }
-            } else {
-                Log.e("EditProfileFragment", "Context is null");
+        if (resultCode == RESULT_OK) {
+            if (requestCode == CAMERA_REQUEST_CODE) {
+                // The image URI will be contained in the imageUri variable
+                startCrop(imageUri);
+            } else if (requestCode == REQUEST_IMAGE_PICK) {
+                Uri imageUri = data.getData();
+                startCrop(imageUri);
+            } else if (requestCode == CAMERA_REQUEST_CODE) {
+                Bitmap photo = (Bitmap) data.getExtras().get("data");
+                Uri photoUri = getImageUri(getContext(), photo);
+                startCrop(photoUri);
+            } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+                CropImage.ActivityResult result = CropImage.getActivityResult(data);
+                Uri resultUri = result.getUri();
+                profilePictureImageView.setImageURI(resultUri);
+                selectedProfilePictureUri = resultUri;
             }
+        } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            Exception error = CropImage.getActivityResult(data).getError();
+            // Handle error, show a message to the user
         }
     }
+
+
+    private void startCrop(Uri imageUri) {
+        CropImage.activity(imageUri)
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .setAspectRatio(1, 1) // You can specify aspect ratio
+                .start(getContext(), this);
+    }
+
 
 
 
@@ -362,12 +361,25 @@ public class EditProfileFragment extends Fragment {
 
     private void openCamera() {
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
         if (cameraIntent.resolveActivity(context.getPackageManager()) != null) {
+            // Create a file to save the image
+            imageUri = createImageUri(); // Implement this method to create a file URI
+            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
             startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
         } else {
             Toast.makeText(context, "No camera app found", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private Uri createImageUri() {
+        // Create a content values object where we will store the metadata of the image
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.TITLE, "New Picture");
+        values.put(MediaStore.Images.Media.DESCRIPTION, "From the Camera");
+
+        // Use the content resolver to insert the image metadata into the system's images media table.
+        // This will also give us back a URI for the image.
+        return context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
     }
 
     private void openGallery() {
