@@ -115,4 +115,8 @@ dependencies {
 
     //SMS
     implementation("androidx.browser:browser:1.3.0")
+
+    // PDF
+    implementation("com.itextpdf:itextg:5.5.10")
+
 }

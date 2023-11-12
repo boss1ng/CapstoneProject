@@ -41,6 +41,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -213,6 +221,10 @@ public class ItineraryViewFragment extends Fragment {
                 } else {
                     // Permission has already been granted, proceed with the PDF generation and saving
                     generatePDF();
+
+                    //String fileName = "itinerary.pdf";
+                    //String filePath = getActivity().getFilesDir() + File.separator + fileName;
+                    //createPdfWithTable(filePath);
                 }
 
             }
@@ -255,6 +267,50 @@ public class ItineraryViewFragment extends Fragment {
 
         startActivityForResult(intent, REQUEST_CODE_SAVE_PDF);
     }
+
+    public static void createPdfWithTable(String filePath) {
+        Document document = new Document(PageSize.A4);
+
+        try {
+            // Create a PdfWriter instance to write to the specified file path
+            PdfWriter.getInstance(document, new FileOutputStream(new File(filePath)));
+            document.open();
+
+            // Add a title to the document
+            document.add(new Paragraph("Table Example"));
+
+            // Create a table with three columns
+            PdfPTable table = new PdfPTable(3);
+
+            // Add headers to the table
+            table.addCell("Header 1");
+            table.addCell("Header 2");
+            table.addCell("Header 3");
+
+            // Add data to the table
+            table.addCell("Row 1, Col 1");
+            table.addCell("Row 1, Col 2");
+            table.addCell("Row 1, Col 3");
+
+            table.addCell("Row 2, Col 1");
+            table.addCell("Row 2, Col 2");
+            table.addCell("Row 2, Col 3");
+
+            // Add the table to the document
+            document.add(table);
+
+        } catch (DocumentException | IOException e) {
+            e.printStackTrace();
+        } finally {
+            // Close the document
+            if (document.isOpen()) {
+                document.close();
+            }
+        }
+    }
+
+
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
