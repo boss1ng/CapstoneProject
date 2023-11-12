@@ -47,6 +47,9 @@ dependencies {
     implementation("com.google.firebase:firebase-messaging:23.3.1")
     implementation("com.google.firebase:firebase-storage:20.3.0")
     implementation("com.google.firebase:firebase-core:21.1.1")
+    implementation("androidx.activity:activity-ktx:1.2.4")
+    implementation("androidx.fragment:fragment-ktx:1.3.3")
+
     //implementation("com.github.esafirm.android-image-picker:imagepicker:2.0.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

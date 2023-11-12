@@ -502,8 +502,11 @@ public class ProfileFragment extends Fragment {
     private void loadProfilePicture(String profilePictureUrl) {
         // Use a library like Picasso or Glide to load and display the image
         if (getContext() != null && profilePictureUrl != null) {
-            Picasso.get().load(profilePictureUrl).fit().into(Pfp);
-
+            Picasso.get()
+                    .load(profilePictureUrl)
+                    .resize(200, getView().getMinimumHeight()) // Set the target dimensions
+                    .centerCrop()
+                    .into(Pfp);
         }
     }
 }

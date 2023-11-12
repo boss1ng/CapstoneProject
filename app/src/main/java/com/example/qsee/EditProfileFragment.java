@@ -8,7 +8,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -64,15 +67,17 @@ public class EditProfileFragment extends Fragment {
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int REQUEST_IMAGE_PICK = 2;
     private static final int TARGET_SIZE = 2;
-    private static final int TARGET_WIDTH_DP = 100; // Target width in dp
-    private static final int TARGET_HEIGHT_DP = 100; // Target height in dp
+    private static final int TARGET_WIDTH_DP = 400; // Target width in dp
+    private static final int TARGET_HEIGHT_DP = 500; // Target height in dp
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_editprofile, container, false);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         context = getActivity();
+        context = requireContext();
         userId = getArguments().getString("userId");
         String uniqueId = String.valueOf(System.currentTimeMillis());
         String filename = userId + "_" + uniqueId + ".png";
@@ -239,54 +244,101 @@ public class EditProfileFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (context != null) {
+            if (requestCode == CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+                if (data != null && data.getExtras() != null && data.getExtras().containsKey("data")) {
+                    Bitmap imageBitmap = (Bitmap) data.getExtras().get("data");
 
-        if (requestCode == CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
+                    if (imageBitmap != null) {
+                        profilePictureImageView.setImageBitmap(imageBitmap);
 
-            if (data != null) {
-                // Get the captured image
-                Bitmap imageBitmap = (Bitmap) data.getExtras().get("data");
+                        // Get the image URI
+                        selectedProfilePictureUri = getImageUri(requireContext(), imageBitmap);
 
-                if (imageBitmap != null) {
-                    // Display the captured image in the profilePictureImageView
-                    profilePictureImageView.setImageBitmap(imageBitmap);
-
-                    // Resize the image to the target dimensions (100x100dp)
-                    Bitmap scaledImage = scaleImageToTargetDimensions(imageBitmap, TARGET_WIDTH_DP, TARGET_HEIGHT_DP);
-
-                    selectedProfilePictureUri = getImageUri(requireContext(), scaledImage);
+                        // Resize the image to the target dimensions
+                        Bitmap scaledImage = scaleImageToTargetDimensions(imageBitmap, TARGET_WIDTH_DP, TARGET_HEIGHT_DP, selectedProfilePictureUri);
+                        selectedProfilePictureUri = getImageUri(requireContext(), scaledImage);
+                    } else {
+                        Toast.makeText(requireContext(), "Failed to capture the image", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
-                    Toast.makeText(requireContext(), "Failed to capture the image", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), "No data received from the camera", Toast.LENGTH_SHORT).show();
+                }
+            } else if (requestCode == REQUEST_IMAGE_PICK && resultCode == Activity.RESULT_OK && data != null) {
+                selectedProfilePictureUri = data.getData();
+                Toast.makeText(requireContext(), "Profile picture selected", Toast.LENGTH_SHORT).show();
+
+                if (selectedProfilePictureUri != null) {
+                    try {
+                        Bitmap selectedImage = MediaStore.Images.Media.getBitmap(requireContext().getContentResolver(), selectedProfilePictureUri);
+                        profilePictureImageView.setImageBitmap(selectedImage);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Log.e("EditProfileFragment", "Error loading the selected image: " + e.getMessage());
+                    }
                 }
             } else {
-                Toast.makeText(requireContext(), "No data received from the camera", Toast.LENGTH_SHORT).show();
-            }
-        } else if (requestCode == REQUEST_IMAGE_PICK && resultCode == Activity.RESULT_OK && data != null) {
-            // Store the selected image URI without initiating the upload
-            selectedProfilePictureUri = data.getData();
-            Toast.makeText(requireContext(), "Profile picture selected", Toast.LENGTH_SHORT).show();
-
-            // Load and display the selected image in the profilePictureImageView
-            if (selectedProfilePictureUri != null) {
-                try {
-                    Bitmap selectedImage = MediaStore.Images.Media.getBitmap(requireContext().getContentResolver(), selectedProfilePictureUri);
-                    profilePictureImageView.setImageBitmap(selectedImage);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Log.e("EditProfileFragment", "Error loading the selected image: " + e.getMessage());
-                }
+                Log.e("EditProfileFragment", "Context is null");
             }
         }
     }
 
-    private Bitmap scaleImageToTargetDimensions(Bitmap image, int targetWidthDp, int targetHeightDp) {
+
+
+    // Get the orientation of the image from its Exif data
+
+    private int getOrientation(Context context, Uri photoUri) {
+        Cursor cursor = context.getContentResolver().query(photoUri,
+                new String[]{MediaStore.Images.ImageColumns.ORIENTATION}, null, null, null);
+
+        if (cursor == null || cursor.getCount() != 1) {
+            return 0; // Default orientation
+        }
+
+        cursor.moveToFirst();
+        int orientation = cursor.getInt(0);
+        cursor.close();
+        return orientation;
+    }
+
+
+    // Rotate the bitmap based on the given orientation value
+    private Bitmap rotateBitmap(Bitmap bitmap, int orientation) {
+        Matrix matrix = new Matrix();
+        matrix.setRotate(orientation);
+
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+    }
+
+    private Bitmap scaleImageToTargetDimensions(Bitmap image, int targetWidthDp, int targetHeightDp, Uri imageUri) {
+        if (context == null) {
+            Log.e("EditProfileFragment", "Context is null. Cannot scale image.");
+            return image;
+        }
+        if (getActivity() == null) {
+            Log.e("EditProfileFragment", "Activity is null. Cannot scale image.");
+            return image;
+        }
+
         // Convert dp to pixels
         int targetWidth = (int) TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP, targetWidthDp, getResources().getDisplayMetrics());
         int targetHeight = (int) TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP, targetHeightDp, getResources().getDisplayMetrics());
 
+        // Handle landscape mode by checking the orientation from Exif data
+        int orientation = getOrientation(getActivity(), imageUri);
+        if (orientation == 90 || orientation == 270) {
+            // Swap target dimensions for landscape orientation
+            int temp = targetWidth;
+            targetWidth = targetHeight;
+            targetHeight = temp;
+        }
+
         return Bitmap.createScaledBitmap(image, targetWidth, targetHeight, true);
     }
+
+
 
     private void showImageSourceDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
@@ -324,36 +376,49 @@ public class EditProfileFragment extends Fragment {
     }
 
     private void uploadProfilePicture(String userId, Uri imageUri) {
-        StorageReference profilePictureRef = storageReference.child(userId + ".jpg");
-        UploadTask uploadTask = profilePictureRef.putFile(imageUri);
-        uploadTask.addOnSuccessListener(taskSnapshot -> {
-            profilePictureRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                String imageUrl = uri.toString();
+        try {
+            // Get the bitmap from the Uri and check Exif orientation
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri);
+            int orientation = getOrientation(context, imageUri);
 
-                DatabaseReference usersReference = FirebaseDatabase.getInstance().getReference("MobileUsers");
-                Query query = usersReference.orderByChild("userId").equalTo(userId);
+            // Rotate the bitmap based on the Exif orientation
+            Bitmap rotatedBitmap = rotateBitmap(bitmap, orientation);
 
-                query.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
-                            for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
-                                userSnapshot.getRef().child("profilePictureUrl").setValue(imageUrl);
-                                Toast.makeText(getContext(), "Profile updated successfully", Toast.LENGTH_SHORT).show();
-                                getParentFragmentManager().popBackStack();
+            // Upload the rotated bitmap
+            StorageReference profilePictureRef = storageReference.child(userId + ".jpg");
+            UploadTask uploadTask = profilePictureRef.putFile(getImageUri(context, rotatedBitmap));
+            uploadTask.addOnSuccessListener(taskSnapshot -> {
+                profilePictureRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                    String imageUrl = uri.toString();
+
+                    DatabaseReference usersReference = FirebaseDatabase.getInstance().getReference("MobileUsers");
+                    Query query = usersReference.orderByChild("userId").equalTo(userId);
+
+                    query.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.exists()) {
+                                for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                                    userSnapshot.getRef().child("profilePictureUrl").setValue(imageUrl);
+                                    Toast.makeText(getContext(), "Profile updated successfully", Toast.LENGTH_SHORT).show();
+                                    getParentFragmentManager().popBackStack();
+                                }
+                            } else {
+                                Log.e("EditProfileFragment", "User with username not found.");
                             }
-                        } else {
-                            Log.e("EditProfileFragment", "User with username not found.");
                         }
-                    }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Log.e("EditProfileFragment", "Database Error: " + databaseError.getMessage());
-                    }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            Log.e("EditProfileFragment", "Database Error: " + databaseError.getMessage());
+                        }
+                    });
                 });
             });
-        });
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e("EditProfileFragment", "Error uploading profile picture: " + e.getMessage());
+        }
     }
 
     // Defining the getImageUri
