@@ -35,6 +35,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
@@ -139,7 +140,7 @@ public class PostDetailsDialog extends DialogFragment {
         }
 
         else {
-            dialogCaptionTextView.setText(caption);
+                dialogCaptionTextView.setText(caption);
             dialogCategoryTextView.setText(category);
         }
 
@@ -184,21 +185,7 @@ public class PostDetailsDialog extends DialogFragment {
                             //Toast.makeText(getContext(), "EDIT PRESSED", Toast.LENGTH_SHORT).show();
                             showEditCaptionDialog();
                         } else if (menuItem.getItemId() == R.id.deletePost) {
-                            // Remove the post from Firebase
-                            DatabaseReference postRef = FirebaseDatabase.getInstance().getReference("Posts").child(userId); // Use the correct reference ID for the post here
-                            postRef.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        Toast.makeText(getContext(), "POST DELETED", Toast.LENGTH_SHORT).show();
-                                        // Dismiss the dialog or update the UI as necessary
-                                        dismiss();
-                                    } else {
-                                        // Handle the error
-                                        Toast.makeText(getContext(), "ERROR: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            });
+                            showDeleteConfirmationDialog(userId, location, category, caption);
                         }
 
                         return true;
@@ -230,6 +217,81 @@ public class PostDetailsDialog extends DialogFragment {
         }
     }
 
+    private void showDeleteConfirmationDialog(final String userId, final String location, final String category, final String caption) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Confirm Delete")
+                .setMessage("Are you sure you want to delete this post?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // User confirmed deletion, proceed with the delete action
+                        deletePostFromFirebase(userId, location, category, caption);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // User canceled deletion, do nothing
+                        dialog.dismiss();
+                    }
+                })
+                .show();
+    }
+
+    private void deletePostFromFirebase(final String userId, final String location, final String category, final String caption) {
+        DatabaseReference postsRef = FirebaseDatabase.getInstance().getReference("Posts");
+
+        Query query = postsRef
+                .orderByChild("userId")
+                .equalTo(userId);
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // Found posts with the specified userId
+                    for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                        String postLocation = postSnapshot.child("location").getValue(String.class);
+                        String postCategory = postSnapshot.child("category").getValue(String.class);
+                        String postCaption = postSnapshot.child("caption").getValue(String.class);
+
+                        if (postLocation != null && postCategory != null && postCaption != null &&
+                                postLocation.equals(location) && postCategory.equals(category) && postCaption.equals(caption)) {
+                            // Matched the criteria, delete the post
+                            DatabaseReference postRef = postSnapshot.getRef();
+                            postRef.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        Toast.makeText(getContext(), "POST DELETED", Toast.LENGTH_SHORT).show();
+                                        // Dismiss the dialog or update the UI as necessary
+                                        dismiss();
+                                    } else {
+                                        // Handle the error
+                                        Toast.makeText(getContext(), "ERROR: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                            return; // Stop iterating as we found and deleted the post
+                        }
+                    }
+                    // Handle the case where no matching post was found
+                    Toast.makeText(getContext(), "No matching post found for criteria", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Handle the case where no matching post was found for the userId
+                    Toast.makeText(getContext(), "No matching post found for user ID: " + userId, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle any errors that occur during the query
+                Toast.makeText(getContext(), "Database error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
     // Method to show dialog for editing caption
     private void showEditCaptionDialog() {
         // Create a dialog or use an AlertDialog.Builder to get user input
@@ -239,6 +301,7 @@ public class PostDetailsDialog extends DialogFragment {
         // Set up the input
         final EditText input = new EditText(getActivity());
         input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.setText(caption);
         builder.setView(input);
 
         // Set up the buttons
@@ -246,7 +309,7 @@ public class PostDetailsDialog extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String newCaption = input.getText().toString();
-                updateCaptionInFirebase(newCaption);
+                updateCaptionInFirebase(userId, caption, newCaption);
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -260,20 +323,52 @@ public class PostDetailsDialog extends DialogFragment {
     }
 
     // Method to update caption in Firebase
-    private void updateCaptionInFirebase(String newCaption) {
-        DatabaseReference postRef = FirebaseDatabase.getInstance().getReference("Posts").child(userId);
-        postRef.child("caption").setValue(newCaption).addOnCompleteListener(new OnCompleteListener<Void>() {
+    private void updateCaptionInFirebase(final String userId, final String oldCaption, final String newCaption) {
+        DatabaseReference postsRef = FirebaseDatabase.getInstance().getReference("Posts");
+
+        Query query = postsRef.orderByChild("userId").equalTo(userId);
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
-                    // Update the UI to show the new caption
-                    dialogCaptionTextView.setText(newCaption);
-                    Toast.makeText(getContext(), "Caption updated", Toast.LENGTH_SHORT).show();
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // Found the post for the specified user ID
+                    for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                        String caption = postSnapshot.child("caption").getValue(String.class);
+                        if (caption != null && caption.equals(oldCaption)) {
+                            // Matched the old caption, update it to the new caption
+                            DatabaseReference postRef = postSnapshot.getRef();
+                            postRef.child("caption").setValue(newCaption).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        // Update the UI to show the new caption
+                                        dialogCaptionTextView.setText(newCaption);
+                                        Toast.makeText(getContext(), "Caption updated", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        // Handle the error
+                                        Toast.makeText(getContext(), "Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                            return; // Stop iterating as we found and updated the post
+                        }
+                    }
+                    // Handle the case where the old caption was not found
+                    Toast.makeText(getContext(), "Old caption not found for user ID: " + userId, Toast.LENGTH_SHORT).show();
                 } else {
-                    // Handle the error
-                    Toast.makeText(getContext(), "Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    // Handle the case where no matching post was found
+                    Toast.makeText(getContext(), "No matching post found for user ID: " + userId, Toast.LENGTH_SHORT).show();
                 }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle any errors that occur during the query
+                Toast.makeText(getContext(), "Database error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
+
+
 }
