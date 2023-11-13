@@ -378,6 +378,54 @@ public class AddItineraryFragment extends Fragment {
                                         itemRef.child("activity").setValue(activity);
                                         itemRef.child("location").setValue(location);
                                         itemRef.child("origin").setValue(origin);
+
+                                        DatabaseReference originReference = FirebaseDatabase.getInstance().getReference("Location");
+                                        originReference.orderByChild("Location").equalTo(origin).addListenerForSingleValueEvent(new ValueEventListener() {
+                                           @Override
+                                           public void onDataChange(DataSnapshot dataSnapshot) {
+                                               for (DataSnapshot locationSnapshot : dataSnapshot.getChildren()) {
+                                                   // Retrieve latitude and longitude for the origin
+                                                   String firebaseOrigLat = locationSnapshot.child("Latitude").getValue(String.class);
+                                                   String firebaseOrigLong = locationSnapshot.child("Longitude").getValue(String.class);
+
+                                                   itemRef.child("originLat").setValue(firebaseOrigLat);
+                                                   itemRef.child("originLong").setValue(firebaseOrigLong);
+                                               }
+                                           }
+
+                                           @Override
+                                           public void onCancelled(@NonNull DatabaseError error) {
+
+                                           }
+                                       });
+
+                                        DatabaseReference destReference = FirebaseDatabase.getInstance().getReference("Location");
+                                        destReference.orderByChild("Location").equalTo(location).addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                                for (DataSnapshot locationSnapshot : dataSnapshot.getChildren()) {
+                                                    // Retrieve latitude and longitude for the origin
+                                                    String firebaseOrigLat = locationSnapshot.child("Latitude").getValue(String.class);
+                                                    String firebaseOrigLong = locationSnapshot.child("Longitude").getValue(String.class);
+
+                                                    itemRef.child("locationLat").setValue(firebaseOrigLat);
+                                                    itemRef.child("locationLong").setValue(firebaseOrigLong);
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+
+                                            }
+                                        });
+
+                                        /*
+                                        itemRef.child("locationLat").setValue();
+                                        itemRef.child("locationLong").setValue();
+
+                                        itemRef.child("originLat").setValue();
+                                        itemRef.child("originLong").setValue();
+                                         */
                                     }
                                 }
 
@@ -413,6 +461,44 @@ public class AddItineraryFragment extends Fragment {
                                             itemRef.child("activity").setValue(activity);
                                             itemRef.child("location").setValue(location);
                                             itemRef.child("origin").setValue(origin);
+
+                                            DatabaseReference originReference = FirebaseDatabase.getInstance().getReference("Location");
+                                            originReference.orderByChild("Location").equalTo(origin).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                                    for (DataSnapshot locationSnapshot : dataSnapshot.getChildren()) {
+                                                        // Retrieve latitude and longitude for the origin
+                                                        String firebaseOrigLat = locationSnapshot.child("Latitude").getValue(String.class);
+                                                        String firebaseOrigLong = locationSnapshot.child("Longitude").getValue(String.class);
+
+                                                        itemRef.child("originLat").setValue(firebaseOrigLat);
+                                                        itemRef.child("originLong").setValue(firebaseOrigLong);
+                                                    }
+                                                }
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                                }
+                                            });
+
+                                            DatabaseReference destReference = FirebaseDatabase.getInstance().getReference("Location");
+                                            destReference.orderByChild("Location").equalTo(location).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                                    for (DataSnapshot locationSnapshot : dataSnapshot.getChildren()) {
+                                                        // Retrieve latitude and longitude for the origin
+                                                        String firebaseOrigLat = locationSnapshot.child("Latitude").getValue(String.class);
+                                                        String firebaseOrigLong = locationSnapshot.child("Longitude").getValue(String.class);
+
+                                                        itemRef.child("locationLat").setValue(firebaseOrigLat);
+                                                        itemRef.child("locationLong").setValue(firebaseOrigLong);
+                                                    }
+                                                }
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                                }
+                                            });
                                         }
                                     }
                                 }
