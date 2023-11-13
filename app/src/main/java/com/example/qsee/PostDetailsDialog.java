@@ -1,9 +1,12 @@
 package com.example.qsee;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -12,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
@@ -25,6 +29,8 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -153,13 +159,14 @@ public class PostDetailsDialog extends DialogFragment {
 
 
         optionsButton = view.findViewById(R.id.options);
-        optionsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+
+        if (optionsButton != null) {
+            optionsButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
                 // Creating a PopupMenu
                 PopupMenu popupMenu = new PopupMenu(getActivity(), optionsButton);
-
                 // Inflate the menu from xml
                 popupMenu.getMenuInflater().inflate(R.menu.popup_menu, popupMenu.getMenu());
 
@@ -173,13 +180,25 @@ public class PostDetailsDialog extends DialogFragment {
                     @Override
                     public boolean onMenuItemClick(MenuItem menuItem) {
                         // Handle menu item click
-
                         if (menuItem.getItemId() == R.id.editPost) {
-                            Toast.makeText(getContext(), "EDIT PRESSED", Toast.LENGTH_SHORT).show();
-                        }
-
-                        else if (menuItem.getItemId() == R.id.deletePost) {
-                            Toast.makeText(getContext(), "DELETE PRESSED", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(getContext(), "EDIT PRESSED", Toast.LENGTH_SHORT).show();
+                            showEditCaptionDialog();
+                        } else if (menuItem.getItemId() == R.id.deletePost) {
+                            // Remove the post from Firebase
+                            DatabaseReference postRef = FirebaseDatabase.getInstance().getReference("Posts").child(userId); // Use the correct reference ID for the post here
+                            postRef.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        Toast.makeText(getContext(), "POST DELETED", Toast.LENGTH_SHORT).show();
+                                        // Dismiss the dialog or update the UI as necessary
+                                        dismiss();
+                                    } else {
+                                        // Handle the error
+                                        Toast.makeText(getContext(), "ERROR: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
                         }
 
                         return true;
@@ -191,7 +210,7 @@ public class PostDetailsDialog extends DialogFragment {
 
             }
         });
-
+        }
         return view;
     }
     private String formatTimestamp(long timestamp) {
@@ -209,5 +228,52 @@ public class PostDetailsDialog extends DialogFragment {
         } else {
             return "just now";
         }
+    }
+
+    // Method to show dialog for editing caption
+    private void showEditCaptionDialog() {
+        // Create a dialog or use an AlertDialog.Builder to get user input
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Edit Caption");
+
+        // Set up the input
+        final EditText input = new EditText(getActivity());
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("Update", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String newCaption = input.getText().toString();
+                updateCaptionInFirebase(newCaption);
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+    // Method to update caption in Firebase
+    private void updateCaptionInFirebase(String newCaption) {
+        DatabaseReference postRef = FirebaseDatabase.getInstance().getReference("Posts").child(userId);
+        postRef.child("caption").setValue(newCaption).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    // Update the UI to show the new caption
+                    dialogCaptionTextView.setText(newCaption);
+                    Toast.makeText(getContext(), "Caption updated", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Handle the error
+                    Toast.makeText(getContext(), "Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 }
