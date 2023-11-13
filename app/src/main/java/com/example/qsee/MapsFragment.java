@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -78,6 +79,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     Double currentUserLocationLat;
     Double currentUserLocationLong;
+    private double placeLatitude;
+    private double placeLongitude;
 
     boolean isUserInQuezonCity = true;
 
@@ -91,6 +94,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
 
         // Retrieve selected categories from Bundle arguments
         Bundle getBundle = getArguments();
@@ -328,6 +332,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         mMap.getUiSettings().setZoomGesturesEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
 
+
         // Constrain the camera target to the Quezon City bounds.
         //mMap.setLatLngBoundsForCameraTarget(QUEZON_CITY);
 
@@ -393,7 +398,24 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 // mMap.addMarker(new MarkerOptions().position(userLocation).title("Your Location"));
 
                 // Move the camera to the user's location
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 13));
+//                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 13));
+
+                Bundle args = getArguments();
+                if (args != null) {
+                    placeLatitude = args.getDouble("placeLatitude", currentUserLocationLat);
+                    placeLongitude = args.getDouble("placeLongitude", currentUserLocationLong);
+
+                    // Log the placeLatitude and placeLongitude values
+                    Log.d("Debug", "placeLatitude: " + placeLatitude);
+                    Log.d("Debug", "placeLongitude: " + placeLongitude);
+
+                    // Create a LatLng object with the place's latitude and longitude
+                    LatLng placeLatLng = new LatLng(placeLatitude, placeLongitude);
+
+                    // Move the camera to the specified location and set an appropriate zoom level
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(placeLatLng, maxZoomLevel)); // Adjust the zoom level as needed
+
+                }
                 /*
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, minZoomLevel));
 

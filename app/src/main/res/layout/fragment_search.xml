@@ -96,6 +96,7 @@
                 android:orientation="vertical">
 
                 <ImageButton
+                    android:id="@+id/accomodation"
                     android:layout_width="75dp"
                     android:layout_height="75dp"
                     android:background="@drawable/sbtn_accomodation" />
@@ -119,6 +120,7 @@
                 android:orientation="vertical">
 
                 <ImageButton
+                    android:id="@+id/restaurant"
                     android:layout_width="75dp"
                     android:layout_height="75dp"
                     android:background="@drawable/sbtn_restaurant" />
@@ -141,6 +143,7 @@
                 android:orientation="vertical">
 
                 <ImageButton
+                    android:id="@+id/shopping"
                     android:layout_width="75dp"
                     android:layout_height="75dp"
                     android:background="@drawable/sbtn_shopping" />
@@ -164,6 +167,7 @@
                 android:orientation="vertical">
 
                 <ImageButton
+                    android:id="@+id/religious"
                     android:layout_width="75dp"
                     android:layout_height="75dp"
                     android:background="@drawable/sbtn_church" />
@@ -187,6 +191,7 @@
                 android:orientation="vertical">
 
                 <ImageButton
+                    android:id="@+id/recreation"
                     android:layout_width="75dp"
                     android:layout_height="75dp"
                     android:background="@drawable/sbtn_sports" />
@@ -210,6 +215,7 @@
                 android:orientation="vertical">
 
                 <ImageButton
+                    android:id="@+id/hospital"
                     android:layout_width="75dp"
                     android:layout_height="75dp"
                     android:background="@drawable/sbtn_hospital" />
@@ -233,6 +239,7 @@
                 android:orientation="vertical">
 
                 <ImageButton
+                    android:id="@+id/school"
                     android:layout_width="75dp"
                     android:layout_height="75dp"
                     android:background="@drawable/sbtn_school" />
@@ -256,6 +263,7 @@
                 android:orientation="vertical">
 
                 <ImageButton
+                    android:id="@+id/attraction"
                     android:layout_width="75dp"
                     android:layout_height="75dp"
                     android:background="@drawable/sbtn_attractions" />
