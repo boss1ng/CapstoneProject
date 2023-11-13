@@ -20,7 +20,7 @@
         <ImageView
             android:id="@+id/imageView4"
             android:layout_width="match_parent"
-            android:layout_height="261dp"
+            android:layout_height="240dp"
             android:alpha=".9"
             android:src="@drawable/bg_quezonmemorialcircle" />
 
@@ -33,7 +33,6 @@
             android:layout_marginBottom="160dp"
             android:background="@drawable/rounded_edittext_background"
             android:clickable="true"
-            android:drawableEnd="@android:drawable/ic_menu_search"
             android:drawablePadding="8dp"
             android:drawableTint="@color/black"
             android:elevation="20dp"
@@ -46,6 +45,9 @@
                 android:layout_height="wrap_content"
                 android:inputType="text"
                 android:padding="5dp"
+                android:background="@drawable/rounded_edittext_background"
+
+                android:drawableEnd="@android:drawable/ic_menu_search"
                 android:textSize="20dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -71,8 +73,8 @@
 
     <HorizontalScrollView
         android:id="@+id/horizontalScrollView"
-        android:layout_width="409dp"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
         app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -285,6 +287,7 @@
         android:id="@+id/horizontalScrollView2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
         app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
@@ -415,9 +418,10 @@
 
     <TextView
         android:id="@+id/plainText2"
-        android:layout_width="237dp"
-        android:layout_height="29dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:ems="10"
+        android:layout_marginTop="10dp"
         android:fontFamily="@font/open_sans"
         android:inputType="text"
         android:minHeight="48dp"

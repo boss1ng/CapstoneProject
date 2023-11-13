@@ -13,7 +13,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout3"
-            android:layout_width="379dp"
+            android:layout_width="350dp"
             android:layout_height="wrap_content"
             android:background="@drawable/rounded_background"
             app:layout_constraintEnd_toEndOf="parent"
@@ -48,8 +48,8 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/dateInput"
-                android:layout_width="212dp"
-                android:layout_height="57dp"
+                android:layout_width="200dp"
+                android:layout_height="55dp"
                 android:layout_marginTop="56dp"
                 android:background="@drawable/rounded_background_white"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -67,7 +67,7 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"
-                android:layout_width="372dp"
+                android:layout_width="330dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintDimensionRatio="16:9"
                 app:layout_constraintEnd_toEndOf="parent"

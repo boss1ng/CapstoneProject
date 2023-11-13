@@ -4,30 +4,31 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
+
     android:padding="8dp">
 
     <ImageView
         android:id="@+id/groupIcon"
-        android:layout_width="48dp"
-        android:layout_height="48dp" />
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="10dp"/>
 
     <TextView
         android:id="@+id/groupName"
-        android:layout_width="wrap_content"
+        android:layout_width="175dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:textSize="18sp"
-        android:layout_marginStart="8dp"
-        android:layout_weight="1"/>
+        android:layout_marginStart="5dp" />
 
     <ImageView
         android:id="@+id/adduser"
         android:layout_width="29dp"
         android:layout_height="25dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="5dp"
         app:srcCompat="@drawable/adduser"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="8dp"
+        android:layout_marginLeft="5dp"
         android:clickable="true"/>
 
 
@@ -35,20 +36,20 @@
         android:id="@+id/edit"
         android:layout_width="29dp"
         android:layout_height="25dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="5dp"
         app:srcCompat="@drawable/edit"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="8dp"
+        android:layout_marginLeft="5dp"
         android:clickable="true"/>
 
     <ImageView
         android:id="@+id/delete"
         android:layout_width="29dp"
         android:layout_height="25dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="5dp"
         app:srcCompat="@drawable/delete"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="8dp"
+        android:layout_marginLeft="5dp"
         android:clickable="true"/>
 
 
