@@ -1,11 +1,14 @@
 package com.example.qsee;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -93,19 +96,33 @@ public class GlimpseFragment extends Fragment implements MyAdapter.OnPostItemCli
                         postList.add(post);
                     }
                 }
-                Collections.sort(postList, new Comparator<Post>() {
-                    @Override
-                    public int compare(Post post1, Post post2) {
-                        // Compare the timestamps in descending order
-                        return Long.compare(post2.getTimestamp(), post1.getTimestamp());
-                    }
-                });
-                // Create and set your RecyclerView adapter here
                 RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
-                int numberOfColumns = 3;
-                recyclerView.setLayoutManager(new GridLayoutManager(getContext(), numberOfColumns));
-                MyAdapter adapter = new MyAdapter(postList, GlimpseFragment.this); // Pass the GlimpseFragment instance
-                recyclerView.setAdapter(adapter);
+                TextView noPostsAvailableTextView = view.findViewById(R.id.tvNoPostsAvailable);
+                ImageView noGlimpseYet = view.findViewById(R.id.noGlimpse);
+
+                if (postList.isEmpty()) {
+                    // Show the no posts available message and image
+                    noPostsAvailableTextView.setVisibility(View.VISIBLE);
+                    noGlimpseYet.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.GONE); // Hide the RecyclerView
+                } else {
+                    // Sort and populate the RecyclerView as usual
+                    Collections.sort(postList, new Comparator<Post>() {
+                        @Override
+                        public int compare(Post post1, Post post2) {
+                            return Long.compare(post2.getTimestamp(), post1.getTimestamp());
+                        }
+                    });
+                    int numberOfColumns = 3;
+                    recyclerView.setLayoutManager(new GridLayoutManager(getContext(), numberOfColumns));
+                    MyAdapter adapter = new MyAdapter(postList, GlimpseFragment.this); // Pass the GlimpseFragment instance
+                    recyclerView.setAdapter(adapter);
+
+                    // Set visibility of no posts elements to gone
+                    noPostsAvailableTextView.setVisibility(View.GONE);
+                    noGlimpseYet.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE); // Show the RecyclerView
+                }
             }
 
             @Override
