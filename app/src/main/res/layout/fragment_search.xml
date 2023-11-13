@@ -309,25 +309,23 @@
                 android:orientation="vertical">
 
                 <ImageView
-                    android:id="@+id/imageView8"
+                    android:id="@+id/popDestImage1"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/jollibee"
-                    tools:ignore="NotSibling" />
+                    android:layout_gravity="center"
+                    android:scaleType="centerCrop" />
 
                 <TextView
-                    android:id="@+id/textView9"
+                    android:id="@+id/popDestRate1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="14dp"
                     android:drawableEnd="@drawable/ic_star_fill"
-                    android:gravity="center"
-                    android:text="5.0 " />
+                    android:gravity="center" />
 
                 <TextView
-                    android:id="@+id/textView10"
+                    android:id="@+id/popDestName1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -336,21 +334,22 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/Place2"
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginRight="25dp"
                 android:orientation="vertical">
 
                 <ImageView
-                    android:id="@+id/imageView9"
+                    android:id="@+id/popDestImage2"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/memorialcircle"
-                    tools:ignore="NotSibling" />
+                    android:scaleType="centerCrop"
+                    android:layout_gravity="center" />
 
                 <TextView
-                    android:id="@+id/textView12"
+                    android:id="@+id/popDestRate2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -360,7 +359,7 @@
                     android:text="4.5 " />
 
                 <TextView
-                    android:id="@+id/textView11"
+                    android:id="@+id/popDestName2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -371,19 +370,22 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/Place3"
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginRight="25dp"
                 android:orientation="vertical">
 
                 <ImageView
-                    android:id="@+id/imageView6"
+                    android:id="@+id/popDestImage3"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
-                    android:src="@drawable/starbs" />
+                    android:scaleType="centerCrop"
+                    android:layout_gravity="center"/>
 
                 <TextView
-                    android:id="@+id/textView13"
+                    android:id="@+id/popDestRate3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -393,7 +395,77 @@
                     android:text="4.5 " />
 
                 <TextView
-                    android:id="@+id/textView14"
+                    android:id="@+id/popDestName3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="Starbucks" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/Place4"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginRight="25dp"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/popDestImage4"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:scaleType="centerCrop"
+                    android:layout_gravity="center"/>
+
+                <TextView
+                    android:id="@+id/popDestRate4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="14dp"
+                    android:drawableEnd="@drawable/ic_star_fill"
+                    android:gravity="center"
+                    android:text="4.5 " />
+
+                <TextView
+                    android:id="@+id/popDestName4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="Starbucks" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/Place5"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginRight="25dp"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/popDestImage5"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:scaleType="centerCrop"
+                    android:layout_gravity="center"/>
+
+                <TextView
+                    android:id="@+id/popDestRate5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="14dp"
+                    android:drawableEnd="@drawable/ic_star_fill"
+                    android:gravity="center"
+                    android:text="4.5 " />
+
+                <TextView
+                    android:id="@+id/popDestName5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -418,10 +490,10 @@
 
     <TextView
         android:id="@+id/plainText2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
+        android:layout_width="373dp"
+        android:layout_height="52dp"
         android:layout_marginTop="10dp"
+        android:ems="10"
         android:fontFamily="@font/open_sans"
         android:inputType="text"
         android:minHeight="48dp"
@@ -430,12 +502,35 @@
         android:textColor="#000000"
         android:textSize="20dp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/horizontalScrollView2"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.091"
+        app:layout_constraintHorizontal_bias="0.421"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView"
-        app:layout_constraintVertical_bias="0.658"
+        app:layout_constraintVertical_bias="0.007"
+        tools:ignore="MissingConstraints,NotSibling" />
+
+    <TextView
+        android:id="@+id/plainText3"
+        android:layout_width="373dp"
+        android:layout_height="52dp"
+        android:layout_marginTop="10dp"
+        android:ems="10"
+        android:fontFamily="@font/open_sans"
+        android:inputType="text"
+        android:minHeight="48dp"
+        android:text="No establishments has been rated yet"
+        android:textAlignment="center"
+        android:textColor="#000000"
+        android:textSize="18dp"
+        android:textStyle="italic"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.421"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/plainText2"
+        android:visibility="gone"
+        app:layout_constraintVertical_bias="0.2"
         tools:ignore="MissingConstraints,NotSibling" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
