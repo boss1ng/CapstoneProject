@@ -47,7 +47,7 @@ public class SearchFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_search, container, false);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
+        ImageView background = view.findViewById(R.id.imageView4);
         ImageButton accommodationsButton = view.findViewById(R.id.accomodation);
         ImageButton restaurantButton = view.findViewById(R.id.restaurant);
         ImageButton shoppingButton = view.findViewById(R.id.shopping);
@@ -56,6 +56,8 @@ public class SearchFragment extends Fragment {
         ImageButton hospitalButton = view.findViewById(R.id.hospital);
         ImageButton schoolButton = view.findViewById(R.id.school);
         ImageButton attractionButton = view.findViewById(R.id.attraction);
+
+        Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/bg_quezonmemorialcircle.jpg?alt=media&token=b297a47e-b875-404c-b5a9-903f1a45c60f").into(background);
         // Retrieve selected categories from Bundle arguments
         Bundle getBundle = getArguments();
 
