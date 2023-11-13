@@ -8,7 +8,7 @@
     <ImageView
         android:id="@+id/imageView7"
         android:layout_width="543dp"
-        android:layout_height="164dp"
+        android:layout_height="180dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -16,188 +16,160 @@
         app:layout_constraintVertical_bias="0.001"
         app:srcCompat="@drawable/bg_changepass" />
 
-    <TextView
-        android:id="@+id/textView14"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Change Password"
-        android:textColor="@color/white"
-        android:textSize="20dp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.076"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.022" />
-
-    <TextView
-        android:id="@+id/textView16"
-        android:layout_width="368dp"
-        android:layout_height="29dp"
-        android:text="Your password must be a minimum of 8 characters in length and include at least one of the following:"
-        android:textColor="@color/white"
-        android:textSize="12dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.619"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.069" />
-
-    <TextView
-        android:id="@+id/textView18"
-        android:layout_width="179dp"
-        android:layout_height="16dp"
-        android:text="• A lowercase letter"
-        android:textColor="@color/white"
-        android:textSize="11dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.172"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.139" />
-
-    <TextView
-        android:id="@+id/textView17"
-        android:layout_width="179dp"
-        android:layout_height="16dp"
-        android:text="• An uppercase letter"
-        android:textColor="@color/white"
-        android:textSize="11dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.172"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.117" />
-
-    <TextView
-        android:id="@+id/textView20"
-        android:layout_width="179dp"
-        android:layout_height="16dp"
-        android:text="• A numeric digit"
-        android:textColor="@color/white"
-        android:textSize="11dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.172"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.184" />
-
-    <TextView
-        android:id="@+id/textView19"
-        android:layout_width="179dp"
-        android:layout_height="16dp"
-        android:text="• A special character"
-        android:textColor="@color/white"
-        android:textSize="11dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.172"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.162" />
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/currentPwd"
-        android:layout_width="373dp"
-        android:layout_height="67dp"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.289">
+        >
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="match_parent"
+
+        <TextView
+            android:id="@+id/textView14"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="Current Password"
-            android:inputType="textPassword"/>
-    </com.google.android.material.textfield.TextInputLayout>
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="15dp"
+            android:text="Change Password"
+            android:textColor="@color/white"
+            android:textSize="20dp"
+            android:textStyle="bold" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/newPwd"
-        android:layout_width="373dp"
-        android:layout_height="67dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.415">
+        <TextView
+            android:id="@+id/textView16"
+            android:layout_width="368dp"
+            android:layout_height="29dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="5dp"
+            android:text="Your password must be a minimum of 8 characters in length and include at least one of the following:"
+            android:textColor="@color/white"
+            android:textSize="12dp" />
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/textView17"
+            android:layout_width="179dp"
+            android:layout_height="16dp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginBottom="5dp"
+            android:text="• An uppercase letter"
+            android:textColor="@color/white"
+            android:textSize="11dp" />
+
+        <TextView
+            android:id="@+id/textView18"
+            android:layout_width="179dp"
+            android:layout_height="16dp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginBottom="5dp"
+            android:text="• A lowercase letter"
+            android:textColor="@color/white"
+            android:textSize="11dp" />
+
+        <TextView
+            android:id="@+id/textView19"
+            android:layout_width="179dp"
+            android:layout_height="16dp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginBottom="5dp"
+            android:text="• A special character"
+            android:textColor="@color/white"
+            android:textSize="11dp" />
+
+        <TextView
+            android:id="@+id/textView20"
+            android:layout_width="179dp"
+            android:layout_height="16dp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginBottom="5dp"
+            android:text="• A numeric digit"
+            android:textColor="@color/white"
+            android:textSize="11dp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/currentPwd"
+            android:layout_width="373dp"
+            android:layout_height="67dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="30dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:hint="Current Password"
+                android:inputType="textPassword" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/newPwd"
+            android:layout_width="373dp"
+            android:layout_height="67dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:hint="New Password"
+                android:inputType="textPassword" />
+
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/reNewPwd"
+            android:layout_width="373dp"
+            android:layout_height="67dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:hint="Re-type New Password"
+                android:inputType="textPassword" />
+
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/forgotPassword"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="New Password"
-            android:inputType="textPassword"/>
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp"
+            android:autoLink="web"
+            android:clickable="true"
+            android:text="Forgot Password?"
+            android:textColor="@color/blue"
+            android:textSize="15dp" />
 
+        <Button
+            android:id="@+id/changePwd"
+            android:layout_width="308dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="10dp"
+            android:backgroundTint="#79BF49"
+            android:text="Change Password" />
 
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/reNewPwd"
-        android:layout_width="373dp"
-        android:layout_height="67dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.542">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Re-type New Password"
-            android:inputType="textPassword"/>
-
-
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <TextView
-        android:id="@+id/forgotPassword"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="64dp"
-        android:autoLink="web"
-        android:clickable="true"
-        android:text="Forgot Password?"
-        android:textColor="@color/blue"
-        android:textSize="15dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/reNewPwd"
-        app:layout_constraintVertical_bias="0.059" />
-
-    <Button
-        android:id="@+id/changePwd"
-        android:layout_width="308dp"
-        android:layout_height="48dp"
-        android:layout_marginBottom="88dp"
-        android:backgroundTint="#79BF49"
-        android:text="Change Password"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.504"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/reNewPwd"
-        app:layout_constraintVertical_bias="0.333" />
-
-    <Button
-        android:id="@+id/cancelBt"
-        android:layout_width="310dp"
-        android:layout_height="48dp"
-        android:backgroundTint="#E47473"
-        android:text="Cancel"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/changePwd"
-        app:layout_constraintVertical_bias="0.0" />
+        <Button
+            android:id="@+id/cancelBt"
+            android:layout_width="310dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:layout_marginBottom="10dp"
+            android:backgroundTint="#E47473"
+            android:text="Cancel" />
+    </LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

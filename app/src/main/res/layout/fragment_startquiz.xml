@@ -5,63 +5,57 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="164dp"
-        android:layout_height="193dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.066"
-        app:srcCompat="@drawable/logo" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <Button
-        android:id="@+id/bt_start"
-        android:layout_width="160dp"
-        android:layout_height="54dp"
-        android:text="Start"
-        android:textSize="20dp"
-        android:textColor="@color/black"
-        android:backgroundTint="#e6e2e5"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.859" />
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="164dp"
+            android:layout_height="193dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="50dp"
+            app:srcCompat="@drawable/logo" />
 
-    <TextView
-        android:id="@+id/infoQuiz"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="50dp"
-        android:text="Informative Quiz"
-        app:layout_constraintBottom_toTopOf="@+id/bt_start"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView"
-        app:layout_constraintVertical_bias="0.147" />
+        <TextView
+            android:id="@+id/infoQuiz"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:text="Informative Quiz"
+            android:textSize="50dp" />
 
-    <TextView
-        android:id="@+id/description"
-        android:layout_width="315dp"
-        android:layout_height="132dp"
-        android:text="1. You will be given an image of a place.\n
-2. Choose the correct answer from the multiple-choice options provided.\n
-3. If your answer is incorrect, keep guessing until you find the right answer.\n
-4. Once you select the correct answer, you will receive a trivia fact about the place.
-"
-        android:textAlignment="center"
-        android:textSize="15dp"
-        app:layout_constraintBottom_toTopOf="@+id/bt_start"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView"
-        app:layout_constraintVertical_bias="0.536" />
+        <TextView
+            android:id="@+id/description"
+            android:layout_width="315dp"
+            android:layout_height="132dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:text="1. You will be given an image of a place.\n
+    2. Choose the correct answer from the multiple-choice options provided.\n
+    3. If your answer is incorrect, keep guessing until you find the right answer.\n
+    4. Once you select the correct answer, you will receive a trivia fact about the place.
+    "
+            android:textAlignment="center"
+            android:textSize="15dp" />
+
+        <Button
+            android:id="@+id/bt_start"
+            android:layout_width="160dp"
+            android:layout_height="54dp"
+            android:layout_gravity="center"
+            android:backgroundTint="#e6e2e5"
+            android:text="Start"
+            android:layout_marginTop="50dp"
+            android:textColor="@color/black"
+            android:textSize="20dp" />
+    </LinearLayout>
 
 
     <!-- Bottom Navigation View -->
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
