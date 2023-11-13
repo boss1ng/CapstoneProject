@@ -5,15 +5,16 @@ import static android.content.ContentValues.TAG;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.Rect;
-import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -22,14 +23,10 @@ import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.text.Html;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,35 +35,40 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.common.collect.Table;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 
+import com.itextpdf.text.BadElementException;
+import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Font;
+import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -74,14 +76,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class ItineraryViewFragment extends Fragment {
+interface TaskCompletedCallback {
+    void onTaskCompleted(String response);
+}
 
+public class ItineraryViewFragment extends Fragment implements TaskCompletedCallback {
     private String userId;
     private String locationName;
     private PdfDocument document;
@@ -90,6 +93,12 @@ public class ItineraryViewFragment extends Fragment {
     private static final int REQUEST_CODE_SAVE_PDF = 102;
 
     private String responseString = null;
+    private String jsonResponseString = null;
+    private HttpURLConnection urlConnection = null;
+
+    public PdfPTable table;
+    public Document pdfDocument;
+    private int pendingTasks = 0; // To track pending async tasks
 
     final String[] originLatitude = {""};
     final String[] originLongitude = {""};
@@ -255,8 +264,630 @@ public class ItineraryViewFragment extends Fragment {
                 }
             }
         });
+    }
+
+    // Custom Page Event Helper
+    class BackgroundImageHelper extends PdfPageEventHelper {
+        private Image backgroundImage;
+
+        public BackgroundImageHelper(Context context) throws Exception {
+            // Load the drawable resource
+            Drawable drawable = ContextCompat.getDrawable(context, R.drawable.logopdf);
+            Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+
+            // Convert bitmap to byte array
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byte[] bitmapData = stream.toByteArray();
+
+            // Create an Image object from the byte array
+            this.backgroundImage = Image.getInstance(bitmapData);
+            this.backgroundImage.scaleToFit(PageSize.A4.getWidth(), PageSize.A4.getHeight());
+            this.backgroundImage.setAbsolutePosition(0, 0);
+        }
+
+        @Override
+        public void onEndPage(PdfWriter writer, Document document) {
+            try {
+                writer.getDirectContentUnder().addImage(backgroundImage);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // Convert a hexadecimal color string to BaseColor
+    private static BaseColor hexToBaseColor(String hexColor) {
+        int red = Integer.parseInt(hexColor.substring(1, 3), 16);
+        int green = Integer.parseInt(hexColor.substring(3, 5), 16);
+        int blue = Integer.parseInt(hexColor.substring(5, 7), 16);
+        return new BaseColor(red, green, blue);
+    }
+
+    @Override
+    public void onTaskCompleted(String response) {
+
+
+
+            // Ensure the document is still open
+            if (pdfDocument != null && pdfDocument.isOpen() && table != null) { // && pdfDocument.isOpen()
+                // Add content to the table
+
+
+                // Get the directory for the user's public documents directory.
+                File pdfFolder = new File(Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_DOCUMENTS), "QSee Itinerary");
+
+                if (!pdfFolder.exists()) {
+                    pdfFolder.mkdirs();
+                    Log.d(TAG, "PDF Directory created");
+                }
+
+                String fileName = ServerValue.TIMESTAMP + "_Itinerary.pdf";
+                File pdfFile = new File(pdfFolder, fileName);
+
+                // Create a new Document
+                Document document = new Document(PageSize.A4);
+
+                // Set margins (left, right, top, bottom)
+                document.setMargins(0, 0, 72, 0); // 1/2 inch margins
+
+                try {
+                    //PdfWriter.getInstance(document, new FileOutputStream(pdfFile));
+                    PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(pdfFile));
+
+                    // Set the page event helper
+                    BackgroundImageHelper backgroundImageHelper = new BackgroundImageHelper(getContext());
+                    writer.setPageEvent(backgroundImageHelper);
+
+                    // Open the document for writing
+                    document.open();
+
+                    /*
+                    // Convert drawable resource to bitmap
+                    Drawable drawable = ContextCompat.getDrawable(getContext(), R.drawable.logopdf);
+                    Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+
+                    // Convert bitmap to byte array
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    byte[] bitmapData = stream.toByteArray();
+
+                    // Create an Image object from the byte array
+                    Image backgroundImage = Image.getInstance(bitmapData);
+
+                    // Scale and position the image
+                    backgroundImage.scaleToFit(PageSize.A4.getWidth(), PageSize.A4.getHeight());
+                    backgroundImage.setAbsolutePosition(0, 0);
+
+                    // Add the image as background
+                    document.add(backgroundImage);
+                     */
+
+                    // Create a Font with a larger size
+                    Font largeFont = new Font(Font.FontFamily.TIMES_ROMAN, 20, Font.BOLD);
+                    Font tableHeader = new Font(Font.FontFamily.TIMES_ROMAN, 16, Font.BOLD);
+                    Font activityHeader = new Font(Font.FontFamily.TIMES_ROMAN, 14, Font.BOLD);
+
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Itinerary");
+                    databaseReference.orderByChild("iterName").equalTo(locationName).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Date startDate = null;
+                            Date endDate = null;
+                            for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                                String iterName = childSnapshot.getKey(); // Assuming iterName is the key
+                                String documentTitle = "Itinerary Plan for " + iterName;
+
+                                try {
+                                    // Add a title to the document
+                                    // Create a Paragraph with the text "Itinerary Plan", centered and using the larger font
+                                    Paragraph paragraph = new Paragraph(documentTitle, largeFont);
+                                    paragraph.setAlignment(Paragraph.ALIGN_CENTER);
+
+                                    // Add the paragraph to the document
+                                    document.add(paragraph);
+
+                                    // Alternatively, you can create a new Paragraph to add a line break
+                                    Paragraph lineBreak = new Paragraph("\n");
+                                    document.add(lineBreak);
+
+                                    // Add content to the document
+                                    // Create a table with five columns
+                                    final PdfPTable table = new PdfPTable(5);
+
+                                    for (int i = 1; i <= 5; i++) {
+                                        String dayKey = "Day" + i;
+                                        String dateText = "";
+                                        String date = childSnapshot.child(dayKey).child("date").getValue(String.class);
+                                        SimpleDateFormat parser = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+
+                                        if (date != null) {
+                                            try {
+                                                Date currentDate = parser.parse(date);
+                                                if (startDate == null || currentDate.before(startDate)) {
+                                                    startDate = currentDate;
+                                                }
+                                                if (endDate == null || currentDate.after(endDate)) {
+                                                    endDate = currentDate;
+                                                }
+                                                SimpleDateFormat formatter = new SimpleDateFormat("EEEE, MMMM d, yyyy", Locale.getDefault());
+                                                dateText = formatter.format(currentDate);
+
+                                            } catch (java.text.ParseException e) {
+                                                e.printStackTrace();
+                                            }
+                                        } else
+                                            break;
+
+                                        // Create a cell with the text "Merged Columns" that spans all five columns
+                                        PdfPCell cell = new PdfPCell(new Paragraph("Day " + i + " - " + dateText, tableHeader));
+                                        cell.setColspan(5); // Set the number of columns to span
+                                        cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
+                                        cell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
+                                        cell.setPadding(10);
+                                        cell.setBackgroundColor(hexToBaseColor("#3894A3"));
+
+                                        // Add the cell to the table
+                                        table.addCell(cell);
+
+                                        PdfPCell timeCell = new PdfPCell(new Paragraph("Time", activityHeader));
+                                        timeCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
+                                        timeCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
+                                        timeCell.setPadding(10);
+                                        table.addCell(timeCell);
+
+                                        PdfPCell activityCell = new PdfPCell(new Paragraph("Activity", activityHeader));
+                                        activityCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
+                                        activityCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
+                                        activityCell.setPadding(10);
+                                        table.addCell(activityCell);
+
+                                        PdfPCell originCell = new PdfPCell(new Paragraph("Origin", activityHeader));
+                                        originCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
+                                        originCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
+                                        originCell.setPadding(10);
+                                        table.addCell(originCell);
+
+                                        PdfPCell destCell = new PdfPCell(new Paragraph("Destination", activityHeader));
+                                        destCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
+                                        destCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
+                                        destCell.setPadding(10);
+                                        table.addCell(destCell);
+
+                                        PdfPCell routeCell = new PdfPCell(new Paragraph("Route Information", activityHeader));
+                                        routeCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
+                                        routeCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
+                                        routeCell.setPadding(10);
+                                        table.addCell(routeCell);
+
+                                        boolean[] isOriginFound = {false};
+                                        boolean[] isDestFound = {false};
+
+                                        for (DataSnapshot timeSnapshot : childSnapshot.child(dayKey).getChildren()) {
+                                            // Add headers to the table
+
+                                            String key = timeSnapshot.getKey();
+
+                                            if (key.contains("date")) {
+                                                break;
+                                            } else {
+
+                                                PdfPCell specificTimeCell = new PdfPCell(new Paragraph(key));
+                                                specificTimeCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
+                                                specificTimeCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
+                                                table.addCell(specificTimeCell);
+
+                                                PdfPCell specificActivityCell = new PdfPCell(new Paragraph(timeSnapshot.child("activity").getValue(String.class)));
+                                                specificActivityCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
+                                                specificActivityCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
+                                                table.addCell(specificActivityCell);
+
+                                                String origin = timeSnapshot.child("origin").getValue(String.class);
+                                                PdfPCell specificOriginCell = new PdfPCell(new Paragraph(origin));
+                                                specificOriginCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
+                                                specificOriginCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
+                                                table.addCell(specificOriginCell);
+
+                                                String destination = timeSnapshot.child("location").getValue(String.class);
+                                                PdfPCell specificDestCell = new PdfPCell(new Paragraph(destination));
+                                                specificDestCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
+                                                specificDestCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
+                                                table.addCell(specificDestCell);
+
+                                                //ROUTE INFORMATION
+                                                //table.addCell("ROUTE");
+                                                Log.d(TAG, "RESPONSE STRING" + response);
+                                                StringBuilder distancesBuilder = new StringBuilder();
+
+                                                try {
+                                                    if (response != null) {
+                                                        JSONObject jsonResponse = new JSONObject(response); // jsonResponseString is the JSON response you received
+
+                                                        // Check the status of the response
+                                                        String status = jsonResponse.getString("status");
+
+                                                        if (status.equals("OK")) {
+                                                            Log.d(TAG, "STATUS" + status);
+
+                                                            JSONArray routes = jsonResponse.getJSONArray("routes");
+
+                                                            for (int h = 0; h < routes.length(); h++) {
+                                                                JSONObject route = routes.getJSONObject(h);
+
+                                                                JSONArray legs = route.getJSONArray("legs");
+
+                                                                for (int j = 0; j < legs.length(); j++) {
+                                                                    JSONObject leg = legs.getJSONObject(j);
+
+                                                                    JSONArray steps = leg.getJSONArray("steps");
+
+                                                                    for (int k = 0; k < steps.length(); k++) {
+                                                                        JSONObject step = steps.getJSONObject(k);
+
+                                                                        // Extract information from the step
+                                                                        String distance = step.getJSONObject("distance").getString("text");
+                                                                        String duration = step.getJSONObject("duration").getString("text");
+                                                                        String htmlInstructions = step.getString("html_instructions");
+                                                                        // Remove HTML tags and display plain text instructions
+                                                                        String plainTextInstructions = Html.fromHtml(htmlInstructions).toString();
+
+                                                                        // Get the maneuver from your API response
+                                                                        // Retrieve maneuver if it's present, or provide a default value
+                                                                        String maneuverType = step.optString("maneuver", "No Maneuver");
+                                                                        //Toast.makeText(getContext(), maneuverType, Toast.LENGTH_LONG).show();
+
+                                                                        //String routeInstruction = "In " + duration + ", " + plainTextInstructions + " after " + distance + ".";
+                                                                        String routeInstruction = "After " + distance + ", " + plainTextInstructions + ".";
+
+                                                                        distancesBuilder.append(routeInstruction).append("\n\n"); // Append distance and a newline
+                                                                    }
+                                                                }
+                                                            }
+
+                                                            if (distancesBuilder.length() > 0) {
+                                                                // Route Information
+                                                                //table.addCell("ROUTE");
+                                                                //table.addCell(distance);
+                                                                PdfPCell distanceCell = new PdfPCell(new Phrase(distancesBuilder.toString()));
+                                                                table.addCell(distanceCell);
+                                                                Log.d(TAG, "BE HAPPY NOW :)");
+                                                            }
+
+                                                        } else {
+                                                            // Handle the case when the API request returns a status other than "OK"
+                                                        }
+                                                    }
+                                                } catch (JSONException e) {
+                                                    e.printStackTrace();
+                                                    // Handle JSON parsing errors
+                                                }
+
+
+                                            }
+                                        }
+
+                                        PdfPCell transitionRow = new PdfPCell(new Paragraph(" "));
+                                        transitionRow.setColspan(5); // Set the number of columns to span
+                                        transitionRow.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
+                                        transitionRow.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
+                                        transitionRow.setBorder(Rectangle.NO_BORDER); // Remove borders from the cell
+
+                                        // Add the cell to the table
+                                        table.addCell(transitionRow);
+                                    }
+
+                                    // Add the table to the document
+                                    document.add(table);
+
+                                    // End of Table
+                                    document.add(lineBreak);
+                                } catch (DocumentException e) {
+                                    throw new RuntimeException(e);
+                                } finally {
+                                    // Close the document
+                                    if (document.isOpen()) {
+                                        document.close();
+                                    }
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+
+                    Toast.makeText(getContext(), "Itinerary saved to /Documents/QSee Itinerary directory.", Toast.LENGTH_LONG).show();
+
+                } catch (DocumentException | IOException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+
+
+
+
+
+
+
+
+
+
+/*
+                Paragraph paragraph = new Paragraph("AWIT SAYO");
+                paragraph.setAlignment(Paragraph.ALIGN_CENTER);
+
+                // Add the paragraph to the document
+                pdfDocument.add(paragraph);
+
+                PdfPTable tableNew = new PdfPTable(5);
+                tableNew.addCell("HELLO");
+                tableNew.addCell("HELLO");
+                tableNew.addCell("HELLO");
+                tableNew.addCell("HELLO");
+                tableNew.addCell("HELLO");
+                pdfDocument.add(tableNew);
+
+
+
+                Log.d(TAG, "RESPONSE STRING" + response);
+
+                pendingTasks--;
+                if (pendingTasks == 0) {
+                    // Add the table to the document
+                    try {
+                        pdfDocument.add(table);
+                        // Close the document here
+                        pdfDocument.close();
+
+                    } catch (DocumentException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+ */
+            } else
+                Log.d(TAG, "DOCUMENT NULL/CLOSED");
+
 
     }
+
+    public void createPdfWithTable() {
+
+        // Get the directory for the user's public documents directory.
+        File pdfFolder = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DOCUMENTS), "QSee Itinerary");
+
+        if (!pdfFolder.exists()) {
+            pdfFolder.mkdirs();
+            Log.d(TAG, "PDF Directory created");
+        }
+
+        String fileName = ServerValue.TIMESTAMP + "_Itinerary.pdf";
+        File pdfFile = new File(pdfFolder, fileName);
+
+        // Create a new Document
+        pdfDocument = new Document(PageSize.A4);
+
+        // Set margins (left, right, top, bottom)
+        pdfDocument.setMargins(0, 0, 36, 36); // 1/2 inch margins
+
+        try {
+            PdfWriter.getInstance(pdfDocument, new FileOutputStream(pdfFile));
+
+            // Open the document for writing
+            pdfDocument.open();
+
+            // Create a Font with a larger size
+            Font largeFont = new Font(Font.FontFamily.TIMES_ROMAN, 20, Font.BOLD);
+            Font tableHeader = new Font(Font.FontFamily.TIMES_ROMAN, 16, Font.BOLD);
+            Font activityHeader = new Font(Font.FontFamily.TIMES_ROMAN, 14, Font.BOLD);
+
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Itinerary");
+            databaseReference.orderByChild("iterName").equalTo(locationName).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Date startDate = null;
+                    Date endDate = null;
+                    for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                        String iterName = childSnapshot.getKey(); // Assuming iterName is the key
+                        String documentTitle = "Itinerary Plan for " + iterName;
+
+                        try {
+                            // Add a title to the document
+                            // Create a Paragraph with the text "Itinerary Plan", centered and using the larger font
+                            Paragraph paragraph = new Paragraph(documentTitle, largeFont);
+                            paragraph.setAlignment(Paragraph.ALIGN_CENTER);
+
+                            // Add the paragraph to the document
+                            pdfDocument.add(paragraph);
+
+                            // Alternatively, you can create a new Paragraph to add a line break
+                            Paragraph lineBreak = new Paragraph("\n");
+                            pdfDocument.add(lineBreak);
+
+                            // Add content to the document
+                            // Create a table with three columns
+                            //PdfPTable table = new PdfPTable(5);
+                            table = new PdfPTable(5);
+
+                            for (int i = 1; i <= 5; i++) {
+                                String dayKey = "Day" + i;
+                                String dateText = "";
+                                String date = childSnapshot.child(dayKey).child("date").getValue(String.class);
+                                SimpleDateFormat parser = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+
+                                if (date != null) {
+                                    try {
+                                        Date currentDate = parser.parse(date);
+                                        if (startDate == null || currentDate.before(startDate)) {
+                                            startDate = currentDate;
+                                        }
+                                        if (endDate == null || currentDate.after(endDate)) {
+                                            endDate = currentDate;
+                                        }
+                                        SimpleDateFormat formatter = new SimpleDateFormat("EEEE, MMMM d, yyyy", Locale.getDefault());
+                                        dateText = formatter.format(currentDate);
+
+                                    } catch (java.text.ParseException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                                else
+                                    break;
+
+                                for (DataSnapshot timeSnapshot : childSnapshot.child(dayKey).getChildren()) {
+                                    // Add headers to the table
+
+                                    String key = timeSnapshot.getKey();
+
+                                    if (key.contains("date")) {
+                                        break;
+                                    }
+
+                                    else {
+                                        String origin = timeSnapshot.child("origin").getValue(String.class);
+                                        String destination = timeSnapshot.child("location").getValue(String.class);
+
+                                        String originLat = timeSnapshot.child("originLat").getValue(String.class);
+                                        String originLong = timeSnapshot.child("originLong").getValue(String.class);
+
+                                        String destLat = timeSnapshot.child("locationLat").getValue(String.class);
+                                        String destLong = timeSnapshot.child("locationLong").getValue(String.class);
+
+                                        pendingTasks++;
+                                        String url = "https://maps.googleapis.com/maps/api/directions/json?" +
+                                                "origin=" + originLat + "," + originLong +
+                                                "&destination=" + destLat + "," + destLong +
+                                                "&key=" + getResources().getString(R.string.google_maps_api_key);
+
+                                        // ROUTE INFORMATION
+                                        //table.addCell(url);
+                                        // Create an instance of DirectionsTask and execute it
+
+                                        // Execute AsyncTask
+                                        //new FetchDirectionsTask().execute(url);
+                                        new FetchDirectionsTask(ItineraryViewFragment.this).execute(url);
+                                        //Log.d(TAG, "RESPONSE STRING" + responseString);
+
+                                        //table.addCell(responseString);
+                                    }
+                                }
+                            }
+                        }
+
+                        catch (DocumentException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
+            Log.d(TAG, "PDF created successfully at: " + pdfFile.getAbsolutePath());
+
+            // Show a toast indicating that the PDF has been saved
+            Toast.makeText(getContext(), "Exporting...", Toast.LENGTH_LONG).show();
+
+        } catch (DocumentException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private class FetchDirectionsTask extends AsyncTask<String, Void, String> {
+        private TaskCompletedCallback callback;
+
+        public FetchDirectionsTask(TaskCompletedCallback callback) {
+            this.callback = callback;
+        }
+        @Override
+        protected String doInBackground(String... urls) {
+            return getDirectionsData(urls[0]);
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            // Process the result here
+            // Update UI based on the fetched data
+            responseString = result;
+            //Log.d(TAG, "RESPONSE STRING" + responseString);
+            callback.onTaskCompleted(result);
+        }
+    }
+
+    private String getDirectionsData(String urlString) {
+        HttpURLConnection urlConnection = null;
+        BufferedReader reader = null;
+        String jsonResponse = null;
+
+        try {
+            URL url = new URL(urlString);
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("GET");
+            urlConnection.connect();
+
+            InputStream inputStream = urlConnection.getInputStream();
+            StringBuilder builder = new StringBuilder();
+            if (inputStream == null) {
+                // No data received, handle accordingly
+                return null;
+            }
+            reader = new BufferedReader(new InputStreamReader(inputStream));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                builder.append(line).append("\n");
+            }
+
+            if (builder.length() == 0) {
+                // Stream was empty, no point in parsing
+                return null;
+            }
+            jsonResponse = builder.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return jsonResponse;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     private void generatePDF() {
         // Get the root view
         final View rootView = requireView();
@@ -294,298 +925,85 @@ public class ItineraryViewFragment extends Fragment {
         startActivityForResult(intent, REQUEST_CODE_SAVE_PDF);
     }
 
-    public void createPdfWithTable() {
+    private class NetworkTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... urls) {
+            try {
+                URL urlRequest = new URL(urls[0]);
+                HttpURLConnection urlConnection = (HttpURLConnection) urlRequest.openConnection();
 
-        // Get the directory for the user's public documents directory.
-        File pdfFolder = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_DOCUMENTS), "QSee Itinerary");
+                int responseCode = urlConnection.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    InputStream inputStream = urlConnection.getInputStream();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                    StringBuilder response = new StringBuilder();
+                    String line;
 
-        if (!pdfFolder.exists()) {
-            pdfFolder.mkdirs();
-            Log.d(TAG, "PDF Directory created");
+                    while ((line = reader.readLine()) != null) {
+                        response.append(line);
+                    }
+
+                    urlConnection.disconnect();
+                    return response.toString();
+                } else {
+                    // Handle the case when the request returns an error
+                    return null; // or an appropriate error message
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null; // or an appropriate error message
+            }
         }
 
-        String fileName = ServerValue.TIMESTAMP + "_Itinerary.pdf";
-        File pdfFile = new File(pdfFolder, fileName);
-
-        // Create a new Document
-        Document document = new Document(PageSize.A4);
-
-        // Set margins (left, right, top, bottom)
-        document.setMargins(0, 0, 36, 36); // 1/2 inch margins
-
-        try {
-            PdfWriter.getInstance(document, new FileOutputStream(pdfFile));
-
-            // Open the document for writing
-            document.open();
-
-            // Create a Font with a larger size
-            Font largeFont = new Font(Font.FontFamily.TIMES_ROMAN, 20, Font.BOLD);
-            Font tableHeader = new Font(Font.FontFamily.TIMES_ROMAN, 16, Font.BOLD);
-            Font activityHeader = new Font(Font.FontFamily.TIMES_ROMAN, 14, Font.BOLD);
-
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Itinerary");
-            databaseReference.orderByChild("iterName").equalTo(locationName).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    Date startDate = null;
-                    Date endDate = null;
-                    for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
-                        String iterName = childSnapshot.getKey(); // Assuming iterName is the key
-                        String documentTitle = "Itinerary Plan for " + iterName;
-
-                        try {
-                            // Add a title to the document
-                            // Create a Paragraph with the text "Itinerary Plan", centered and using the larger font
-                            Paragraph paragraph = new Paragraph(documentTitle, largeFont);
-                            paragraph.setAlignment(Paragraph.ALIGN_CENTER);
-
-                            // Add the paragraph to the document
-                            document.add(paragraph);
-
-                            // Alternatively, you can create a new Paragraph to add a line break
-                            Paragraph lineBreak = new Paragraph("\n");
-                            document.add(lineBreak);
-
-                            // Add content to the document
-                            // Create a table with three columns
-                            final PdfPTable table = new PdfPTable(5);
-
-                            for (int i = 1; i <= 5; i++) {
-                                String dayKey = "Day" + i;
-                                String dateText = "";
-                                String date = childSnapshot.child(dayKey).child("date").getValue(String.class);
-                                SimpleDateFormat parser = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-
-                                if (date != null) {
-                                    try {
-                                        Date currentDate = parser.parse(date);
-                                        if (startDate == null || currentDate.before(startDate)) {
-                                            startDate = currentDate;
-                                        }
-                                        if (endDate == null || currentDate.after(endDate)) {
-                                            endDate = currentDate;
-                                        }
-                                        SimpleDateFormat formatter = new SimpleDateFormat("EEEE, MMMM d, yyyy", Locale.getDefault());
-                                        dateText = formatter.format(currentDate);
-
-                                    } catch (java.text.ParseException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-
-                                else
-                                    break;
-
-                                // Create a cell with the text "Merged Columns" that spans all four columns
-                                PdfPCell cell = new PdfPCell(new Paragraph("Day 1 - " + dateText, tableHeader));
-                                cell.setColspan(5); // Set the number of columns to span
-                                cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
-                                cell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
-
-                                // Add the cell to the table
-                                table.addCell(cell);
-
-                                PdfPCell timeCell = new PdfPCell(new Paragraph("Time", activityHeader));
-                                timeCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
-                                timeCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
-                                table.addCell(timeCell);
-
-                                PdfPCell activityCell = new PdfPCell(new Paragraph("Activity", activityHeader));
-                                activityCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
-                                activityCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
-                                table.addCell(activityCell);
-
-                                PdfPCell originCell = new PdfPCell(new Paragraph("Origin", activityHeader));
-                                originCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
-                                originCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
-                                table.addCell(originCell);
-
-                                PdfPCell destCell = new PdfPCell(new Paragraph("Destination", activityHeader));
-                                destCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
-                                destCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
-                                table.addCell(destCell);
-
-                                PdfPCell routeCell = new PdfPCell(new Paragraph("Route Information", activityHeader));
-                                routeCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
-                                routeCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
-                                table.addCell(routeCell);
-
-                                boolean[] isOriginFound = {false};
-                                boolean[] isDestFound = {false};
-
-                                for (DataSnapshot timeSnapshot : childSnapshot.child(dayKey).getChildren()) {
-                                    // Add headers to the table
-
-                                    String key = timeSnapshot.getKey();
-
-                                    if (key.contains("date")) {
-                                        break;
-                                    }
-
-                                    else {
-
-                                        PdfPCell specificTimeCell = new PdfPCell(new Paragraph(key));
-                                        specificTimeCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
-                                        table.addCell(specificTimeCell);
-
-                                        PdfPCell specificActivityCell = new PdfPCell(new Paragraph(timeSnapshot.child("activity").getValue(String.class)));
-                                        specificActivityCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
-                                        table.addCell(specificActivityCell);
-
-                                        String origin = timeSnapshot.child("origin").getValue(String.class);
-                                        PdfPCell specificOriginCell = new PdfPCell(new Paragraph(origin));
-                                        specificOriginCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
-                                        table.addCell(specificOriginCell);
-
-                                        String destination = timeSnapshot.child("location").getValue(String.class);
-                                        PdfPCell specificDestCell = new PdfPCell(new Paragraph(destination));
-                                        specificDestCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
-                                        table.addCell(specificDestCell);
-
-                                        //table.addCell(urlRequest);
-                                        // Add here the Directions API URL Request.
-                                        // The latitude and longitude of the origin and destination will be queried from the Locations from realtime database.
-
-                                        // Assuming you have a DatabaseReference for the "Locations" node
-                                        DatabaseReference locationsReference = FirebaseDatabase.getInstance().getReference("Location");
-
-                                        // Query the "Locations" node to retrieve latitude and longitude for the origin
-                                        locationsReference.orderByChild("Location").equalTo(origin).addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                                for (DataSnapshot locationSnapshot : dataSnapshot.getChildren()) {
-                                                    // Retrieve latitude and longitude for the origin
-                                                    String firebaseOrigLat = locationSnapshot.child("Latitude").getValue(String.class);
-                                                    String firebaseOrigLong = locationSnapshot.child("Longitude").getValue(String.class);
-
-                                                    originLatitude[0] = firebaseOrigLat;
-                                                    originLongitude[0] = firebaseOrigLong;
-
-
-                                                    Log.d(TAG, "Origin Latitude: " + originLatitude[0]);
-                                                    Log.d(TAG, "Origin Longitude: " + originLongitude[0]);
-
-                                                    // Now you have the latitude and longitude for the origin, you can construct the Directions API URL
-
-                                                    // Similarly, query the "Locations" node for destination latitude and longitude
-                                                    locationsReference.orderByChild("Location").equalTo(destination).addListenerForSingleValueEvent(new ValueEventListener() {
-                                                        @Override
-                                                        public void onDataChange(DataSnapshot dataSnapshot) {
-                                                            for (DataSnapshot locationSnapshot : dataSnapshot.getChildren()) {
-                                                                // Retrieve latitude and longitude for the destination
-                                                                String firebaseDestLat = locationSnapshot.child("Latitude").getValue(String.class);
-                                                                String firebaseDestLong = locationSnapshot.child("Longitude").getValue(String.class);
-
-                                                                destLatitude[0] = firebaseDestLat;
-                                                                destLongitude[0] = firebaseDestLong;
-
-                                                                Log.d(TAG, "destination Latitude: " + destLatitude[0]);
-                                                                Log.d(TAG, "destination Longitude: " + destLongitude[0]);
-
-                                                                // not working here
-                                                            }
-                                                        }
-
-                                                        @Override
-                                                        public void onCancelled(DatabaseError databaseError) {
-                                                            // Handle the error if the query fails
-                                                        }
-                                                    });
-                                                }
-
-                                                // not working here
-                                            }
-
-                                            @Override
-                                            public void onCancelled(DatabaseError databaseError) {
-                                                // Handle the error if the query fails
-                                            }
-                                        });
-
-                                        // Now you have the latitude and longitude for the destination, you can construct the Directions API URL
-                                        // Now you have the latitude and longitude for both origin and destination
-                                        // Construct the URL for directions
-                                        String url = "https://maps.googleapis.com/maps/api/directions/json?" +
-                                                "origin=" + originLatitude[0] + "," + originLongitude[0] +
-                                                "&destination=" + destLatitude[0] + "," + destLongitude[0] +
-                                                "&key=" + getResources().getString(R.string.google_maps_api_key);
-
-                                        Log.e(TAG, url);
-
-                                        // Use the 'url' as needed
-                                        table.addCell(url);
-                                    }
-                                }
-                            }
-
-                            // Add the table to the document
-                            document.add(table);
-
-                            // End of Table
-                            document.add(lineBreak);
-                        }
-
-                        catch (DocumentException e) {
-                            throw new RuntimeException(e);
-                        } finally {
-                            // Close the document
-                            if (document.isOpen()) {
-                                document.close();
-                            }
-                        }
-                    }
-                }
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
-
-            Log.d(TAG, "PDF created successfully at: " + pdfFile.getAbsolutePath());
-
-            // Show a toast indicating that the PDF has been saved
-            Toast.makeText(getContext(), "Itinerary saved to /Documents/QSee Itinerary directory.", Toast.LENGTH_LONG).show();
-
-        } catch (DocumentException | IOException e) {
-            e.printStackTrace();
+        @Override
+        protected void onPostExecute(String result) {
+            if (result != null) {
+                // jsonResponseString = result;
+                //table.addCell(result);
+                // Process the result here
+            } else {
+                // Handle the case where the result is null
+                table.addCell("RESULT NULL");
+            }
         }
     }
+
 
 
 
     public String getResponseString(String urlString) {
-        StringBuilder response = new StringBuilder();
-        try {
-            URL url = new URL(urlString);
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                response.append(line);
+        if (urlString != null) {
+            StringBuilder response = new StringBuilder();
+            try {
+                URL url = new URL(urlString);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                Log.d(TAG, "RESPONSE STRING" + response.toString());
+                reader.close();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            reader.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+
+            return response.toString();
+
         }
-        return response.toString();
+
+        else
+            return "NULL";
     }
 
-    public class DirectionsTask extends AsyncTask<Void, Void, String> {
+    public class DirectionsTask extends AsyncTask<String, Void, String> {
 
         String passedUrl;
-        PdfPTable passedtable;
-        //PdfPTable table
         public DirectionsTask(String url) {
             passedUrl = url;
-            //passedtable = table;
         }
 
-        @Override
-        protected String doInBackground(Void... voids) {
-            String jsonResponseString = null;
-            HttpURLConnection urlConnection = null;
+        protected String doInBackground(String... urls) {
 
             try {
                 URL urlRequest = new URL(passedUrl);
@@ -628,55 +1046,56 @@ public class ItineraryViewFragment extends Fragment {
         protected void onPostExecute(String jsonResponseString) {
             // Use the jsonResponseString in your application as needed
 
+            table.addCell(jsonResponseString);
+
             try {
+                if (jsonResponseString != null) {
+                    JSONObject jsonResponse = new JSONObject(jsonResponseString); // jsonResponseString is the JSON response you received
 
-                JSONObject jsonResponse = new JSONObject(jsonResponseString); // jsonResponseString is the JSON response you received
+                    responseString = jsonResponseString;
 
-                responseString = jsonResponseString;
-
-                // Check the status of the response
-                String status = jsonResponse.getString("status");
+                    // Check the status of the response
+                    String status = jsonResponse.getString("status");
 
 
-                if (status.equals("OK")) {
-                    JSONArray routes = jsonResponse.getJSONArray("routes");
+                    if (status.equals("OK")) {
+                        JSONArray routes = jsonResponse.getJSONArray("routes");
 
-                    for (int i = 0; i < routes.length(); i++) {
-                        JSONObject route = routes.getJSONObject(i);
+                        for (int i = 0; i < routes.length(); i++) {
+                            JSONObject route = routes.getJSONObject(i);
 
-                        JSONArray legs = route.getJSONArray("legs");
+                            JSONArray legs = route.getJSONArray("legs");
 
-                        for (int j = 0; j < legs.length(); j++) {
-                            JSONObject leg = legs.getJSONObject(j);
+                            for (int j = 0; j < legs.length(); j++) {
+                                JSONObject leg = legs.getJSONObject(j);
 
-                            JSONArray steps = leg.getJSONArray("steps");
+                                JSONArray steps = leg.getJSONArray("steps");
 
-                            for (int k = 0; k < steps.length(); k++) {
-                                JSONObject step = steps.getJSONObject(k);
+                                for (int k = 0; k < steps.length(); k++) {
+                                    JSONObject step = steps.getJSONObject(k);
 
-                                // Extract information from the step
-                                String distance = step.getJSONObject("distance").getString("text");
-                                String duration = step.getJSONObject("duration").getString("text");
-                                String htmlInstructions = step.getString("html_instructions");
-                                // Remove HTML tags and display plain text instructions
-                                String plainTextInstructions = Html.fromHtml(htmlInstructions).toString();
+                                    // Extract information from the step
+                                    String distance = step.getJSONObject("distance").getString("text");
+                                    String duration = step.getJSONObject("duration").getString("text");
+                                    String htmlInstructions = step.getString("html_instructions");
+                                    // Remove HTML tags and display plain text instructions
+                                    String plainTextInstructions = Html.fromHtml(htmlInstructions).toString();
 
-                                // Get the maneuver from your API response
-                                // Retrieve maneuver if it's present, or provide a default value
-                                String maneuverType = step.optString("maneuver", "No Maneuver");
-                                //Toast.makeText(getContext(), maneuverType, Toast.LENGTH_LONG).show();
+                                    // Get the maneuver from your API response
+                                    // Retrieve maneuver if it's present, or provide a default value
+                                    String maneuverType = step.optString("maneuver", "No Maneuver");
+                                    //Toast.makeText(getContext(), maneuverType, Toast.LENGTH_LONG).show();
 
-                                // Route Information
-                                //passedtable.addCell("INSERT");
+                                    // Route Information
 
+
+                                }
                             }
                         }
+
+                    } else {
+                        // Handle the case when the API request returns a status other than "OK"
                     }
-
-                }
-
-                else {
-                    // Handle the case when the API request returns a status other than "OK"
                 }
             }
 
