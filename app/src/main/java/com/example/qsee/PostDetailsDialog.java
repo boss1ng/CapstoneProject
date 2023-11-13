@@ -309,7 +309,7 @@ public class PostDetailsDialog extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String newCaption = input.getText().toString();
-                updateCaptionInFirebase(userId, caption, newCaption);
+                updateCaptionInFirebase(userId, caption, newCaption, category, location);
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -323,7 +323,7 @@ public class PostDetailsDialog extends DialogFragment {
     }
 
     // Method to update caption in Firebase
-    private void updateCaptionInFirebase(final String userId, final String oldCaption, final String newCaption) {
+    private void updateCaptionInFirebase(final String userId, final String oldCaption, final String newCaption, final String category, final String location) {
         DatabaseReference postsRef = FirebaseDatabase.getInstance().getReference("Posts");
 
         Query query = postsRef.orderByChild("userId").equalTo(userId);
@@ -335,8 +335,11 @@ public class PostDetailsDialog extends DialogFragment {
                     // Found the post for the specified user ID
                     for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                         String caption = postSnapshot.child("caption").getValue(String.class);
-                        if (caption != null && caption.equals(oldCaption)) {
-                            // Matched the old caption, update it to the new caption
+                        String postCategory = postSnapshot.child("category").getValue(String.class);
+                        String postLocation = postSnapshot.child("location").getValue(String.class);
+
+                        if (caption != null && caption.equals(oldCaption) && postCategory != null && postCategory.equals(category) && postLocation != null && postLocation.equals(location)) {
+                            // Matched the old caption, category, and location, update the caption
                             DatabaseReference postRef = postSnapshot.getRef();
                             postRef.child("caption").setValue(newCaption).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
@@ -354,10 +357,10 @@ public class PostDetailsDialog extends DialogFragment {
                             return; // Stop iterating as we found and updated the post
                         }
                     }
-                    // Handle the case where the old caption was not found
-                    Toast.makeText(getContext(), "Old caption not found for user ID: " + userId, Toast.LENGTH_SHORT).show();
+                    // Handle the case where the old caption, category, or location was not found
+                    Toast.makeText(getContext(), "No matching post found for criteria", Toast.LENGTH_SHORT).show();
                 } else {
-                    // Handle the case where no matching post was found
+                    // Handle the case where no matching post was found for the userId
                     Toast.makeText(getContext(), "No matching post found for user ID: " + userId, Toast.LENGTH_SHORT).show();
                 }
             }
@@ -369,6 +372,7 @@ public class PostDetailsDialog extends DialogFragment {
             }
         });
     }
+
 
 
 }
