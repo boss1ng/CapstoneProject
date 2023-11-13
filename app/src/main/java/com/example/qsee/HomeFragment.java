@@ -119,7 +119,7 @@ public class HomeFragment extends Fragment {
 
         if (getBundle != null) {
             String userID = getBundle.getString("userId");
-            //Toast.makeText(getContext(), userID, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getContext(), userID, Toast.LENGTH_LONG).show();
         }
 
         BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
@@ -223,7 +223,7 @@ public class HomeFragment extends Fragment {
                         /*
                         if (postCaption.equals("")) {
                             dataMap.put("caption", "NULL");
-                            //Toast.makeText(getContext(), "NO CAPTION", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(getContext(), "NO CAPTION", Toast.LENGTH_LONG).show();
                         }
 
                         else {

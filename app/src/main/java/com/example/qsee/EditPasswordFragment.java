@@ -110,18 +110,18 @@ public class EditPasswordFragment extends Fragment {
                                             // Navigate back to the ProfileFragment
                                             getParentFragmentManager().popBackStack();
                                             // Show a success message to the user
-                                            Toast.makeText(getActivity(), "Password Changed Successfully", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(getActivity(), "Password Changed Successfully.", Toast.LENGTH_LONG).show();
                                         } else {
                                             // New password and re-entered password do not match, display an error message
-                                            Toast.makeText(getActivity(), "New password do not match", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(getActivity(), "New password do not match.", Toast.LENGTH_LONG).show();
                                         }
                                     } else {
                                         // New password does not match the pattern, display an error message
-                                        Toast.makeText(getActivity(), "New password does not meet the requirements", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getActivity(), "New password does not meet the requirements.", Toast.LENGTH_LONG).show();
                                     }
                                 } else {
                                     // Passwords do not match, display a toast message to the user
-                                    Toast.makeText(getActivity(), "Current Password does not match", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getActivity(), "Current Password does not match.", Toast.LENGTH_LONG).show();
                                     // You may also want to clear the password fields and prompt the user to re-enter
                                 }
                             }

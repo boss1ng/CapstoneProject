@@ -113,17 +113,17 @@ public class AddUserToGroup extends DialogFragment {
                     // Check if the user is already a member of the group
                     if (isUserAlreadyMember(groupSnapshot, member)) {
                         // Display a toast for duplicate user
-                        Toast.makeText(context, "User is already a member of the group", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "User is already a member of the group.", Toast.LENGTH_LONG).show();
                     } else {
                         // Create a notification for the invitation without adding the user
                         createNotification(member, groupId);
 
                         // Display a confirmation to the user
-                        Toast.makeText(context, "Invitation sent to " + member, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Invitation sent to " + member, Toast.LENGTH_LONG).show();
                     }
                 } else {
                     // The group doesn't exist for this user
-                    Toast.makeText(context, "You are not the admin of this group.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "You are not the admin of this group.", Toast.LENGTH_LONG).show();
                     Log.d("AddUserToGroup", "Group doesn't exist for user: " + userId);
                 }
             }

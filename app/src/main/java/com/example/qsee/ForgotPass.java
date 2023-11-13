@@ -59,7 +59,7 @@ public class ForgotPass extends AppCompatActivity {
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
                         // Handle database error, if any
-                        Toast.makeText(ForgotPass.this, "Database error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ForgotPass.this, "Database error: " + databaseError.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
 

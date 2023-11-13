@@ -192,7 +192,7 @@ public class EditActivityFragment extends Fragment {
 
                             // Check if any of the fields are empty
                             if (updatedLocation.isEmpty() || standardTime.isEmpty() || updatedActivity.isEmpty()) {
-                                Toast.makeText(getContext(), "Please fill all fields", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), "Please fill all fields", Toast.LENGTH_LONG).show();
                             } else {
 
                             String status = completionSwitch.isChecked() ? "Completed" : "Incompleted";
@@ -237,7 +237,7 @@ public class EditActivityFragment extends Fragment {
 
                                                 showRatingDialog();
                                                 // Show a toast to confirm the save
-                                                Toast.makeText(getContext(), "Changes saved successfully", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(getContext(), "Changes saved successfully.", Toast.LENGTH_LONG).show();
                                                 dialog.dismiss();
                                             }
                                         }
@@ -275,7 +275,7 @@ public class EditActivityFragment extends Fragment {
 
 
                                                 // Show a toast to confirm the save
-                                                Toast.makeText(getContext(), "Changes saved successfully", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(getContext(), "Changes saved successfully.", Toast.LENGTH_LONG).show();
                                                 dialog.dismiss();
                                             }
                                         }
@@ -291,7 +291,7 @@ public class EditActivityFragment extends Fragment {
                         }
 
                             // Show a toast to confirm the save
-                            Toast.makeText(getContext(), "Changes saved successfully", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Changes saved successfully.", Toast.LENGTH_LONG).show();
                             dialog.dismiss();
                         }
                         }

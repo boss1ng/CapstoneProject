@@ -211,7 +211,7 @@ public class MapsFragmentArrived extends Fragment implements OnMapReadyCallback 
 
                     //LatLng originLatLng = new LatLng(location.getLatitude(), location.getLongitude());
 
-                    //Toast.makeText(getContext(), currentUserLocationLat.toString(), Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getContext(), currentUserLocationLat.toString(), Toast.LENGTH_LONG).show();
 
                     // Use Google Directions API to request directions
                     String apiKey = getString(R.string.google_maps_api_key);

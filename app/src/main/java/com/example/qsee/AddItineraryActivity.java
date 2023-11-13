@@ -117,7 +117,7 @@ public class AddItineraryActivity extends Fragment {
 
                                 // Check if any of the fields are empty
                                 if (time.isEmpty() || activity.isEmpty() || location.isEmpty()) {
-                                    Toast.makeText(getContext(), "Please fill all fields", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getContext(), "Please fill all fields", Toast.LENGTH_LONG).show();
                                 } else {
 
                                     String standardTime = Objects.requireNonNull(time);
@@ -131,9 +131,9 @@ public class AddItineraryActivity extends Fragment {
                                                 @Override
                                                 public void onComplete(@NonNull Task<Void> task) {
                                                     if (task.isSuccessful()) {
-                                                        Toast.makeText(getContext(), "Activity added to " + day, Toast.LENGTH_SHORT).show();
+                                                        Toast.makeText(getContext(), "Activity added to " + day, Toast.LENGTH_LONG).show();
                                                     } else {
-                                                        Toast.makeText(getContext(), "Failed to save data", Toast.LENGTH_SHORT).show();
+                                                        Toast.makeText(getContext(), "Failed to save data", Toast.LENGTH_LONG).show();
                                                     }
                                                 }
                                             });

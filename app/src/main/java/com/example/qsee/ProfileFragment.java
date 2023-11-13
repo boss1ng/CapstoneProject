@@ -189,14 +189,14 @@ public class ProfileFragment extends Fragment {
                         clipboard.setPrimaryClip(clip);
 
                         // Show a toast message indicating that the numeric part has been copied
-                        Toast.makeText(context, "User ID copied to clipboard", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "User ID copied to clipboard.", Toast.LENGTH_LONG).show();
                     } catch (Exception e) {
                         // Handle the exception (e.g., show a message to the user)
-                        Toast.makeText(context, "Clipboard functionality is not available", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Clipboard functionality is not available.", Toast.LENGTH_LONG).show();
                     }
                 } else {
                     // Show a message if there are no numeric characters to copy
-                    Toast.makeText(context, "No numeric part found in User ID", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "No numeric part found in User ID.", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -242,7 +242,7 @@ public class ProfileFragment extends Fragment {
 
         if (getBundle != null) {
             String userID = getBundle.getString("userId");
-            Toast.makeText(getContext(), userID, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), userID, Toast.LENGTH_LONG).show();
         }
 
         BottomNavigationView bottomNavigationView = rootView.findViewById(R.id.bottomNavigationView);
@@ -377,7 +377,7 @@ public class ProfileFragment extends Fragment {
                     });
                 } else {
                     // Show a toast message when there are no notifications
-                    Toast.makeText(context, "No notifications found", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "No notifications found.", Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -447,7 +447,7 @@ public class ProfileFragment extends Fragment {
                                 // Check if the notifications list is empty
                                 if (notifications.isEmpty()) {
                                     // Show a toast message when there are no items in the notification list
-                                    Toast.makeText(context, "Notifications is empty", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(context, "Notifications is .", Toast.LENGTH_LONG).show();
                                 }
                             }
 

@@ -122,7 +122,7 @@ public class AddGroupFragment extends DialogFragment {
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             if (dataSnapshot.exists()) {
                                 // The group name already exists, show a toast message
-                                Toast.makeText(getActivity(), "Group already exists, Try a different group name", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity(), "Group already exists. Try a different group name", Toast.LENGTH_LONG).show();
                             } else {
                                 // Group name does not exist, proceed to create the group
                                 DatabaseReference usersReference = databaseReference.child("MobileUsers");
@@ -155,7 +155,7 @@ public class AddGroupFragment extends DialogFragment {
                                             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Icons").child(group.getGroupName());
                                             databaseReference.child("GroupPhoto").setValue(randomUrl);
                                             // Display a Toast for successful group creation
-                                            Toast.makeText(getActivity(), "Group created successfully", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(getActivity(), "Group created successfully", Toast.LENGTH_LONG).show();
 
                                             // Close the dialog
                                             dismiss();
@@ -180,7 +180,7 @@ public class AddGroupFragment extends DialogFragment {
                     });
                 } else {
                     // Display a Toast message for an empty group name
-                    Toast.makeText(getActivity(), "Group name cannot be empty", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Group name cannot be empty", Toast.LENGTH_LONG).show();
                 }
             }
         });

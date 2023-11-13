@@ -212,7 +212,7 @@ public class EditProfileFragment extends Fragment {
                                 if (selectedProfilePictureUri != null) {
                                     uploadProfilePicture(userId, selectedProfilePictureUri);
                                 } else {
-                                    Toast.makeText(getContext(), "Profile information updated successfully", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getContext(), "Profile information updated successfully.", Toast.LENGTH_LONG).show();
                                     getParentFragmentManager().popBackStack();
                                 }
                             }
@@ -374,7 +374,7 @@ public class EditProfileFragment extends Fragment {
             cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
             startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
         } else {
-            Toast.makeText(context, "No camera app found", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "No camera app found.", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -419,7 +419,7 @@ public class EditProfileFragment extends Fragment {
                             if (dataSnapshot.exists()) {
                                 for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
                                     userSnapshot.getRef().child("profilePictureUrl").setValue(imageUrl);
-                                    Toast.makeText(getContext(), "Profile updated successfully", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getContext(), "Profile updated successfully.", Toast.LENGTH_LONG).show();
                                     getParentFragmentManager().popBackStack();
                                 }
                             } else {

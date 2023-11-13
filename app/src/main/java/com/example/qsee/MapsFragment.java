@@ -101,8 +101,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
         if (getBundle != null) {
             String userID = getBundle.getString("userId");
-            Toast.makeText(getContext(), userID, Toast.LENGTH_SHORT).show();
-            // Toast.makeText(getContext(), getBundle.getString("isVisited"), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), userID, Toast.LENGTH_LONG).show();
+            // Toast.makeText(getContext(), getBundle.getString("isVisited"), Toast.LENGTH_LONG).show();
         }
 
         BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
@@ -424,11 +424,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 if (isUserInQuezonCity) {
                     // The user is within Quezon City
                     // You can perform specific actions or display messages as needed.
-                    //Toast.makeText(getContext(), "WITHIN", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getContext(), "WITHIN", Toast.LENGTH_LONG).show();
                 } else {
                     // The user is outside Quezon City
                     // You can handle this case accordingly.
-                    //Toast.makeText(getContext(), "OUTSIDE", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getContext(), "OUTSIDE", Toast.LENGTH_LONG).show();
                     Toast.makeText(getContext(), "You are outside Quezon City.", Toast.LENGTH_LONG).show();
 
                     // Create a Handler to introduce a delay
@@ -465,7 +465,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
                     /*
                     if (visited == "YES") {
-                        Toast.makeText(getContext(), bundle.getString("isVisited"), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), bundle.getString("isVisited"), Toast.LENGTH_LONG).show();
 
                         LinearLayout layoutFilter = getView().findViewById(R.id.filterMenu);
                         layoutFilter.setVisibility(View.GONE);
@@ -583,7 +583,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                                                     if (isUserInQuezonCity) {
                                                         // The user is within Quezon City
                                                         // You can perform specific actions or display messages as needed.
-                                                        Toast.makeText(getContext(), "WITHIN", Toast.LENGTH_SHORT).show();
+                                                        Toast.makeText(getContext(), "WITHIN", Toast.LENGTH_LONG).show();
                                                         args.putString("isUserInQuezonCity", "MISS KO NA KAT");
                                                     } else {
                                                         // The user is outside Quezon City

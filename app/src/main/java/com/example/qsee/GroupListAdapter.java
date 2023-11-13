@@ -150,7 +150,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
                 // Check if the user is the admin
                 if (!group.getAdmin().equals(userId)) {
                     // Show a toast message indicating that only admins can edit the group
-                    Toast.makeText(v.getContext(), "Only admins can edit the group", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(v.getContext(), "Only admins can edit the group.", Toast.LENGTH_LONG).show();
                 } else {
                     // User is the admin, proceed with the edit action
                     GroupEditFragment groupEditFragment = new GroupEditFragment();
@@ -416,7 +416,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
                     dialog.show();
                 } else {
                     // User is not the admin, show a toast message
-                    Toast.makeText(context, "Only admins can delete a group", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Only admins can delete a group.", Toast.LENGTH_LONG).show();
                 }
             }
 
