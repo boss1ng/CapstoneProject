@@ -13,14 +13,16 @@
         android:layout_gravity="center_vertical"
         android:textSize="18sp"
         android:text="15:00"
+        android:gravity="center"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"/>
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/locationIcon"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:background="@drawable/logo" />
+        android:layout_gravity="center"
+        android:scaleType="centerCrop"/>
 
     <TextView
         android:id="@+id/locationName"
@@ -31,5 +33,15 @@
         android:textSize="18sp"
         android:layout_marginStart="8dp"
         android:layout_weight="1"/>
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/checkIcon"
+        android:layout_marginStart="8dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="center"
+        android:scaleType="centerCrop"
+        android:src="@drawable/baseline_check_circle_outline_24"
+        android:visibility="gone"/>
 
 </LinearLayout>

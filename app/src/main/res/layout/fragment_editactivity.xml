@@ -30,6 +30,24 @@
             android:textStyle="bold" />
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/originName"
+            android:layout_width="342dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="35dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="35dp">
+
+            <AutoCompleteTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Origin"
+                android:inputType="text"
+                android:padding="16dp"
+                android:textSize="16.5dp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/locName"
             android:layout_width="342dp"
             android:layout_height="wrap_content"
@@ -76,23 +94,7 @@
                 android:hint="Activity" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/originName"
-            android:layout_width="342dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="35dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginEnd="35dp">
 
-            <AutoCompleteTextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Origin"
-                android:inputType="text"
-                android:padding="16dp"
-                android:textSize="16.5dp" />
-
-        </com.google.android.material.textfield.TextInputLayout>
 
         <Switch
             android:id="@+id/completionSwitch"

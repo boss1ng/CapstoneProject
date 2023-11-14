@@ -38,6 +38,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -96,6 +97,9 @@ public class EditItineraryAdapter extends RecyclerView.Adapter<EditItineraryAdap
         // Setting the formatted text to the TextView
         holder.locationTextView.setText(spannableString);
 
+        // Call the method to load and set the location icon
+        holder.bindLocationIcon(location);
+
 
     }
 
@@ -110,6 +114,7 @@ public class EditItineraryAdapter extends RecyclerView.Adapter<EditItineraryAdap
         TextView locationTextView;
         ImageView editButton;
         ImageView deleteButton;
+        ImageView locationIcon;
 
 
         public EditItineraryViewHolder(View itemView) {
@@ -117,6 +122,7 @@ public class EditItineraryAdapter extends RecyclerView.Adapter<EditItineraryAdap
             timeTextView = itemView.findViewById(R.id.locationTime); // Replace with your TextView ID
             locationTextView = itemView.findViewById(R.id.locationName); // Replace with your TextView ID
             editButton = itemView.findViewById(R.id.edit);
+            locationIcon = itemView.findViewById(R.id.locationIcon);
 
             // Initialize other views
             deleteButton = itemView.findViewById(R.id.delete); // Replace with your delete button ID
@@ -152,6 +158,34 @@ public class EditItineraryAdapter extends RecyclerView.Adapter<EditItineraryAdap
                 }
             });
 
+        }
+        public void bindLocationIcon(String location) {
+            // Query the Firebase database to find the location
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Location");
+            Query query = databaseReference.orderByChild("Location").equalTo(location);
+
+            query.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        // Location data found
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            String link = snapshot.child("Link").getValue(String.class);
+
+                            // Use Picasso to load the image and set it into locationIcon
+                            Picasso.get().load(link).into(locationIcon);
+                        }
+                    } else {
+                        // Location data not found
+                        // You can set a default image or handle the case as needed
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    // Handle the error if any
+                }
+            });
         }
     }
     // Method to delete item from the database
@@ -264,7 +298,7 @@ public class EditItineraryAdapter extends RecyclerView.Adapter<EditItineraryAdap
                                 }
                             }
                         }
-                        if (dataSnapshot.getChildrenCount() == 2) {
+                        if (dataSnapshot.getChildrenCount() == 3) {
                             // Remove the day from the database
                             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Itinerary");
                             databaseReference.child(iterName).removeValue();

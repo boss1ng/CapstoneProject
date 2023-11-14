@@ -13,14 +13,16 @@
         android:layout_gravity="center_vertical"
         android:textSize="18sp"
         android:text="15:00"
+        android:gravity="center"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"/>
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/locationIcon"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:background="@drawable/logo" />
+        android:layout_gravity="center"
+        android:scaleType="centerCrop"/>
 
     <TextView
         android:id="@+id/locationName"

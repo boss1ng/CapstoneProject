@@ -2,6 +2,8 @@ package com.example.qsee;
 
 import static android.app.PendingIntent.getActivity;
 
+import static java.security.AccessController.getContext;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -38,6 +40,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -74,6 +77,7 @@ public class ItineraryViewAdapter extends RecyclerView.Adapter<ItineraryViewAdap
         // Bind data to your views here
         Itinerary data = dataList.get(position);
         holder.timeTextView.setText(data.getTime());
+
         // Assuming holder.locationTextView is your TextView
         String location = data.getLocation();
         String activity = data.getActivity();
@@ -96,6 +100,56 @@ public class ItineraryViewAdapter extends RecyclerView.Adapter<ItineraryViewAdap
         // Setting the formatted text to the TextView
         holder.locationTextView.setText(spannableString);
 
+        // Call the method to load and set the location icon
+        holder.bindLocationIcon(location);
+
+        // Define a SimpleDateFormat pattern to match your time format
+        SimpleDateFormat inputFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+
+        // Parse the time string and convert it to a Date object
+        try {
+            Date timeDate = inputFormat.parse(data.getTime());
+
+            // Now, you can use the timeDate object as needed in your loop
+            // For example, you can format it to a different time format
+            SimpleDateFormat outputFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+            String formattedTime = outputFormat.format(timeDate);
+
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Itinerary");
+            Query activityQuery = databaseReference.child(iterName);
+            activityQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for (DataSnapshot daySnapshot : dataSnapshot.getChildren()) {
+                        for (DataSnapshot timeSnapshot : daySnapshot.getChildren()) {
+                            String retrievedLoc = timeSnapshot.child("location").getValue(String.class);
+                            if (timeSnapshot.getKey().equals(formattedTime) && retrievedLoc.equals(location)) {
+
+                                // Remove the old timeSnapshot
+                                if(timeSnapshot.child("status").getValue(String.class).equals("Completed")){
+                                    holder.checkIcon.setVisibility(View.VISIBLE);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    // Handle any errors that occur during the query
+                    Log.e("FirebaseError", "Error: " + databaseError.getMessage());
+                }
+
+            });
+
+
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+
+
 
     }
 
@@ -108,14 +162,47 @@ public class ItineraryViewAdapter extends RecyclerView.Adapter<ItineraryViewAdap
     public class ItineraryViewHolder extends RecyclerView.ViewHolder {
         TextView timeTextView;
         TextView locationTextView;
+        ImageView locationIcon;
+        ImageView checkIcon;
 
 
         public ItineraryViewHolder(View itemView) {
             super(itemView);
             timeTextView = itemView.findViewById(R.id.locationTime); // Replace with your TextView ID
             locationTextView = itemView.findViewById(R.id.locationName); // Replace with your TextView ID
+            locationIcon = itemView.findViewById(R.id.locationIcon);
+            checkIcon = itemView.findViewById(R.id.checkIcon);
 
         }
+        public void bindLocationIcon(String location) {
+            // Query the Firebase database to find the location
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Location");
+            Query query = databaseReference.orderByChild("Location").equalTo(location);
+
+            query.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        // Location data found
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            String link = snapshot.child("Link").getValue(String.class);
+
+                            // Use Picasso to load the image and set it into locationIcon
+                            Picasso.get().load(link).into(locationIcon);
+                        }
+                    } else {
+                        // Location data not found
+                        // You can set a default image or handle the case as needed
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    // Handle the error if any
+                }
+            });
+        }
     }
+
 }
 

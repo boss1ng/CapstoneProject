@@ -6,11 +6,12 @@
     android:orientation="horizontal"
     android:padding="8dp">
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/groupIcon"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:background="@drawable/profilepicture" />
+        android:layout_gravity="center"
+        android:scaleType="centerCrop" />
 
     <TextView
         android:id="@+id/memberName"

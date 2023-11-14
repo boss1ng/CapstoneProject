@@ -118,7 +118,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/originInput"
+                android:id="@+id/locationInput"
                 android:layout_width="212dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -140,7 +140,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/locationInput"
+                android:id="@+id/originInput"
                 android:layout_width="212dp"
                 android:layout_height="wrap_content"
                 app:boxBackgroundMode="outline"

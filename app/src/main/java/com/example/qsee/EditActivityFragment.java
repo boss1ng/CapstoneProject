@@ -210,30 +210,10 @@ public class EditActivityFragment extends Fragment {
                                             String retrievedLoc = timeSnapshot.child("location").getValue(String.class);
                                             if (timeSnapshot.getKey().equals(finalTime) && retrievedLoc.equals(location)) {
                                                 // Remove the old timeSnapshot
-                                                timeSnapshot.getRef().removeValue();
 
                                                 // Add a new timeSnapshot with the updatedTime as the key
-                                                DatabaseReference newTimeSnapshot = daySnapshot.child(militaryTime).getRef();
-                                                newTimeSnapshot.child("location").setValue(updatedLocation);
-                                                newTimeSnapshot.child("activity").setValue(updatedActivity);
-                                                newTimeSnapshot.child("origin").setValue(updatedOrigin);
+                                                DatabaseReference newTimeSnapshot = daySnapshot.child(finalTime).getRef();
                                                 newTimeSnapshot.child("status").setValue("Completed");
-                                                //newTimeSnapshot.child("status").setValue("incomplete");
-
-                                                // Delete the entire itinerary if status is complete
-                                                if ("Completed".equals(status)) {
-                                                    DatabaseReference timeSnapshotRef = daySnapshot.child(finalTime).getRef();
-                                                    timeSnapshotRef.removeValue();
-
-                                                    // Check if iterName is not null and has no children, then remove it
-                                                    if (iterName != null && !dataSnapshot.hasChildren()) {
-                                                        databaseReference.child(iterName).removeValue();
-                                                    }
-                                                }
-
-                                                //if(iterName == null){
-                                               //         databaseReference.child(iterName).removeValue();
-                                                //}
 
                                                 showRatingDialog();
                                                 // Show a toast to confirm the save
