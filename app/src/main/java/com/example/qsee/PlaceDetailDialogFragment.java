@@ -116,7 +116,7 @@ public class PlaceDetailDialogFragment extends DialogFragment {
         String isUserInQuezonCity = getArguments().getString("isUserInQuezonCity");
         //Toast.makeText(getContext(), isUserInQuezonCity, Toast.LENGTH_LONG).show();
 
-        if (isUserInQuezonCity.equals("true"))
+        if (isUserInQuezonCity.equals("TRUE"))
             directionsButton.setEnabled(true);
         else
             directionsButton.setEnabled(true);

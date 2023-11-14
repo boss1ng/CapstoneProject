@@ -79,8 +79,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     Double currentUserLocationLat;
     Double currentUserLocationLong;
-    private double placeLatitude;
-    private double placeLongitude;
+    private double placeLatitude = 0.0;
+    private double placeLongitude = 0.0;
 
     boolean isUserInQuezonCity = true;
 
@@ -402,20 +402,30 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
                 Bundle args = getArguments();
                 if (args != null) {
-                    placeLatitude = args.getDouble("placeLatitude", currentUserLocationLat);
-                    placeLongitude = args.getDouble("placeLongitude", currentUserLocationLong);
+                    //placeLatitude = args.getDouble("placeLatitude", currentUserLocationLat);
+                    //placeLongitude = args.getDouble("placeLongitude", currentUserLocationLong);
 
-                    // Log the placeLatitude and placeLongitude values
-                    Log.d("Debug", "placeLatitude: " + placeLatitude);
-                    Log.d("Debug", "placeLongitude: " + placeLongitude);
+                    placeLatitude = args.getDouble("placeLatitude");
+                    placeLongitude = args.getDouble("placeLongitude");
 
-                    // Create a LatLng object with the place's latitude and longitude
-                    LatLng placeLatLng = new LatLng(placeLatitude, placeLongitude);
+                    if (placeLatitude == 0.0 && placeLongitude == 0.0) {
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 13));
+                    }
 
-                    // Move the camera to the specified location and set an appropriate zoom level
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(placeLatLng, maxZoomLevel)); // Adjust the zoom level as needed
+                    else {
+                        // Log the placeLatitude and placeLongitude values
+                        Log.d("Debug", "placeLatitude: " + placeLatitude);
+                        Log.d("Debug", "placeLongitude: " + placeLongitude);
 
+                        // Create a LatLng object with the place's latitude and longitude
+                        LatLng placeLatLng = new LatLng(placeLatitude, placeLongitude);
+
+                        // Move the camera to the specified location and set an appropriate zoom level
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(placeLatLng, maxZoomLevel)); // Adjust the zoom level as needed
+                    }
                 }
+
+
                 /*
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, minZoomLevel));
 
@@ -584,7 +594,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                                                         // The user is within Quezon City
                                                         // You can perform specific actions or display messages as needed.
                                                         Toast.makeText(getContext(), "WITHIN", Toast.LENGTH_LONG).show();
-                                                        args.putString("isUserInQuezonCity", "MISS KO NA KAT");
+                                                        args.putString("isUserInQuezonCity", "TRUW");
                                                     } else {
                                                         // The user is outside Quezon City
                                                         // You can handle this case accordingly.

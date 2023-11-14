@@ -1,12 +1,15 @@
 package com.example.qsee;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -19,6 +22,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -26,6 +30,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -41,6 +49,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProfileFragment extends Fragment {
+
+    private FusedLocationProviderClient fusedLocationProviderClient;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+    private LatLngBounds QUEZON_CITY_13 = new LatLngBounds(
+            new LatLng(14.637, 121.02),      // SW bounds
+            new LatLng(14.7289, 121.103));     // NE bounds
+    boolean isUserInQuezonCity = true;
+
+
     private TextView userFullNameTextView;
     private TextView userIdTextView;
     private TextView usernameTextView;
@@ -66,6 +83,9 @@ public class ProfileFragment extends Fragment {
 
         // Retrieve the username from the arguments
         userId = getArguments().getString("userId");
+
+        // Initialize the FusedLocationProviderClient
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
 
         // Call showNotificationCount to update the notification count
         showNotificationCount();
@@ -115,18 +135,62 @@ public class ProfileFragment extends Fragment {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Create an instance of the AddGlimpseFragment
-                AddGlimpseFragment addGlimpseFragment = new AddGlimpseFragment();
 
-                // Create a Bundle to pass the userId as an argument
-                Bundle args = new Bundle();
-                args.putString("userId", userId); // Replace "your_user_id_here" with the actual user ID
-                addGlimpseFragment.setArguments(args);
+                // Check if location permission is granted
+                if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED
+                        && ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
 
-                // Show the AddGlimpseFragment as a dialog
-                FragmentManager fragmentManager = getChildFragmentManager();
-                FragmentTransaction transaction = fragmentManager.beginTransaction();
-                addGlimpseFragment.show(transaction, "add_glimpse_dialog"); // You can provide a tag for the dialog
+                    // Request location permission if not granted
+                    requestPermissions(new String[]{
+                            android.Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                    }, LOCATION_PERMISSION_REQUEST_CODE);
+                }
+
+                // Get the user's last known location and move the camera there
+                fusedLocationProviderClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
+                    if (location != null) {
+                        double latitude = location.getLatitude();
+                        double longitude = location.getLongitude();
+
+                        isUserInQuezonCity = QUEZON_CITY_13.contains(new LatLng(latitude, longitude));
+
+                        if (isUserInQuezonCity) {
+                            // The user is within Quezon City
+                            // Create an instance of the AddGlimpseFragment
+                            AddGlimpseFragment addGlimpseFragment = new AddGlimpseFragment();
+
+                            // Create a Bundle to pass the userId as an argument
+                            Bundle args = new Bundle();
+                            args.putString("userId", userId); // Replace "your_user_id_here" with the actual user ID
+                            addGlimpseFragment.setArguments(args);
+
+                            // Show the AddGlimpseFragment as a dialog
+                            FragmentManager fragmentManager = getChildFragmentManager();
+                            FragmentTransaction transaction = fragmentManager.beginTransaction();
+                            addGlimpseFragment.show(transaction, "add_glimpse_dialog"); // You can provide a tag for the dialog
+                        }
+
+                        else {
+                            // The user is outside Quezon City
+                            addButton.setEnabled(false);
+
+                            Toast.makeText(getContext(), "You are outside Quezon City.", Toast.LENGTH_LONG).show();
+
+                            // Create a Handler to introduce a delay
+                            Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    // Display the second Toast with LENGTH_LONG duration after a delay
+                                    Toast.makeText(getContext(), "You won't be able to post.", Toast.LENGTH_LONG).show();
+                                }
+                            }, 3500); // 2000 milliseconds (2 seconds) delay
+                        }
+                    }
+                });
             }
         });
 

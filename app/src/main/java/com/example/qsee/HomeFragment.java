@@ -7,6 +7,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -29,6 +30,8 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
@@ -57,8 +60,13 @@ import java.util.Objects;
 import java.util.TimeZone;
 
 public class HomeFragment extends Fragment {
+    private LatLngBounds QUEZON_CITY_13 = new LatLngBounds(
+            new LatLng(14.637, 121.02),      // SW bounds
+            new LatLng(14.7289, 121.103));     // NE bounds
+    boolean isUserInQuezonCity = true;
 
-    private FusedLocationProviderClient fusedLocationProviderClient;
+
+        private FusedLocationProviderClient fusedLocationProviderClient;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private TextView textView;
     private TextView dateText;
@@ -171,25 +179,67 @@ public class HomeFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Handle FAB click here
-                // You can perform actions like opening a new activity, showing a dialog, etc.
-                // Create an instance of the AddGlimpseFragment
-                AddGlimpseFragment addGlimpseFragment = new AddGlimpseFragment();
 
-                if (getBundle != null) {
-                    String userID = getBundle.getString("userId");
+                // Check if location permission is granted
+                if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED
+                        && ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
 
-                    // Create a Bundle to pass the userId as an argument
-                    Bundle args = new Bundle();
-                    args.putString("userId", userID); // Replace "your_user_id_here" with the actual user ID
-                    args.putString("fromHome", "From Home Fragment");
-                    addGlimpseFragment.setArguments(args);
+                    // Request location permission if not granted
+                    requestPermissions(new String[]{
+                            android.Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                    }, LOCATION_PERMISSION_REQUEST_CODE);
                 }
 
-                // Show the AddGlimpseFragment as a dialog
-                FragmentManager fragmentManager = getChildFragmentManager();
-                FragmentTransaction transaction = fragmentManager.beginTransaction();
-                addGlimpseFragment.show(transaction, "add_glimpse_dialog"); // You can provide a tag for the dialog
+                // Get the user's last known location and move the camera there
+                fusedLocationProviderClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
+                    if (location != null) {
+                        double latitude = location.getLatitude();
+                        double longitude = location.getLongitude();
+
+                        isUserInQuezonCity = QUEZON_CITY_13.contains(new LatLng(latitude, longitude));
+
+                        if (isUserInQuezonCity) {
+                            // The user is within Quezon City
+                            // Create an instance of the AddGlimpseFragment
+                            AddGlimpseFragment addGlimpseFragment = new AddGlimpseFragment();
+
+                            if (getBundle != null) {
+                                String userID = getBundle.getString("userId");
+
+                                // Create a Bundle to pass the userId as an argument
+                                Bundle args = new Bundle();
+                                args.putString("userId", userID); // Replace "your_user_id_here" with the actual user ID
+                                args.putString("fromHome", "From Home Fragment");
+                                addGlimpseFragment.setArguments(args);
+                            }
+
+                            // Show the AddGlimpseFragment as a dialog
+                            FragmentManager fragmentManager = getChildFragmentManager();
+                            FragmentTransaction transaction = fragmentManager.beginTransaction();
+                            addGlimpseFragment.show(transaction, "add_glimpse_dialog"); // You can provide a tag for the dialog
+                        }
+
+                        else {
+                            // The user is outside Quezon City
+                            fab.setEnabled(false);
+
+                            Toast.makeText(getContext(), "You are outside Quezon City.", Toast.LENGTH_LONG).show();
+
+                            // Create a Handler to introduce a delay
+                            Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    // Display the second Toast with LENGTH_LONG duration after a delay
+                                    Toast.makeText(getContext(), "You won't be able to post.", Toast.LENGTH_LONG).show();
+                                }
+                            }, 3500); // 2000 milliseconds (2 seconds) delay
+                        }
+                    }
+                });
             }
         });
 
