@@ -66,16 +66,16 @@ dependencies {
     // Google Maps SDK
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation ("com.google.maps.android:android-maps-utils:x.y.z")
-        // OLDER
-        // implementation("com.google.android.gms:play-services-maps:17.0.0")
+    // OLDER
+    // implementation("com.google.android.gms:play-services-maps:17.0.0")
 
     // Places API
     implementation("com.google.android.libraries.places:places:3.2.0")
 
     // Current Location
     implementation("com.google.android.gms:play-services-location:21.0.1")
-        // OLDER
-        // implementation("com.google.android.gms:play-services-location:17.0.0")
+    // OLDER
+    // implementation("com.google.android.gms:play-services-location:17.0.0")
 
     //
     implementation ("com.google.maps.android:android-maps-utils:3.5.3")
@@ -87,19 +87,19 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:adapter-rxjava2:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-        // OLDER VERSION
-        // implementation("com.squareup.retrofit2:retrofit:2.4.0")
-        // implementation("com.squareup.retrofit2:adapter-rxjava2:2.4.0")
-        // implementation("com.squareup.retrofit2:converter-gson:2.3.0")
+    // OLDER VERSION
+    // implementation("com.squareup.retrofit2:retrofit:2.4.0")
+    // implementation("com.squareup.retrofit2:adapter-rxjava2:2.4.0")
+    // implementation("com.squareup.retrofit2:converter-gson:2.3.0")
 
     // RX
     implementation("io.reactivex.rxjava2:rxjava:2.2.21")
     implementation("com.jakewharton.rxrelay2:rxrelay:2.1.1")
     implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
-        // OLDER VERSION
-        // implementation("io.reactivex.rxjava2:rxjava:2.2.2")
-        // implementation("com.jakewharton.rxrelay2:rxrelay:2.0.0")
-        // implementation("io.reactivex.rxjava2:rxandroid:2.0.2")
+    // OLDER VERSION
+    // implementation("io.reactivex.rxjava2:rxjava:2.2.2")
+    // implementation("com.jakewharton.rxrelay2:rxrelay:2.0.0")
+    // implementation("io.reactivex.rxjava2:rxandroid:2.0.2")
 
     // ImageView from Firebase
     implementation ("com.squareup.picasso:picasso:2.71828")
