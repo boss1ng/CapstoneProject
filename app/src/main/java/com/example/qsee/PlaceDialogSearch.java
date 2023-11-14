@@ -23,6 +23,8 @@ import androidx.fragment.app.FragmentTransaction;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.squareup.picasso.Picasso;
 
+import java.text.DecimalFormat;
+
 public class PlaceDialogSearch extends DialogFragment {
 
 
@@ -84,6 +86,7 @@ public class PlaceDialogSearch extends DialogFragment {
 
         String placeRating = getArguments().getString("placeRating");
         Double doubleRating = Double.parseDouble(placeRating);
+
         String placeLink = getArguments().getString("placeLink");
 
         String placePrice;
@@ -105,7 +108,9 @@ public class PlaceDialogSearch extends DialogFragment {
         nameTextView.setText(placeName);
         addressTextView.setText(placeAddress);
         descriptionTextView.setText(placeDescription);
-        ratingTextView.setText(String.valueOf(doubleRating));
+        DecimalFormat df = new DecimalFormat(doubleRating == 0 ? "0" : "#0.0");
+        String formattedRating = df.format(doubleRating);
+        ratingTextView.setText(String.valueOf(formattedRating));
         Picasso.get()
                 .load(placeLink)
                 .into(imageViewLocation);

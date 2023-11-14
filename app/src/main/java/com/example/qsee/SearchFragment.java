@@ -29,6 +29,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -67,38 +68,43 @@ public class SearchFragment extends Fragment {
 
         DatabaseReference destinationsRef = FirebaseDatabase.getInstance().getReference("Location");
 
-        destinationsRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                List<DestinationData> destinationList = new ArrayList<>();
+            destinationsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    List<DestinationData> destinationList = new ArrayList<>();
 
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    String ratingStr = snapshot.child("AverageRate").getValue(String.class);
-                    if (ratingStr != null) {
-                        double rating = Double.parseDouble(ratingStr);
-                        if (rating >= 1.0 && rating <= 5.0) {
-                            String name = snapshot.child("Location").getValue(String.class);
-                            String imageUrl = snapshot.child("Link").getValue(String.class);
-                            destinationList.add(new DestinationData(name, imageUrl, rating));
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        String ratingStr = snapshot.child("AverageRate").getValue(String.class);
+                        if (ratingStr != null) {
+                            double rating = Double.parseDouble(ratingStr);
+                            if (rating >= 1.0 && rating <= 5.0) {
+                                String name = snapshot.child("Location").getValue(String.class);
+                                String imageUrl = snapshot.child("Link").getValue(String.class);
+
+                                // Format the rating to one decimal place
+                                DecimalFormat df = new DecimalFormat(rating == 0 ? "0" : "#0.0");
+                                String formattedRating = df.format(rating);
+
+                                destinationList.add(new DestinationData(name, imageUrl, Double.parseDouble(formattedRating)));
+                            }
                         }
                     }
+
+                    // Sort the destinations by rating in descending order
+                    Collections.sort(destinationList, (d1, d2) -> Double.compare(d2.getRating(), d1.getRating()));
+
+                    // Take the top 5 destinations (or less if there are fewer than 5)
+                    List<DestinationData> top5Destinations = destinationList.subList(0, Math.min(5, destinationList.size()));
+
+                    // After fetching, filtering, and sorting data, update the UI with the top 5 destinations
+                    updateUIWithTop5Destinations(top5Destinations, userID);
                 }
 
-                // Sort the destinations by rating in descending order
-                Collections.sort(destinationList, (d1, d2) -> Double.compare(d2.getRating(), d1.getRating()));
-
-                // Take the top 5 destinations (or less if there are fewer than 5)
-                List<DestinationData> top5Destinations = destinationList.subList(0, Math.min(5, destinationList.size()));
-
-                // After fetching, filtering, and sorting data, update the UI with the top 5 destinations
-                updateUIWithTop5Destinations(top5Destinations,userID);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // Handle database error
-            }
-        });
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    // Handle database error
+                }
+            });
 
 
 
@@ -107,7 +113,8 @@ public class SearchFragment extends Fragment {
 
 
 
-        accommodationsButton.setOnClickListener(new View.OnClickListener() {
+
+            accommodationsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 openCategoryListFragment("Accommodations",userID);
