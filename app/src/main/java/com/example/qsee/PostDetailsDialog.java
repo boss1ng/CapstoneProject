@@ -182,7 +182,7 @@ public class PostDetailsDialog extends DialogFragment {
                     public boolean onMenuItemClick(MenuItem menuItem) {
                         // Handle menu item click
                         if (menuItem.getItemId() == R.id.editPost) {
-                            //Toast.makeText(getContext(), "EDIT PRESSED", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(getContext(), "EDIT PRESSED", Toast.LENGTH_LONG).show();
                             showEditCaptionDialog();
                         } else if (menuItem.getItemId() == R.id.deletePost) {
                             showDeleteConfirmationDialog(userId, location, category, caption);
@@ -263,12 +263,12 @@ public class PostDetailsDialog extends DialogFragment {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
-                                        Toast.makeText(getContext(), "POST DELETED", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getContext(), "Post Deleted.", Toast.LENGTH_LONG).show();
                                         // Dismiss the dialog or update the UI as necessary
                                         dismiss();
                                     } else {
                                         // Handle the error
-                                        Toast.makeText(getContext(), "ERROR: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getContext(), "ERROR: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                                     }
                                 }
                             });
@@ -276,17 +276,17 @@ public class PostDetailsDialog extends DialogFragment {
                         }
                     }
                     // Handle the case where no matching post was found
-                    Toast.makeText(getContext(), "No matching post found for criteria", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "No matching post found for criteria.", Toast.LENGTH_LONG).show();
                 } else {
                     // Handle the case where no matching post was found for the userId
-                    Toast.makeText(getContext(), "No matching post found for user ID: " + userId, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "No matching post found for user ID: " + userId, Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 // Handle any errors that occur during the query
-                Toast.makeText(getContext(), "Database error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Database error: " + databaseError.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -347,10 +347,10 @@ public class PostDetailsDialog extends DialogFragment {
                                     if (task.isSuccessful()) {
                                         // Update the UI to show the new caption
                                         dialogCaptionTextView.setText(newCaption);
-                                        Toast.makeText(getContext(), "Caption updated", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getContext(), "Caption updated.", Toast.LENGTH_LONG).show();
                                     } else {
                                         // Handle the error
-                                        Toast.makeText(getContext(), "Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getContext(), "Error: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                                     }
                                 }
                             });
@@ -358,17 +358,17 @@ public class PostDetailsDialog extends DialogFragment {
                         }
                     }
                     // Handle the case where the old caption, category, or location was not found
-                    Toast.makeText(getContext(), "No matching post found for criteria", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "No matching post found for criteria.", Toast.LENGTH_LONG).show();
                 } else {
                     // Handle the case where no matching post was found for the userId
-                    Toast.makeText(getContext(), "No matching post found for user ID: " + userId, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "No matching post found for user ID: " + userId, Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 // Handle any errors that occur during the query
-                Toast.makeText(getContext(), "Database error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Database error: " + databaseError.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }

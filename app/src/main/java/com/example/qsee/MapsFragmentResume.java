@@ -60,8 +60,8 @@ public class MapsFragmentResume extends DialogFragment {
         if (getBundle != null) {
             String userID = getBundle.getString("userId");
             String placeName = getBundle.getString("placeName");
-            //Toast.makeText(getContext(), userID, Toast.LENGTH_SHORT).show();
-            //Toast.makeText(getContext(), placeName, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getContext(), userID, Toast.LENGTH_LONG).show();
+            //Toast.makeText(getContext(), placeName, Toast.LENGTH_LONG).show();
         }
 
         /*

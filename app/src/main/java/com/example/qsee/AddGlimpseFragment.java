@@ -210,7 +210,7 @@ public class AddGlimpseFragment extends DialogFragment {
         if (cameraIntent.resolveActivity(context.getPackageManager()) != null) {
             startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
         } else {
-            Toast.makeText(context, "No camera app found", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "No camera app found", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -308,7 +308,7 @@ public class AddGlimpseFragment extends DialogFragment {
                 getUserLocation();
             } else {
                 // Permission denied, handle this case (e.g., show a message to the user).
-                Toast.makeText(context, "Location permission denied. Location data won't be available.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Location permission denied. Location data won't be available.", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -451,7 +451,7 @@ public class AddGlimpseFragment extends DialogFragment {
 
                 else {
                     // Handle the case where location data is not available
-                    Toast.makeText(context, "Location data not available", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Location data not available", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -512,7 +512,7 @@ public class AddGlimpseFragment extends DialogFragment {
                                     pushKey[0] = postSnapshot.getKey();
 
                                     String numberPostsFirebase = postSnapshot.child("NumPosts").getValue(String.class);
-                                    //Toast.makeText(getContext(), numberReportsFirebase, Toast.LENGTH_SHORT).show();
+                                    //Toast.makeText(getContext(), numberReportsFirebase, Toast.LENGTH_LONG).show();
 
                                     // Access the "Users" node under the specific rss
                                     DataSnapshot usersSnapshot = postSnapshot.child("Users");
@@ -522,8 +522,8 @@ public class AddGlimpseFragment extends DialogFragment {
                                         String key = userSnapshot.getKey(); // Get the key ("-NhtkyoZUylTyqoeHvLQ")
                                         String value = userSnapshot.getValue(String.class); // Get the value ("5456073013")
 
-                                        //Toast.makeText(getContext(), key, Toast.LENGTH_SHORT).show();
-                                        //Toast.makeText(getContext(), value, Toast.LENGTH_SHORT).show();
+                                        //Toast.makeText(getContext(), key, Toast.LENGTH_LONG).show();
+                                        //Toast.makeText(getContext(), value, Toast.LENGTH_LONG).show();
 
                                         if (value.equals(userId)) {
                                             isUserExisting[0] = true;

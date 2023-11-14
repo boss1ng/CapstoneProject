@@ -103,7 +103,7 @@ public class sendOtp extends AppCompatActivity {
                 // Check if the timer is already running
                 if (resendOtpTimer != null && !sendOtpAgainTextView.isEnabled()) {
                     // Notify the user with a Toast message that they need to wait for the timer to finish
-                    Toast.makeText(sendOtp.this, "Please wait for the timer to end before requesting a new OTP.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(sendOtp.this, "Please wait for the timer to end before requesting a new OTP.", Toast.LENGTH_LONG).show();
                 } else {
                     // Disable the button and start the timer
                     view.setEnabled(false);
@@ -141,13 +141,13 @@ public class sendOtp extends AppCompatActivity {
             @Override
             public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
                 // Handle successful verification completion here
-                Toast.makeText(getApplicationContext(), "Verification completed successfully!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Verification completed successfully!", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onVerificationFailed(@NonNull FirebaseException e) {
                 // Handle verification failure here
-                Toast.makeText(getApplicationContext(), "Verification failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Verification failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
 
             @Override
@@ -159,7 +159,7 @@ public class sendOtp extends AppCompatActivity {
                 // myVerificationId = verificationId;
                 myVerificationId = verificationId;
                 sendOtp.this.forceResendingToken = forceResendingToken;
-                Toast.makeText(getApplicationContext(), "Verification code has been sent", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Verification code has been sent.", Toast.LENGTH_LONG).show();
                 resendOtpTimer.start();
             }
         };
@@ -221,13 +221,13 @@ public class sendOtp extends AppCompatActivity {
                                         @Override
                                         public void onCancelled(@NonNull DatabaseError databaseError) {
                                             // Handle database error, if any
-                                            Toast.makeText(sendOtp.this, "Database error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(sendOtp.this, "Database error: " + databaseError.getMessage(), Toast.LENGTH_LONG).show();
                                         }
                                     });
                             showSuccessDialog();
                         } else {
                             // Verification failed
-                            Toast.makeText(getApplicationContext(), "OTP does not match", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "OTP does not match.", Toast.LENGTH_LONG).show();
                         }
                     }
                 });

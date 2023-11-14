@@ -77,7 +77,7 @@ public class FilterCategories extends DialogFragment {
 
         if (getBundle != null) {
             String userID = getBundle.getString("userId");
-            Toast.makeText(getContext(), userID, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), userID, Toast.LENGTH_LONG).show();
         }
 
         // For Reading the Database
@@ -92,10 +92,10 @@ public class FilterCategories extends DialogFragment {
         //Bundle getBundle = getArguments();
         if (getBundle != null) {
             String categoryName = getBundle.getString("categoryName");
-            //Toast.makeText(view.getContext(), categoryName, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(view.getContext(), categoryName, Toast.LENGTH_LONG).show();
 
             if (categoryName != null) {
-                //Toast.makeText(view.getContext(), categoryName, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(view.getContext(), categoryName, Toast.LENGTH_LONG).show();
 
                 if (categoryName.contains("+")) {
                     //Toast.makeText(view.getContext(), categoryName, Toast.LENGTH_LONG).show();
@@ -142,7 +142,7 @@ public class FilterCategories extends DialogFragment {
                 }
 
                 else {
-                    // Toast.makeText(view.getContext(), categoryName, Toast.LENGTH_SHORT).show();
+                    // Toast.makeText(view.getContext(), categoryName, Toast.LENGTH_LONG).show();
 
                     databaseReference.addValueEventListener(new ValueEventListener() {
                         @Override

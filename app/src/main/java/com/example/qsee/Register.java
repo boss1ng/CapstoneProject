@@ -134,7 +134,7 @@ public class Register extends AppCompatActivity {
                         TextUtils.isEmpty(username) || TextUtils.isEmpty(password)) {
 
                     // Show an error Toast message if any field is empty
-                    Toast.makeText(Register.this, "Please fill all the fields", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Register.this, "Please fill all the fields.", Toast.LENGTH_LONG).show();
                     return; // Don't proceed with registration
                 }
 
@@ -145,28 +145,28 @@ public class Register extends AppCompatActivity {
                 } else {
                     // Password is not valid
                     // Show an error message
-                    Toast.makeText(Register.this, "Password must be at least 8 characters and include at least one uppercase letter, one lowercase letter, one special character, and one numeric character.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Register.this, "Password must be at least 8 characters and include at least one uppercase letter, one lowercase letter, one special character, and one numeric character.", Toast.LENGTH_LONG).show();
                     return; // Don't proceed with registration
                 }
 
                 // Check if the password and re-typed password match
                 if (!password.equals(reTypedPassword)) {
                     // Show an error Toast message if the passwords do not match
-                    Toast.makeText(Register.this, "Passwords do not match", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Register.this, "Passwords do not match.", Toast.LENGTH_LONG).show();
                     return; // Don't proceed with registration
                 }
 
                 // Check if the checkbox is checked
                 if (!consentCheckbox.isChecked()) {
                     // Show an error Toast message if the checkbox is not checked
-                    Toast.makeText(Register.this, "Please consent to share information as per Data Privacy Act of 2012", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Register.this, "Please consent to share information as per Data Privacy Act of 2012.", Toast.LENGTH_LONG).show();
                     return; // Don't proceed with registration
                 }
 
                 // Check if the username contains a "."
                 if (username.contains(".")) {
                     // Show an error Toast message if the username contains a "."
-                    Toast.makeText(Register.this, "Username cannot contain a period ('.')", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Register.this, "Username cannot contain a period ('.')", Toast.LENGTH_LONG).show();
                     return; // Don't proceed with registration
                 }
 
@@ -206,7 +206,7 @@ public class Register extends AppCompatActivity {
 
                         if (isUsernameTaken) {
                             // Username already exists, show an error message
-                            Toast.makeText(Register.this, "Username already exists. Choose a different username.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(Register.this, "Username already exists. Choose a different username.", Toast.LENGTH_LONG).show();
                         } else {
                             // Username is unique, proceed with registration
 
@@ -216,7 +216,7 @@ public class Register extends AppCompatActivity {
                                         @Override
                                         public void onSuccess(Void aVoid) {
                                             // Registration in Firebase was successful
-                                            Toast.makeText(Register.this, "You have been registered!", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(Register.this, "You have been registered.", Toast.LENGTH_LONG).show();
 
                                             // Redirect to MainActivity or perform any other desired actions
                                             Intent intent = new Intent(Register.this, MainActivity.class);
@@ -227,7 +227,7 @@ public class Register extends AppCompatActivity {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
                                             // Registration in Firebase failed
-                                            Toast.makeText(Register.this, "Registration failed. Please try again.", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(Register.this, "Registration failed. Please try again.", Toast.LENGTH_LONG).show();
                                         }
                                     });
                         }
@@ -236,7 +236,7 @@ public class Register extends AppCompatActivity {
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
                         // Handle database error, if any
-                        Toast.makeText(Register.this, "Database error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Register.this, "Database error: " + databaseError.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
             }

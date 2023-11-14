@@ -164,7 +164,7 @@ public class AddItineraryFragment extends Fragment {
                 dayItineraryAdapter.addItem(newItem); // Add the new item to the RecyclerView
                 addCounter[0]++;
             } else {
-                Toast.makeText(getContext(), "Maximum activities for a day reached.\nYou can add more in the edit option later.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Maximum activities for a day reached.\nYou can add more in the edit option later.", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -201,7 +201,7 @@ public class AddItineraryFragment extends Fragment {
                     addNewForm(formCount); // Increment the day count by 1
                     if (formCount == 4) {
                         addItineraryButton.setVisibility(View.GONE); // Hide the "Add Itinerary" button if formCount reaches 5
-                        Toast.makeText(getContext(), "Maximum number of days reached", Toast.LENGTH_SHORT).show(); // Show a toast when the maximum number of days is reached
+                        Toast.makeText(getContext(), "Maximum number of days reached", Toast.LENGTH_LONG).show(); // Show a toast when the maximum number of days is reached
                     }
                     if (formCount > 0) {
                         ImageButton deleteButton = view.findViewById(R.id.deleteForm);
@@ -262,13 +262,13 @@ public class AddItineraryFragment extends Fragment {
             String itineraryName = Objects.requireNonNull(itineraryNameTextInput.getEditText()).getText().toString();
 
             if (itineraryName.isEmpty()) {
-                Toast.makeText(getContext(), "Please fill in all fields for Day 1", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Please fill in all fields for Day 1", Toast.LENGTH_LONG).show();
             } else {
                 itineraryRef.orderByChild("iterName").equalTo(itineraryName).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()) {
-                            Toast.makeText(getContext(), "Itinerary name already exists. Please use a different name.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Itinerary name already exists. Please use a different name.", Toast.LENGTH_LONG).show();
                         } else {
                             boolean allFormsFilled = true;
                             RecyclerView defaultDayRecyclerView = view.findViewById(R.id.recyclerView);
@@ -278,7 +278,7 @@ public class AddItineraryFragment extends Fragment {
                             String defaultDate = Objects.requireNonNull(defaultDateInputLayout.getEditText()).getText().toString();
 
                             if (defaultDate.isEmpty()) {
-                                Toast.makeText(getContext(), "Please fill in all fields for Day 1", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), "Please fill in all fields for Day 1", Toast.LENGTH_LONG).show();
                                 allFormsFilled = false;
                             } else {
                                 for (int j = 0; j < 5; j++) {
@@ -297,7 +297,7 @@ public class AddItineraryFragment extends Fragment {
                                         String origin = Objects.requireNonNull(originInputLayout.getEditText()).getText().toString();
 
                                         if (time.isEmpty() || activity.isEmpty() || location.isEmpty() || origin.isEmpty()) {
-                                            Toast.makeText(getContext(), "Please fill in all fields for Day 1", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(getContext(), "Please fill in all fields for Day 1", Toast.LENGTH_LONG).show();
                                             allFormsFilled = false;
                                             break;
                                         }
@@ -312,7 +312,7 @@ public class AddItineraryFragment extends Fragment {
                                 String date = Objects.requireNonNull(dateInputLayout.getEditText()).getText().toString();
 
                                 if (date.isEmpty()) {
-                                    Toast.makeText(getContext(), "Please fill in all fields for Day " + (i + 2), Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getContext(), "Please fill in all fields for Day " + (i + 2), Toast.LENGTH_LONG).show();
                                     allFormsFilled = false;
                                     break;
                                 }
@@ -335,7 +335,7 @@ public class AddItineraryFragment extends Fragment {
                                         String origin = Objects.requireNonNull(originInputLayout.getEditText()).getText().toString();
 
                                         if (time.isEmpty() || activity.isEmpty() || location.isEmpty() || origin.isEmpty()) {
-                                            Toast.makeText(getContext(), "Please fill in all fields for Day " + (i + 2), Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(getContext(), "Please fill in all fields for Day " + (i + 2), Toast.LENGTH_LONG).show();
                                             allFormsFilled = false;
                                             break;
                                         }
@@ -521,7 +521,7 @@ public class AddItineraryFragment extends Fragment {
                                     e.printStackTrace();
                                 }
 
-                                Toast.makeText(getContext(), "Itinerary saved to Firebase", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), "Itinerary Saved.", Toast.LENGTH_LONG).show();
                                 FragmentManager fragmentManager = getParentFragmentManager();
                                 fragmentManager.popBackStack();
                             }
@@ -530,7 +530,7 @@ public class AddItineraryFragment extends Fragment {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Toast.makeText(getContext(), "Error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Error: " + databaseError.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
             }
@@ -580,7 +580,7 @@ public class AddItineraryFragment extends Fragment {
             // Check if the day count has reached 5 to hide the addItineraryButton
             if (dayCount == 4) {
                 addItineraryButton.setVisibility(View.GONE);
-                Toast.makeText(getContext(), "Maximum number of days reached", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Maximum number of days reached", Toast.LENGTH_LONG).show();
             }
 
 
@@ -668,7 +668,7 @@ public class AddItineraryFragment extends Fragment {
                     dayItineraryAdapter.addItem(newItem); // Add the new item to the RecyclerView
                     addCounter[0]++;
                 } else {
-                    Toast.makeText(getContext(), "Maximum activities for a day reached.\nYou can add more in the edit option later.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Maximum activities for a day reached.\nYou can add more in the edit option later.", Toast.LENGTH_LONG).show();
                 }
             });
 
@@ -740,7 +740,7 @@ public class AddItineraryFragment extends Fragment {
                                 if (selectedYear < calendar.get(Calendar.YEAR) ||
                                         (selectedYear == calendar.get(Calendar.YEAR) && monthOfYear < calendar.get(Calendar.MONTH)) ||
                                         (selectedYear == calendar.get(Calendar.YEAR) && monthOfYear == calendar.get(Calendar.MONTH) && dayOfMonth <= calendar.get(Calendar.DAY_OF_MONTH))) {
-                                    Toast.makeText(getContext(), "Please select a date after " + date, Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getContext(), "Please select a date after " + date, Toast.LENGTH_LONG).show();
                                     dateAllowed = false;
                                     break;
                                 }

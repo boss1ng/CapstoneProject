@@ -76,7 +76,7 @@ public class AddUserFinder extends DialogFragment {
                     // Retrieve user details (firstname and lastname) based on userId
                     retrieveUserDetails(enteredUserId);
                 } else {
-                    Toast.makeText(getActivity(), "Please enter a User ID", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Please enter a User ID", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -102,7 +102,7 @@ public class AddUserFinder extends DialogFragment {
                     // Display the AddUserToGroup dialog with user details
                     showAddUserToGroupDialog(userId, groupName, member, firstName, lastName);
                 } else {
-                    Toast.makeText(getActivity(), "User does not exist", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "User does not exist", Toast.LENGTH_LONG).show();
                 }
             }
 

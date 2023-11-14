@@ -228,14 +228,14 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
                                 notifyItemRangeChanged(position, locationList.size());
 
                                 // Display a toast message
-                                Toast.makeText(context, "Itinerary deleted", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, "Itinerary deleted.", Toast.LENGTH_LONG).show();
                             })
                             .setNegativeButton("No", (dialog, which) -> dialog.dismiss());
 
                     builder.create().show();
                 } else {
                     // Current user is not the admin, show a toast message or any other notification
-                    Toast.makeText(context, "Only the owner can delete the itinerary", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Only the owner can delete the itinerary.", Toast.LENGTH_LONG).show();
                 }
             }
 

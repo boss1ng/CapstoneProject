@@ -109,12 +109,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     boolean isUserAlreadyMember = isUserAlreadyMember(group, member);
 
                     if (adminUserId != null && adminUserId.equals(member)) {
-                        Toast.makeText(context, "You are the admin of the group.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "You are the admin of the group.", Toast.LENGTH_LONG).show();
                     } else if (isUserAlreadyMember) {
-                        Toast.makeText(context, "User is already a member of the group", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "User is already a member of the group.", Toast.LENGTH_LONG).show();
                     } else {
                         // User is not the admin and not already a member, proceed with adding.
-                        Toast.makeText(context, "Successfully joined " + groupName, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Successfully joined " + groupName, Toast.LENGTH_LONG).show();
 
                         // Find the next available member number
                         int nextMemberNumber = 1;
@@ -172,7 +172,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     notifyDataSetChanged();
 
                     // Notify the user that the group invitation has been rejected
-                    Toast.makeText(context, "Group invitation rejected", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Group invitation rejected.", Toast.LENGTH_LONG).show();
                 } else {
                     // Handle the error
                     Log.e("RemoveNotification", "Error removing notification from the database: " + task.getException().getMessage());

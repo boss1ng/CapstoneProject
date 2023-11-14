@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
                 // Check if the username is empty
                 String username = unameInputLayout.getEditText().getText().toString();
                 if (TextUtils.isEmpty(username)) {
-                    Toast.makeText(MainActivity.this, "Please enter your username", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Please enter your username.", Toast.LENGTH_LONG).show();
                     return; // Don't proceed if the username is empty
                 }
 
@@ -96,14 +96,14 @@ public class MainActivity extends AppCompatActivity {
 
                         if (!usernameExists) {
                             // Username does not exist in the database
-                            Toast.makeText(MainActivity.this, "Username not found", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, "Username not found.", Toast.LENGTH_LONG).show();
                         }
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
                         // Handle database error, if any
-                        Toast.makeText(MainActivity.this, "Database error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "Database error: " + databaseError.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
             }
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
         String password = passInputLayout.getEditText().getText().toString();
 
         if (TextUtils.isEmpty(username) || TextUtils.isEmpty(password)) {
-            Toast.makeText(this, "Please enter your username and password", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please enter your username and password.", Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -154,13 +154,13 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 // No matching username and password found
-                Toast.makeText(MainActivity.this, "Username or Password is incorrect.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Username or Password is incorrect.", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 // Handle database error, if any
-                Toast.makeText(MainActivity.this, "Database error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Database error: " + databaseError.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }

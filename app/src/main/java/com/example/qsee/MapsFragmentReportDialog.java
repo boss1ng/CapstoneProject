@@ -55,8 +55,8 @@ public class MapsFragmentReportDialog extends DialogFragment {
         if (getBundle != null) {
             String userID = getBundle.getString("userId");
             String placeName = getBundle.getString("placeName");
-            //Toast.makeText(getContext(), userID, Toast.LENGTH_SHORT).show();
-            //Toast.makeText(getContext(), placeName, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getContext(), userID, Toast.LENGTH_LONG).show();
+            //Toast.makeText(getContext(), placeName, Toast.LENGTH_LONG).show();
         }
 
         /*
@@ -149,7 +149,7 @@ public class MapsFragmentReportDialog extends DialogFragment {
                             pushKey[0] = reportSnapshot.getKey();
 
                             String numberReportsFirebase = reportSnapshot.child("NumReports").getValue(String.class);
-                            //Toast.makeText(getContext(), numberReportsFirebase, Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(getContext(), numberReportsFirebase, Toast.LENGTH_LONG).show();
 
                             // Access the "Users" node under the specific report
                             DataSnapshot usersSnapshot = reportSnapshot.child("Users");
@@ -159,8 +159,8 @@ public class MapsFragmentReportDialog extends DialogFragment {
                                 String key = userSnapshot.getKey(); // Get the key ("-NhtkyoZUylTyqoeHvLQ")
                                 String value = userSnapshot.getValue(String.class); // Get the value ("5456073013")
 
-                                //Toast.makeText(getContext(), key, Toast.LENGTH_SHORT).show();
-                                //Toast.makeText(getContext(), value, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(getContext(), key, Toast.LENGTH_LONG).show();
+                                //Toast.makeText(getContext(), value, Toast.LENGTH_LONG).show();
 
                                 if (value.equals(userID)) {
                                     isUserExisting[0] = true;
@@ -197,7 +197,7 @@ public class MapsFragmentReportDialog extends DialogFragment {
                                                     // Delete Location record from Firebase Realtime Database
                                                     placeSnapshot.getRef().removeValue();
 
-                                                    //Toast.makeText(getContext(), filename, Toast.LENGTH_SHORT).show();
+                                                    //Toast.makeText(getContext(), filename, Toast.LENGTH_LONG).show();
 
                                                     //FirebaseApp.initializeApp(getContext());
 
@@ -215,7 +215,7 @@ public class MapsFragmentReportDialog extends DialogFragment {
                                                         public void onSuccess(Void aVoid) {
                                                             // File deleted successfully
                                                             // You can add your logic here
-                                                            //Toast.makeText(getContext(), "Successfully deleted.", Toast.LENGTH_SHORT).show();
+                                                            //Toast.makeText(getContext(), "Successfully deleted.", Toast.LENGTH_LONG).show();
                                                         }
                                                     }).addOnFailureListener(new OnFailureListener() {
                                                         @Override
@@ -274,7 +274,7 @@ public class MapsFragmentReportDialog extends DialogFragment {
                         //String userIdFirebase = placeSnapshot.child("UserId").getValue(String.class);
 
                         if (establishmentNameFirebase.equals(placeName)) {
-                            //Toast.makeText(getContext(), "SAME", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(getContext(), "SAME", Toast.LENGTH_LONG).show();
                             isEstablishmentExisting[0] = true;
                             pushKey[0] = placeSnapshot.getKey();
 
@@ -289,8 +289,8 @@ public class MapsFragmentReportDialog extends DialogFragment {
                                         String key = userSnapshot.getKey(); // Get the key ("-NhtguWSv9lYhLe41ufh", "-Nhth0cET4hUsbSrxh0V")
                                         String value = userSnapshot.getValue(String.class); // Get the value ("5456073013", "9225443216")
 
-                                        Toast.makeText(getContext(), key, Toast.LENGTH_SHORT).show();
-                                        Toast.makeText(getContext(), value, Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getContext(), key, Toast.LENGTH_LONG).show();
+                                        Toast.makeText(getContext(), value, Toast.LENGTH_LONG).show();
 
                                         // Now, you can use the key and value as needed
                                         // ...
@@ -309,13 +309,13 @@ public class MapsFragmentReportDialog extends DialogFragment {
                                 int intReports = Integer.parseInt(numberReportsFirebase);
                                 ++intReports;
 
-                                Toast.makeText(getContext(), String.valueOf(intReports), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), String.valueOf(intReports), Toast.LENGTH_LONG).show();
 
                                 //placeSnapshot.child("NumReports").getRef().setValue(String.valueOf(intReports));
                             }
 
                             else {
-                                //Toast.makeText(getContext(), "NOT SAME", Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(getContext(), "NOT SAME", Toast.LENGTH_LONG).show();
                                 int intReports = Integer.parseInt(numberReportsFirebase);
                                 intReports++;
                                 placeSnapshot.getRef().child("NumReports").setValue(String.valueOf(intReports));
@@ -323,7 +323,7 @@ public class MapsFragmentReportDialog extends DialogFragment {
                                 Toast.makeText(getContext(), "Reported Successfully.", Toast.LENGTH_LONG).show();
                                 break;
 
-                                //Toast.makeText(getContext(), String.valueOf(intReports), Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(getContext(), String.valueOf(intReports), Toast.LENGTH_LONG).show();
                                 //placeSnapshot.child("NumReports").getRef().setValue(String.valueOf(intReports));
                             }
                              *
@@ -331,7 +331,7 @@ public class MapsFragmentReportDialog extends DialogFragment {
                         }
 
                         else
-                            Toast.makeText(getContext(), "NOT SAME", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "NOT SAME", Toast.LENGTH_LONG).show();
 
                     }
 
@@ -371,7 +371,7 @@ public class MapsFragmentReportDialog extends DialogFragment {
 
                         if (establishmentNameFirebase.equals(placeName)) {
                             pushKey[0] = placeSnapshot.getKey();
-                            //Toast.makeText(getContext(), pushKey[0], Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(getContext(), pushKey[0], Toast.LENGTH_LONG).show();
                         }
                     }
                 }
@@ -456,7 +456,7 @@ public class MapsFragmentReportDialog extends DialogFragment {
         }
 
         else {
-            //Toast.makeText(getContext(), "No getBundle", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getContext(), "No getBundle", Toast.LENGTH_LONG).show();
         }
     }
 

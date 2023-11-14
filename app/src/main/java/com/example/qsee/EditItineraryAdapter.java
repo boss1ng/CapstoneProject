@@ -199,7 +199,7 @@ public class EditItineraryAdapter extends RecyclerView.Adapter<EditItineraryAdap
                                                 public void onSuccess(Void aVoid) {
                                                     dataList.remove(position);
                                                     notifyItemRemoved(position);
-                                                    Toast.makeText(context, "Activity deleted", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(context, "Activity deleted.", Toast.LENGTH_LONG).show();
 
                                                     TextView dayTitleTextView = null;
                                                     ImageView optD = null;
@@ -246,8 +246,8 @@ public class EditItineraryAdapter extends RecyclerView.Adapter<EditItineraryAdap
                                                         databaseReference.child(iterName).removeValue();
                                                         dataList.remove(position);
                                                         notifyItemRemoved(position);
-                                                        //Toast.makeText(context, "Activity deleted", Toast.LENGTH_SHORT).show();
-                                                        Toast.makeText(context, "Last activity removed, The Itinerary will be deleted.", Toast.LENGTH_SHORT).show();
+                                                        //Toast.makeText(context, "Activity deleted", Toast.LENGTH_LONG).show();
+                                                        Toast.makeText(context, "Last activity removed, The Itinerary will be deleted.", Toast.LENGTH_LONG).show();
 
                                                         // Pop back the fragment when the itinerary is deleted
                                                         FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
@@ -258,7 +258,7 @@ public class EditItineraryAdapter extends RecyclerView.Adapter<EditItineraryAdap
                                             .addOnFailureListener(new OnFailureListener() {
                                                 @Override
                                                 public void onFailure(@NonNull Exception e) {
-                                                    Toast.makeText(context, "Item not deleted successfully", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(context, "Item not deleted successfully.", Toast.LENGTH_LONG).show();
                                                 }
                                             });
                                 }
@@ -269,7 +269,7 @@ public class EditItineraryAdapter extends RecyclerView.Adapter<EditItineraryAdap
                             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Itinerary");
                             databaseReference.child(iterName).removeValue();
 
-                            Toast.makeText(context, "Last activity removed, The Itinerary will be deleted.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "Last activity removed, The Itinerary will be deleted.", Toast.LENGTH_LONG).show();
 
                             // Pop back the fragment when the itinerary is deleted
                             FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();

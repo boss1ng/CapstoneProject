@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -78,6 +79,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     Double currentUserLocationLat;
     Double currentUserLocationLong;
+    private double placeLatitude = 0.0;
+    private double placeLongitude = 0.0;
 
     boolean isUserInQuezonCity = true;
 
@@ -92,13 +95,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+
         // Retrieve selected categories from Bundle arguments
         Bundle getBundle = getArguments();
 
         if (getBundle != null) {
             String userID = getBundle.getString("userId");
-            Toast.makeText(getContext(), userID, Toast.LENGTH_SHORT).show();
-            // Toast.makeText(getContext(), getBundle.getString("isVisited"), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getContext(), userID, Toast.LENGTH_LONG).show();
+            // Toast.makeText(getContext(), getBundle.getString("isVisited"), Toast.LENGTH_LONG).show();
         }
 
         BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
@@ -328,6 +332,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         mMap.getUiSettings().setZoomGesturesEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
 
+
         // Constrain the camera target to the Quezon City bounds.
         //mMap.setLatLngBoundsForCameraTarget(QUEZON_CITY);
 
@@ -393,7 +398,34 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 // mMap.addMarker(new MarkerOptions().position(userLocation).title("Your Location"));
 
                 // Move the camera to the user's location
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 13));
+//                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 13));
+
+                Bundle args = getArguments();
+                if (args != null) {
+                    //placeLatitude = args.getDouble("placeLatitude", currentUserLocationLat);
+                    //placeLongitude = args.getDouble("placeLongitude", currentUserLocationLong);
+
+                    placeLatitude = args.getDouble("placeLatitude");
+                    placeLongitude = args.getDouble("placeLongitude");
+
+                    if (placeLatitude == 0.0 && placeLongitude == 0.0) {
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 13));
+                    }
+
+                    else {
+                        // Log the placeLatitude and placeLongitude values
+                        Log.d("Debug", "placeLatitude: " + placeLatitude);
+                        Log.d("Debug", "placeLongitude: " + placeLongitude);
+
+                        // Create a LatLng object with the place's latitude and longitude
+                        LatLng placeLatLng = new LatLng(placeLatitude, placeLongitude);
+
+                        // Move the camera to the specified location and set an appropriate zoom level
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(placeLatLng, maxZoomLevel)); // Adjust the zoom level as needed
+                    }
+                }
+
+
                 /*
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, minZoomLevel));
 
@@ -402,11 +434,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 if (isUserInQuezonCity) {
                     // The user is within Quezon City
                     // You can perform specific actions or display messages as needed.
-                    //Toast.makeText(getContext(), "WITHIN", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getContext(), "WITHIN", Toast.LENGTH_LONG).show();
                 } else {
                     // The user is outside Quezon City
                     // You can handle this case accordingly.
-                    //Toast.makeText(getContext(), "OUTSIDE", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getContext(), "OUTSIDE", Toast.LENGTH_LONG).show();
                     Toast.makeText(getContext(), "You are outside Quezon City.", Toast.LENGTH_LONG).show();
 
                     // Create a Handler to introduce a delay
@@ -443,7 +475,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
                     /*
                     if (visited == "YES") {
-                        Toast.makeText(getContext(), bundle.getString("isVisited"), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), bundle.getString("isVisited"), Toast.LENGTH_LONG).show();
 
                         LinearLayout layoutFilter = getView().findViewById(R.id.filterMenu);
                         layoutFilter.setVisibility(View.GONE);
@@ -561,8 +593,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                                                     if (isUserInQuezonCity) {
                                                         // The user is within Quezon City
                                                         // You can perform specific actions or display messages as needed.
-                                                        Toast.makeText(getContext(), "WITHIN", Toast.LENGTH_SHORT).show();
-                                                        args.putString("isUserInQuezonCity", "MISS KO NA KAT");
+                                                        Toast.makeText(getContext(), "WITHIN", Toast.LENGTH_LONG).show();
+                                                        args.putString("isUserInQuezonCity", "TRUW");
                                                     } else {
                                                         // The user is outside Quezon City
                                                         // You can handle this case accordingly.

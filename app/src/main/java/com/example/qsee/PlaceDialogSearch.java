@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +23,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.squareup.picasso.Picasso;
 
-public class PlaceDetailDialogFragment extends DialogFragment {
+public class PlaceDialogSearch extends DialogFragment {
 
 
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -44,9 +45,6 @@ public class PlaceDetailDialogFragment extends DialogFragment {
     public void onDismiss(DialogInterface dialog) {
         super.onDismiss(dialog);
 
-        // Re-enable the ImageButton
-        ImageButton filterMenuBar = getParentFragment().getView().findViewById(R.id.filterMenuBar);
-        filterMenuBar.setEnabled(true);
     }
 
     @Nullable
@@ -61,9 +59,8 @@ public class PlaceDetailDialogFragment extends DialogFragment {
 
         if (getBundle != null) {
             String userID = getBundle.getString("userId");
-            String placeName = getBundle.getString("placeName");
-            //Toast.makeText(getContext(), userID, Toast.LENGTH_LONG).show();
-        }
+            Toast.makeText(getContext(), userID, Toast.LENGTH_LONG).show();
+
 
         // Populate UI elements with place details
         TextView nameTextView = view.findViewById(R.id.placeNameTextView);
@@ -71,6 +68,8 @@ public class PlaceDetailDialogFragment extends DialogFragment {
         TextView descriptionTextView = view.findViewById(R.id.placeDescriptionTextView);
         TextView ratingTextView = view.findViewById(R.id.placeRatingTextView);
         Button directionsButton = view.findViewById(R.id.directionsButton);
+            // Change the text of the button
+            directionsButton.setText("Go to Maps");
         ImageView reportButton = view.findViewById(R.id.reportButton);
         reportButton.setImageResource(R.drawable.report);
         ImageView imageViewLocation = view.findViewById(R.id.imageViewLocation);
@@ -116,7 +115,7 @@ public class PlaceDetailDialogFragment extends DialogFragment {
         String isUserInQuezonCity = getArguments().getString("isUserInQuezonCity");
         //Toast.makeText(getContext(), isUserInQuezonCity, Toast.LENGTH_LONG).show();
 
-        if (isUserInQuezonCity.equals("TRUE"))
+        if (isUserInQuezonCity.equals("true"))
             directionsButton.setEnabled(true);
         else
             directionsButton.setEnabled(true);
@@ -127,41 +126,27 @@ public class PlaceDetailDialogFragment extends DialogFragment {
         directionsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Dismiss the current dialog
+                dismiss();
 
-                dismiss(); // Dismiss the dialog
+                // Create an instance of your MapsFragment
+                MapsFragment mapsFragment = new MapsFragment();
 
-                // In the fragment or activity where you want to navigate
+                // Pass latitude and longitude as arguments
+                Bundle args = new Bundle();
+                args.putDouble("placeLatitude", Double.parseDouble(destinationLat));
+                args.putDouble("placeLongitude", Double.parseDouble(destinationLong));
+                args.putString("userId", userID);
+                mapsFragment.setArguments(args);
+
+                // Replace the current fragment with MapsFragment
                 FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-
-                MapsFragmentConfirmation fragmentConfirmation = new MapsFragmentConfirmation();
-
-                if (getBundle != null) {
-                    String userID = getBundle.getString("userId");
-
-                    // Use Bundle to pass values
-                    Bundle bundle = new Bundle();
-                    bundle.putString("userId", userID);
-                    bundle.putString("placeName", placeName);
-                    bundle.putDouble("userCurrentLatitude", currentUserLat);
-                    bundle.putDouble("userCurrentLongitude", currentUserLong);
-                    bundle.putString("destinationLatitude", destinationLat);
-                    bundle.putString("destinationLongitude", destinationLong);
-                    fragmentConfirmation.setArguments(bundle);
-                }
-
-                BottomNavigationView bottomNavigationView = getParentFragment().getView().findViewById(R.id.bottomNavigationView);
-                bottomNavigationView.setVisibility(View.GONE);
-
-                LinearLayout linearLayout = getParentFragment().getView().findViewById(R.id.filterMenu);
-                linearLayout.setVisibility(View.GONE);
-
-                // Replace the current fragment with the receiving fragment
-                transaction.replace(R.id.maps, fragmentConfirmation);
-                transaction.addToBackStack(null);
+                transaction.replace(R.id.fragment_container, mapsFragment); // Replace "R.id.fragment_container" with your actual container ID
+                transaction.addToBackStack(null); // If you want to add this transaction to the back stack
                 transaction.commit();
-
             }
         });
+
 
         // Add a click listener to the Report button
         reportButton.setOnClickListener(new View.OnClickListener() {
@@ -187,7 +172,7 @@ public class PlaceDetailDialogFragment extends DialogFragment {
                 mapsFragmentReportDialog.show(getChildFragmentManager(), "MapsFragmentReportDialog");
             }
         });
-
+        }
         return view;
     }
 
