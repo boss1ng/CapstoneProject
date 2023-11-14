@@ -62,7 +62,7 @@ public class PlaceDetailDialogFragment extends DialogFragment {
         if (getBundle != null) {
             String userID = getBundle.getString("userId");
             String placeName = getBundle.getString("placeName");
-            Toast.makeText(getContext(), userID, Toast.LENGTH_LONG).show();
+            //Toast.makeText(getContext(), userID, Toast.LENGTH_LONG).show();
         }
 
         // Populate UI elements with place details

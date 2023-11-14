@@ -101,7 +101,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
         if (getBundle != null) {
             String userID = getBundle.getString("userId");
-            Toast.makeText(getContext(), userID, Toast.LENGTH_LONG).show();
+            //Toast.makeText(getContext(), userID, Toast.LENGTH_LONG).show();
             // Toast.makeText(getContext(), getBundle.getString("isVisited"), Toast.LENGTH_LONG).show();
         }
 

@@ -102,7 +102,7 @@ public class QuizFragment extends Fragment {
 
         if (getBundle != null) {
             String userID = getBundle.getString("userId");
-            Toast.makeText(getContext(), userID, Toast.LENGTH_LONG).show();
+            //Toast.makeText(getContext(), userID, Toast.LENGTH_LONG).show();
         }
 
         BottomNavigationView bottomNavigationView = rootView.findViewById(R.id.bottomNavigationView);
