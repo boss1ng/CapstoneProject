@@ -588,7 +588,7 @@ public class AddGlimpseFragment extends DialogFragment {
                                                     if (intNumPosts == 20) {
 
                                                         //reachThresholdPostLocation(firebaseLat, firebaseLong, categoriesSnapshot, downloadUrl, userLocation);
-                                                        Toast.makeText(context, "ADD RSS FEED TO LOCATION", Toast.LENGTH_LONG).show();
+                                                        //Toast.makeText(context, "ADD RSS FEED TO LOCATION", Toast.LENGTH_LONG).show();
 
                                                         // Register the RSS Feed to Location table from Firebase
                                                         DatabaseReference newLocation = FirebaseDatabase.getInstance().getReference("Location");
@@ -660,7 +660,7 @@ public class AddGlimpseFragment extends DialogFragment {
 
                                                 if (intNumPosts == 20) {
                                                     //reachThresholdPostLocation(firebaseLat, firebaseLong, categoriesSnapshot, downloadUrl, userLocation);
-                                                    Toast.makeText(context, "ADD RSS FEED TO LOCATION", Toast.LENGTH_LONG).show();
+                                                    //Toast.makeText(context, "ADD RSS FEED TO LOCATION", Toast.LENGTH_LONG).show();
 
                                                     // Register the RSS Feed to Location table from Firebase
                                                     DatabaseReference newLocation = FirebaseDatabase.getInstance().getReference("Location");

@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -49,7 +51,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
@@ -343,7 +347,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         mMap.setMinZoomPreference(minZoomLevel); // Set the minimum desired zoom level.
         mMap.setMaxZoomPreference(maxZoomLevel); // Set the maximum desired zoom level.
 
-        /*
+        // RESTRICTION TO QUEZON CITY.
+// /*
         mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
             float currentZoomLevel = mMap.getCameraPosition().zoom;
             @Override
@@ -366,7 +371,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 }
             }
         });
-         */
+// */
 
         // Check if location permission is granted
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
@@ -400,6 +405,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 // Move the camera to the user's location
 //                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 13));
 
+
                 Bundle args = getArguments();
                 if (args != null) {
                     //placeLatitude = args.getDouble("placeLatitude", currentUserLocationLat);
@@ -409,7 +415,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                     placeLongitude = args.getDouble("placeLongitude");
 
                     if (placeLatitude == 0.0 && placeLongitude == 0.0) {
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 13));
+                        // IF RESTRICTION TO QUEZON CITY IS REMOVED, change to 13.
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15)); // 13
                     }
 
                     else {
@@ -426,10 +433,59 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 }
 
 
-                /*
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, minZoomLevel));
+                // RESTRICTION TO QUEZON CITY.
+// /*
+                //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, minZoomLevel));
 
-                isUserInQuezonCity = QUEZON_CITY_13.contains(new LatLng(latitude, longitude));
+                Geocoder geocoder = new Geocoder(getContext());
+
+                try {
+                    List<android.location.Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+
+                    if (addresses != null && addresses.size() > 0) {
+                        Address address = addresses.get(0);
+
+                        // You can now extract address components
+                        String completeAddress = address.getAddressLine(0); // Full street address
+                        String city = address.getLocality();
+                        String state = address.getAdminArea();
+                        String postalCode = address.getPostalCode();
+                        String country = address.getCountryName();
+
+                        /*
+                        https://quezoncity.com/000001a/000001b/qc+links/backups/quezon+city+zip+code+6.html
+                        1105	1102	1106	1116	1109	1111	1119	1110	1115	1126	1120	1101	1117	1100	1121
+                        1128	1104	1112	1123	1113	1125	1118	1122	1114	1127	1124	1103	1108	1107
+                         */
+
+                        if (completeAddress.contains("Metro Manila")) {
+
+                            if (completeAddress.contains("1105") || completeAddress.contains("1102") || completeAddress.contains("1106") || completeAddress.contains("1116") ||
+                                    completeAddress.contains("1109") || completeAddress.contains("1111") || completeAddress.contains("1119") || completeAddress.contains("1110") ||
+                                    completeAddress.contains("1115") || completeAddress.contains("1126") || completeAddress.contains("1120") || completeAddress.contains("1101") ||
+                                    completeAddress.contains("1117") || completeAddress.contains("1100") || completeAddress.contains("1121") || completeAddress.contains("1128") ||
+                                    completeAddress.contains("1104") || completeAddress.contains("1112") || completeAddress.contains("1123") || completeAddress.contains("1113") ||
+                                    completeAddress.contains("1125") || completeAddress.contains("1118") || completeAddress.contains("1122") || completeAddress.contains("1114") ||
+                                    completeAddress.contains("1127") || completeAddress.contains("1124") || completeAddress.contains("1103") || completeAddress.contains("1108") ||
+                                    completeAddress.contains("1107") || completeAddress.contains("Quezon City")) {
+
+                                isUserInQuezonCity = true;
+                            }
+                            else
+                                isUserInQuezonCity = false;
+                        }
+                        else
+                            isUserInQuezonCity = false;
+
+                    } else {
+                        // Geocoder couldn't find an address for the given latitude and longitude
+                    }
+                } catch (IOException e) {
+                    // Handle geocoding errors (e.g., network issues, service not available)
+                    throw new RuntimeException(e);
+                }
+
+                //isUserInQuezonCity = QUEZON_CITY_13.contains(new LatLng(latitude, longitude));
 
                 if (isUserInQuezonCity) {
                     // The user is within Quezon City
@@ -451,7 +507,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                         }
                     }, 3500); // 2000 milliseconds (2 seconds) delay
                 }
-                 */
+// */
+
 
             }
         });
@@ -594,13 +651,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                                                         // The user is within Quezon City
                                                         // You can perform specific actions or display messages as needed.
                                                         Toast.makeText(getContext(), "WITHIN", Toast.LENGTH_LONG).show();
-                                                        args.putString("isUserInQuezonCity", "TRUW");
+                                                        args.putString("isUserInQuezonCity", "TRUE");
                                                     } else {
                                                         // The user is outside Quezon City
                                                         // You can handle this case accordingly.
                                                         args.putString("isUserInQuezonCity", "FALSE");
                                                     }
-                                                     */
+                                                    */
 
                                                     fragment.setArguments(args);
 
