@@ -51,14 +51,17 @@
                     android:drawableTop="@drawable/ic_carret_down"
                     app:layout_constraintBaseline_toBottomOf="parent" />
 
-                <Space
-                    android:layout_width="165dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="1" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:gravity="right"
+                android:orientation="horizontal">
 
                 <FrameLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_marginRight="5dp"
                     >
@@ -88,8 +91,8 @@
                     android:id="@+id/editButton"
                     android:layout_width="27dp"
                     android:layout_height="34dp"
-                    android:backgroundTint="#FFFFFF"
                     android:layout_marginRight="6dp"
+                    android:backgroundTint="#FFFFFF"
                     android:drawableTop="@drawable/ic_edit"
                     app:layout_constraintBaseline_toBottomOf="parent" />
 
@@ -98,6 +101,7 @@
                     android:layout_width="27dp"
                     android:layout_height="34dp"
                     android:backgroundTint="#FFFFFF"
+                    android:layout_marginRight="15dp"
                     android:drawableTop="@drawable/ic_add_square"
                     app:layout_constraintBaseline_toBottomOf="parent" />
             </LinearLayout>
