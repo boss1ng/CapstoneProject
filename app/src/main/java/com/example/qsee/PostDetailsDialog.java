@@ -207,15 +207,19 @@ public class PostDetailsDialog extends DialogFragment {
         long seconds = differenceMillis / 1000;
         long minutes = seconds / 60;
         long hours = minutes / 60;
+        long days = hours / 24;
 
-        if (hours > 0) {
+        if (days > 0) {
+            return days + (days == 1 ? " day ago" : " days ago");
+        } else if (hours > 0) {
             return hours + (hours == 1 ? " hour ago" : " hours ago");
         } else if (minutes > 0) {
             return minutes + (minutes == 1 ? " minute ago" : " minutes ago");
         } else {
-            return "just now";
+            return seconds + (seconds == 1 ? " second ago" : " seconds ago");
         }
     }
+
 
     private void showDeleteConfirmationDialog(final String userId, final String location, final String category, final String caption) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());

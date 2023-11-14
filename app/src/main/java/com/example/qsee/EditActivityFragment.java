@@ -139,11 +139,19 @@ public class EditActivityFragment extends Fragment {
                                     // Retrieve the activity data
                                     String activity = timeSnapshot.child("activity").getValue(String.class);
                                     String origin = timeSnapshot.child("origin").getValue(String.class);
+                                    String status = timeSnapshot.child("status").getValue(String.class); // Get the status
 
                                     // Update the TextInputLayout in your activity layout
                                     TextInputLayout activityTextInputLayout = rootView.findViewById(R.id.locActivity);
                                     activityTextInputLayout.getEditText().setText(activity);
                                     originAutoCompleteTextView.setText(origin);
+
+                                    // Check the status and set the completion switch
+                                    if ("Completed".equals(status)) {
+                                        completionSwitch.setChecked(true);
+                                    } else {
+                                        completionSwitch.setChecked(false);
+                                    }
                                 }
                             }
                         }
