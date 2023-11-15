@@ -63,9 +63,6 @@ import java.util.Objects;
 import java.util.TimeZone;
 
 public class HomeFragment extends Fragment {
-    private LatLngBounds QUEZON_CITY_13 = new LatLngBounds(
-            new LatLng(14.637, 121.02),      // SW bounds
-            new LatLng(14.7289, 121.103));     // NE bounds
     boolean isUserInQuezonCity = true;
 
 
@@ -202,6 +199,8 @@ public class HomeFragment extends Fragment {
                         double latitude = location.getLatitude();
                         double longitude = location.getLongitude();
 
+// RESTRICTION TO QUEZON CITY.
+// /*
                         Geocoder geocoder = new Geocoder(getContext());
 
                         try {
@@ -251,8 +250,7 @@ public class HomeFragment extends Fragment {
                             // Handle geocoding errors (e.g., network issues, service not available)
                             throw new RuntimeException(e);
                         }
-
-                        //isUserInQuezonCity = QUEZON_CITY_13.contains(new LatLng(latitude, longitude));
+// */
 
                         if (isUserInQuezonCity) {
                             // The user is within Quezon City

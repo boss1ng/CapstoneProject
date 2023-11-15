@@ -347,8 +347,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         mMap.setMinZoomPreference(minZoomLevel); // Set the minimum desired zoom level.
         mMap.setMaxZoomPreference(maxZoomLevel); // Set the maximum desired zoom level.
 
-        // RESTRICTION TO QUEZON CITY.
-// /*
+
+// RESTRICTION TO QUEZON CITY.
+/*
         mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
             float currentZoomLevel = mMap.getCameraPosition().zoom;
             @Override
@@ -371,7 +372,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 }
             }
         });
-// */
+*/
 
         // Check if location permission is granted
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
@@ -415,8 +416,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                     placeLongitude = args.getDouble("placeLongitude");
 
                     if (placeLatitude == 0.0 && placeLongitude == 0.0) {
-                        // IF RESTRICTION TO QUEZON CITY IS REMOVED, change to 13.
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15)); // 13
+                        // IF RESTRICTION TO QUEZON CITY IS REMOVED, change to 15.
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, minZoomLevel)); // 15
                     }
 
                     else {
@@ -434,7 +435,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
 
                 // RESTRICTION TO QUEZON CITY.
-// /*
+/*
                 //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, minZoomLevel));
 
                 Geocoder geocoder = new Geocoder(getContext());
@@ -452,11 +453,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                         String postalCode = address.getPostalCode();
                         String country = address.getCountryName();
 
-                        /*
+                        / *
                         https://quezoncity.com/000001a/000001b/qc+links/backups/quezon+city+zip+code+6.html
                         1105	1102	1106	1116	1109	1111	1119	1110	1115	1126	1120	1101	1117	1100	1121
                         1128	1104	1112	1123	1113	1125	1118	1122	1114	1127	1124	1103	1108	1107
-                         */
+                         * /
 
                         if (completeAddress.contains("Metro Manila")) {
 
@@ -507,7 +508,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                         }
                     }, 3500); // 2000 milliseconds (2 seconds) delay
                 }
-// */
+*/
 
 
             }

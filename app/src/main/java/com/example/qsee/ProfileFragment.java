@@ -55,9 +55,6 @@ public class ProfileFragment extends Fragment {
 
     private FusedLocationProviderClient fusedLocationProviderClient;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
-    private LatLngBounds QUEZON_CITY_13 = new LatLngBounds(
-            new LatLng(14.637, 121.02),      // SW bounds
-            new LatLng(14.7289, 121.103));     // NE bounds
     boolean isUserInQuezonCity = true;
 
 
@@ -158,6 +155,7 @@ public class ProfileFragment extends Fragment {
                         double latitude = location.getLatitude();
                         double longitude = location.getLongitude();
 
+// /*
                         Geocoder geocoder = new Geocoder(context);
 
                         try {
@@ -207,8 +205,7 @@ public class ProfileFragment extends Fragment {
                             // Handle geocoding errors (e.g., network issues, service not available)
                             throw new RuntimeException(e);
                         }
-
-                        //isUserInQuezonCity = QUEZON_CITY_13.contains(new LatLng(latitude, longitude));
+// */
 
                         if (isUserInQuezonCity) {
                             // The user is within Quezon City
