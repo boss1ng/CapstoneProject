@@ -5,6 +5,7 @@ import static com.example.qsee.AddGlimpseFragment.CAMERA_REQUEST_CODE;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,6 +17,7 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.InputFilter;
 import android.util.Log;
@@ -50,6 +52,7 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -259,8 +262,13 @@ public class EditProfileFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             if (requestCode == CAMERA_REQUEST_CODE) {
+                if (imageUri != null) {
                 // The image URI will be contained in the imageUri variable
                 startCrop(imageUri);
+                } else {
+                    // Handle null Uri case here
+                    Log.e("EditProfileFragment", "Image Uri is null in onActivityResult.");
+                }
             } else if (requestCode == REQUEST_IMAGE_PICK) {
                 Uri imageUri = data.getData();
                 startCrop(imageUri);
@@ -379,14 +387,13 @@ public class EditProfileFragment extends Fragment {
     }
 
     private Uri createImageUri() {
-        // Create a content values object where we will store the metadata of the image
+        ContentResolver contentResolver = context.getContentResolver();
         ContentValues values = new ContentValues();
-        values.put(MediaStore.Images.Media.TITLE, "New Picture");
-        values.put(MediaStore.Images.Media.DESCRIPTION, "From the Camera");
+        values.put(MediaStore.Images.Media.DISPLAY_NAME, "Image_" + System.currentTimeMillis() + ".jpg");
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+        values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
 
-        // Use the content resolver to insert the image metadata into the system's images media table.
-        // This will also give us back a URI for the image.
-        return context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+        return contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
     }
 
     private void openGallery() {
@@ -396,44 +403,43 @@ public class EditProfileFragment extends Fragment {
 
     private void uploadProfilePicture(String userId, Uri imageUri) {
         try {
-            // Get the bitmap from the Uri and check Exif orientation
             Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri);
             int orientation = getOrientation(context, imageUri);
-
-            // Rotate the bitmap based on the Exif orientation
             Bitmap rotatedBitmap = rotateBitmap(bitmap, orientation);
 
-            // Upload the rotated bitmap
-            StorageReference profilePictureRef = storageReference.child(userId + ".jpg");
-            UploadTask uploadTask = profilePictureRef.putFile(getImageUri(context, rotatedBitmap));
-            uploadTask.addOnSuccessListener(taskSnapshot -> {
-                profilePictureRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                    String imageUrl = uri.toString();
+            Uri rotatedBitmapUri = getImageUri(context, rotatedBitmap);
+            if (rotatedBitmapUri != null) {
+                StorageReference profilePictureRef = storageReference.child(userId + ".jpg");
+                UploadTask uploadTask = profilePictureRef.putFile(getImageUri(context, rotatedBitmap));
+                uploadTask.addOnSuccessListener(taskSnapshot -> {
+                    profilePictureRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                        String imageUrl = uri.toString();
 
-                    DatabaseReference usersReference = FirebaseDatabase.getInstance().getReference("MobileUsers");
-                    Query query = usersReference.orderByChild("userId").equalTo(userId);
+                        DatabaseReference usersReference = FirebaseDatabase.getInstance().getReference("MobileUsers");
+                        Query query = usersReference.orderByChild("userId").equalTo(userId);
 
-                    query.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            if (dataSnapshot.exists()) {
-                                for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
-                                    userSnapshot.getRef().child("profilePictureUrl").setValue(imageUrl);
-                                    Toast.makeText(getContext(), "Profile updated successfully.", Toast.LENGTH_LONG).show();
-                                    getParentFragmentManager().popBackStack();
+                        query.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                if (dataSnapshot.exists()) {
+                                    for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                                        userSnapshot.getRef().child("profilePictureUrl").setValue(imageUrl);
+                                        Toast.makeText(getContext(), "Profile updated successfully.", Toast.LENGTH_LONG).show();
+                                        getParentFragmentManager().popBackStack();
+                                    }
+                                } else {
+                                    Log.e("EditProfileFragment", "User with username not found.");
                                 }
-                            } else {
-                                Log.e("EditProfileFragment", "User with username not found.");
                             }
-                        }
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                            Log.e("EditProfileFragment", "Database Error: " + databaseError.getMessage());
-                        }
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                Log.e("EditProfileFragment", "Database Error: " + databaseError.getMessage());
+                            }
+                        });
                     });
                 });
-            });
+            }
         } catch (IOException e) {
             e.printStackTrace();
             Log.e("EditProfileFragment", "Error uploading profile picture: " + e.getMessage());
@@ -447,21 +453,26 @@ public class EditProfileFragment extends Fragment {
             return null;
         }
 
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-            String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, "Image Title", null);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] imageData = baos.toByteArray();
 
-            if (path != null) {
-                return Uri.parse(path);
-            } else {
-                Log.e("EditProfileFragment", "Failed to create Uri from path.");
-                return null;
+        Uri uri = createImageUri();
+        if (uri != null) {
+            try {
+                OutputStream os = context.getContentResolver().openOutputStream(uri);
+                os.write(imageData);
+                os.flush();
+                os.close();
+                return uri;
+            } catch (Exception e) {
+                Log.e("EditProfileFragment", "Error writing to output stream: " + e.getMessage());
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.e("EditProfileFragment", "Error creating Uri: " + e.getMessage());
-            return null;
+        } else {
+            Log.e("EditProfileFragment", "Failed to create Uri for image.");
         }
+
+        return null;
     }
+
 }
