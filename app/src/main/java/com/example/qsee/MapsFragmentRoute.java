@@ -81,6 +81,8 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
     private FusedLocationProviderClient fusedLocationProviderClient;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
+    int isDisconnected = 0;
+
     private Polyline previousCurrentRoutePolyline = null;
     private Polyline previousCurrentBorderPolyline = null;
     private Polyline currentRoutePolyline = null; // Declare a member variable to keep track of the current route polyline
@@ -329,43 +331,102 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
         });
          */
 
-        ImageView viewCurrent = getView().findViewById(R.id.imageViewOverviewButton);
-        viewCurrent.setImageResource(R.drawable.currentloc);
+        View rootView = getView(); // Get the root view
+        if (rootView != null) {
+            ImageView viewCurrent = getView().findViewById(R.id.imageViewOverviewButton);
+            viewCurrent.setImageResource(R.drawable.currentloc);
 
-        ImageView viewInstructions = getView().findViewById(R.id.btnShowInstructions);
-        viewInstructions.setImageResource(R.drawable.navigate_up_arrow);
-        viewInstructions.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            ImageView viewInstructions = getView().findViewById(R.id.btnShowInstructions);
+            viewInstructions.setImageResource(R.drawable.navigate_up_arrow);
+            viewInstructions.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
-                // Check if location permission is granted
-                if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED
-                        && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED) {
+                    // Check if location permission is granted
+                    if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                            != PackageManager.PERMISSION_GRANTED
+                            && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                            != PackageManager.PERMISSION_GRANTED) {
 
-                    // Request location permission if not granted
-                    requestPermissions(new String[]{
-                            Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.ACCESS_COARSE_LOCATION
-                    }, LOCATION_PERMISSION_REQUEST_CODE);
-                    return;
-                }
-
-                // Get the user's last known location and move the camera there
-                fusedLocationProviderClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
-
-                    double latitude = 0;
-                    double longitude = 0;
-                            
-                    if (location != null) {
-                        latitude = location.getLatitude();
-                        longitude = location.getLongitude();
+                        // Request location permission if not granted
+                        requestPermissions(new String[]{
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_COARSE_LOCATION
+                        }, LOCATION_PERMISSION_REQUEST_CODE);
+                        return;
                     }
-                    
-                    // Create a new PlaceDetailDialogFragment and pass the place details as arguments
-                    MapsInstructions fragment = new MapsInstructions();
-                    //fragment.setCancelable(true);
+
+                    // Get the user's last known location and move the camera there
+                    fusedLocationProviderClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
+
+                        double latitude = 0;
+                        double longitude = 0;
+
+                        if (location != null) {
+                            latitude = location.getLatitude();
+                            longitude = location.getLongitude();
+                        }
+
+                        // Create a new PlaceDetailDialogFragment and pass the place details as arguments
+                        MapsInstructions fragment = new MapsInstructions();
+                        //fragment.setCancelable(true);
+
+                        // Retrieve selected categories from Bundle arguments
+                        Bundle getBundle = getArguments();
+
+                        // Use Bundle to pass values
+                        Bundle bundle = new Bundle();
+
+                        if (getBundle != null) {
+                            String placeName = getBundle.getString("placeName");
+
+                            Double passedCurrentUserLocationLat = getBundle.getDouble("userCurrentLatitude");
+                            Double passedCurrentUserLocationLong = getBundle.getDouble("userCurrentLongitude");
+
+                            String destinationLatitude = getBundle.getString("destinationLatitude");
+                            String destinationLongitude = getBundle.getString("destinationLongitude");
+
+                            String userID = getBundle.getString("userId");
+                            bundle.putString("userId", userID);
+
+                            bundle.putString("placeName", placeName);
+                            bundle.putDouble("userCurrentLatitude", latitude);
+                            bundle.putDouble("userCurrentLongitude", longitude);
+                            bundle.putString("destinationLatitude", destinationLatitude);
+                            bundle.putString("destinationLongitude", destinationLongitude);
+
+                            fragment.setArguments(bundle);
+                        }
+
+                        // Show the PlaceDetailDialogFragment as a dialog
+                        fragment.show(getChildFragmentManager(), "MapsInstructions");
+                    });
+                }
+            });
+
+            Button btnFinishRoute = getView().findViewById(R.id.btnDone);
+            btnFinishRoute.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    isRunning = false;
+
+                    // Use a Handler to refresh the map every second
+                    Handler handlerDelay = new Handler();
+                    Runnable runnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            handler.removeCallbacks(mapRefreshRunnable); // Remove any pending callbacks // Dismiss the dialog
+                        }
+                    };
+                    handlerDelay.postDelayed(runnable, 1000); // Schedule it to run after 1 second
+
+                    //loadFragment(new MapsFragmentArrived());
+
+                    // In the fragment or activity where you want to navigate
+                    FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+
+                    MapsFragmentArrived mapsFragment = new MapsFragmentArrived();
 
                     // Retrieve selected categories from Bundle arguments
                     Bundle getBundle = getArguments();
@@ -375,10 +436,8 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
 
                     if (getBundle != null) {
                         String placeName = getBundle.getString("placeName");
-
                         Double passedCurrentUserLocationLat = getBundle.getDouble("userCurrentLatitude");
                         Double passedCurrentUserLocationLong = getBundle.getDouble("userCurrentLongitude");
-
                         String destinationLatitude = getBundle.getString("destinationLatitude");
                         String destinationLongitude = getBundle.getString("destinationLongitude");
 
@@ -386,89 +445,83 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                         bundle.putString("userId", userID);
 
                         bundle.putString("placeName", placeName);
-                        bundle.putDouble("userCurrentLatitude", latitude);
-                        bundle.putDouble("userCurrentLongitude", longitude);
+                        bundle.putDouble("userCurrentLatitude", passedCurrentUserLocationLat);
+                        bundle.putDouble("userCurrentLongitude", passedCurrentUserLocationLong);
                         bundle.putString("destinationLatitude", destinationLatitude);
                         bundle.putString("destinationLongitude", destinationLongitude);
-
-                        fragment.setArguments(bundle);
+                        mapsFragment.setArguments(bundle);
                     }
 
-                    // Show the PlaceDetailDialogFragment as a dialog
-                    fragment.show(getChildFragmentManager(), "MapsInstructions");
-                });
-            }
-        });
+                    LinearLayout linearLayoutDirections = getView().findViewById(R.id.directionsCont);
+                    linearLayoutDirections.setVisibility(View.GONE);
 
-        Button btnFinishRoute = getView().findViewById(R.id.btnDone);
-        btnFinishRoute.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                    FragmentContainerView fragmentContainerView = getView().findViewById(R.id.mapsRoute);
+                    fragmentContainerView.setVisibility(View.GONE);
 
-                isRunning = false;
+                    LinearLayout linearLayoutOverview = getView().findViewById(R.id.overviewCont);
+                    linearLayoutOverview.setVisibility(View.GONE);
+
+                    BottomNavigationView bottomNavigationView = getView().findViewById(R.id.bottomNavigationView);
+                    bottomNavigationView.setVisibility(View.GONE);
+
+                    // Replace the current fragment with the receiving fragment
+                    transaction.replace(R.id.fragment_container, mapsFragment);
+                    transaction.addToBackStack(null);
+                    transaction.commit();
+                }
+            });
+
+            routing();
+
+            /*updateMap();
+
+
+            // Check network connectivity
+            ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+            if (networkInfo != null && networkInfo.isConnected()) {
+                Log.d(TAG, "-----outside CONNECTED-----");
 
                 // Use a Handler to refresh the map every second
-                Handler handlerDelay = new Handler();
-                Runnable runnable = new Runnable() {
+                final int INTERVAL = 1000; // 1000 milliseconds = 1 second
+                handler = new Handler();
+                mapRefreshRunnable = new Runnable() {
                     @Override
                     public void run() {
-                        handler.removeCallbacks(mapRefreshRunnable); // Remove any pending callbacks // Dismiss the dialog
+                        //updateMap(); // Call the method to update the map
+                        //reUpdateMap();
+
+                        if (!isRunning) {
+                            // Stop the execution if the flag is false
+                            return;
+                        } else {
+                            if (currentRoutePolyline != null && currentBorderPolyline != null) {
+                                //updateMap();
+                                reUpdateMapAgain();
+                                //handler.postDelayed(this, 1000);
+                            } else if (previousCurrentRoutePolyline != null && previousCurrentBorderPolyline != null) {
+                                //manualMap();
+                                reUpdateMap();
+                                //handler.postDelayed(this, 1000);
+                            }
+
+                            handler.postDelayed(this, 1000);
+                        }
                     }
                 };
-                handlerDelay.postDelayed(runnable, 1000); // Schedule it to run after 1 second
 
-                //loadFragment(new MapsFragmentArrived());
+                handler.postDelayed(mapRefreshRunnable, 1000); // Schedule it to run again in 1 second
+            } else {
+                //isRunning = false;
+                Toast.makeText(getContext(), "Reconnecting...", Toast.LENGTH_LONG).show();
+                Log.d(TAG, "----DISCONNECTED----");
+            }*/
+        }
 
-                // In the fragment or activity where you want to navigate
-                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+    }
 
-                MapsFragmentArrived mapsFragment = new MapsFragmentArrived();
-
-                // Retrieve selected categories from Bundle arguments
-                Bundle getBundle = getArguments();
-
-                // Use Bundle to pass values
-                Bundle bundle = new Bundle();
-
-                if (getBundle != null) {
-                    String placeName = getBundle.getString("placeName");
-                    Double passedCurrentUserLocationLat = getBundle.getDouble("userCurrentLatitude");
-                    Double passedCurrentUserLocationLong = getBundle.getDouble("userCurrentLongitude");
-                    String destinationLatitude = getBundle.getString("destinationLatitude");
-                    String destinationLongitude = getBundle.getString("destinationLongitude");
-
-                    String userID = getBundle.getString("userId");
-                    bundle.putString("userId", userID);
-
-                    bundle.putString("placeName", placeName);
-                    bundle.putDouble("userCurrentLatitude", passedCurrentUserLocationLat);
-                    bundle.putDouble("userCurrentLongitude", passedCurrentUserLocationLong);
-                    bundle.putString("destinationLatitude", destinationLatitude);
-                    bundle.putString("destinationLongitude", destinationLongitude);
-                    mapsFragment.setArguments(bundle);
-                }
-
-                LinearLayout linearLayoutDirections = getView().findViewById(R.id.directionsCont);
-                linearLayoutDirections.setVisibility(View.GONE);
-
-                FragmentContainerView fragmentContainerView = getView().findViewById(R.id.mapsRoute);
-                fragmentContainerView.setVisibility(View.GONE);
-
-                LinearLayout linearLayoutOverview = getView().findViewById(R.id.overviewCont);
-                linearLayoutOverview.setVisibility(View.GONE);
-
-                BottomNavigationView bottomNavigationView = getView().findViewById(R.id.bottomNavigationView);
-                bottomNavigationView.setVisibility(View.GONE);
-
-                // Replace the current fragment with the receiving fragment
-                transaction.replace(R.id.fragment_container, mapsFragment);
-                transaction.addToBackStack(null);
-                transaction.commit();
-            }
-        });
-
+    public void routing() {
         updateMap();
-
 
         // Check network connectivity
         ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -488,9 +541,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                     if (!isRunning) {
                         // Stop the execution if the flag is false
                         return;
-                    }
-
-                    else {
+                    } else {
                         if (currentRoutePolyline != null && currentBorderPolyline != null) {
                             //updateMap();
                             reUpdateMapAgain();
@@ -507,15 +558,11 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
             };
 
             handler.postDelayed(mapRefreshRunnable, 1000); // Schedule it to run again in 1 second
-        }
-
-        else {
+        } else {
             //isRunning = false;
             Toast.makeText(getContext(), "Reconnecting...", Toast.LENGTH_LONG).show();
             Log.d(TAG, "----DISCONNECTED----");
         }
-
-
     }
 
     private BroadcastReceiver networkChangeReceiver = new BroadcastReceiver() {
@@ -534,6 +581,115 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                 handler1.removeCallbacks(runnableCode);
 
                 Log.d(TAG, "RECONNECTED---------------------------------------------------------------------------------------------------");
+
+                /*
+                if (isDisconnected > 0) {
+
+                    Toast.makeText(getContext(), "Reconnected.", Toast.LENGTH_LONG).show();
+
+                    isDisconnected = 0;
+
+
+                    if (currentLocMarker != null) {
+                        currentLocMarker.remove();
+                        currentLocMarker = null;
+                    }
+
+                    if (currentRoutePolyline != null) {
+                        currentRoutePolyline.remove();
+                        currentRoutePolyline = null;
+                    }
+
+                    if (currentBorderPolyline != null) {
+                        currentBorderPolyline.remove();
+                        currentBorderPolyline = null;
+                    }
+
+                    if (previousCurrentRoutePolyline != null) {
+                        previousCurrentRoutePolyline.remove();
+                        previousCurrentRoutePolyline = null;
+                    }
+                    if (previousCurrentBorderPolyline != null) {
+                        previousCurrentBorderPolyline.remove();
+                        previousCurrentBorderPolyline = null;
+                    }
+
+                    routing();
+
+                }
+                */
+
+                if (isDisconnected > 0) {
+
+                    isDisconnected = 0;
+
+                    Toast.makeText(getContext(), "Reconnected.", Toast.LENGTH_LONG).show();
+
+                    // Check if location permission is granted
+                    if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                            != PackageManager.PERMISSION_GRANTED
+                            && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                            != PackageManager.PERMISSION_GRANTED) {
+
+                        // Request location permission if not granted
+                        requestPermissions(new String[]{
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_COARSE_LOCATION
+                        }, LOCATION_PERMISSION_REQUEST_CODE);
+                        return;
+                    }
+
+                    // In the fragment or activity where you want to navigate
+                    FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+
+                    MapsFragmentRoute mapsFragmentRoute = new MapsFragmentRoute();
+
+                    // Retrieve selected categories from Bundle arguments
+                    Bundle getBundle = getArguments();
+
+                    // Use Bundle to pass values
+                    Bundle bundle = new Bundle();
+
+                    // Get the user's last known location and move the camera there
+                    fusedLocationProviderClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
+                        if (location != null) {
+                            double latitude = location.getLatitude();
+                            double longitude = location.getLongitude();
+
+                            if (getBundle != null) {
+                                String destinationLatitude = getBundle.getString("destinationLatitude");
+                                String destinationLongitude = getBundle.getString("destinationLongitude");
+
+                                String userID = getBundle.getString("userId");
+                                bundle.putString("userId", userID);
+
+                                bundle.putDouble("userCurrentLatitude", latitude);
+                                bundle.putDouble("userCurrentLongitude", longitude);
+                                bundle.putString("destinationLatitude", destinationLatitude);
+                                bundle.putString("destinationLongitude", destinationLongitude);
+                                mapsFragmentRoute.setArguments(bundle);
+                            }
+                        }
+                    });
+
+                    LinearLayout linearLayoutDirections = getView().findViewById(R.id.directionsCont);
+                    linearLayoutDirections.setVisibility(View.GONE);
+
+                    FragmentContainerView fragmentContainerView = getView().findViewById(R.id.mapsRoute);
+                    fragmentContainerView.setVisibility(View.GONE);
+
+                    LinearLayout linearLayoutOverview = getView().findViewById(R.id.overviewCont);
+                    linearLayoutOverview.setVisibility(View.GONE);
+
+                    BottomNavigationView bottomNavigationView = getView().findViewById(R.id.bottomNavigationView);
+                    bottomNavigationView.setVisibility(View.GONE);
+
+                    // Replace the current fragment with the receiving fragment
+                    transaction.replace(R.id.fragment_container, mapsFragmentRoute);
+                    transaction.addToBackStack(null);
+                    transaction.commit();
+                }
+
             }
         }
     };
@@ -551,6 +707,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
     };
 
     private void displayDisconnectMessage() {
+        isDisconnected++;
         handler1.postDelayed(runnableCode, delay);
     }
 
@@ -862,7 +1019,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                         }
                     }
                 };
-                handler.postDelayed(mapRefreshRunnable, 1000); // Schedule it to run after 0.3 second
+                handler.postDelayed(mapRefreshRunnable, 800); // Schedule it to run after 0.3 second
             }
         }
 
@@ -1082,7 +1239,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                 }
             }
         };
-        handler.postDelayed(mapRefreshRunnable, 1000); // Schedule it to run after 0.5 second
+        handler.postDelayed(mapRefreshRunnable, 800); // Schedule it to run after 0.5 second
 
     }
 
@@ -1343,7 +1500,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                     }
                 }
             };
-            handler.postDelayed(mapRefreshRunnable, 1000); // Schedule it to run after 0.3 second
+            handler.postDelayed(mapRefreshRunnable, 800); // Schedule it to run after 0.3 second
 
         }
 
@@ -1451,191 +1608,195 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                         // Remove HTML tags and display plain text instructions
                         String plainTextInstructions = Html.fromHtml(htmlInstructionsSample).toString();
 
-                        // Populate UI elements with place details
-                        TextView textViewDistance = getView().findViewById(R.id.textViewDistance);
-                        Button buttonFinish = getView().findViewById(R.id.btnDone);
-                        //textViewDistance.setText(distanceSample);
-                        //Toast.makeText(getContext(), distanceSample, Toast.LENGTH_LONG).show();
+                        View rootview = getView();
+                        if (rootview != null) {
 
-                        TextView textViewDirection = getView().findViewById(R.id.textViewDirection);
-                        if (textViewDirection != null) {
-                            textViewDirection.setText(plainTextInstructions);
-                        }
+                            // Populate UI elements with place details
+                            TextView textViewDistance = getView().findViewById(R.id.textViewDistance);
+                            Button buttonFinish = getView().findViewById(R.id.btnDone);
+                            //textViewDistance.setText(distanceSample);
+                            //Toast.makeText(getContext(), distanceSample, Toast.LENGTH_LONG).show();
 
-                        // Extract the numerical value from the distance string
-                        double distanceValue = Double.parseDouble(distanceSample.replaceAll("[^0-9.]+", ""));
-
-                        if (distanceSample.contains("km") && distanceValue < 1.0) {
-                            // Convert the distance to meters
-                            int meters = (int) (distanceValue * 1000);
-                            String distanceInMeters = meters + " m";
-                            // Use distanceInMeters as needed
-                            if (textViewDistance != null) {
-                                textViewDistance.setText(distanceInMeters);
+                            TextView textViewDirection = getView().findViewById(R.id.textViewDirection);
+                            if (textViewDirection != null) {
+                                textViewDirection.setText(plainTextInstructions);
                             }
-                        } else {
-                            // Use the original distance string (it's already in meters or more than 1 km)
-                            if (textViewDistance != null) {
-                                textViewDistance.setText(distanceSample);
-                            }
-                        }
 
+                            // Extract the numerical value from the distance string
+                            double distanceValue = Double.parseDouble(distanceSample.replaceAll("[^0-9.]+", ""));
 
-                        // Initialize ImageView container
-                        ImageView imageViewDirections = getView().findViewById(R.id.imageViewDirections);
-
-                        // Get the maneuver from your API response
-                        // Retrieve maneuver if it's present, or provide a default value
-                        String maneuverType = stepSamp.optString("maneuver", "No Maneuver");
-                        //Toast.makeText(getContext(), maneuverType, Toast.LENGTH_LONG).show();
-
-                        // Create a variable to store the drawable resource ID
-                        int drawableResource = R.drawable.straight; // Default drawable
-
-                        // Map maneuver types to corresponding drawable resource IDs
-                        switch (maneuverType) {
-                            case "keep-left":
-                                drawableResource = R.drawable.keep_left;
-                                break;
-                            case "keep-right":
-                                drawableResource = R.drawable.keep_right;
-                                break;
-                            case "ferry":
-                                drawableResource = R.drawable.ferry;
-                                break;
-                            case "ferry-train":
-                                drawableResource = R.drawable.ferry_train;
-                                break;
-                            case "fork-left":
-                                drawableResource = R.drawable.fork_left;
-                                break;
-                            case "fork-right":
-                                drawableResource = R.drawable.fork_right;
-                                break;
-                            case "merge":
-                                drawableResource = R.drawable.merge;
-                                break;
-                            case "ramp-left":
-                                drawableResource = R.drawable.ramp_left;
-                                break;
-                            case "ramp-right":
-                                drawableResource = R.drawable.ramp_right;
-                                break;
-                            case "roundabout-left":
-                                drawableResource = R.drawable.roundabout_left;
-                                break;
-                            case "roundabout-right":
-                                drawableResource = R.drawable.roundabout_right;
-                                break;
-                            case "straight":
-                                drawableResource = R.drawable.straight;
-                                break;
-                            case "turn-right":
-                                drawableResource = R.drawable.turn_right;
-                                break;
-                            case "turn-left":
-                                drawableResource = R.drawable.turn_left;
-                                break;
-                            case "turn-sharp-right":
-                                drawableResource = R.drawable.turn_sharp_right;
-                                break;
-                            case "turn-sharp-left":
-                                drawableResource = R.drawable.turn_sharp_left;
-                                break;
-                            case "turn-slight-right":
-                                drawableResource = R.drawable.turn_slight_right;
-                                break;
-                            case "turn-slight-left":
-                                drawableResource = R.drawable.turn_slight_left;
-                                break;
-                            case "uturn-right":
-                                drawableResource = R.drawable.uturn_right;
-                                break;
-                            case "uturn-left":
-                                drawableResource = R.drawable.uturn_left;
-                                break;
-
-                            default:
-                                // Handle unknown maneuver types or use a default drawable
-                                drawableResource = R.drawable.straight;
-                                break;
-                        }
-
-
-                        if (imageViewDirections != null) {
-                            // Set the selected drawable to the ImageView
-                            imageViewDirections.setImageResource(drawableResource);
-                        }
-
-                        double totalDistanceKm = 0.0;
-                        int totalDurationMinutes = 0;
-
-                        for (int i = 0; i < routes.length(); i++) {
-                            JSONObject route = routes.getJSONObject(i);
-
-                            JSONArray legs = route.getJSONArray("legs");
-
-                            for (int j = 0; j < legs.length(); j++) {
-                                JSONObject leg = legs.getJSONObject(j);
-
-                                JSONArray steps = leg.getJSONArray("steps");
-
-                                for (int k = 0; k < steps.length(); k++) {
-                                    JSONObject step = steps.getJSONObject(k);
-
-                                    // Extract information from the step
-                                    String distance = step.getJSONObject("distance").getString("text");
-                                    String duration = step.getJSONObject("duration").getString("text");
-                                    String htmlInstructions = step.getString("html_instructions");
-
-                                    // Extract and add up the distance and duration for each leg
-                                    totalDistanceKm += step.getJSONObject("distance").getDouble("value") / 1000.0; // Convert meters to kilometers
-                                    totalDurationMinutes += step.getJSONObject("duration").getInt("value") / 60; // Convert seconds to minutes
-
-                                    //String[] splitDistance = distance.split(" ");
-                                    //String[] splitTime = duration.split(" ");
-
-                                    //Toast.makeText(getContext(), splitTime[0], Toast.LENGTH_LONG).show();
-
-                                    //double doubleDistance = Double.parseDouble(splitDistance[0]);
-                                    //int intMinutes = Integer.parseInt(splitTime[0]);
-
-                                    //totalDistance += doubleDistance;
-                                    //totalTime += intMinutes;
-
-                                    //Toast.makeText(getContext(), distance, Toast.LENGTH_LONG).show();
-
-                                    // You can now use the extracted information as needed
-
-                                    // Retrieve maneuver if it's present, or provide a default value
-                                    //String maneuver = step.optString("maneuver", "No Maneuver");
-                                    //Toast.makeText(getContext(), maneuver, Toast.LENGTH_LONG).show();
+                            if (distanceSample.contains("km") && distanceValue < 1.0) {
+                                // Convert the distance to meters
+                                int meters = (int) (distanceValue * 1000);
+                                String distanceInMeters = meters + " m";
+                                // Use distanceInMeters as needed
+                                if (textViewDistance != null) {
+                                    textViewDistance.setText(distanceInMeters);
+                                }
+                            } else {
+                                // Use the original distance string (it's already in meters or more than 1 km)
+                                if (textViewDistance != null) {
+                                    textViewDistance.setText(distanceSample);
                                 }
                             }
-                        }
 
-                        // Format totalDistanceKm with 2 decimal places
-                        String formattedDistance = String.format("%.2f", totalDistanceKm);
 
-                        double thresholdDistance = 0.015; // 0.015=15 meters threshold    1.2
+                            // Initialize ImageView container
+                            ImageView imageViewDirections = getView().findViewById(R.id.imageViewDirections);
 
-                        if (textViewDistance != null && textViewDirection != null && buttonFinish != null && imageViewDirections != null) {
-                            if (totalDistanceKm <= thresholdDistance) {
-                                textViewDistance.setText("You have arrived at your destination.");
-                                textViewDirection.setVisibility(View.GONE);
-                                buttonFinish.setVisibility(View.VISIBLE);
-                                buttonFinish.setText("Done");
-                                imageViewDirections.setImageResource(R.drawable.arrived);
-                            } else {
-                                textViewDirection.setVisibility(View.VISIBLE);
-                                buttonFinish.setVisibility(View.GONE);
+                            // Get the maneuver from your API response
+                            // Retrieve maneuver if it's present, or provide a default value
+                            String maneuverType = stepSamp.optString("maneuver", "No Maneuver");
+                            //Toast.makeText(getContext(), maneuverType, Toast.LENGTH_LONG).show();
+
+                            // Create a variable to store the drawable resource ID
+                            int drawableResource = R.drawable.straight; // Default drawable
+
+                            // Map maneuver types to corresponding drawable resource IDs
+                            switch (maneuverType) {
+                                case "keep-left":
+                                    drawableResource = R.drawable.keep_left;
+                                    break;
+                                case "keep-right":
+                                    drawableResource = R.drawable.keep_right;
+                                    break;
+                                case "ferry":
+                                    drawableResource = R.drawable.ferry;
+                                    break;
+                                case "ferry-train":
+                                    drawableResource = R.drawable.ferry_train;
+                                    break;
+                                case "fork-left":
+                                    drawableResource = R.drawable.fork_left;
+                                    break;
+                                case "fork-right":
+                                    drawableResource = R.drawable.fork_right;
+                                    break;
+                                case "merge":
+                                    drawableResource = R.drawable.merge;
+                                    break;
+                                case "ramp-left":
+                                    drawableResource = R.drawable.ramp_left;
+                                    break;
+                                case "ramp-right":
+                                    drawableResource = R.drawable.ramp_right;
+                                    break;
+                                case "roundabout-left":
+                                    drawableResource = R.drawable.roundabout_left;
+                                    break;
+                                case "roundabout-right":
+                                    drawableResource = R.drawable.roundabout_right;
+                                    break;
+                                case "straight":
+                                    drawableResource = R.drawable.straight;
+                                    break;
+                                case "turn-right":
+                                    drawableResource = R.drawable.turn_right;
+                                    break;
+                                case "turn-left":
+                                    drawableResource = R.drawable.turn_left;
+                                    break;
+                                case "turn-sharp-right":
+                                    drawableResource = R.drawable.turn_sharp_right;
+                                    break;
+                                case "turn-sharp-left":
+                                    drawableResource = R.drawable.turn_sharp_left;
+                                    break;
+                                case "turn-slight-right":
+                                    drawableResource = R.drawable.turn_slight_right;
+                                    break;
+                                case "turn-slight-left":
+                                    drawableResource = R.drawable.turn_slight_left;
+                                    break;
+                                case "uturn-right":
+                                    drawableResource = R.drawable.uturn_right;
+                                    break;
+                                case "uturn-left":
+                                    drawableResource = R.drawable.uturn_left;
+                                    break;
+
+                                default:
+                                    // Handle unknown maneuver types or use a default drawable
+                                    drawableResource = R.drawable.straight;
+                                    break;
+                            }
+
+
+                            if (imageViewDirections != null) {
+                                // Set the selected drawable to the ImageView
                                 imageViewDirections.setImageResource(drawableResource);
                             }
-                        }
 
-                        TextView textViewTotal = getView().findViewById(R.id.textViewTotalMinKm);
-                        if (textViewTotal != null) {
-                            textViewTotal.setText(formattedDistance + " km • " + totalDurationMinutes + " mins");
+                            double totalDistanceKm = 0.0;
+                            int totalDurationMinutes = 0;
+
+                            for (int i = 0; i < routes.length(); i++) {
+                                JSONObject route = routes.getJSONObject(i);
+
+                                JSONArray legs = route.getJSONArray("legs");
+
+                                for (int j = 0; j < legs.length(); j++) {
+                                    JSONObject leg = legs.getJSONObject(j);
+
+                                    JSONArray steps = leg.getJSONArray("steps");
+
+                                    for (int k = 0; k < steps.length(); k++) {
+                                        JSONObject step = steps.getJSONObject(k);
+
+                                        // Extract information from the step
+                                        String distance = step.getJSONObject("distance").getString("text");
+                                        String duration = step.getJSONObject("duration").getString("text");
+                                        String htmlInstructions = step.getString("html_instructions");
+
+                                        // Extract and add up the distance and duration for each leg
+                                        totalDistanceKm += step.getJSONObject("distance").getDouble("value") / 1000.0; // Convert meters to kilometers
+                                        totalDurationMinutes += step.getJSONObject("duration").getInt("value") / 60; // Convert seconds to minutes
+
+                                        //String[] splitDistance = distance.split(" ");
+                                        //String[] splitTime = duration.split(" ");
+
+                                        //Toast.makeText(getContext(), splitTime[0], Toast.LENGTH_LONG).show();
+
+                                        //double doubleDistance = Double.parseDouble(splitDistance[0]);
+                                        //int intMinutes = Integer.parseInt(splitTime[0]);
+
+                                        //totalDistance += doubleDistance;
+                                        //totalTime += intMinutes;
+
+                                        //Toast.makeText(getContext(), distance, Toast.LENGTH_LONG).show();
+
+                                        // You can now use the extracted information as needed
+
+                                        // Retrieve maneuver if it's present, or provide a default value
+                                        //String maneuver = step.optString("maneuver", "No Maneuver");
+                                        //Toast.makeText(getContext(), maneuver, Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                            }
+
+                            // Format totalDistanceKm with 2 decimal places
+                            String formattedDistance = String.format("%.2f", totalDistanceKm);
+
+                            double thresholdDistance = 0.015; // 0.015=15 meters threshold    1.2
+
+                            if (textViewDistance != null && textViewDirection != null && buttonFinish != null && imageViewDirections != null) {
+                                if (totalDistanceKm <= thresholdDistance) {
+                                    textViewDistance.setText("You have arrived at your destination.");
+                                    textViewDirection.setVisibility(View.GONE);
+                                    buttonFinish.setVisibility(View.VISIBLE);
+                                    buttonFinish.setText("Done");
+                                    imageViewDirections.setImageResource(R.drawable.arrived);
+                                } else {
+                                    textViewDirection.setVisibility(View.VISIBLE);
+                                    buttonFinish.setVisibility(View.GONE);
+                                    imageViewDirections.setImageResource(drawableResource);
+                                }
+                            }
+
+                            TextView textViewTotal = getView().findViewById(R.id.textViewTotalMinKm);
+                            if (textViewTotal != null) {
+                                textViewTotal.setText(formattedDistance + " km • " + totalDurationMinutes + " mins");
+                            }
                         }
 
                     } else {

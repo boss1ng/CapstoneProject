@@ -1,5 +1,3 @@
-import java.util.regex.Pattern.compile
-
 plugins {
     id("com.android.application")
 }
@@ -34,8 +32,6 @@ android {
 }
 
 
-
-
 dependencies {
     //noinspection GradleCompatible
     implementation("androidx.appcompat:appcompat:1.6.1")
@@ -53,8 +49,6 @@ dependencies {
     implementation("com.google.firebase:firebase-core:21.1.1")
     implementation("androidx.activity:activity-ktx:1.2.4")
     implementation("androidx.fragment:fragment-ktx:1.3.3")
-    api ("com.theartofdev.edmodo:android-image-cropper:2.8.+")
-
 
     //implementation("com.github.esafirm.android-image-picker:imagepicker:2.0.1")
     testImplementation("junit:junit:4.13.2")

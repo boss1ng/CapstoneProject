@@ -6,16 +6,10 @@ pluginManagement {
     }
 }
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
-        jcenter() {
-            content {
-                includeModule("com.theartofdev.edmodo", "android-image-cropper")
-            }
-        }
-        // jcenter() // Uncomment if needed
     }
 }
 
