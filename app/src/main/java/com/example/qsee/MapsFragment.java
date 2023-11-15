@@ -33,6 +33,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -804,6 +805,20 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                                 .title(name)
                                 //.title(rating)
                                 .snippet(address + "@" + stringRating + "@" + description + "@" + imageLink + "@" + placePrice + "@" + doubleLatitude + "@" + doubleLongitude);
+
+                        Bundle args = getArguments();
+                        if (args != null) {
+                            placeLatitude = args.getDouble("placeLatitude");
+                            placeLongitude = args.getDouble("placeLongitude");
+
+                            if (doubleLatitude == placeLatitude && doubleLongitude == placeLongitude) {
+                                // Set a different color for the marker (e.g., red)
+                                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                            } else {
+                                // Set a default color for the marker (e.g., blue)
+                                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                            }
+                        }
 
                         // Add markers to the Google Map
                         Marker marker = mMap.addMarker(markerOptions);
