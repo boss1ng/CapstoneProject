@@ -417,7 +417,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
                     if (placeLatitude == 0.0 && placeLongitude == 0.0) {
                         // IF RESTRICTION TO QUEZON CITY IS REMOVED, change to 15.
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, minZoomLevel)); // 15
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15)); // 15 minZoomLevel
                     }
 
                     else {

@@ -1,7 +1,12 @@
 package com.example.qsee;
 
+import static android.content.ContentValues.TAG;
+
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -90,6 +95,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
 
     // Declare a boolean flag to control execution
     private boolean isRunning = true;
+    private boolean isConnected = true;
     Handler handler;
     Runnable mapRefreshRunnable;
 
@@ -111,6 +117,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                 if (itemId == R.id.action_home) {
                     isRunning = false;
                     Toast.makeText(getContext(), "Exiting...", Toast.LENGTH_LONG).show();
+                    Log.d(TAG, "EXITING via HOME...");
 
                     // Use a Handler to refresh the map every second
                     Handler handlerDelay = new Handler();
@@ -120,7 +127,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                             handler.removeCallbacks(mapRefreshRunnable); // Remove any pending callbacks // Dismiss the dialog
                         }
                     };
-                    handlerDelay.postDelayed(runnable, 900); // Schedule it to run after 1 second
+                    handlerDelay.postDelayed(runnable, 3150); // Schedule it to run after 1 second
 
                     bottomNavigationView.setVisibility(View.GONE);
                     loadFragment(new HomeFragment());
@@ -129,6 +136,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                 else if (itemId == R.id.action_search) {
                     isRunning = false;
                     Toast.makeText(getContext(), "Exiting...", Toast.LENGTH_LONG).show();
+                    Log.d(TAG, "EXITING via SEARCH...");
 
                     // Use a Handler to refresh the map every second
                     Handler handlerDelay = new Handler();
@@ -138,7 +146,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                             handler.removeCallbacks(mapRefreshRunnable); // Remove any pending callbacks // Dismiss the dialog
                         }
                     };
-                    handlerDelay.postDelayed(runnable, 1000); // Schedule it to run after 1 second
+                    handlerDelay.postDelayed(runnable, 3150); // Schedule it to run after 1 second
 
                     bottomNavigationView.setVisibility(View.GONE);
                     loadFragment(new SearchFragment());
@@ -158,7 +166,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                             handler.removeCallbacks(mapRefreshRunnable); // Remove any pending callbacks // Dismiss the dialog
                         }
                     };
-                    handlerDelay.postDelayed(runnable, 1000); // Schedule it to run after 1 second
+                    handlerDelay.postDelayed(runnable, 3150); // Schedule it to run after 1 second
 
                     bottomNavigationView.setVisibility(View.GONE);
                     loadFragment(new MapsFragment());
@@ -168,6 +176,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                 else if (itemId == R.id.action_quiz) {
                     isRunning = false;
                     Toast.makeText(getContext(), "Exiting...", Toast.LENGTH_LONG).show();
+                    Log.d(TAG, "EXITING via QUIZ...");
 
                     // Use a Handler to refresh the map every second
                     Handler handlerDelay = new Handler();
@@ -177,7 +186,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                             handler.removeCallbacks(mapRefreshRunnable); // Remove any pending callbacks // Dismiss the dialog
                         }
                     };
-                    handlerDelay.postDelayed(runnable, 1000); // Schedule it to run after 1 second
+                    handlerDelay.postDelayed(runnable, 3150); // Schedule it to run after 1 second
 
                     bottomNavigationView.setVisibility(View.GONE);
                     loadFragment(new StartQuizFragment());
@@ -186,6 +195,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                 else if (itemId == R.id.action_profile) {
                     isRunning = false;
                     Toast.makeText(getContext(), "Exiting...", Toast.LENGTH_LONG).show();
+                    Log.d(TAG, "EXITING via PROFILE...");
 
                     // Use a Handler to refresh the map every second
                     Handler handlerDelay = new Handler();
@@ -195,7 +205,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                             handler.removeCallbacks(mapRefreshRunnable); // Remove any pending callbacks // Dismiss the dialog
                         }
                     };
-                    handlerDelay.postDelayed(runnable, 1000); // Schedule it to run after 1 second
+                    handlerDelay.postDelayed(runnable, 3150); // Schedule it to run after 1 second
 
                     bottomNavigationView.setVisibility(View.GONE);
                     loadFragment(new ProfileFragment());
@@ -262,6 +272,20 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
         transaction.addToBackStack(null);
         transaction.commit();
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        getActivity().registerReceiver(networkChangeReceiver, filter);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getActivity().unregisterReceiver(networkChangeReceiver);
+    }
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -445,6 +469,98 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
 
         updateMap();
 
+
+        // Check network connectivity
+        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            Log.d(TAG, "-----outside CONNECTED-----");
+
+            // Use a Handler to refresh the map every second
+            final int INTERVAL = 1000; // 1000 milliseconds = 1 second
+            handler = new Handler();
+            mapRefreshRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    //updateMap(); // Call the method to update the map
+                    //reUpdateMap();
+
+                    if (!isRunning) {
+                        // Stop the execution if the flag is false
+                        return;
+                    }
+
+                    else {
+                        if (currentRoutePolyline != null && currentBorderPolyline != null) {
+                            //updateMap();
+                            reUpdateMapAgain();
+                            //handler.postDelayed(this, 1000);
+                        } else if (previousCurrentRoutePolyline != null && previousCurrentBorderPolyline != null) {
+                            //manualMap();
+                            reUpdateMap();
+                            //handler.postDelayed(this, 1000);
+                        }
+
+                        handler.postDelayed(this, 1000);
+                    }
+                }
+            };
+
+            handler.postDelayed(mapRefreshRunnable, 1000); // Schedule it to run again in 1 second
+        }
+
+        else {
+            //isRunning = false;
+            Toast.makeText(getContext(), "Reconnecting...", Toast.LENGTH_LONG).show();
+            Log.d(TAG, "----DISCONNECTED----");
+        }
+
+
+    }
+
+    private BroadcastReceiver networkChangeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+            boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+            if (!isConnected) {
+                // Network is disconnected
+                displayDisconnectMessage();
+            } else {
+                // Network is connected
+                //handleReconnection();
+
+                handler1.removeCallbacks(runnableCode);
+
+                Log.d(TAG, "RECONNECTED---------------------------------------------------------------------------------------------------");
+            }
+        }
+    };
+
+    private final Handler handler1 = new Handler();
+    private final int delay = 3500; // 3.5 seconds in milliseconds
+
+    private final Runnable runnableCode = new Runnable() {
+        @Override
+        public void run() {
+            // Your code to display the Toast message goes here
+            Toast.makeText(getContext(), "Reconnecting...", Toast.LENGTH_LONG).show();
+            handler1.postDelayed(this, delay); // Repeat the code after the specified delay
+        }
+    };
+
+    private void displayDisconnectMessage() {
+        handler1.postDelayed(runnableCode, delay);
+    }
+
+    private void handleReconnection() {
+        // Implement the logic to handle reconnection
+        // For example, refresh the map or retry network requests
+        //Toast.makeText(getContext(), "Reconnected, updating map...", Toast.LENGTH_SHORT).show();
+
+        updateMap(); // Assuming updateMap() is a method to refresh map data
+
         // Use a Handler to refresh the map every second
         final int INTERVAL = 1000; // 1000 milliseconds = 1 second
         handler = new Handler();
@@ -458,149 +574,167 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                     // Stop the execution if the flag is false
                     return;
                 }
-//ADDED
-                // Check network connectivity
-                ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-                NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-                if (networkInfo == null || !networkInfo.isConnected()) {
-                    handler.postDelayed(this, 1000);
-                }
-//
-                //updateMap();
-                if (currentRoutePolyline != null && currentBorderPolyline != null) {
-                    //updateMap();
-                    reUpdateMapAgain();
-                    handler.postDelayed(this, 1000);
-                }
 
-                else if (previousCurrentRoutePolyline != null && previousCurrentBorderPolyline != null) {
-                    //manualMap();
-                    reUpdateMap();
-                    handler.postDelayed(this, 1000);
+                else {
+                    if (currentRoutePolyline != null && currentBorderPolyline != null) {
+                        //updateMap();
+                        reUpdateMapAgain();
+                        handler.postDelayed(this, 1000);
+                    } else if (previousCurrentRoutePolyline != null && previousCurrentBorderPolyline != null) {
+                        //manualMap();
+                        reUpdateMap();
+                        handler.postDelayed(this, 1000);
+                    }
                 }
             }
         };
 
         handler.postDelayed(mapRefreshRunnable, 1000); // Schedule it to run again in 1 second
-
     }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+
 
     // Create a method to update the map
     private void updateMap() {
         // Add your code here to update the map
-        // This method will be called every time you want to refresh the map
+        // This method will be called every time you want to refresh the
 
-        if (!isRunning) {
-            // Stop execution of the method if isRunning is false
-            return;
-        }
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        getActivity().registerReceiver(networkChangeReceiver, filter);
 
-        if (currentLocMarker != null) {
-            currentLocMarker.remove();
-        }
 
-        LinearLayout linearLayoutDirections = getView().findViewById(R.id.directionsCont);
-        linearLayoutDirections.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        // Check network connectivity
+        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            Log.d(TAG, "-----updateMap CONNECTED-----");
 
+            if (!isRunning) {
+                // Stop execution of the method if isRunning is false
+                return;
             }
-        });
 
-        LinearLayout linearLayoutOverview = getView().findViewById(R.id.overviewCont);
-        linearLayoutOverview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
+            if (currentLocMarker != null) {
+                currentLocMarker.remove();
             }
-        });
 
-        BitmapDescriptor customArrow = BitmapDescriptorFactory.fromResource(R.drawable.currentlocation);
-        BitmapDescriptor destinationMarker = BitmapDescriptorFactory.fromResource(R.drawable.destinationflag);
+            View rootView = getView(); // Get the root view
+            if (rootView != null) {
+                LinearLayout linearLayoutDirections = rootView.findViewById(R.id.directionsCont);
+                if (linearLayoutDirections != null) {
+                    linearLayoutDirections.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
 
-        // Check if location permission is granted
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
+                        }
+                    });
+                }
 
-            // Request location permission if not granted
-            requestPermissions(new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-            }, LOCATION_PERMISSION_REQUEST_CODE);
-            return;
-        }
 
-        // Get the user's last known location and move the camera there
-        fusedLocationProviderClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
-            if (location != null) {
-                double latitude = location.getLatitude();
-                double longitude = location.getLongitude();
-                currentUserLocationLat = location.getLatitude();
-                currentUserLocationLong = location.getLongitude();
-                LatLng userLocation = new LatLng(latitude, longitude);
+                LinearLayout linearLayoutOverview = rootView.findViewById(R.id.overviewCont);
+                if (linearLayoutOverview != null) {
+                    linearLayoutOverview.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
 
-                // Add a marker to the map using the scaled custom arrow icon
-                currentLocMarker = mMap.addMarker(new MarkerOptions()
-                        .position(new LatLng(location.getLatitude(), location.getLongitude())) // Specify the position of the marker
-                        .icon(customArrow) // Use the scaled custom arrow as the marker icon
-                        .anchor(0.5f, 0.5f) // Adjust the anchor to the center of your custom arrow
-                        .rotation(location.getBearing()) // Rotate the arrow to match the user's heading (if needed)
-                        .flat(true) // Make the arrow always face the same direction
-                );
+                        }
+                    });
+                }
 
-                mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                    @Override
-                    public boolean onMarkerClick(@NonNull Marker marker) {
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 19));
-                        return true;
+                BitmapDescriptor customArrow = BitmapDescriptorFactory.fromResource(R.drawable.currentlocation);
+                BitmapDescriptor destinationMarker = BitmapDescriptorFactory.fromResource(R.drawable.destinationflag);
+
+                // Check if location permission is granted
+                if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED
+                        && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+
+                    // Request location permission if not granted
+                    requestPermissions(new String[]{
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                    }, LOCATION_PERMISSION_REQUEST_CODE);
+                    return;
+                }
+
+                // Get the user's last known location and move the camera there
+                fusedLocationProviderClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
+                    if (location != null) {
+                        double latitude = location.getLatitude();
+                        double longitude = location.getLongitude();
+                        currentUserLocationLat = location.getLatitude();
+                        currentUserLocationLong = location.getLongitude();
+                        LatLng userLocation = new LatLng(latitude, longitude);
+
+                        // Add a marker to the map using the scaled custom arrow icon
+                        currentLocMarker = mMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(location.getLatitude(), location.getLongitude())) // Specify the position of the marker
+                                .icon(customArrow) // Use the scaled custom arrow as the marker icon
+                                .anchor(0.5f, 0.5f) // Adjust the anchor to the center of your custom arrow
+                                .rotation(location.getBearing()) // Rotate the arrow to match the user's heading (if needed)
+                                .flat(true) // Make the arrow always face the same direction
+                        );
+
+                        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                            @Override
+                            public boolean onMarkerClick(@NonNull Marker marker) {
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 19));
+                                return true;
+                            }
+                        });
+
+                        ImageView imageViewReCenter = rootView.findViewById(R.id.imageViewOverviewButton);
+                        if (imageViewReCenter != null) {
+                            imageViewReCenter.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 19));
+                                }
+
+                            });
+                        }
+
+                        // Add a marker at the user's location
+                        // mMap.addMarker(new MarkerOptions().position(userLocation).title("Your Location"));
+
+                        // Move the camera to the user's location
+                        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
                     }
                 });
 
-                ImageView imageViewReCenter = getView().findViewById(R.id.imageViewOverviewButton);
-                imageViewReCenter.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 19));
-                    }
+                // Receive the values from the Bundle
+                Bundle bundle = getArguments();
+                if (bundle != null) {
+                    // CURRENT USER LOCATION
+                    //Double userCurrentLatitude = bundle.getDouble("userCurrentLatitude");
+                    //Double userCurrentLongitude = bundle.getDouble("userCurrentLongitude");
 
-                });
+                    // DESTINATION LOCATION
+                    String placeName = bundle.getString("placeName");
+                    String destinationLatitude = bundle.getString("destinationLatitude");
+                    String destinationLongitude = bundle.getString("destinationLongitude");
 
-                // Add a marker at the user's location
-                // mMap.addMarker(new MarkerOptions().position(userLocation).title("Your Location"));
+                    Double destLatitude = Double.parseDouble(destinationLatitude);
+                    Double destLongitude = Double.parseDouble(destinationLongitude);
 
-                // Move the camera to the user's location
-                //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
-            }
-        });
+                    // Create MarkerOptions or LatLng objects for each place
+                    LatLng marketLocation = new LatLng(destLatitude, destLongitude);
 
-        // Receive the values from the Bundle
-        Bundle bundle = getArguments();
-        if (bundle != null) {
-            // CURRENT USER LOCATION
-            //Double userCurrentLatitude = bundle.getDouble("userCurrentLatitude");
-            //Double userCurrentLongitude = bundle.getDouble("userCurrentLongitude");
-
-            // DESTINATION LOCATION
-            String placeName = bundle.getString("placeName");
-            String destinationLatitude = bundle.getString("destinationLatitude");
-            String destinationLongitude = bundle.getString("destinationLongitude");
-
-            Double destLatitude = Double.parseDouble(destinationLatitude);
-            Double destLongitude = Double.parseDouble(destinationLongitude);
-
-            // Create MarkerOptions or LatLng objects for each place
-            LatLng marketLocation = new LatLng(destLatitude, destLongitude);
-
-            MarkerOptions markerOptions = new MarkerOptions()
-                    .position(marketLocation)
-                    .title(placeName)
-                    .icon(destinationMarker); // Use the scaled custom arrow as the marker icon
+                    MarkerOptions markerOptions = new MarkerOptions()
+                            .position(marketLocation)
+                            .title(placeName)
+                            .icon(destinationMarker); // Use the scaled custom arrow as the marker icon
                     //.anchor(0.5f, 1f); // Adjust the anchor to the center of your custom arrow
 
-            // Add markers to the Google Map
-            Marker marker = mMap.addMarker(markerOptions);
+                    // Add markers to the Google Map
+                    Marker marker = mMap.addMarker(markerOptions);
 
             /*
             // Clear the previous route polyline and border polyline if they exist
@@ -612,117 +746,131 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
             }
              */
 
-            // previousCurrentRoutePolyline previousCurrentBorderPolyline currentRoutePolyline currentBorderPolyline
+                    // previousCurrentRoutePolyline previousCurrentBorderPolyline currentRoutePolyline currentBorderPolyline
 
-            // Get the destination coordinates (latitude and longitude) of the clicked marker
-            LatLng destinationLatLng = marker.getPosition();
+                    // Get the destination coordinates (latitude and longitude) of the clicked marker
+                    LatLng destinationLatLng = marker.getPosition();
 
-            // Get your current location using the FusedLocationProviderClient
-            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
-                if (location != null) {
-                    LatLng originLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+                    // Get your current location using the FusedLocationProviderClient
+                    fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
+                        if (location != null) {
+                            LatLng originLatLng = new LatLng(location.getLatitude(), location.getLongitude());
 
-                    // Use Google Directions API to request directions
-                    String apiKey = getString(R.string.google_maps_api_key);
-                    String url = "https://maps.googleapis.com/maps/api/directions/json?" +
-                            "origin=" + originLatLng.latitude + "," + originLatLng.longitude +
-                            "&destination=" + destinationLatLng.latitude + "," + destinationLatLng.longitude +
-                            "&key=" + apiKey;
+                            // Use Google Directions API to request directions
+                            String apiKey = getString(R.string.google_maps_api_key);
+                            String url = "https://maps.googleapis.com/maps/api/directions/json?" +
+                                    "origin=" + originLatLng.latitude + "," + originLatLng.longitude +
+                                    "&destination=" + destinationLatLng.latitude + "," + destinationLatLng.longitude +
+                                    "&key=" + apiKey;
 
-                    // Make an HTTP request to the Directions API
-                    RequestQueue queue = Volley.newRequestQueue(requireContext());
+                            // Make an HTTP request to the Directions API
+                            RequestQueue queue = Volley.newRequestQueue(requireContext());
 
-                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
-                            response -> {
-                                // Parse the JSON response to extract the route information
-                                List<LatLng> points = parseDirectionsResponse(response);
+                            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
+                                    response -> {
+                                        // Parse the JSON response to extract the route information
+                                        List<LatLng> points = parseDirectionsResponse(response);
 
-                                // Draw the border line on the map with color "#1967d2" (slightly wider)
-                                if (points != null) {
-                                    PolylineOptions borderOptions = new PolylineOptions()
-                                            .addAll(points)
-                                            .width(20) // Adjust the width as needed for the border
-                                            .color(Color.parseColor("#1967d2")); // Set color to "#1967d2" for the border
-                                    previousCurrentBorderPolyline = mMap.addPolyline(borderOptions);
+                                        // Draw the border line on the map with color "#1967d2" (slightly wider)
+                                        if (points != null) {
+                                            PolylineOptions borderOptions = new PolylineOptions()
+                                                    .addAll(points)
+                                                    .width(20) // Adjust the width as needed for the border
+                                                    .color(Color.parseColor("#1967d2")); // Set color to "#1967d2" for the border
+                                            previousCurrentBorderPolyline = mMap.addPolyline(borderOptions);
 
-                                    // Draw the solid route line on the map with color "#00b0ff"
-                                    PolylineOptions routeOptions = new PolylineOptions()
-                                            .addAll(points)
-                                            .width(14) // Adjust the width as needed for the route
-                                            .color(Color.parseColor("#00b0ff")); // Set color to "#00b0ff" for the route
-                                    previousCurrentRoutePolyline = mMap.addPolyline(routeOptions);
+                                            // Draw the solid route line on the map with color "#00b0ff"
+                                            PolylineOptions routeOptions = new PolylineOptions()
+                                                    .addAll(points)
+                                                    .width(14) // Adjust the width as needed for the route
+                                                    .color(Color.parseColor("#00b0ff")); // Set color to "#00b0ff" for the route
+                                            previousCurrentRoutePolyline = mMap.addPolyline(routeOptions);
 
-                                    // Move the camera to fit the bounds of the new route
-                                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                                    builder.include(originLatLng);
-                                    builder.include(destinationLatLng);
-                                    LatLngBounds bounds = builder.build();
-                                    //mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 50));
+                                            // Move the camera to fit the bounds of the new route
+                                            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                                            builder.include(originLatLng);
+                                            builder.include(destinationLatLng);
+                                            LatLngBounds bounds = builder.build();
+                                            //mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 50));
 
-                                    // Move the camera to the user's location
-                                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(originLatLng, 19));   //19
+                                            // Move the camera to the user's location
+                                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(originLatLng, 19));   //19
 
 
+                                            Button overviewButton = rootView.findViewById(R.id.overviewButton);
+                                            if (overviewButton != null) {
+                                                overviewButton.setOnClickListener(new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View v) {
+                                                        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 250));
+                                                    }
+                                                });
+                                            }
 
-                                    Button overviewButton = getView().findViewById(R.id.overviewButton);
-                                    overviewButton.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 250));
                                         }
+                                    },
+                                    error -> {
+                                        // Handle errors in making the request or parsing the response
+                                        Log.e("Directions Error", error.toString());
+                                    }
+                            );
 
-                                    });
+                            // ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-                                }
-                            },
-                            error -> {
-                                // Handle errors in making the request or parsing the response
-                                Log.e("Directions Error", error.toString());
+                            // Use this method before starting any async task
+                            if(isNetworkAvailable()) {
+                                // Start Async Task
+                                // Create an instance of DirectionsTask and execute it
+                                DirectionsTask directionsTask = new DirectionsTask(url);
+                                directionsTask.execute();
+                            } else {
+                                // Show error message
+                                Toast.makeText(getContext(), "Reconnecting...", Toast.LENGTH_LONG).show();
+                                Log.d(TAG, "updateMap----DISCONNECTED----");
                             }
-                    );
-
-    // ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-                    // Create an instance of DirectionsTask and execute it
-                    DirectionsTask directionsTask = new DirectionsTask(url);
-                    directionsTask.execute();
 
-                    //String jsonResponseString = String.valueOf(directionsTask);
-                    //Toast.makeText(getContext(), jsonResponseString, Toast.LENGTH_LONG).show();
+                            //String jsonResponseString = String.valueOf(directionsTask);
+                            //Toast.makeText(getContext(), jsonResponseString, Toast.LENGTH_LONG).show();
 
 
-    // ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                            // ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-                    // Add the request to the queue
-                    queue.add(request);
+                            // Add the request to the queue
+                            queue.add(request);
+                        }
+                    });
                 }
-            });
+
+
+                // Use a Handler to refresh the map every second
+                Handler handler = new Handler();
+                Runnable mapRefreshRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        // Clear the previous route polyline and border polyline if they exist
+                        if (currentRoutePolyline != null) {
+                            currentRoutePolyline.remove();
+                            currentRoutePolyline = null;
+                        }
+                        if (currentBorderPolyline != null) {
+                            currentBorderPolyline.remove();
+                            currentBorderPolyline = null;
+                        }
+                    }
+                };
+                handler.postDelayed(mapRefreshRunnable, 1000); // Schedule it to run after 0.3 second
+            }
         }
 
-
-        // Use a Handler to refresh the map every second
-        Handler handler = new Handler();
-        Runnable mapRefreshRunnable = new Runnable() {
-            @Override
-            public void run() {
-                // Clear the previous route polyline and border polyline if they exist
-                if (currentRoutePolyline != null) {
-                    currentRoutePolyline.remove();
-                    currentRoutePolyline = null;
-                }
-                if (currentBorderPolyline != null) {
-                    currentBorderPolyline.remove();
-                    currentBorderPolyline = null;
-                }
-            }
-        };
-        handler.postDelayed(mapRefreshRunnable, 1000); // Schedule it to run after 0.3 second
-
-
-
+        else {
+            //isRunning = false;
+            Toast.makeText(getContext(), "Reconnecting...", Toast.LENGTH_LONG).show();
+            Log.d(TAG, "----DISCONNECTED----");
+        }
     }
 
     private void reUpdateMap() {
@@ -732,6 +880,15 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
         if (!isRunning) {
             // Stop execution of the method if isRunning is false
             return;
+        }
+
+        // Check network connectivity
+        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            Log.d(TAG, "-----reUpdateMap CONNECTED-----");
+        } else {
+            Log.d(TAG, "----DISCONNECTED----");
         }
 
         if (currentLocMarker != null) {
@@ -884,9 +1041,17 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                     // ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-                    // Create an instance of DirectionsTask and execute it
-                    DirectionsTask directionsTask = new DirectionsTask(url);
-                    directionsTask.execute();
+                    // Use this method before starting any async task
+                    if(isNetworkAvailable()) {
+                        // Start Async Task
+                        // Create an instance of DirectionsTask and execute it
+                        DirectionsTask directionsTask = new DirectionsTask(url);
+                        directionsTask.execute();
+                    } else {
+                        // Show error message
+                        Toast.makeText(getContext(), "Reconnecting...", Toast.LENGTH_LONG).show();
+                        Log.d(TAG, "reUpdateMap----DISCONNECTED----");
+                    }
 
                     //String jsonResponseString = String.valueOf(directionsTask);
                     //Toast.makeText(getContext(), jsonResponseString, Toast.LENGTH_LONG).show();
@@ -930,112 +1095,129 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
             return;
         }
 
+        // Check network connectivity
+        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            Log.d(TAG, "-----reUpdateMapAgain CONNECTED-----");
+        } else {
+            Log.d(TAG, "----DISCONNECTED----");
+        }
+
         if (currentLocMarker != null) {
             currentLocMarker.remove();
         }
 
-        LinearLayout linearLayoutDirections = getView().findViewById(R.id.directionsCont);
-        linearLayoutDirections.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        View rootView = getView(); // Get the root view
+        if (rootView != null) {
 
-            }
-        });
-
-        LinearLayout linearLayoutOverview = getView().findViewById(R.id.overviewCont);
-        linearLayoutOverview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
-        BitmapDescriptor customArrow = BitmapDescriptorFactory.fromResource(R.drawable.currentlocation);
-        BitmapDescriptor destinationMarker = BitmapDescriptorFactory.fromResource(R.drawable.destinationflag);
-
-        // Check if location permission is granted
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            // Request location permission if not granted
-            requestPermissions(new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-            }, LOCATION_PERMISSION_REQUEST_CODE);
-            return;
-        }
-
-        // Get the user's last known location and move the camera there
-        fusedLocationProviderClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
-            if (location != null) {
-                double latitude = location.getLatitude();
-                double longitude = location.getLongitude();
-                currentUserLocationLat = location.getLatitude();
-                currentUserLocationLong = location.getLongitude();
-                LatLng userLocation = new LatLng(latitude, longitude);
-
-                // Add a marker to the map using the scaled custom arrow icon
-                currentLocMarker = mMap.addMarker(new MarkerOptions()
-                        .position(new LatLng(location.getLatitude(), location.getLongitude())) // Specify the position of the marker
-                        .icon(customArrow) // Use the scaled custom arrow as the marker icon
-                        .anchor(0.5f, 0.5f) // Adjust the anchor to the center of your custom arrow
-                        .rotation(location.getBearing()) // Rotate the arrow to match the user's heading (if needed)
-                        .flat(true) // Make the arrow always face the same direction
-                );
-
-                mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                    @Override
-                    public boolean onMarkerClick(@NonNull Marker marker) {
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 19));
-                        return true;
-                    }
-                });
-
-                ImageView imageViewReCenter = getView().findViewById(R.id.imageViewOverviewButton);
-                imageViewReCenter.setOnClickListener(new View.OnClickListener() {
+            LinearLayout linearLayoutDirections = rootView.findViewById(R.id.directionsCont);
+            if (linearLayoutDirections != null) {
+                linearLayoutDirections.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 19));
+
+                    }
+                });
+            }
+
+            LinearLayout linearLayoutOverview = rootView.findViewById(R.id.overviewCont);
+            if (linearLayoutOverview != null) {
+                linearLayoutOverview.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                });
+            }
+
+            BitmapDescriptor customArrow = BitmapDescriptorFactory.fromResource(R.drawable.currentlocation);
+            BitmapDescriptor destinationMarker = BitmapDescriptorFactory.fromResource(R.drawable.destinationflag);
+
+            // Check if location permission is granted
+            if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
+
+                // Request location permission if not granted
+                requestPermissions(new String[]{
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                }, LOCATION_PERMISSION_REQUEST_CODE);
+                return;
+            }
+
+            // Get the user's last known location and move the camera there
+            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
+                if (location != null) {
+                    double latitude = location.getLatitude();
+                    double longitude = location.getLongitude();
+                    currentUserLocationLat = location.getLatitude();
+                    currentUserLocationLong = location.getLongitude();
+                    LatLng userLocation = new LatLng(latitude, longitude);
+
+                    // Add a marker to the map using the scaled custom arrow icon
+                    currentLocMarker = mMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(location.getLatitude(), location.getLongitude())) // Specify the position of the marker
+                            .icon(customArrow) // Use the scaled custom arrow as the marker icon
+                            .anchor(0.5f, 0.5f) // Adjust the anchor to the center of your custom arrow
+                            .rotation(location.getBearing()) // Rotate the arrow to match the user's heading (if needed)
+                            .flat(true) // Make the arrow always face the same direction
+                    );
+
+                    mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                        @Override
+                        public boolean onMarkerClick(@NonNull Marker marker) {
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 19));
+                            return true;
+                        }
+                    });
+
+                    ImageView imageViewReCenter = rootView.findViewById(R.id.imageViewOverviewButton);
+                    if (imageViewReCenter != null) {
+                        imageViewReCenter.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 19));
+                            }
+                        });
                     }
 
-                });
+                    // Add a marker at the user's location
+                    // mMap.addMarker(new MarkerOptions().position(userLocation).title("Your Location"));
 
-                // Add a marker at the user's location
-                // mMap.addMarker(new MarkerOptions().position(userLocation).title("Your Location"));
+                    // Move the camera to the user's location
+                    //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
+                }
+            });
 
-                // Move the camera to the user's location
-                //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
-            }
-        });
+            // Receive the values from the Bundle
+            Bundle bundle = getArguments();
+            if (bundle != null) {
+                // CURRENT USER LOCATION
+                //Double userCurrentLatitude = bundle.getDouble("userCurrentLatitude");
+                //Double userCurrentLongitude = bundle.getDouble("userCurrentLongitude");
 
-        // Receive the values from the Bundle
-        Bundle bundle = getArguments();
-        if (bundle != null) {
-            // CURRENT USER LOCATION
-            //Double userCurrentLatitude = bundle.getDouble("userCurrentLatitude");
-            //Double userCurrentLongitude = bundle.getDouble("userCurrentLongitude");
+                // DESTINATION LOCATION
+                String placeName = bundle.getString("placeName");
+                String destinationLatitude = bundle.getString("destinationLatitude");
+                String destinationLongitude = bundle.getString("destinationLongitude");
 
-            // DESTINATION LOCATION
-            String placeName = bundle.getString("placeName");
-            String destinationLatitude = bundle.getString("destinationLatitude");
-            String destinationLongitude = bundle.getString("destinationLongitude");
+                Double destLatitude = Double.parseDouble(destinationLatitude);
+                Double destLongitude = Double.parseDouble(destinationLongitude);
 
-            Double destLatitude = Double.parseDouble(destinationLatitude);
-            Double destLongitude = Double.parseDouble(destinationLongitude);
+                // Create MarkerOptions or LatLng objects for each place
+                LatLng marketLocation = new LatLng(destLatitude, destLongitude);
 
-            // Create MarkerOptions or LatLng objects for each place
-            LatLng marketLocation = new LatLng(destLatitude, destLongitude);
+                MarkerOptions markerOptions = new MarkerOptions()
+                        .position(marketLocation)
+                        .title(placeName)
+                        .icon(destinationMarker); // Use the scaled custom arrow as the marker icon
+                //.anchor(0.5f, 1f); // Adjust the anchor to the center of your custom arrow
 
-            MarkerOptions markerOptions = new MarkerOptions()
-                    .position(marketLocation)
-                    .title(placeName)
-                    .icon(destinationMarker); // Use the scaled custom arrow as the marker icon
-            //.anchor(0.5f, 1f); // Adjust the anchor to the center of your custom arrow
-
-            // Add markers to the Google Map
-            Marker marker = mMap.addMarker(markerOptions);
+                // Add markers to the Google Map
+                Marker marker = mMap.addMarker(markerOptions);
 
             /*
             // Clear the previous route polyline and border polyline if they exist
@@ -1047,116 +1229,123 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
             }
              */
 
-            // previousCurrentRoutePolyline previousCurrentBorderPolyline currentRoutePolyline currentBorderPolyline
+                // previousCurrentRoutePolyline previousCurrentBorderPolyline currentRoutePolyline currentBorderPolyline
 
-            // Get the destination coordinates (latitude and longitude) of the clicked marker
-            LatLng destinationLatLng = marker.getPosition();
+                // Get the destination coordinates (latitude and longitude) of the clicked marker
+                LatLng destinationLatLng = marker.getPosition();
 
-            // Get your current location using the FusedLocationProviderClient
-            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
-                if (location != null) {
-                    LatLng originLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+                // Get your current location using the FusedLocationProviderClient
+                fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
+                    if (location != null) {
+                        LatLng originLatLng = new LatLng(location.getLatitude(), location.getLongitude());
 
-                    // Use Google Directions API to request directions
-                    String apiKey = getString(R.string.google_maps_api_key);
-                    String url = "https://maps.googleapis.com/maps/api/directions/json?" +
-                            "origin=" + originLatLng.latitude + "," + originLatLng.longitude +
-                            "&destination=" + destinationLatLng.latitude + "," + destinationLatLng.longitude +
-                            "&key=" + apiKey;
+                        // Use Google Directions API to request directions
+                        String apiKey = getString(R.string.google_maps_api_key);
+                        String url = "https://maps.googleapis.com/maps/api/directions/json?" +
+                                "origin=" + originLatLng.latitude + "," + originLatLng.longitude +
+                                "&destination=" + destinationLatLng.latitude + "," + destinationLatLng.longitude +
+                                "&key=" + apiKey;
 
-                    // Make an HTTP request to the Directions API
-                    RequestQueue queue = Volley.newRequestQueue(requireContext());
+                        // Make an HTTP request to the Directions API
+                        RequestQueue queue = Volley.newRequestQueue(requireContext());
 
-                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
-                            response -> {
-                                // Parse the JSON response to extract the route information
-                                List<LatLng> points = parseDirectionsResponse(response);
+                        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
+                                response -> {
+                                    // Parse the JSON response to extract the route information
+                                    List<LatLng> points = parseDirectionsResponse(response);
 
-                                // Draw the border line on the map with color "#1967d2" (slightly wider)
-                                if (points != null) {
-                                    PolylineOptions borderOptions = new PolylineOptions()
-                                            .addAll(points)
-                                            .width(20) // Adjust the width as needed for the border
-                                            .color(Color.parseColor("#1967d2")); // Set color to "#1967d2" for the border
-                                    previousCurrentBorderPolyline = mMap.addPolyline(borderOptions);
+                                    // Draw the border line on the map with color "#1967d2" (slightly wider)
+                                    if (points != null) {
+                                        PolylineOptions borderOptions = new PolylineOptions()
+                                                .addAll(points)
+                                                .width(20) // Adjust the width as needed for the border
+                                                .color(Color.parseColor("#1967d2")); // Set color to "#1967d2" for the border
+                                        previousCurrentBorderPolyline = mMap.addPolyline(borderOptions);
 
-                                    // Draw the solid route line on the map with color "#00b0ff"
-                                    PolylineOptions routeOptions = new PolylineOptions()
-                                            .addAll(points)
-                                            .width(14) // Adjust the width as needed for the route
-                                            .color(Color.parseColor("#00b0ff")); // Set color to "#00b0ff" for the route
-                                    previousCurrentRoutePolyline = mMap.addPolyline(routeOptions);
+                                        // Draw the solid route line on the map with color "#00b0ff"
+                                        PolylineOptions routeOptions = new PolylineOptions()
+                                                .addAll(points)
+                                                .width(14) // Adjust the width as needed for the route
+                                                .color(Color.parseColor("#00b0ff")); // Set color to "#00b0ff" for the route
+                                        previousCurrentRoutePolyline = mMap.addPolyline(routeOptions);
 
-                                    // Move the camera to fit the bounds of the new route
-                                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                                    builder.include(originLatLng);
-                                    builder.include(destinationLatLng);
-                                    LatLngBounds bounds = builder.build();
-                                    //mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 50));
+                                        // Move the camera to fit the bounds of the new route
+                                        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                                        builder.include(originLatLng);
+                                        builder.include(destinationLatLng);
+                                        LatLngBounds bounds = builder.build();
+                                        //mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 50));
 
-                                    // Move the camera to the user's location
-                                    //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(originLatLng, 19));   //19
+                                        // Move the camera to the user's location
+                                        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(originLatLng, 19));   //19
 
 
-
-                                    Button overviewButton = getView().findViewById(R.id.overviewButton);
-                                    overviewButton.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 250));
+                                        Button overviewButton = rootView.findViewById(R.id.overviewButton);
+                                        if (overviewButton != null) {
+                                            overviewButton.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View v) {
+                                                    mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 250));
+                                                }
+                                            });
                                         }
 
-                                    });
-
-
+                                    }
+                                },
+                                error -> {
+                                    // Handle errors in making the request or parsing the response
+                                    Log.e("Directions Error", error.toString());
                                 }
-                            },
-                            error -> {
-                                // Handle errors in making the request or parsing the response
-                                Log.e("Directions Error", error.toString());
-                            }
-                    );
+                        );
 
-                    // ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                        // ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-                    // Create an instance of DirectionsTask and execute it
-                    DirectionsTask directionsTask = new DirectionsTask(url);
-                    directionsTask.execute();
+                        // Use this method before starting any async task
+                        if(isNetworkAvailable()) {
+                            // Start Async Task
+                            // Create an instance of DirectionsTask and execute it
+                            DirectionsTask directionsTask = new DirectionsTask(url);
+                            directionsTask.execute();
+                        } else {
+                            // Show error message
+                            Toast.makeText(getContext(), "Reconnecting...", Toast.LENGTH_LONG).show();
+                            Log.d(TAG, "reupdateMapAGain()----DISCONNECTED----");
+                        }
 
-                    //String jsonResponseString = String.valueOf(directionsTask);
-                    //Toast.makeText(getContext(), jsonResponseString, Toast.LENGTH_LONG).show();
-
-
-                    // ------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
-                    // Add the request to the queue
-                    queue.add(request);
-                }
-            });
-        }
+                        //String jsonResponseString = String.valueOf(directionsTask);
+                        //Toast.makeText(getContext(), jsonResponseString, Toast.LENGTH_LONG).show();
 
 
-        // Use a Handler to refresh the map every second
-        Handler handler = new Handler();
-        Runnable mapRefreshRunnable = new Runnable() {
-            @Override
-            public void run() {
-                // Clear the previous route polyline and border polyline if they exist
-                if (currentRoutePolyline != null) {
-                    currentRoutePolyline.remove();
-                    currentRoutePolyline = null;
-                }
-                if (currentBorderPolyline != null) {
-                    currentBorderPolyline.remove();
-                    currentBorderPolyline = null;
-                }
+                        // ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+                        // Add the request to the queue
+                        queue.add(request);
+                    }
+                });
             }
-        };
-        handler.postDelayed(mapRefreshRunnable, 1000); // Schedule it to run after 0.3 second
 
 
+            // Use a Handler to refresh the map every second
+            Handler handler = new Handler();
+            Runnable mapRefreshRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    // Clear the previous route polyline and border polyline if they exist
+                    if (currentRoutePolyline != null) {
+                        currentRoutePolyline.remove();
+                        currentRoutePolyline = null;
+                    }
+                    if (currentBorderPolyline != null) {
+                        currentBorderPolyline.remove();
+                        currentBorderPolyline = null;
+                    }
+                }
+            };
+            handler.postDelayed(mapRefreshRunnable, 1000); // Schedule it to run after 0.3 second
+
+        }
 
     }
 
@@ -1214,6 +1403,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
             catch (Exception e) {
                 e.printStackTrace();
                 // Handle exceptions
+                return null;
             }
 
             finally {
@@ -1238,206 +1428,219 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
 
             try {
 
-                JSONObject jsonResponse = new JSONObject(jsonResponseString); // jsonResponseString is the JSON response you received
+                if (jsonResponseString != null) {
 
-                // Check the status of the response
-                String status = jsonResponse.getString("status");
+                    JSONObject jsonResponse = new JSONObject(jsonResponseString); // jsonResponseString is the JSON response you received
 
-                if (!isRunning || !status.equals("OK")) {
-                    // Stop processing if isRunning is false or status is not "OK"
-                    return;
-                }
+                    // Check the status of the response
+                    String status = jsonResponse.getString("status");
 
-                else if (status.equals("OK")) {
-                    JSONArray routes = jsonResponse.getJSONArray("routes");
+                    if (!isRunning || !status.equals("OK")) {
+                        // Stop processing if isRunning is false or status is not "OK"
+                        return;
+                    } else if (status.equals("OK")) {
+                        JSONArray routes = jsonResponse.getJSONArray("routes");
 
-                    JSONObject routeSample = routes.getJSONObject(0);
-                    JSONArray legsSample = routeSample.getJSONArray("legs");
-                    JSONObject legSamp = legsSample.getJSONObject(0);
-                    JSONArray stepsSample = legSamp.getJSONArray("steps");
-                    JSONObject stepSamp = stepsSample.getJSONObject(0);
-                    String distanceSample = stepSamp.getJSONObject("distance").getString("text");
-                    String htmlInstructionsSample = stepSamp.getString("html_instructions");
-                    // Remove HTML tags and display plain text instructions
-                    String plainTextInstructions = Html.fromHtml(htmlInstructionsSample).toString();
+                        JSONObject routeSample = routes.getJSONObject(0);
+                        JSONArray legsSample = routeSample.getJSONArray("legs");
+                        JSONObject legSamp = legsSample.getJSONObject(0);
+                        JSONArray stepsSample = legSamp.getJSONArray("steps");
+                        JSONObject stepSamp = stepsSample.getJSONObject(0);
+                        String distanceSample = stepSamp.getJSONObject("distance").getString("text");
+                        String htmlInstructionsSample = stepSamp.getString("html_instructions");
+                        // Remove HTML tags and display plain text instructions
+                        String plainTextInstructions = Html.fromHtml(htmlInstructionsSample).toString();
 
-                    // Populate UI elements with place details
-                    TextView textViewDistance = getView().findViewById(R.id.textViewDistance);
-                    Button buttonFinish = getView().findViewById(R.id.btnDone);
-                    //textViewDistance.setText(distanceSample);
-                    //Toast.makeText(getContext(), distanceSample, Toast.LENGTH_LONG).show();
+                        // Populate UI elements with place details
+                        TextView textViewDistance = getView().findViewById(R.id.textViewDistance);
+                        Button buttonFinish = getView().findViewById(R.id.btnDone);
+                        //textViewDistance.setText(distanceSample);
+                        //Toast.makeText(getContext(), distanceSample, Toast.LENGTH_LONG).show();
 
-                    TextView textViewDirection = getView().findViewById(R.id.textViewDirection);
-                    textViewDirection.setText(plainTextInstructions);
+                        TextView textViewDirection = getView().findViewById(R.id.textViewDirection);
+                        if (textViewDirection != null) {
+                            textViewDirection.setText(plainTextInstructions);
+                        }
 
-                    // Extract the numerical value from the distance string
-                    double distanceValue = Double.parseDouble(distanceSample.replaceAll("[^0-9.]+", ""));
+                        // Extract the numerical value from the distance string
+                        double distanceValue = Double.parseDouble(distanceSample.replaceAll("[^0-9.]+", ""));
 
-                    if (distanceSample.contains("km") && distanceValue < 1.0) {
-                        // Convert the distance to meters
-                        int meters = (int) (distanceValue * 1000);
-                        String distanceInMeters = meters + " m";
-                        // Use distanceInMeters as needed
-                        textViewDistance.setText(distanceInMeters);
-                    } else {
-                        // Use the original distance string (it's already in meters or more than 1 km)
-                        textViewDistance.setText(distanceSample);
-                    }
-
-
-
-                    // Initialize ImageView container
-                    ImageView imageViewDirections = getView().findViewById(R.id.imageViewDirections);
-
-                    // Get the maneuver from your API response
-                    // Retrieve maneuver if it's present, or provide a default value
-                    String maneuverType = stepSamp.optString("maneuver", "No Maneuver");
-                    //Toast.makeText(getContext(), maneuverType, Toast.LENGTH_LONG).show();
-
-                    // Create a variable to store the drawable resource ID
-                    int drawableResource = R.drawable.straight; // Default drawable
-
-                    // Map maneuver types to corresponding drawable resource IDs
-                    switch (maneuverType) {
-                        case "keep-left":
-                            drawableResource = R.drawable.keep_left;
-                            break;
-                        case "keep-right":
-                            drawableResource = R.drawable.keep_right;
-                            break;
-                        case "ferry":
-                            drawableResource = R.drawable.ferry;
-                            break;
-                        case "ferry-train":
-                            drawableResource = R.drawable.ferry_train;
-                            break;
-                        case "fork-left":
-                            drawableResource = R.drawable.fork_left;
-                            break;
-                        case "fork-right":
-                            drawableResource = R.drawable.fork_right;
-                            break;
-                        case "merge":
-                            drawableResource = R.drawable.merge;
-                            break;
-                        case "ramp-left":
-                            drawableResource = R.drawable.ramp_left;
-                            break;
-                        case "ramp-right":
-                            drawableResource = R.drawable.ramp_right;
-                            break;
-                        case "roundabout-left":
-                            drawableResource = R.drawable.roundabout_left;
-                            break;
-                        case "roundabout-right":
-                            drawableResource = R.drawable.roundabout_right;
-                            break;
-                        case "straight":
-                            drawableResource = R.drawable.straight;
-                            break;
-                        case "turn-right":
-                            drawableResource = R.drawable.turn_right;
-                            break;
-                        case "turn-left":
-                            drawableResource = R.drawable.turn_left;
-                            break;
-                        case "turn-sharp-right":
-                            drawableResource = R.drawable.turn_sharp_right;
-                            break;
-                        case "turn-sharp-left":
-                            drawableResource = R.drawable.turn_sharp_left;
-                            break;
-                        case "turn-slight-right":
-                            drawableResource = R.drawable.turn_slight_right;
-                            break;
-                        case "turn-slight-left":
-                            drawableResource = R.drawable.turn_slight_left;
-                            break;
-                        case "uturn-right":
-                            drawableResource = R.drawable.uturn_right;
-                            break;
-                        case "uturn-left":
-                            drawableResource = R.drawable.uturn_left;
-                            break;
-
-                        default:
-                            // Handle unknown maneuver types or use a default drawable
-                            drawableResource = R.drawable.straight;
-                            break;
-                    }
-                    // Set the selected drawable to the ImageView
-                    imageViewDirections.setImageResource(drawableResource);
-
-                    double totalDistanceKm = 0.0;
-                    int totalDurationMinutes = 0;
-
-                    for (int i = 0; i < routes.length(); i++) {
-                        JSONObject route = routes.getJSONObject(i);
-
-                        JSONArray legs = route.getJSONArray("legs");
-
-                        for (int j = 0; j < legs.length(); j++) {
-                            JSONObject leg = legs.getJSONObject(j);
-
-                            JSONArray steps = leg.getJSONArray("steps");
-
-                            for (int k = 0; k < steps.length(); k++) {
-                                JSONObject step = steps.getJSONObject(k);
-
-                                // Extract information from the step
-                                String distance = step.getJSONObject("distance").getString("text");
-                                String duration = step.getJSONObject("duration").getString("text");
-                                String htmlInstructions = step.getString("html_instructions");
-
-                                // Extract and add up the distance and duration for each leg
-                                totalDistanceKm += step.getJSONObject("distance").getDouble("value") / 1000.0; // Convert meters to kilometers
-                                totalDurationMinutes += step.getJSONObject("duration").getInt("value") / 60; // Convert seconds to minutes
-
-                                //String[] splitDistance = distance.split(" ");
-                                //String[] splitTime = duration.split(" ");
-
-                                //Toast.makeText(getContext(), splitTime[0], Toast.LENGTH_LONG).show();
-
-                                //double doubleDistance = Double.parseDouble(splitDistance[0]);
-                                //int intMinutes = Integer.parseInt(splitTime[0]);
-
-                                //totalDistance += doubleDistance;
-                                //totalTime += intMinutes;
-
-                                //Toast.makeText(getContext(), distance, Toast.LENGTH_LONG).show();
-
-                                // You can now use the extracted information as needed
-
-                                // Retrieve maneuver if it's present, or provide a default value
-                                //String maneuver = step.optString("maneuver", "No Maneuver");
-                                //Toast.makeText(getContext(), maneuver, Toast.LENGTH_LONG).show();
+                        if (distanceSample.contains("km") && distanceValue < 1.0) {
+                            // Convert the distance to meters
+                            int meters = (int) (distanceValue * 1000);
+                            String distanceInMeters = meters + " m";
+                            // Use distanceInMeters as needed
+                            if (textViewDistance != null) {
+                                textViewDistance.setText(distanceInMeters);
+                            }
+                        } else {
+                            // Use the original distance string (it's already in meters or more than 1 km)
+                            if (textViewDistance != null) {
+                                textViewDistance.setText(distanceSample);
                             }
                         }
+
+
+                        // Initialize ImageView container
+                        ImageView imageViewDirections = getView().findViewById(R.id.imageViewDirections);
+
+                        // Get the maneuver from your API response
+                        // Retrieve maneuver if it's present, or provide a default value
+                        String maneuverType = stepSamp.optString("maneuver", "No Maneuver");
+                        //Toast.makeText(getContext(), maneuverType, Toast.LENGTH_LONG).show();
+
+                        // Create a variable to store the drawable resource ID
+                        int drawableResource = R.drawable.straight; // Default drawable
+
+                        // Map maneuver types to corresponding drawable resource IDs
+                        switch (maneuverType) {
+                            case "keep-left":
+                                drawableResource = R.drawable.keep_left;
+                                break;
+                            case "keep-right":
+                                drawableResource = R.drawable.keep_right;
+                                break;
+                            case "ferry":
+                                drawableResource = R.drawable.ferry;
+                                break;
+                            case "ferry-train":
+                                drawableResource = R.drawable.ferry_train;
+                                break;
+                            case "fork-left":
+                                drawableResource = R.drawable.fork_left;
+                                break;
+                            case "fork-right":
+                                drawableResource = R.drawable.fork_right;
+                                break;
+                            case "merge":
+                                drawableResource = R.drawable.merge;
+                                break;
+                            case "ramp-left":
+                                drawableResource = R.drawable.ramp_left;
+                                break;
+                            case "ramp-right":
+                                drawableResource = R.drawable.ramp_right;
+                                break;
+                            case "roundabout-left":
+                                drawableResource = R.drawable.roundabout_left;
+                                break;
+                            case "roundabout-right":
+                                drawableResource = R.drawable.roundabout_right;
+                                break;
+                            case "straight":
+                                drawableResource = R.drawable.straight;
+                                break;
+                            case "turn-right":
+                                drawableResource = R.drawable.turn_right;
+                                break;
+                            case "turn-left":
+                                drawableResource = R.drawable.turn_left;
+                                break;
+                            case "turn-sharp-right":
+                                drawableResource = R.drawable.turn_sharp_right;
+                                break;
+                            case "turn-sharp-left":
+                                drawableResource = R.drawable.turn_sharp_left;
+                                break;
+                            case "turn-slight-right":
+                                drawableResource = R.drawable.turn_slight_right;
+                                break;
+                            case "turn-slight-left":
+                                drawableResource = R.drawable.turn_slight_left;
+                                break;
+                            case "uturn-right":
+                                drawableResource = R.drawable.uturn_right;
+                                break;
+                            case "uturn-left":
+                                drawableResource = R.drawable.uturn_left;
+                                break;
+
+                            default:
+                                // Handle unknown maneuver types or use a default drawable
+                                drawableResource = R.drawable.straight;
+                                break;
+                        }
+
+
+                        if (imageViewDirections != null) {
+                            // Set the selected drawable to the ImageView
+                            imageViewDirections.setImageResource(drawableResource);
+                        }
+
+                        double totalDistanceKm = 0.0;
+                        int totalDurationMinutes = 0;
+
+                        for (int i = 0; i < routes.length(); i++) {
+                            JSONObject route = routes.getJSONObject(i);
+
+                            JSONArray legs = route.getJSONArray("legs");
+
+                            for (int j = 0; j < legs.length(); j++) {
+                                JSONObject leg = legs.getJSONObject(j);
+
+                                JSONArray steps = leg.getJSONArray("steps");
+
+                                for (int k = 0; k < steps.length(); k++) {
+                                    JSONObject step = steps.getJSONObject(k);
+
+                                    // Extract information from the step
+                                    String distance = step.getJSONObject("distance").getString("text");
+                                    String duration = step.getJSONObject("duration").getString("text");
+                                    String htmlInstructions = step.getString("html_instructions");
+
+                                    // Extract and add up the distance and duration for each leg
+                                    totalDistanceKm += step.getJSONObject("distance").getDouble("value") / 1000.0; // Convert meters to kilometers
+                                    totalDurationMinutes += step.getJSONObject("duration").getInt("value") / 60; // Convert seconds to minutes
+
+                                    //String[] splitDistance = distance.split(" ");
+                                    //String[] splitTime = duration.split(" ");
+
+                                    //Toast.makeText(getContext(), splitTime[0], Toast.LENGTH_LONG).show();
+
+                                    //double doubleDistance = Double.parseDouble(splitDistance[0]);
+                                    //int intMinutes = Integer.parseInt(splitTime[0]);
+
+                                    //totalDistance += doubleDistance;
+                                    //totalTime += intMinutes;
+
+                                    //Toast.makeText(getContext(), distance, Toast.LENGTH_LONG).show();
+
+                                    // You can now use the extracted information as needed
+
+                                    // Retrieve maneuver if it's present, or provide a default value
+                                    //String maneuver = step.optString("maneuver", "No Maneuver");
+                                    //Toast.makeText(getContext(), maneuver, Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        }
+
+                        // Format totalDistanceKm with 2 decimal places
+                        String formattedDistance = String.format("%.2f", totalDistanceKm);
+
+                        double thresholdDistance = 0.015; // 0.015=15 meters threshold    1.2
+
+                        if (textViewDistance != null && textViewDirection != null && buttonFinish != null && imageViewDirections != null) {
+                            if (totalDistanceKm <= thresholdDistance) {
+                                textViewDistance.setText("You have arrived at your destination.");
+                                textViewDirection.setVisibility(View.GONE);
+                                buttonFinish.setVisibility(View.VISIBLE);
+                                buttonFinish.setText("Done");
+                                imageViewDirections.setImageResource(R.drawable.arrived);
+                            } else {
+                                textViewDirection.setVisibility(View.VISIBLE);
+                                buttonFinish.setVisibility(View.GONE);
+                                imageViewDirections.setImageResource(drawableResource);
+                            }
+                        }
+
+                        TextView textViewTotal = getView().findViewById(R.id.textViewTotalMinKm);
+                        if (textViewTotal != null) {
+                            textViewTotal.setText(formattedDistance + " km • " + totalDurationMinutes + " mins");
+                        }
+
+                    } else {
+                        // Handle the case when the API request returns a status other than "OK"
                     }
-
-                    // Format totalDistanceKm with 2 decimal places
-                    String formattedDistance = String.format("%.2f", totalDistanceKm);
-
-                    double thresholdDistance = 0.015; // 0.015=15 meters threshold    1.2
-                    if (totalDistanceKm <= thresholdDistance) {
-                        textViewDistance.setText("You have arrived at your destination.");
-                        textViewDirection.setVisibility(View.GONE);
-                        buttonFinish.setVisibility(View.VISIBLE);
-                        buttonFinish.setText("Done");
-                        imageViewDirections.setImageResource(R.drawable.arrived);
-                    }
-
-                    else {
-                        textViewDirection.setVisibility(View.VISIBLE);
-                        buttonFinish.setVisibility(View.GONE);
-                        imageViewDirections.setImageResource(drawableResource);
-                    }
-
-                    TextView textViewTotal = getView().findViewById(R.id.textViewTotalMinKm);
-                    textViewTotal.setText(formattedDistance + " km • " + totalDurationMinutes + " mins");
-
-                } else {
-                    // Handle the case when the API request returns a status other than "OK"
                 }
 
             }
