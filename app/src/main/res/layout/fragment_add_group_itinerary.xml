@@ -65,12 +65,11 @@
 
             <LinearLayout
                 android:id="@+id/itineraryFormList"
-                android:layout_width="413dp"
+                android:layout_width="400dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
                 <include layout="@layout/dynamic_form_layout" />
-                <!-- Add more views here as needed -->
 
             </LinearLayout>
 
@@ -91,6 +90,7 @@
                 android:layout_marginBottom="90dp"
                 android:backgroundTint="@color/gradient_end"
                 android:text="Cancel" />
+
         </LinearLayout>
 
 

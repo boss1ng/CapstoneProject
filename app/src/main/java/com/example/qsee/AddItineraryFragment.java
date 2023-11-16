@@ -159,7 +159,7 @@ public class AddItineraryFragment extends Fragment {
         final int[] addCounter = {0};
 
         addActivityButton.setOnClickListener(v -> {
-            if (addCounter[0] < 3) {
+            if (addCounter[0] < 2) {
                 ItineraryItem newItem = new ItineraryItem("", "", ""); // Create a new ItineraryItem
                 dayItineraryAdapter.addItem(newItem); // Add the new item to the RecyclerView
                 addCounter[0]++;
@@ -663,7 +663,7 @@ public class AddItineraryFragment extends Fragment {
             final int[] addCounter = {0};
 
             addActivityButton.setOnClickListener(v -> {
-                if (addCounter[0] < 3) {
+                if (addCounter[0] < 2) {
                     ItineraryItem newItem = new ItineraryItem("", "", ""); // Create a new ItineraryItem
                     dayItineraryAdapter.addItem(newItem); // Add the new item to the RecyclerView
                     addCounter[0]++;

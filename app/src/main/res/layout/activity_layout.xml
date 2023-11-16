@@ -16,7 +16,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout2"
             android:layout_width="328dp"
-            android:layout_height="300dp"
+            android:layout_height="261dp"
             android:background="@drawable/rounded_background_white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -37,7 +37,7 @@
                 app:layout_constraintHorizontal_bias="0.316"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.45" />
+                app:layout_constraintVertical_bias="0.56" />
 
             <TextView
                 android:id="@+id/activityTextView"
@@ -83,14 +83,14 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/timeInput"
-                android:layout_width="213dp"
+                android:layout_width="212dp"
                 android:layout_height="57dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.854"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.074">
+                app:layout_constraintVertical_bias="0.11">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
