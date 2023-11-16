@@ -10,4 +10,10 @@
     <color name="gradient_end">#E47473</color>
     <color name="transparent">@android:color/transparent</color>
 
+    <!-- APP COLOR THEME -->
+    <color name="shade1">#2F414F</color>
+    <color name="shade2">#3894A3</color>
+    <color name="shade3">#FIFIEF</color>
+    <color name="shade4">#C7DAD4</color>
+
 </resources>

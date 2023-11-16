@@ -104,9 +104,9 @@
                     android:id="@+id/location"
                     android:layout_width="wrap_content"
                     android:layout_height="15dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd= "60dp"
                     android:layout_marginStart="67dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="60dp"
                     android:layout_marginBottom="70dp"
                     android:text="Quezon City, Manila"
                     android:textColor="@color/white"
@@ -167,17 +167,18 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="DISCOVER MORE"
-                android:fontFamily="@font/barabara_font"
                 android:layout_marginTop="15dp"
-                android:textSize="30dp"
-                android:textColor="#FFBD59"/>
+                android:fontFamily="@font/barabara_font"
+                android:text="DISCOVER MORE"
+                android:textColor="#3894A3"
+                android:textSize="30dp" />
 
             <LinearLayout
                 android:id="@+id/feedDisplayLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:background="@color/shade1">
                 <!--
                                 <LinearLayout
                                     android:layout_width="match_parent"
@@ -281,11 +282,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
+        android:backgroundTint="@color/shade4"
         android:contentDescription=""
         android:src="@drawable/ic_add"
         app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:ignore="MissingConstraints" />
+        tools:ignore="MissingConstraints"
+        app:backgroundTint="@color/shade1"/>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
