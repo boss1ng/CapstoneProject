@@ -402,48 +402,80 @@ public class EditProfileFragment extends Fragment {
     }
 
     private void uploadProfilePicture(String userId, Uri imageUri) {
-        try {
-            Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri);
-            int orientation = getOrientation(context, imageUri);
-            Bitmap rotatedBitmap = rotateBitmap(bitmap, orientation);
+        DatabaseReference usersReference = FirebaseDatabase.getInstance().getReference("MobileUsers");
+        Query query = usersReference.orderByChild("userId").equalTo(userId);
 
-            Uri rotatedBitmapUri = getImageUri(context, rotatedBitmap);
-            if (rotatedBitmapUri != null) {
-                StorageReference profilePictureRef = storageReference.child(userId + ".jpg");
-                UploadTask uploadTask = profilePictureRef.putFile(getImageUri(context, rotatedBitmap));
-                uploadTask.addOnSuccessListener(taskSnapshot -> {
-                    profilePictureRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                        String imageUrl = uri.toString();
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                        String currentImageUrl = userSnapshot.child("profilePictureUrl").getValue(String.class);
 
-                        DatabaseReference usersReference = FirebaseDatabase.getInstance().getReference("MobileUsers");
-                        Query query = usersReference.orderByChild("userId").equalTo(userId);
+                        // Delete the current image from Firebase Storage
+                        if (currentImageUrl != null && !currentImageUrl.isEmpty()) {
+                            StorageReference oldImageRef = FirebaseStorage.getInstance().getReferenceFromUrl(currentImageUrl);
+                            oldImageRef.delete().addOnSuccessListener(aVoid -> {
+                                Log.d("EditProfileFragment", "Old profile image deleted successfully.");
+                            }).addOnFailureListener(exception -> {
+                                Log.e("EditProfileFragment", "Error deleting old profile image: " + exception.getMessage());
+                            });
+                        }
 
-                        query.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                if (dataSnapshot.exists()) {
-                                    for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
-                                        userSnapshot.getRef().child("profilePictureUrl").setValue(imageUrl);
-                                        Toast.makeText(getContext(), "Profile updated successfully.", Toast.LENGTH_LONG).show();
-                                        getParentFragmentManager().popBackStack();
-                                    }
-                                } else {
-                                    Log.e("EditProfileFragment", "User with username not found.");
-                                }
-                            }
+                        // Upload new image
+                        try {
+                            Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri);
+                            int orientation = getOrientation(context, imageUri);
+                            Bitmap rotatedBitmap = rotateBitmap(bitmap, orientation);
+
+                            Uri rotatedBitmapUri = getImageUri(context, rotatedBitmap);
+                            if (rotatedBitmapUri != null) {
+                                StorageReference profilePictureRef = storageReference.child(userId + ".jpg");
+                                UploadTask uploadTask = profilePictureRef.putFile(getImageUri(context, rotatedBitmap));
+                                uploadTask.addOnSuccessListener(taskSnapshot -> {
+                                    profilePictureRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                                        String imageUrl = uri.toString();
+
+                                        DatabaseReference usersReference = FirebaseDatabase.getInstance().getReference("MobileUsers");
+                                        Query query = usersReference.orderByChild("userId").equalTo(userId);
+
+                                        query.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                if (dataSnapshot.exists()) {
+                                                    for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                                                        userSnapshot.getRef().child("profilePictureUrl").setValue(imageUrl);
+                                                        Toast.makeText(getContext(), "Profile updated successfully.", Toast.LENGTH_LONG).show();
+                                                        getParentFragmentManager().popBackStack();
+                                                    }
+                                                } else {
+                                                    Log.e("EditProfileFragment", "User with username not found.");
+                                                }
+                                            }
 
                             @Override
                             public void onCancelled(@NonNull DatabaseError databaseError) {
                                 Log.e("EditProfileFragment", "Database Error: " + databaseError.getMessage());
+                                            }
+                                        });
+                                    });
+                                });
                             }
-                        });
-                    });
-                });
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            Log.e("EditProfileFragment", "Error uploading profile picture: " + e.getMessage());
+                        }
+                    }
+                } else {
+                    Log.e("EditProfileFragment", "User with username not found.");
+                }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.e("EditProfileFragment", "Error uploading profile picture: " + e.getMessage());
-        }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("EditProfileFragment", "Database Error: " + databaseError.getMessage());
+            }
+        });
     }
 
     // Defining the getImageUri
