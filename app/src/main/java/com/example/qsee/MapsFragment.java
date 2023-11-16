@@ -170,12 +170,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         // Create a PlacesClient
         placesClient = Places.createClient(requireContext());
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
-                .findFragmentById(R.id.maps);
-        if (mapFragment != null) {
-            mapFragment.getMapAsync(this);
-        }
+        // Find the fragment by ID
+        Fragment fragment = getChildFragmentManager().findFragmentById(R.id.maps);
+
+        // Check if the fragment is an instance of SupportMapFragment
+        if (fragment instanceof SupportMapFragment) {
+            // Safe to cast to SupportMapFragment
+            SupportMapFragment mapFragment = (SupportMapFragment) fragment;
+            mapFragment.getMapAsync(this);  // Or any other operation you need to perform
+
 
         /*
         // Initialize AutocompleteSupportFragment
@@ -269,6 +272,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 });
             }
         });
+        } else {
+            // Handle the situation where the fragment is not the expected type
+            // This could be logging an error, throwing an exception, or any other error handling
+            Log.e("FragmentCasting", "Fragment is not an instance of SupportMapFragment");
+        }
 
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("MyAppPreferences", Context.MODE_PRIVATE);
         String userID = sharedPreferences.getString("user", "0");

@@ -9,6 +9,7 @@
     android:backgroundTint="#000000">
 
     <LinearLayout
+        android:id="@+id/profileCont"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
