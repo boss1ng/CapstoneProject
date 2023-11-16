@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -370,19 +371,29 @@ public class ProfileFragment extends Fragment {
                 if (itemId == R.id.action_home) {
                     loadFragment(new HomeFragment());
                     bottomNavigationView.setVisibility(View.GONE);
+                    LinearLayout linearLayout = rootView.findViewById(R.id.profileCont);
+                    linearLayout.setVisibility(View.GONE);
                 } else if (itemId == R.id.action_search) {
                     loadFragment(new SearchFragment());
                     bottomNavigationView.setVisibility(View.GONE);
+                    LinearLayout linearLayout = rootView.findViewById(R.id.profileCont);
+                    linearLayout.setVisibility(View.GONE);
                 } else if (itemId == R.id.action_maps) {
                     loadFragment(new MapsFragment());
                     //BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
                     bottomNavigationView.setVisibility(View.GONE);
+                    LinearLayout linearLayout = rootView.findViewById(R.id.profileCont);
+                    linearLayout.setVisibility(View.GONE);
                 } else if (itemId == R.id.action_quiz) {
                     loadFragment(new StartQuizFragment());
                     bottomNavigationView.setVisibility(View.GONE);
+                    LinearLayout linearLayout = rootView.findViewById(R.id.profileCont);
+                    linearLayout.setVisibility(View.GONE);
                 } else if (itemId == R.id.action_profile) {
                     loadFragment(new ProfileFragment());
                     bottomNavigationView.setVisibility(View.GONE);
+                    LinearLayout linearLayout = rootView.findViewById(R.id.profileCont);
+                    linearLayout.setVisibility(View.GONE);
                 }
                 return true;
             }
