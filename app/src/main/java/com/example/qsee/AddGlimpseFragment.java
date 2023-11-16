@@ -179,6 +179,14 @@ public class AddGlimpseFragment extends DialogFragment {
         postButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String userLocation = location.getText().toString();
+
+                // Check if the location is empty
+                if (userLocation.trim().isEmpty()) {
+                    Toast.makeText(context, "Location Unknown, Input Location", Toast.LENGTH_LONG).show();
+                    return; // Exit the method early
+                }
+
                 if (imageBitmap != null) {
                     postButton.setEnabled(false);
                     categorySpinner.setEnabled(false);

@@ -151,7 +151,7 @@
                     android:layout_height="22dp"
                     android:layout_marginLeft="5dp"
                     android:clickable="true"
-                    app:srcCompat="@drawable/btn_add_photo" />
+                    app:srcCompat="@drawable/ic_camera_24" />
 
                 <ImageView
                     android:id="@+id/locationBT"

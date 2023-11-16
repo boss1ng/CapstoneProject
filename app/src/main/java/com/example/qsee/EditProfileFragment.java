@@ -35,6 +35,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+
+import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.database.DataSnapshot;
@@ -246,7 +248,9 @@ public class EditProfileFragment extends Fragment {
     }
 
     public void bindData(String url) {
-        Picasso.get().load(url).into(profilePictureImageView);
+        Glide.with(profilePictureImageView.getContext())
+                .load(url)
+                .into(profilePictureImageView);
     }
 
     public static EditProfileFragment newInstance(String userId) {
