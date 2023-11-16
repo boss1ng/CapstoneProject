@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.location.Address;
 import android.location.Geocoder;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -61,6 +63,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class HomeFragment extends Fragment {
     boolean isUserInQuezonCity = true;
@@ -359,9 +363,11 @@ public class HomeFragment extends Fragment {
                         innerLayout1.setLayoutParams(new LinearLayout.LayoutParams(
                                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
                         ));
-                        innerLayout1.setPadding(25, 25, 25, 25);
+                        innerLayout1.setPadding(25, 25, 25, 0);
                         innerLayout1.setOrientation(LinearLayout.HORIZONTAL);
-                        innerLayout1.setBackgroundColor(0xffefefef);
+                        //innerLayout1.setBackgroundColor(0xffefefef);
+                        innerLayout1.setBackgroundColor(Color.parseColor("#F1F1EF")); // 2F414F F1F1EF
+                        //innerLayout1.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.shade3));
 
                         // Get the existing layout parameters of innerLayout1
                         LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) innerLayout1.getLayoutParams();
@@ -383,7 +389,7 @@ public class HomeFragment extends Fragment {
                                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT));
                         innerLayout3.setOrientation(LinearLayout.HORIZONTAL);
 
-                        ImageView imageView15 = new ImageView(getActivity());
+                        CircleImageView imageView15 = new CircleImageView (getActivity());
                         imageView15.setId(View.generateViewId());
                         imageView15.setLayoutParams(new LinearLayout.LayoutParams(150, 150));
 
@@ -454,20 +460,21 @@ public class HomeFragment extends Fragment {
                         ));
                         innerLayout7.setPadding(0, 20, 0, 0);
                         innerLayout7.setOrientation(LinearLayout.VERTICAL);
-                        innerLayout7.setBackgroundColor(0xffefefef);
+                        //innerLayout7.setBackgroundColor(0xffefefef);
+                        innerLayout7.setBackgroundColor(Color.parseColor("#F1F1EF")); // 2F414F F1F1EF
 
                         LinearLayout innerLayout5 = new LinearLayout(getActivity());
                         innerLayout5.setLayoutParams(new LinearLayout.LayoutParams(
                                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
                         innerLayout5.setOrientation(LinearLayout.VERTICAL);
-                        innerLayout5.setPadding(10, 10, 10, 10);
+                        innerLayout5.setPadding(10, 0, 10, 10);
 
                         ImageView postView = new ImageView(getActivity());
                         //loadUserPostImage(postImage, postView);
                         postView.setId(View.generateViewId());
                         postView.setLayoutParams(new LinearLayout.LayoutParams(
                                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-                        postView.setPadding(0, 10, 0, 10);
+                        postView.setPadding(0, 0, 0, 10);
                         //postView.setImageResource(R.drawable.logo);
                         loadUserPostImage(imageUrl, postView);
 
