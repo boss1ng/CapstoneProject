@@ -132,6 +132,16 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                     handlerDelay.postDelayed(runnable, 3150); // Schedule it to run after 1 second
 
                     bottomNavigationView.setVisibility(View.GONE);
+
+                    LinearLayout linearLayoutDirections = getView().findViewById(R.id.directionsCont);
+                    linearLayoutDirections.setVisibility(View.GONE);
+
+                    FragmentContainerView fragmentContainerView = getView().findViewById(R.id.mapsRoute);
+                    fragmentContainerView.setVisibility(View.GONE);
+
+                    LinearLayout linearLayoutOverview = getView().findViewById(R.id.overviewCont);
+                    linearLayoutOverview.setVisibility(View.GONE);
+
                     loadFragment(new HomeFragment());
                 }
 
@@ -151,6 +161,16 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                     handlerDelay.postDelayed(runnable, 3150); // Schedule it to run after 1 second
 
                     bottomNavigationView.setVisibility(View.GONE);
+
+                    LinearLayout linearLayoutDirections = getView().findViewById(R.id.directionsCont);
+                    linearLayoutDirections.setVisibility(View.GONE);
+
+                    FragmentContainerView fragmentContainerView = getView().findViewById(R.id.mapsRoute);
+                    fragmentContainerView.setVisibility(View.GONE);
+
+                    LinearLayout linearLayoutOverview = getView().findViewById(R.id.overviewCont);
+                    linearLayoutOverview.setVisibility(View.GONE);
+
                     loadFragment(new SearchFragment());
                 }
 
@@ -191,6 +211,16 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                     handlerDelay.postDelayed(runnable, 3150); // Schedule it to run after 1 second
 
                     bottomNavigationView.setVisibility(View.GONE);
+
+                    LinearLayout linearLayoutDirections = getView().findViewById(R.id.directionsCont);
+                    linearLayoutDirections.setVisibility(View.GONE);
+
+                    FragmentContainerView fragmentContainerView = getView().findViewById(R.id.mapsRoute);
+                    fragmentContainerView.setVisibility(View.GONE);
+
+                    LinearLayout linearLayoutOverview = getView().findViewById(R.id.overviewCont);
+                    linearLayoutOverview.setVisibility(View.GONE);
+
                     loadFragment(new StartQuizFragment());
                 }
 
@@ -210,6 +240,16 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                     handlerDelay.postDelayed(runnable, 3150); // Schedule it to run after 1 second
 
                     bottomNavigationView.setVisibility(View.GONE);
+
+                    LinearLayout linearLayoutDirections = getView().findViewById(R.id.directionsCont);
+                    linearLayoutDirections.setVisibility(View.GONE);
+
+                    FragmentContainerView fragmentContainerView = getView().findViewById(R.id.mapsRoute);
+                    fragmentContainerView.setVisibility(View.GONE);
+
+                    LinearLayout linearLayoutOverview = getView().findViewById(R.id.overviewCont);
+                    linearLayoutOverview.setVisibility(View.GONE);
+
                     loadFragment(new ProfileFragment());
                 }
                 return true;
