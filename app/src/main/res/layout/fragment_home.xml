@@ -177,8 +177,7 @@
                 android:id="@+id/feedDisplayLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:background="@color/shade1">
+                android:orientation="vertical">
                 <!--
                                 <LinearLayout
                                     android:layout_width="match_parent"
@@ -287,8 +286,7 @@
         android:src="@drawable/ic_add"
         app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:ignore="MissingConstraints"
-        app:backgroundTint="@color/shade1"/>
+        tools:ignore="MissingConstraints"/>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
