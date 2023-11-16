@@ -62,7 +62,7 @@
         android:id="@+id/forgotPassSubmit"
         android:layout_width="231dp"
         android:layout_height="46dp"
-        android:backgroundTint="#115272"
+        android:backgroundTint="@color/shade2"
         android:onClick="forgotPassSubmit"
         android:text="Submit"
         app:layout_constraintBottom_toBottomOf="parent"

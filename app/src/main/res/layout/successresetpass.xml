@@ -30,5 +30,6 @@
         android:text="Back to Login"
         android:id="@+id/backToLoginButton"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/shade2"/>
 </LinearLayout>

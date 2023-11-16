@@ -6,8 +6,8 @@
     <color name="default_text_color">#000000</color>
     <color name="default_button_color">#e6e2e5</color>
     <!-- Define the gradient start and end colors -->
-    <color name="gradient_start">#79BF49</color>
-    <color name="gradient_end">#E47473</color>
+    <color name="gradient_start">#23C552</color>
+    <color name="gradient_end">#F84F31</color>
     <color name="transparent">@android:color/transparent</color>
 
     <!-- APP COLOR THEME -->

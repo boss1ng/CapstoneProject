@@ -40,9 +40,9 @@
 
                 <ImageView
                     android:id="@+id/post_bt"
-                    android:layout_width="65dp"
+                    android:layout_width="70dp"
                     android:layout_height="35dp"
-                    android:layout_marginLeft="170dp"
+                    android:layout_marginLeft="165dp"
                     android:layout_marginTop="5dp"
                     app:srcCompat="@drawable/btn_post" />
             </LinearLayout>
@@ -84,13 +84,20 @@
 
                     <Spinner
                         android:id="@+id/categorySpinner"
-                        android:layout_width="200dp"
-                        android:layout_height="50dp"
-                        android:layout_marginLeft="10dp"
-
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
                         android:layout_marginTop="5dp"
-                        android:background="@android:drawable/btn_dropdown"
-                        android:contextClickable="true" />
+                        android:layout_marginEnd="30dp"
+                        android:background="@drawable/custom_spinner_background"
+                        android:drawableEnd="@drawable/ic_dropdown_arrow"
+                        android:gravity="center_vertical"
+                        android:paddingStart="1dp"
+                        android:paddingEnd="1dp"
+                        android:popupBackground="@drawable/custom_spinner_popup_background"
+                        android:spinnerMode="dropdown" />
+
+
 
                 </LinearLayout>
 

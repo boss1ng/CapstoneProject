@@ -106,7 +106,7 @@
         android:id="@+id/SignInButton"
         android:layout_width="319dp"
         android:layout_height="57dp"
-        android:backgroundTint="#115272"
+        android:backgroundTint="@color/shade2"
         android:text="Sign in"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

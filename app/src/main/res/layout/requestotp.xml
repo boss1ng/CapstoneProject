@@ -153,7 +153,7 @@
         android:layout_width="288dp"
         android:layout_height="53dp"
         android:layout_marginBottom="16dp"
-        android:backgroundTint="#115272"
+        android:backgroundTint="@color/shade2"
         android:text="Confirm"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -48,6 +48,7 @@
                     android:layout_width="25dp"
                     android:layout_height="28dp"
                     android:backgroundTint="#FFFFFF"
+                    android:layout_marginTop="5dp"
 
                     android:drawableTop="@drawable/ic_carret_down"
                     app:layout_constraintBaseline_toBottomOf="parent" />

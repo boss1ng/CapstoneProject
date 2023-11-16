@@ -11,7 +11,7 @@
         android:id="@+id/directionsCont"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#49454f"
+        android:background="@color/shade1"
         android:orientation="horizontal"
         android:padding="10dp"
         tools:ignore="MissingConstraints"
@@ -89,7 +89,7 @@
         android:id="@+id/overviewCont"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#49454f"
+        android:background="@color/shade1"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:padding="10dp"
@@ -135,7 +135,8 @@
             android:id="@+id/overviewButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Overview" />
+            android:text="Overview"
+            android:backgroundTint="@color/shade2"/>
 
         <ImageView
             android:id="@+id/btnShowInstructions"

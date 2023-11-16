@@ -58,7 +58,7 @@
             android:layout_width="412dp"
             android:layout_height="37dp"
             android:layout_marginTop="4dp"
-            android:background="?attr/colorPrimary"
+            android:background="@color/shade1"
             android:padding="6dp"
             android:text="Day 1"
             android:textColor="@android:color/white"

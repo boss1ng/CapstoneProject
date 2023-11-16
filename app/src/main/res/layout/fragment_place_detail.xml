@@ -150,7 +150,8 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="right"
                             android:enabled="false"
-                            android:text="Directions" />
+                            android:text="Directions"
+                            android:backgroundTint="@color/shade2"/>
                 </LinearLayout>
 
         </LinearLayout>

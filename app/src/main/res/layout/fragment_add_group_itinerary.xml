@@ -80,7 +80,7 @@
                 android:layout_height="48dp"
                 android:layout_gravity="center"
                 android:layout_marginTop="0dp"
-                android:backgroundTint="#79BF49"
+                android:backgroundTint="@color/gradient_start"
                 android:text="Submit" />
 
             <Button
@@ -89,7 +89,7 @@
                 android:layout_height="48dp"
                 android:layout_gravity="center"
                 android:layout_marginBottom="90dp"
-                android:backgroundTint="#E47473"
+                android:backgroundTint="@color/gradient_end"
                 android:text="Cancel" />
         </LinearLayout>
 

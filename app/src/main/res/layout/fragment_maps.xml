@@ -13,14 +13,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="#FFFFFF"
+        android:background="@color/shade1"
         tools:ignore="MissingConstraints">
 
         <ImageButton
             android:id="@+id/filterMenuBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:backgroundTint="#FFFFFF"
+            android:backgroundTint="@color/shade1"
             android:src="@android:drawable/ic_menu_sort_by_size"
             android:contentDescription="TODO" />
 

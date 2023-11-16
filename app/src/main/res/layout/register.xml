@@ -165,7 +165,7 @@
         android:id="@+id/RegisterButton"
         android:layout_width="237dp"
         android:layout_height="43dp"
-        android:backgroundTint="#115272"
+        android:backgroundTint="@color/shade2"
         android:text="Register"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

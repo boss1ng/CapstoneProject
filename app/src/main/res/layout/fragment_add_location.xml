@@ -8,9 +8,9 @@
 
     <Button
         android:id="@+id/IndivBtn"
-        android:layout_width="135dp"
-        android:layout_height="53dp"
-        android:backgroundTint="#F4C01E"
+        android:layout_width="139dp"
+        android:layout_height="57dp"
+        android:backgroundTint="@color/shade2"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
         android:layout_marginStart="16dp"
@@ -28,7 +28,7 @@
         android:id="@+id/BatchBtn"
         android:layout_width="139dp"
         android:layout_height="57dp"
-        android:backgroundTint="#F4C01E"
+        android:backgroundTint="@color/shade4"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
         android:layout_marginStart="16dp"

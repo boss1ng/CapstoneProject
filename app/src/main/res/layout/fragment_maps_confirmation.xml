@@ -6,14 +6,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/constraintParent"
-    android:background="#4B849D">
+    android:background="@color/shade4">
 
     <LinearLayout
         android:id="@+id/filterMenu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="#FFFFFF"
+        android:background="@color/shade1"
         tools:ignore="MissingConstraints"
         >
 
@@ -21,7 +21,7 @@
             android:id="@+id/filterMenuBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:backgroundTint="#FFFFFF"
+            android:backgroundTint="@color/shade1"
             android:src="@android:drawable/ic_menu_sort_by_size"
             android:contentDescription="TODO" />
 
@@ -43,7 +43,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="TextView"
-            android:textColor="#FFFFFF"
+            android:textColor="#000000"
             android:textSize="22sp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -83,7 +83,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="15dp"
-            android:backgroundTint="#F2DF3A"
+            android:backgroundTint="@color/gradient_end"
             android:text="Cancel"
             android:textColor="#000000"
             android:textSize="16sp"
@@ -93,7 +93,7 @@
             android:id="@+id/btnProceed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:backgroundTint="#F2DF3A"
+            android:backgroundTint="@color/gradient_start"
             android:enabled="false"
             android:text="Go Now"
             android:textColor="#000000"

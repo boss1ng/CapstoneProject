@@ -6,18 +6,6 @@
     android:layout_height="match_parent">
 
     <ImageView
-        android:id="@+id/imageView5"
-        android:layout_width="540dp"
-        android:layout_height="240dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.504"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        app:srcCompat="@drawable/bg_editpfp" />
-
-    <ImageView
         android:id="@+id/profilePic_edit"
         android:layout_width="100dp"
         android:layout_height="100dp"
@@ -46,15 +34,14 @@
         app:layout_constraintVertical_bias="0.214" />
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/imageView5"
-        app:layout_constraintVertical_bias="0.714">
+        app:layout_constraintStart_toStartOf="parent">
 
 
         <com.google.android.material.textfield.TextInputLayout
@@ -131,7 +118,7 @@
             android:layout_height="48dp"
             android:layout_gravity="center"
             android:layout_marginBottom="15dp"
-            android:backgroundTint="#79BF49"
+            android:backgroundTint="@color/gradient_start"
             android:text="Save" />
 
         <Button
@@ -140,7 +127,7 @@
             android:layout_height="48dp"
             android:layout_gravity="center"
             android:layout_marginBottom="15dp"
-            android:backgroundTint="#E47473"
+            android:backgroundTint="@color/gradient_end"
             android:text="Cancel" />
     </LinearLayout>
 

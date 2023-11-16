@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#135272"> <!-- Set the background color to #135272 -->
+    android:background="@color/shade1"> <!-- Set the background color to #135272 -->
 
 
     <ImageView
@@ -67,8 +67,7 @@
         android:id="@+id/selectadminbtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/rounded_confirmbtn_background"
-        android:backgroundTint="#79BF49"
+        android:backgroundTint="@color/shade2"
         android:text="Set as New Admin"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

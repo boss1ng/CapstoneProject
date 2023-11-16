@@ -110,7 +110,7 @@
             android:layout_height="48dp"
             android:layout_gravity="center"
             android:layout_marginTop="10dp"
-            android:backgroundTint="#79BF49"
+            android:backgroundTint="@color/gradient_start"
             android:foregroundGravity="center"
             android:gravity="center"
             android:text="Save" />
@@ -121,7 +121,7 @@
             android:layout_height="48dp"
             android:layout_gravity="center"
             android:layout_marginTop="10dp"
-            android:backgroundTint="#E47473"
+            android:backgroundTint="@color/gradient_end"
             android:foregroundGravity="center"
             android:gravity="center"
             android:text="Return" />
