@@ -3,6 +3,8 @@ package com.example.qsee;
 import android.annotation.SuppressLint;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -85,6 +87,52 @@ public class AddItineraryActivity extends Fragment {
                         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, locationsList);
                         originAutoCompleteTextView.setAdapter(adapter);
                         locationAutoCompleteTextView.setAdapter(adapter);
+
+                        originAutoCompleteTextView.addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence charSequence, int start, int before, int count) {
+                                // Not used in this case
+                            }
+
+                            @Override
+                            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                                // Check if the entered text is not present in the locationsList
+                                String locationText = charSequence.toString();
+                                if (!locationsList.contains(locationText)) {
+                                    originAutoCompleteTextView.setError("Invalid location"); // Optionally, you can show an error message
+                                } else {
+                                    originAutoCompleteTextView.setError(null); // Clear the error if the location is valid
+                                }
+                            }
+
+                            @Override
+                            public void afterTextChanged(Editable editable) {
+                                // Not used in this case
+                            }
+                        });
+
+                        locationAutoCompleteTextView.addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence charSequence, int start, int before, int count) {
+                                // Not used in this case
+                            }
+
+                            @Override
+                            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                                // Check if the entered text is not present in the locationsList
+                                String locationText = charSequence.toString();
+                                if (!locationsList.contains(locationText)) {
+                                    locationAutoCompleteTextView.setError("Invalid location"); // Optionally, you can show an error message
+                                } else {
+                                    locationAutoCompleteTextView.setError(null); // Clear the error if the location is valid
+                                }
+                            }
+
+                            @Override
+                            public void afterTextChanged(Editable editable) {
+                                // Not used in this case
+                            }
+                        });
                     }
                 }
 
