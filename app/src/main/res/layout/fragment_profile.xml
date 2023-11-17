@@ -79,14 +79,16 @@
 
                     <TextView
                         android:id="@+id/notificationBadge"
-                        android:layout_width="12dp"
-                        android:layout_height="12dp"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
                         android:layout_marginLeft="18dp"
-                        android:layout_marginTop="22dp"
+                        android:layout_marginTop="5dp"
                         android:background="@drawable/circular_red_background"
                         android:gravity="center"
                         android:textColor="#FFFFFF"
-                        android:visibility="gone" />
+                        android:fontFamily="sans-serif"
+                        android:text="1"
+                        android:visibility="visible" />
                 </FrameLayout>
 
                 <Button
