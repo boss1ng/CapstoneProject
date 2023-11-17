@@ -1,5 +1,6 @@
 package com.example.qsee;
 
+import android.annotation.SuppressLint;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
@@ -7,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -32,6 +34,7 @@ public class GroupsFragment extends Fragment {
     private String userId;
     private GroupListAdapter adapter;
     private TextView noGroupsTextView;
+    private ImageView noGroupsImage;
 
     // Reference to the Firebase Realtime Database
     private DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
@@ -45,6 +48,7 @@ public class GroupsFragment extends Fragment {
         RecyclerView recyclerView = view.findViewById(R.id.groupRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         noGroupsTextView = view.findViewById(R.id.noGroupsTextView);
+        noGroupsImage = view.findViewById(R.id.noGroups);
 
         // Create a list of mock groups (you should replace this with your actual data)
         List<Groups> groupList = createMockGroupList();
@@ -133,8 +137,10 @@ public class GroupsFragment extends Fragment {
                     adapter.updateData(userGroups);
                     if (userGroups.isEmpty()) {
                         noGroupsTextView.setVisibility(View.VISIBLE);
+                        noGroupsImage.setVisibility(View.VISIBLE);
                     } else {
                         noGroupsTextView.setVisibility(View.GONE);
+                        noGroupsImage.setVisibility(View.GONE);
                     }
                 }
             }

@@ -2,11 +2,13 @@ package com.example.qsee;
 
 import android.annotation.SuppressLint;
 import android.content.pm.ActivityInfo;
+import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -24,6 +26,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,9 +35,11 @@ import java.util.List;
 public class LocationFragment extends Fragment {
 
     private TextView noLocationsTextView;
+    private ImageView noItinerary;
     private String userId;
     private static final String TAG = "LocationFragment"; // Added TAG constant
 
+    @SuppressLint("MissingInflatedId")
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -117,8 +123,10 @@ public class LocationFragment extends Fragment {
                         // Update the visibility of the "No Locations Added" TextView
                         if (locationList.isEmpty()) {
                             noLocationsTextView.setVisibility(View.VISIBLE);
+                            noItinerary.setVisibility(View.VISIBLE);
                         } else {
                             noLocationsTextView.setVisibility(View.GONE);
+                            noItinerary.setVisibility(View.GONE);
                         }
                     }
 
@@ -156,6 +164,7 @@ public class LocationFragment extends Fragment {
 
         // Initialize the "No Locations Added" TextView
         noLocationsTextView = view.findViewById(R.id.noLocationsTextView);
+        noItinerary = view.findViewById(R.id.noItinerary);
 
         return view;
     }
