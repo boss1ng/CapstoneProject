@@ -18,10 +18,11 @@
 
         <ImageButton
             android:id="@+id/filterMenuBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+            android:layout_height="30dp"
+            android:layout_margin="10dp"
             android:backgroundTint="@color/shade1"
-            android:src="@android:drawable/ic_menu_sort_by_size"
+            android:src="@drawable/filter"
             android:contentDescription="TODO" />
 
     </LinearLayout>
