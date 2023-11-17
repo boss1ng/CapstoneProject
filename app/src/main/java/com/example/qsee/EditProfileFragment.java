@@ -1,6 +1,7 @@
 package com.example.qsee;
 
 import static android.app.Activity.RESULT_OK;
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 import static com.example.qsee.AddGlimpseFragment.CAMERA_REQUEST_CODE;
 
 import android.app.Activity;
@@ -11,6 +12,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -18,6 +20,7 @@ import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.Manifest;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.InputFilter;
@@ -34,6 +37,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -86,6 +90,8 @@ public class EditProfileFragment extends Fragment {
     private static final int TARGET_SIZE = 2;
     private static final int TARGET_WIDTH_DP = 400; // Target width in dp
     private static final int TARGET_HEIGHT_DP = 500; // Target height in dp
+    private static final int CAMERA_PERMISSION_REQUEST_CODE = 101;
+
 
 
     @Override
@@ -398,14 +404,41 @@ public class EditProfileFragment extends Fragment {
     }
 
     private void openCamera() {
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Request the camera permission
+            requestPermissions(new String[]{Manifest.permission.CAMERA},
+                    CAMERA_PERMISSION_REQUEST_CODE);
+        } else {
+            // Camera permission is already granted, open the camera
+            //Log.d(TAG, "GUMANA YUNG CAMERA HAHAHA!");
+            launchCameraIntent();
+        }
+    }
+    private void launchCameraIntent() {
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (cameraIntent.resolveActivity(context.getPackageManager()) != null) {
+        if (cameraIntent.resolveActivity(getContext().getPackageManager()) != null) {
             // Create a file to save the image
-            imageUri = createImageUri(); // Implement this method to create a file URI
+            imageUri = createImageUri(); // Make sure this method returns a valid Uri
             cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
             startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
         } else {
-            Toast.makeText(context, "No camera app found.", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "No camera app found", Toast.LENGTH_LONG).show();
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, open the camera
+                launchCameraIntent();
+            } else {
+                // Permission denied
+                Toast.makeText(getContext(), "Camera permission is required to take pictures", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
