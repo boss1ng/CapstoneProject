@@ -1,5 +1,7 @@
 package com.example.qsee;
 
+import static android.content.ContentValues.TAG;
+
 import android.app.Dialog;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
@@ -7,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -38,6 +41,9 @@ import java.util.List;
 public class FilterCategories extends DialogFragment {
 
     private Bitmap screenshotMapView;
+
+    ListView listView;
+    CategoryAdapter adapter;
 
     public FilterCategories(Bitmap screenshotMap) {
         this.screenshotMapView = screenshotMap;
@@ -77,7 +83,7 @@ public class FilterCategories extends DialogFragment {
 
         if (getBundle != null) {
             String userID = getBundle.getString("userId");
-            Toast.makeText(getContext(), userID, Toast.LENGTH_LONG).show();
+            //Toast.makeText(getContext(), userID, Toast.LENGTH_LONG).show();
         }
 
         // For Reading the Database
@@ -85,111 +91,52 @@ public class FilterCategories extends DialogFragment {
         // Reference to the "Location" node in Firebase
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Category");
         List categories = new ArrayList<>();
-        ListView listView = view.findViewById(R.id.listView);
-        ArrayAdapter<Object> adapter= new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_multiple_choice, categories);
+        listView = view.findViewById(R.id.listView);
+        adapter = new CategoryAdapter(getContext(), categories);
+        listView.setAdapter(adapter);
+        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
-        // Retrieve selected categories from Bundle arguments
-        //Bundle getBundle = getArguments();
         if (getBundle != null) {
             String categoryName = getBundle.getString("categoryName");
-            //Toast.makeText(view.getContext(), categoryName, Toast.LENGTH_LONG).show();
 
             if (categoryName != null) {
-                //Toast.makeText(view.getContext(), categoryName, Toast.LENGTH_LONG).show();
+                Toast.makeText(view.getContext(), categoryName, Toast.LENGTH_LONG).show();
 
-                if (categoryName.contains("+")) {
-                    //Toast.makeText(view.getContext(), categoryName, Toast.LENGTH_LONG).show();
-
-                    // Split the string by the '+' character
-                    String[] preSelectedCategories = categoryName.split("\\+");
-
-                    // Get the count of the resulting substrings
-                    int numberOfCategories = preSelectedCategories.length;
-                    String numCat = String.valueOf(numberOfCategories);
-                    Toast.makeText(view.getContext(), numCat, Toast.LENGTH_LONG).show();
-
-                    databaseReference.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                            for (DataSnapshot categorySnapshot : dataSnapshot.getChildren()) {
-                                String categoryName = categorySnapshot.child("Category").getValue(String.class);
-                                categories.add(categoryName);
-                            }
-
-                            // Now, you have the list of categories, you can display them as checkboxes.
-                            ArrayAdapter<Object> adapter= new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_multiple_choice, categories);
-                            listView.setAdapter(adapter);
-                            listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-
-                            for (int i = 0; i < numberOfCategories; i++) {
-                                // Autocheck items based on a condition
-                                for (int y = 0; y < listView.getCount(); y++) {
-                                    String item = (String) listView.getItemAtPosition(y);
-
-                                    if (item != null && preSelectedCategories[i].equals(item)) {
-                                        listView.setItemChecked(y, true);
-                                    }
-                                }
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                            // Handle any errors here
-                        }
-                    });
-                }
-
-                else {
-                    // Toast.makeText(view.getContext(), categoryName, Toast.LENGTH_LONG).show();
-
-                    databaseReference.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                            for (DataSnapshot categorySnapshot : dataSnapshot.getChildren()) {
-                                String categoryName = categorySnapshot.child("Category").getValue(String.class);
-                                categories.add(categoryName);
-                            }
-
-                            // Now, you have the list of categories, you can display them as checkboxes.
-                            ArrayAdapter<Object> adapter= new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_multiple_choice, categories);
-                            listView.setAdapter(adapter);
-                            listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-
-                            for (int y = 0; y < listView.getCount(); y++) {
-                                String item = (String) listView.getItemAtPosition(y);
-
-                                if (item != null && categoryName.equals(item)) {
-                                    listView.setItemChecked(y, true);
-                                }
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                            // Handle any errors here
-                        }
-                    });
-                }
-            }
-
-            else {
-                //Toast.makeText(view.getContext(), categoryName, Toast.LENGTH_LONG).show();
                 databaseReference.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        categories.clear(); // Clear existing data
+                        int position = 0; // Initialize position counter
 
+                        for (DataSnapshot categorySnapshot : dataSnapshot.getChildren()) {
+                            String firebaseCategoryName = categorySnapshot.child("Category").getValue(String.class);
+                            categories.add(firebaseCategoryName);
+
+                            // Decide whether to check this item
+                            if (firebaseCategoryName.equals(categoryName)) {
+                                adapter.setItemChecked(position, true);
+                            }
+                            position++;
+                        }
+                        adapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        // Handle any errors here
+                    }
+                });
+            }
+
+            else {
+                databaseReference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         for (DataSnapshot categorySnapshot : dataSnapshot.getChildren()) {
                             String categoryName = categorySnapshot.child("Category").getValue(String.class);
                             categories.add(categoryName);
                         }
-
-                        // Now, you have the list of categories, you can display them as checkboxes.
-                        ArrayAdapter<Object> adapter= new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_multiple_choice, categories);
-                        listView.setAdapter(adapter);
-                        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+                        adapter.notifyDataSetChanged();
                     }
 
                     @Override
@@ -201,27 +148,10 @@ public class FilterCategories extends DialogFragment {
         }
 
         else {
-            databaseReference.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                    for (DataSnapshot categorySnapshot : dataSnapshot.getChildren()) {
-                        String categoryName = categorySnapshot.child("Category").getValue(String.class);
-                        categories.add(categoryName);
-                    }
-
-                    // Now, you have the list of categories, you can display them as checkboxes.
-                    ArrayAdapter<Object> adapter= new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_multiple_choice, categories);
-                    listView.setAdapter(adapter);
-                    listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    // Handle any errors here
-                }
-            });
         }
+
+
 
 /*
         // Customize the dialog's appearance and position
@@ -248,61 +178,40 @@ public class FilterCategories extends DialogFragment {
             public void onClick(View v) {
                 dismiss();
 
-                // In the fragment or activity where you want to navigate
-                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-
-                MapsFragment mapsFragment = new MapsFragment();
-
-                // Retrieve the selected categories
-                SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
-                ArrayList<String> selectedItems = new ArrayList<>();
+                // Assuming 'adapter' is an instance of CategoryAdapter
+                ArrayList<String> selectedCategories = adapter.getCheckedItems();
 
                 // Concatenate selected categories
-                String selectedItem = "";
+                String concatenatedCategories = "";
+                if (!selectedCategories.isEmpty()) {
+                    concatenatedCategories = TextUtils.join("+", selectedCategories);
+                }
 
-                // Use Bundle to pass values
+                else
+                    Log.d(TAG, "selectedCategories EMPTY");
+
+                Log.d(TAG, "SELECTED CATEGORIES: " + concatenatedCategories);
+
+                // Prepare the bundle to pass to the next fragment
                 Bundle bundle = new Bundle();
-                for (int i = 0; i < checkedItems.size(); i++) {
-                    int position = checkedItems.keyAt(i); // Get the position of the checked item
-                    boolean isChecked = checkedItems.valueAt(i); // Get whether the item is checked
-
-                    if (isChecked) {
-                        String category = (String) categories.get(position); // Replace with your list of categories
-                        //category += "+";
-                        selectedItems.add(category); // Add selected category to the list
-                    }
-                }
-
-                // Concatenate the selected categories into a single string
-                if (!selectedItems.isEmpty()) {
-                    selectedItem = TextUtils.join("+", selectedItems);
-                }
-
-                // Retrieve selected categories from Bundle arguments
                 Bundle getBundle = getArguments();
-
                 if (getBundle != null) {
                     String userID = getBundle.getString("userId");
                     bundle.putString("isVisited", "YES");
                     bundle.putString("userId", userID);
-                    bundle.putString("categoryName", selectedItem);
-                    mapsFragment.setArguments(bundle);
+                    bundle.putString("categoryName", concatenatedCategories);
                 }
 
-                //FrameLayout frameLayout = view.findViewById(R.id.parent_container);
-                //frameLayout.setVisibility(View.GONE);
+                // Create and set arguments for the next fragment
+                MapsFragment mapsFragment = new MapsFragment();
+                mapsFragment.setArguments(bundle);
 
-                //ConstraintLayout constraintLayout = view.findViewById(R.id.fragment_container);
-                //constraintLayout.setVisibility(View.GONE);
-
-                //LinearLayout linearLayout = view.findViewById(R.id.filterContainer);
-                //linearLayout.setVisibility(View.GONE);
-
-
-                // Replace the current fragment with the receiving fragment
+                // Replace the current fragment with the new fragment
+                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
                 transaction.replace(R.id.fragment_container, mapsFragment);
                 transaction.addToBackStack(null);
                 transaction.commit();
+
             }
         });
 

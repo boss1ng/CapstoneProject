@@ -556,7 +556,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
                         if (categoryName != null) {
 
-                            // Toast.makeText(getContext(), categoryName, Toast.LENGTH_LONG).show();
+                            Toast.makeText(getContext(), categoryName, Toast.LENGTH_LONG).show();
 
                             // Split the string by the '+' character
                             String[] categories = categoryName.split("\\+");
@@ -735,7 +735,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                     }
 
                     else {
-                        //Toast.makeText(getContext(), "NO TEXT PROVIDED", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "NO TEXT PROVIDED", Toast.LENGTH_LONG).show();
                         populateMap();
                     }
                 }
