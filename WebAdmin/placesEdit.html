@@ -25,7 +25,7 @@
     <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-storage.js"></script>
 
 </head>
-<body>
+<body style="background-color: #2F414F;">
     <div class="sidebar">
         <div class="d-flex align-items-center justify-content-center m-3 mt-5">
             <img src="images/Qsee.png">
@@ -280,6 +280,22 @@
             var inputLocImageEdit = document.querySelector("#inputLocImageEdit");
             var imageResolutionAlert = document.getElementById("imageResolution");
 
+            var inputLocation = document.querySelector("#estabName");
+            var inputLocationAdd = document.querySelector("#estabAddress");
+            var inputLocationCat = document.querySelector("#selectedCategory");
+            var inputLocationCatDropdown = document.querySelector("#dropdownBtn");
+            var inputLocationCont = document.querySelector("#estabContact");
+            var inputLocationLat = document.querySelector("#geocodeLat");
+            var inputLocationLong = document.querySelector("#geocodeLong");
+            var inputLocationHigh = document.querySelector("#estabHighPrice");
+            var inputLocationLow = document.querySelector("#estabLowPrice");
+            var inputLocationImage = document.querySelector("#inputLocImage");
+            var inputLocationImageDesc = document.querySelector("#estabImageDesc");
+            var inputLocationDesc = document.querySelector("#estabDesc");
+
+            var buttonCancel = document.querySelector("#actionCancelPlace");
+            var buttonSave = document.querySelector("#actionSavePlace");
+
             if (inputFile.files && inputFile.files[0]) {
                 var img = new Image();
                 img.src = URL.createObjectURL(inputFile.files[0]);
@@ -298,12 +314,36 @@
                         buttonSave.disabled = false;
                         
                     } else {
+
+                        buttonCancel.disabled = true;
+
+                        inputLocation.disabled = true;
+                        inputLocationAdd.disabled = true;
+                        inputLocationCat.disabled = true;
+                        inputLocationCatDropdown.disabled = true;
+                        inputLocationCont.disabled = true;
+                        inputLocationImage.disabled = true;
+                        inputLocImageEdit.disabled = true;
+                        inputLocationImageDesc.disabled = true;
+                        inputLocationDesc.disabled = true;
                         // alert("Please upload an image with the correct resolution.");
 
                         imageResolutionAlert.style.visibility = "visible";
                         setTimeout(function(){
                                 imageResolutionAlert.style.visibility = "hidden";
                                 inputFile.value = ""; // Clear the input field
+
+                                buttonCancel.disabled = false;
+
+                                inputLocation.disabled = false;
+                                inputLocationAdd.disabled = false;
+                                inputLocationCat.disabled = false;
+                                inputLocationCatDropdown.disabled = false;
+                                inputLocationCont.disabled = false;
+                                inputLocationImage.disabled = false;
+                                inputLocImageEdit.disabled = false;
+                                inputLocationImageDesc.disabled = false;
+                                inputLocationDesc.disabled = false;
                             }, 2000);
                     }
                 };
@@ -486,6 +526,20 @@
         }
 
         function editLocation() {
+
+            buttonSave.disabled = true;
+            buttonCancel.disabled = true;
+
+            inputLocation.disabled = true;
+            inputLocationAdd.disabled = true;
+            inputLocationCat.disabled = true;
+            inputLocationCont.disabled = true;
+            inputLocationHigh.disabled = true;
+            inputLocationLow.disabled = true;
+            inputLocationImage.disabled = true;
+            inputLocImageEdit.disabled = true;
+            inputLocationImageDesc.disabled = true;
+            inputLocationDesc.disabled = true;
 
             if (inputLocationImage.value == "" || inputLocationImage.value == null) {
                 // UPDATE Location Information (except Image) in Firebase Realtime Database

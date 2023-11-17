@@ -22,7 +22,7 @@
     <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-storage.js"></script>
 
 </head>
-<body>
+<body style="background-color: #2F414F;">
     <div class="sidebar">
         <div class="d-flex align-items-center justify-content-center m-3 mt-5">
             <img src="images/Qsee.png">
@@ -150,6 +150,10 @@
         }
 
         var buttonSave = document.querySelector("#actionSaveCat");
+        var buttonCancel = document.querySelector("#actionCancelCat");
+        var inputCat = document.querySelector("#inputCat");
+        var inputCatIconEdit = document.querySelector("#inputCatIconEdit"); 
+        var inputCatIcon = document.querySelector("#inputCatIcon");
 
         function updateOtherInput(inputFile) {
             // var inputCategoryName = document.querySelector("#inputCat");
@@ -174,13 +178,22 @@
 
                         buttonSave.disabled = false;
                     } else {
+                        buttonCancel.disabled = true;
+                        inputCat.disabled = true;
+                        inputCatIconEdit.disabled = true;
+                        inputCatIcon.disabled = true;
+
                         // alert("Please upload an image with the correct resolution.");
 
                         imageResolutionAlert.style.visibility = "visible";
                         setTimeout(function(){
-                                imageResolutionAlert.style.visibility = "hidden";
-                                inputFile.value = ""; // Clear the input field
-                            }, 2000);
+                            imageResolutionAlert.style.visibility = "hidden";
+                            inputFile.value = ""; // Clear the input field
+                            buttonCancel.disabled = false;
+                            inputCat.disabled = false;
+                            inputCatIconEdit.disabled = false;
+                            inputCatIcon.disabled = false;
+                        }, 2000);
                     }
                 };
             }
@@ -265,6 +278,12 @@
         }
 
         function editCategory() {
+
+            buttonSave.disabled = true;
+            buttonCancel.disabled = true;
+            inputCategoryName.disabled = true;
+            inputCategoryIcon.disabled = true;
+            inputFileCategoryIcon.disabled = true;
 
             if (inputFileCategoryIcon.value == "" || inputFileCategoryIcon.value == null) {
                 // UPDATE Category Name in Firebase Realtime Database

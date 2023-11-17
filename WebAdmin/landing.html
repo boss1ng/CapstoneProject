@@ -20,7 +20,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
 
 </head>
-<body>
+<body style="background-color: #2F414F;">
     <div class="sidebar">
         <div class="d-flex align-items-center justify-content-center m-3 mt-5">
             <img src="images/Qsee.png">
@@ -59,56 +59,55 @@
       
     <div class="contentCont">
         <div class="container" style="margin-top: 50px; margin-left: 50px;">
-            <h1>Account Settings</h1>
+            <h1 class="displayHeading">Account Settings</h1>
             <div class="container mx-5 my-4">
-                <h2>Administrator Info</h2>
+                <h2 class="displayHeading">Administrator Info</h2>
                 <div class="container m-5">
                     <div class="d-flex align-items-center mt-5">
-                        <h4 class="mx-3">First Name: </h4>
-                        <input type="text" class="form-control mx-5" id="firstName" aria-label="Username" aria-describedby="addon-wrapping"/>
+                        <h4 class="displayHeading mx-3">First Name: </h4>
+                        <input type="text" class="form-control mx-5" id="firstName" onchange="updatePersonalData()" aria-label="Username" aria-describedby="addon-wrapping"/>
                     </div>
                     
                     <div class="adminInfo d-flex align-items-center mt-4">
-                        <h4 class="mx-3">Last Name: </h4>
-                        <input type="text" class="form-control mx-5" id="lastName" aria-label="Username" aria-describedby="addon-wrapping"/>
+                        <h4 class="displayHeading mx-3">Last Name: </h4>
+                        <input type="text" class="form-control mx-5" id="lastName" onchange="updatePersonalData()" aria-label="Username" aria-describedby="addon-wrapping"/>
                     </div>
 
                     <div class="adminInfo d-flex align-items-center mt-4">
-                        <h4 class="mx-3">Email Address: </h4>
+                        <h4 class="displayHeading mx-3">Email Address: </h4>
                         <input type="text" class="form-control mx-2" id="emailAddress" disabled aria-label="Username" aria-describedby="addon-wrapping"/>
                     </div>
                 </div>
 
                 <div class="container" style="margin-left: 290px;">
-                    <button type="button" class="btn btn-secondary btn-lg" id="btnCancelInfo">Cancel</button>
-                    <button type="button" class="btn btn-secondary btn-lg" id="btnSaveInfo" style="margin-left: 100px;">Save</button>                
+                    <button type="button" class="btn btn-secondary btn-lg" id="btnCancelInfo" disabled>Cancel</button>
+                    <button type="button" class="btn btn-secondary btn-lg" id="btnSaveInfo" style="margin-left: 100px;" disabled>Save</button>                
                 </div>
             </div>
 
 
-
             <div class="container mx-5 my-4">
-                <h2>Change Password</h2>
+                <h2 class="displayHeading">Change Password</h2>
                 <div class="container m-5">
                     <div class="d-flex align-items-center mt-5">
-                        <h4 class="mx-3">Current Password: </h4>
-                        <input type="password" class="form-control mx-3" id="currPass" placeholder="" aria-label="Username" aria-describedby="addon-wrapping"/>
+                        <h4 class="displayHeading mx-3">Current Password: </h4>
+                        <input type="password" class="form-control mx-3" id="currPass" onchange="updatePasswordData()" placeholder="" aria-label="Username" aria-describedby="addon-wrapping"/>
                     </div>
                     
                     <div class="adminInfo d-flex align-items-center mt-4">
-                        <h4 class="mx-3">New Password: </h4>
-                        <input type="password" class="form-control mx-5" id="newPass" placeholder="" aria-label="Username" aria-describedby="addon-wrapping"/>
+                        <h4 class="displayHeading mx-3">New Password: </h4>
+                        <input type="password" class="form-control mx-5" id="newPass" onchange="updatePasswordData()" placeholder="" aria-label="Username" aria-describedby="addon-wrapping"/>
                     </div>
 
                     <div class="adminInfo d-flex align-items-center mt-4">
-                        <h4 class="mx-3">Confirm Password: </h4>
-                        <input type="password" class="form-control mx-2" id="rePass" placeholder="" aria-label="Username" aria-describedby="addon-wrapping"/>
+                        <h4 class="displayHeading mx-3">Confirm Password: </h4>
+                        <input type="password" class="form-control mx-2" id="rePass" onchange="updatePasswordData()" placeholder="" aria-label="Username" aria-describedby="addon-wrapping"/>
                     </div>
                 </div>
 
                 <div class="container" style="margin-left: 290px;">
-                    <button type="button" class="btn btn-secondary btn-lg" id="btnCancelPass">Cancel</button>
-                    <button type="button" class="btn btn-secondary btn-lg" id="btnSavePass" style="margin-left: 100px;">Save</button>                
+                    <button type="button" class="btn btn-secondary btn-lg" id="btnCancelPass" disabled>Cancel</button>
+                    <button type="button" class="btn btn-secondary btn-lg" id="btnSavePass" style="margin-left: 100px;" disabled>Save</button>                
                 </div>
             </div>
         </div>
@@ -153,6 +152,25 @@
                 Logout successful. You have been logged out of your account.
         </div>
     </div>
+
+    <script>
+        function updatePersonalData() {
+            document.getElementById('btnCancelInfo').disabled = false;
+            document.getElementById('btnSaveInfo').disabled = false;
+        }
+
+        function updatePasswordData() {
+
+            var currPass = document.getElementById('currPass').value;
+            var newPass = document.getElementById('newPass').value;  
+            var rePass = document.getElementById('rePass').value;
+
+            if (currPass != "" && newPass != "" && rePass != "") {
+                document.getElementById('btnCancelPass').disabled = false;
+                document.getElementById('btnSavePass').disabled = false;
+            }
+        }
+    </script>
 
     <script type="module">
         // Import the functions you need from the SDKs you need
@@ -241,8 +259,10 @@
                     inputLName.value = decryptedDataLName;
                     inputEmail.value = decryptedDataEmail; 
 
-                    firebaseFName = snapshot.val().FirstName;
-                    firebaseLName = snapshot.val().LastName;
+                    //firebaseFName = snapshot.val().FirstName;
+                    //firebaseLName = snapshot.val().LastName;
+                    firebaseFName = decryptedDataFName;
+                    firebaseLName = decryptedDataLName;
                 }
             })
         }
@@ -259,6 +279,11 @@
         // console.log(secretKey1);
 
         function changePersonalInfo() {
+
+            cancelInfo.disabled = true;
+            buttonSaveInfo.disabled = true;
+            inputFName.disabled = true;
+            inputLName.disabled = true;
 
             const dbref = ref(db);
             get(child(dbref, "User/" + userID))
@@ -304,6 +329,12 @@
         }
 
         function changePass() {
+
+            cancelPass.disabled = true;
+            buttonSavePass.disabled = true;
+            inputCurrentPass.disabled = true;
+            inputNewPass.disabled = true;
+            inputRePass.disabled = true;
 
             const dbref = ref(db);
             get(child(dbref, "User/" + userID))
@@ -362,6 +393,10 @@
                                     inputNewPass.value = "";
                                     inputRePass.value = "";
                                     editPassFailedAlert.style.visibility = "hidden";
+
+                                    inputCurrentPass.disabled = false;
+                                    inputNewPass.disabled = false;
+                                    inputRePass.disabled = false;
                                 }, 5000);
                             }
                         }
@@ -388,6 +423,8 @@
         cancelInfo.addEventListener('click', cancelPersonalInfo);
 
         function cancelPersonalInfo() {
+            cancelInfo.disabled = true;
+            buttonSaveInfo.disabled = true;
             inputFName.value = firebaseFName;
             inputLName.value = firebaseLName;
         }
@@ -396,6 +433,8 @@
         cancelPass.addEventListener('click', cancelPassword);
 
         function cancelPassword() {
+            cancelPass.disabled = true;
+            buttonSavePass.disabled = true;
             inputCurrentPass.value = "";
             inputNewPass.value = "";
             inputRePass.value = "";

@@ -1,6 +1,17 @@
 
+/* 
+#2F414F - dark
+#3894A3 - light blue
+#F1F1EF - darker white
+#C7DAD4 - light green apple
+
+#23C552 - 
+$F84F31 - 
+
+*/
+
 body {
-    background-image: url(../images/Enhanced.jpg);
+    /* background-image: url(../images/Enhanced.jpg); */
     background-size: cover;
     /* overflow: hidden; */
 }
@@ -13,7 +24,7 @@ img {
     height: 100%;
     width: 330px;
     position: fixed;
-    background-color: #fff;
+    background-color: #F1F1EF;
     color: #fff;
 }
 
@@ -31,7 +42,7 @@ img {
 }
 
 .aCont:hover {
-    background-color: #135272;
+    background-color: #3894A3;
 }
 
 .aCont:hover svg {
@@ -43,7 +54,7 @@ img {
 }
 
 .aSelectedCont {
-    background-color: #135272;
+    background-color: #3894A3;
 }
 
 .aSelectedCont a {
@@ -73,10 +84,15 @@ button {
     margin-top: 120px;
     padding-bottom: 50px;
     margin-bottom: 120px;
-    background-color: #c6e6f0;
+    background-color: #C7DAD4;
     height: auto;
     border-radius: 50px;
 }
+
+/* #2F414F - dark
+#3894A3 - light blue
+#F1F1EF - darker white
+#C7DAD4 - light green apple */
 
 .categoryTable {
     font-size: x-large;
@@ -92,7 +108,7 @@ button {
 
 .addCategoryCont {
     margin-top: 12.5%;
-    background-color: #c6e6f0;
+    background-color: #C7DAD4;
     height: 600px;
     border-radius: 50px;
 }

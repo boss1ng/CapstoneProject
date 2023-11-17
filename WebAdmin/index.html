@@ -128,6 +128,10 @@
 
 // SEARCH
         function verifyCredentials() {
+            buttonSignIn.disabled = true;
+            inputEmail.disabled = true;
+            inputPassword.disabled = true;
+
             if (!(inputEmail.value == "" || inputPassword.value == "")) {
                 const dbref = ref(db)
 
@@ -167,7 +171,11 @@
                 setTimeout(function() {
                     loginWarningAlert.style.visibility = "hidden";
                     // location.reload()
+                    inputEmail.disabled = false;
+                    inputPassword.disabled = false;
+                    buttonSignIn.disabled = false;
                 }, 1500);
+                
             }
         }
 

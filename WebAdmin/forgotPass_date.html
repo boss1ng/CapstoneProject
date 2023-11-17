@@ -125,6 +125,9 @@
 
         function verifyDate() {
 
+            buttonSubmit.disabled = true;
+            inputDate.disabled = true;
+
             if (!(inputDate.value == "" || inputDate.value == null)) {
 
                 const dbref = ref(db)
@@ -183,6 +186,8 @@
                                 setTimeout(function(){
                                     inputDate.value = "";
                                     dateFailedAlert.style.visibility = "hidden";
+                                    buttonSubmit.disabled = false;
+                                    inputDate.disabled = false;
                                 }, 2000);
                             }
 
@@ -199,6 +204,8 @@
                 allFieldsAlert.style.visibility = "visible";
                 setTimeout(function() {
                     allFieldsAlert.style.visibility = "hidden";
+                    buttonSubmit.disabled = false;
+                    inputDate.disabled = false;
                 }, 1500);
             }
         }

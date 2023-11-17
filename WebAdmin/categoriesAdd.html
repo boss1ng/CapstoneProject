@@ -22,7 +22,7 @@
     <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-storage.js"></script>
 
 </head>
-<body>
+<body style="background-color: #2F414F;">
     <div class="sidebar">
         <div class="d-flex align-items-center justify-content-center m-3 mt-5">
             <img src="images/Qsee.png">
@@ -178,7 +178,9 @@
     </div>
 
     <script>
+
         function validateImage(input) {
+
             var imageResolutionAlert = document.getElementById("imageResolution");
 
             if (input.files && input.files[0]) {
@@ -201,6 +203,7 @@
                 };
             }
         }
+        
     </script>
 
 
@@ -239,8 +242,10 @@
             window.location.replace("index.html");
         }
 
-        var inputCategory = document.querySelector("#inputCat");
-        var inputCategoryIcon = document.querySelector("#inputCatIcon");
+        //var inputCategory = document.querySelector("#inputCat");
+        //var inputCategoryIcon = document.querySelector("#inputCatIcon");
+        var inputCategory = document.getElementById('inputCat');
+        var inputCategoryIcon = document.getElementById('inputCatIcon');
 
         var addSuccessAlert = document.getElementById("addSuccess");
         var addFailedAlert = document.getElementById("addFailed");
@@ -251,21 +256,27 @@
 
         var recordExisting = null;
 
-        function createCategory() {
+        function createCategory() { //Accommodations
 
-            var uploadedFile = inputCategoryIcon.files[0]; // Get the selected file
-            var fileInputName = uploadedFile.name;
+            buttonAdd.disabled = true;
+            buttonCancel.disabled = true;
+            inputCategory.disabled = true;
+            inputCategoryIcon.disabled = true;
 
-            // Initialize Cloud Storage
-            const storage = firebase.storage();
-            const storageRef = storage.ref();
-
+            //if (inputCategory != "" && inputCategoryIcon != "") {
             if (!(inputCategory.value == "" || inputCategoryIcon.value == "")) {
+
+                var uploadedFile = inputCategoryIcon.files[0]; // Get the selected file
+                var fileInputName = uploadedFile.name;
+                // Initialize Cloud Storage
+                const storage = firebase.storage();
+                const storageRef = storage.ref();
+
                 const dbref = ref(db);
 
                 get(child(dbref, "Category"))
                 .then( (snapshot)=> {
-                    if(snapshot.exists()) { 
+                    if(snapshot.exists()) {
 
                         const categoriesData = [];
                         snapshot.forEach(childSnapshot => {
@@ -284,10 +295,17 @@
                                 existingCategoryAlert.style.visibility = "hidden";
                                 inputCategory.value = "";
                                 recordExisting = null;
+
+                                buttonAdd.disabled = false;
+                                buttonCancel.disabled = false;
+                                inputCategory.disabled = false;
+                                inputCategoryIcon.disabled = false;
                             }, 2000);
                         }
 
+                        
                         else {
+                            
                             // UPLOAD
                             const uploadTask = storageRef.child('Categories/' + fileInputName).put(uploadedFile);
 
@@ -394,17 +412,22 @@
             }
 
             else {
+                console.log("EMPTY");
                 allFieldsAlert.style.visibility = "visible";
-                setTimeout(function() {
+                setTimeout(function(){
                     allFieldsAlert.style.visibility = "hidden";
-                }, 1500);
+                    buttonAdd.disabled = false;
+                    buttonCancel.disabled = false;
+                    inputCategory.disabled = false;
+                    inputCategoryIcon.disabled = false;
+                }, 2000);
             }
         }
 
-        var buttonAdd = document.querySelector("#actionAddCat");
+        var buttonAdd = document.getElementById('actionAddCat');
         buttonAdd.addEventListener('click', createCategory);
 
-        var buttonCancel = document.querySelector("#actionCancelCat");
+        var buttonCancel = document.getElementById('actionCancelCat');
         buttonCancel.addEventListener('click', goNext)
 
         function goNext() {

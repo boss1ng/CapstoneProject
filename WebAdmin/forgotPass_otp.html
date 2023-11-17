@@ -140,6 +140,9 @@
 // SEARCH & UPDATE
         function updateDate() {
 
+            buttonSubmit.disabled = true;
+            inputOTP.disabled = true;
+
             if (!(inputOTP.value == "" || inputOTP.value == null)) {
 
                 if (inputOTP.value == OTPCode) {
@@ -180,6 +183,8 @@
                     setTimeout(function() {
                         inputOTP.value = "";
                         invalidOTP.style.visibility = "hidden";
+                        buttonSubmit.disabled = false;
+                        inputOTP.disabled = false;
                     }, 2000);
                 } 
 
@@ -189,6 +194,8 @@
                 allFieldsAlert.style.visibility = "visible";
                 setTimeout(function() {
                     allFieldsAlert.style.visibility = "hidden";
+                    buttonSubmit.disabled = false;
+                    inputOTP.disabled = false;
                 }, 1500);
             }
         }

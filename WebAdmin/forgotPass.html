@@ -51,6 +51,9 @@
 
         function goNext() {
 
+            buttonSubmit.disabled = true;
+            inputEmailAdd.disabled = true;
+
             if (!(inputEmailAdd.value == "" || inputEmailAdd.value == null)) {
 
                 sessionStorage.removeItem('inputEmail');
@@ -67,6 +70,8 @@
                 allFieldsAlert.style.visibility = "visible";
                 setTimeout(function() {
                     allFieldsAlert.style.visibility = "hidden";
+                    inputEmailAdd.disabled = false;
+                    buttonSubmit.disabled = false;
                 }, 1500);
             }
             

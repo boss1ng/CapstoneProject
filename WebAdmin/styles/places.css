@@ -1,7 +1,13 @@
 
+/* 
+#2F414F - dark
+#3894A3 - light blue
+#F1F1EF - darker white
+#C7DAD4 - light green apple
+*/
 
 body {
-    background-image: url(../images/Enhanced.jpg);
+    /* background-image: url(../images/Enhanced.jpg); */
     background-size: cover;
     /* overflow: hidden; */
 }
@@ -14,7 +20,7 @@ img {
     height: 100%;
     width: 330px;
     position: fixed;
-    background-color: #fff;
+    background-color: #F1F1EF;
     color: #fff;
 }
 
@@ -32,7 +38,7 @@ img {
 }
 
 .aCont:hover {
-    background-color: #135272;
+    background-color: #3894A3;
 }
 
 .aCont:hover svg {
@@ -44,7 +50,7 @@ img {
 }
 
 .aSelectedCont {
-    background-color: #135272;
+    background-color: #3894A3;
 }
 
 .aSelectedCont a {
@@ -64,7 +70,7 @@ img {
     margin-top: 110px;
     padding-bottom: 30px;
     margin-bottom: 110px;
-    background-color: #c6e6f0;
+    background-color: #C7DAD4;
     height: auto;
     border-radius: 50px;
 }

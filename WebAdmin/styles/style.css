@@ -1,10 +1,18 @@
 
+/* 
+#2F414F - dark
+#3894A3 - light blue
+#F1F1EF - darker white
+#C7DAD4 - light green apple
+*/
+
 body {
-    background-image: url(../images/Background.jpg);
+    /* background-image: url(../images/Background.jpg); */
     background-size: cover;
 }
 
 .outerCont {
+    background-color: #2F414F;
     height: 100vh;
     display: flex;
     justify-content: center;
@@ -12,7 +20,7 @@ body {
 }
 
 #loginCont {
-    background-color: #c6e6f0;
+    background-color: #F1F1EF;
     width: 40%;
     height: 60vh;
     vertical-align: middle;
