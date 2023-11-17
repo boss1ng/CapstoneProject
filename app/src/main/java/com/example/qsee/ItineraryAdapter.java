@@ -1,6 +1,8 @@
 package com.example.qsee;
 
 import android.app.TimePickerDialog;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -151,11 +153,41 @@ public class ItineraryAdapter extends RecyclerView.Adapter<ItineraryAdapter.Acti
                         ArrayAdapter<String> adapter = new ArrayAdapter<>(originAutoCompleteTextView.getContext(), android.R.layout.simple_dropdown_item_1line, locationsList);
                         originAutoCompleteTextView.setAdapter(adapter);
 
-                        // Set the existing location text
-                        String locationText = originAutoCompleteTextView.getText().toString();
-                        if (locationText.isEmpty()) {
-                            originAutoCompleteTextView.setText(item.getLocation());
-                        }
+                        originAutoCompleteTextView.addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence charSequence, int start, int before, int count) {
+                                // Not used in this case
+                            }
+
+                            @Override
+                            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                                // Check if the entered text is not present in the locationsList
+                                String locationText = charSequence.toString();
+                                if (!locationsList.contains(locationText)) {
+                                    originAutoCompleteTextView.setError("Invalid location"); // Optionally, you can show an error message
+                                } else {
+                                    originAutoCompleteTextView.setError(null); // Clear the error if the location is valid
+                                }
+                            }
+
+                            @Override
+                            public void afterTextChanged(Editable editable) {
+                                // Not used in this case
+                            }
+                        });
+
+                        originAutoCompleteTextView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                            @Override
+                            public void onFocusChange(View v, boolean hasFocus) {
+                                if (!hasFocus) {
+                                    // Check if the entered text is not present in the locationsList
+                                    String locationText = originAutoCompleteTextView.getText().toString();
+                                    if (!locationsList.contains(locationText)) {
+                                        originAutoCompleteTextView.setText(""); // Clear the input if it doesn't match any item
+                                    }
+                                }
+                            }
+                        });
                     }
 
                     @Override
@@ -189,11 +221,41 @@ public class ItineraryAdapter extends RecyclerView.Adapter<ItineraryAdapter.Acti
                         ArrayAdapter<String> adapter = new ArrayAdapter<>(locationAutoCompleteTextView.getContext(), android.R.layout.simple_dropdown_item_1line, locationsList);
                         locationAutoCompleteTextView.setAdapter(adapter);
 
-                        // Set the existing location text
-                        String locationText = locationAutoCompleteTextView.getText().toString();
-                        if (locationText.isEmpty()) {
-                            locationAutoCompleteTextView.setText(item.getLocation());
-                        }
+                        locationAutoCompleteTextView.addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence charSequence, int start, int before, int count) {
+                                // Not used in this case
+                            }
+
+                            @Override
+                            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                                // Check if the entered text is not present in the locationsList
+                                String locationText = charSequence.toString();
+                                if (!locationsList.contains(locationText)) {
+                                    locationAutoCompleteTextView.setError("Invalid location"); // Optionally, you can show an error message
+                                } else {
+                                    locationAutoCompleteTextView.setError(null); // Clear the error if the location is valid
+                                }
+                            }
+
+                            @Override
+                            public void afterTextChanged(Editable editable) {
+                                // Not used in this case
+                            }
+                        });
+
+                        locationAutoCompleteTextView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                            @Override
+                            public void onFocusChange(View v, boolean hasFocus) {
+                                if (!hasFocus) {
+                                    // Check if the entered text is not present in the locationsList
+                                    String locationText = locationAutoCompleteTextView.getText().toString();
+                                    if (!locationsList.contains(locationText)) {
+                                        locationAutoCompleteTextView.setText(""); // Clear the input if it doesn't match any item
+                                    }
+                                }
+                            }
+                        });
                     }
 
                     @Override
