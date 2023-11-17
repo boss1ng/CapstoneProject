@@ -15,6 +15,7 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -37,6 +38,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.database.DataSnapshot;
@@ -248,10 +253,24 @@ public class EditProfileFragment extends Fragment {
     }
 
     public void bindData(String url) {
-        Glide.with(profilePictureImageView.getContext())
+        Picasso.get()
                 .load(url)
-                .into(profilePictureImageView);
+                .placeholder(R.drawable.profilepicture) // Placeholder image
+                .error(R.drawable.ic_profile) // Error image
+                .into(profilePictureImageView, new com.squareup.picasso.Callback() {
+                    @Override
+                    public void onSuccess() {
+                        // Successful loading
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        Log.e("PicassoError", "Load failed", e);
+                    }
+                });
     }
+
+
 
     public static EditProfileFragment newInstance(String userId) {
         EditProfileFragment fragment = new EditProfileFragment();
