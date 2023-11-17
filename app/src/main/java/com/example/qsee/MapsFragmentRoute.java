@@ -377,7 +377,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
             viewCurrent.setImageResource(R.drawable.currentloc);
 
             ImageView viewInstructions = getView().findViewById(R.id.btnShowInstructions);
-            viewInstructions.setImageResource(R.drawable.navigate_up_arrow);
+            viewInstructions.setImageResource(R.drawable.expand_route);
             viewInstructions.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
