@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,14 +27,16 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class LocationFragment extends Fragment {
 
+    private TextView noLocationsTextView;
     private String userId;
     private static final String TAG = "LocationFragment"; // Added TAG constant
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_location_list, container, false);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
@@ -42,7 +45,6 @@ public class LocationFragment extends Fragment {
         if (args != null) {
             userId = args.getString("userId");
         }
-
 
         // Initialize Firebase
         FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -111,6 +113,13 @@ public class LocationFragment extends Fragment {
                             }
                         }
                         locationAdapter.notifyDataSetChanged();
+
+                        // Update the visibility of the "No Locations Added" TextView
+                        if (locationList.isEmpty()) {
+                            noLocationsTextView.setVisibility(View.VISIBLE);
+                        } else {
+                            noLocationsTextView.setVisibility(View.GONE);
+                        }
                     }
 
                     @Override
@@ -128,7 +137,6 @@ public class LocationFragment extends Fragment {
             }
         });
 
-
         // Find the "addLocationBtn" button
         FloatingActionButton addLocationBtn = view.findViewById(R.id.addLocationBtn);
 
@@ -145,6 +153,9 @@ public class LocationFragment extends Fragment {
                 dialogFragment.show(fragmentManager, "LocationDialogFragment");
             }
         });
+
+        // Initialize the "No Locations Added" TextView
+        noLocationsTextView = view.findViewById(R.id.noLocationsTextView);
 
         return view;
     }

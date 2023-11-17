@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.Group;
@@ -29,6 +31,7 @@ import java.util.List;
 public class GroupsFragment extends Fragment {
     private String userId;
     private GroupListAdapter adapter;
+    private TextView noGroupsTextView;
 
     // Reference to the Firebase Realtime Database
     private DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
@@ -41,6 +44,7 @@ public class GroupsFragment extends Fragment {
         // Initialize RecyclerView
         RecyclerView recyclerView = view.findViewById(R.id.groupRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        noGroupsTextView = view.findViewById(R.id.noGroupsTextView);
 
         // Create a list of mock groups (you should replace this with your actual data)
         List<Groups> groupList = createMockGroupList();
@@ -127,6 +131,11 @@ public class GroupsFragment extends Fragment {
                 // Update the RecyclerView adapter with the retrieved user groups
                 if (adapter != null) {
                     adapter.updateData(userGroups);
+                    if (userGroups.isEmpty()) {
+                        noGroupsTextView.setVisibility(View.VISIBLE);
+                    } else {
+                        noGroupsTextView.setVisibility(View.GONE);
+                    }
                 }
             }
 
