@@ -100,32 +100,75 @@ public class FilterCategories extends DialogFragment {
             String categoryName = getBundle.getString("categoryName");
 
             if (categoryName != null) {
-                Toast.makeText(view.getContext(), categoryName, Toast.LENGTH_LONG).show();
+                //Toast.makeText(view.getContext(), categoryName, Toast.LENGTH_LONG).show();
 
-                databaseReference.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        categories.clear(); // Clear existing data
-                        int position = 0; // Initialize position counter
+                if (categoryName.contains("+")) {
+                    Toast.makeText(view.getContext(), categoryName, Toast.LENGTH_LONG).show();
 
-                        for (DataSnapshot categorySnapshot : dataSnapshot.getChildren()) {
-                            String firebaseCategoryName = categorySnapshot.child("Category").getValue(String.class);
-                            categories.add(firebaseCategoryName);
+                    // Split the string by the '+' character
+                    String[] preSelectedCategories = categoryName.split("\\+");
 
-                            // Decide whether to check this item
-                            if (firebaseCategoryName.equals(categoryName)) {
-                                adapter.setItemChecked(position, true);
+                    // Get the count of the resulting substrings
+                    int numberOfCategories = preSelectedCategories.length;
+                    String numCat = String.valueOf(numberOfCategories);
+                    //Toast.makeText(view.getContext(), numCat, Toast.LENGTH_LONG).show();
+
+                    databaseReference.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            categories.clear(); // Clear existing data
+                            int position = 0; // Initialize position counter
+
+                            for (DataSnapshot categorySnapshot : dataSnapshot.getChildren()) {
+                                String firebaseCategoryName = categorySnapshot.child("Category").getValue(String.class);
+                                categories.add(firebaseCategoryName);
+
+                                for (int i = 0; i < numberOfCategories; i++) {
+                                    // Decide whether to check this item
+                                    if (firebaseCategoryName.equals(preSelectedCategories[i])) {
+                                        adapter.setItemChecked(position, true);
+                                    }
+                                }
+                                position++;
                             }
-                            position++;
-                        }
-                        adapter.notifyDataSetChanged();
-                    }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        // Handle any errors here
-                    }
-                });
+
+                            adapter.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            // Handle any errors here
+                        }
+                    });
+                }
+
+                else {
+                    databaseReference.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            categories.clear(); // Clear existing data
+                            int position = 0; // Initialize position counter
+
+                            for (DataSnapshot categorySnapshot : dataSnapshot.getChildren()) {
+                                String firebaseCategoryName = categorySnapshot.child("Category").getValue(String.class);
+                                categories.add(firebaseCategoryName);
+
+                                // Decide whether to check this item
+                                if (firebaseCategoryName.equals(categoryName)) {
+                                    adapter.setItemChecked(position, true);
+                                }
+                                position++;
+                            }
+                            adapter.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            // Handle any errors here
+                        }
+                    });
+                }
             }
 
             else {
