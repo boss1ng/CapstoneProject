@@ -328,7 +328,7 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
         Document document = new Document(PageSize.A4);
 
         // Set margins (left, right, top, bottom)
-        document.setMargins(0, 0, 72, 0); // 1/2 inch margins
+        document.setMargins(0, 0, 72, 36); // 1/2 inch margins
 
         try {
             //PdfWriter.getInstance(document, new FileOutputStream(pdfFile));

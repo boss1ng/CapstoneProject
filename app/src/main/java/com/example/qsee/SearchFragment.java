@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -228,18 +229,87 @@ public class SearchFragment extends Fragment {
                 if (itemId == R.id.action_home) {
                     loadFragment(new HomeFragment());
                     bottomNavigationView.setVisibility(View.GONE);
+
+                    FrameLayout frameLayout = view.findViewById(R.id.searchTab);
+                    frameLayout.setVisibility(View.GONE);
+                    TextInputLayout textInputLayout = view.findViewById(R.id.searchText);
+                    textInputLayout.setVisibility(View.GONE);
+                    TextView textView = view.findViewById(R.id.plainText);
+                    textView.setVisibility(View.GONE);
+                    TextView textView1 = view.findViewById(R.id.plainText2);
+                    textView1.setVisibility(View.GONE);
+                    HorizontalScrollView horizontalScrollView = view.findViewById(R.id.horizontalScrollView);
+                    horizontalScrollView.setVisibility(View.GONE);
+                    HorizontalScrollView horizontalScrollView2 = view.findViewById(R.id.horizontalScrollView2);
+                    horizontalScrollView2.setVisibility(View.GONE);
+
                 } else if (itemId == R.id.action_search) {
                     loadFragment(new SearchFragment());
                     bottomNavigationView.setVisibility(View.GONE);
+
+                    FrameLayout frameLayout = view.findViewById(R.id.searchTab);
+                    frameLayout.setVisibility(View.GONE);
+                    TextInputLayout textInputLayout = view.findViewById(R.id.searchText);
+                    textInputLayout.setVisibility(View.GONE);
+                    TextView textView = view.findViewById(R.id.plainText);
+                    textView.setVisibility(View.GONE);
+                    TextView textView1 = view.findViewById(R.id.plainText2);
+                    textView1.setVisibility(View.GONE);
+                    HorizontalScrollView horizontalScrollView = view.findViewById(R.id.horizontalScrollView);
+                    horizontalScrollView.setVisibility(View.GONE);
+                    HorizontalScrollView horizontalScrollView2 = view.findViewById(R.id.horizontalScrollView2);
+                    horizontalScrollView2.setVisibility(View.GONE);
+
                 } else if (itemId == R.id.action_maps) {
                     loadFragment(new MapsFragment());
                     bottomNavigationView.setVisibility(View.GONE);
+
+                    FrameLayout frameLayout = view.findViewById(R.id.searchTab);
+                    frameLayout.setVisibility(View.GONE);
+                    TextInputLayout textInputLayout = view.findViewById(R.id.searchText);
+                    textInputLayout.setVisibility(View.GONE);
+                    TextView textView = view.findViewById(R.id.plainText);
+                    textView.setVisibility(View.GONE);
+                    TextView textView1 = view.findViewById(R.id.plainText2);
+                    textView1.setVisibility(View.GONE);
+                    HorizontalScrollView horizontalScrollView = view.findViewById(R.id.horizontalScrollView);
+                    horizontalScrollView.setVisibility(View.GONE);
+                    HorizontalScrollView horizontalScrollView2 = view.findViewById(R.id.horizontalScrollView2);
+                    horizontalScrollView2.setVisibility(View.GONE);
+
                 } else if (itemId == R.id.action_quiz) {
                     loadFragment(new StartQuizFragment());
                     bottomNavigationView.setVisibility(View.GONE);
+
+                    FrameLayout frameLayout = view.findViewById(R.id.searchTab);
+                    frameLayout.setVisibility(View.GONE);
+                    TextInputLayout textInputLayout = view.findViewById(R.id.searchText);
+                    textInputLayout.setVisibility(View.GONE);
+                    TextView textView = view.findViewById(R.id.plainText);
+                    textView.setVisibility(View.GONE);
+                    TextView textView1 = view.findViewById(R.id.plainText2);
+                    textView1.setVisibility(View.GONE);
+                    HorizontalScrollView horizontalScrollView = view.findViewById(R.id.horizontalScrollView);
+                    horizontalScrollView.setVisibility(View.GONE);
+                    HorizontalScrollView horizontalScrollView2 = view.findViewById(R.id.horizontalScrollView2);
+                    horizontalScrollView2.setVisibility(View.GONE);
+
                 } else if (itemId == R.id.action_profile) {
                     loadFragment(new ProfileFragment());
                     bottomNavigationView.setVisibility(View.GONE);
+
+                    FrameLayout frameLayout = view.findViewById(R.id.searchTab);
+                    frameLayout.setVisibility(View.GONE);
+                    TextInputLayout textInputLayout = view.findViewById(R.id.searchText);
+                    textInputLayout.setVisibility(View.GONE);
+                    TextView textView = view.findViewById(R.id.plainText);
+                    textView.setVisibility(View.GONE);
+                    TextView textView1 = view.findViewById(R.id.plainText2);
+                    textView1.setVisibility(View.GONE);
+                    HorizontalScrollView horizontalScrollView = view.findViewById(R.id.horizontalScrollView);
+                    horizontalScrollView.setVisibility(View.GONE);
+                    HorizontalScrollView horizontalScrollView2 = view.findViewById(R.id.horizontalScrollView2);
+                    horizontalScrollView2.setVisibility(View.GONE);
                 }
                 return true;
             }
