@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:backgroundTint="@color/shade1"
+            android:background="@color/shade1"
             tools:ignore="MissingConstraints">
 
             <ImageButton
@@ -57,8 +57,9 @@
         android:id="@+id/filterContainer"
         android:layout_width="250dp"
         android:layout_height="match_parent"
-        android:background="@color/shade1"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="@drawable/bordered_background"
+        >
 
         <ImageButton
             android:id="@+id/backButton"
@@ -81,7 +82,10 @@
             android:id="@+id/listView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="20dp" />
+            android:layout_marginTop="20dp"
+            android:divider="@color/shade3"
+            android:dividerHeight="1dp"
+            />
 
     </LinearLayout>
 

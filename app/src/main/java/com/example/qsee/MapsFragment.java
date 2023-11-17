@@ -556,7 +556,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
                         if (categoryName != null) {
 
-                            // Toast.makeText(getContext(), categoryName, Toast.LENGTH_LONG).show();
+                            //Toast.makeText(getContext(), categoryName, Toast.LENGTH_LONG).show();
 
                             // Split the string by the '+' character
                             String[] categories = categoryName.split("\\+");
@@ -723,7 +723,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                                 else
                                     noCategoryMessage = "There is no registered establishments under the selected categories.";
 
-                                //Toast.makeText(getContext(), noCategoryMessage, Toast.LENGTH_LONG).show();
+                                Toast.makeText(getContext(), noCategoryMessage, Toast.LENGTH_LONG).show();
                             }
                         }
 
