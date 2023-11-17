@@ -59,6 +59,7 @@ public class AddItineraryFragment extends Fragment {
     private List<View> formViews = new ArrayList<>();
     // Define a global variable to store the selected dates
     private List<String> selectedDates = new ArrayList<>();
+    private List<String> locationsList;
 
     private String Itinerary1 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/ItineraryPhoto%2FItinerary%201.png?alt=media&token=14ec1289-0cf4-41d6-abb5-2f46fe4855e4";
     private String Itinerary2 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/ItineraryPhoto%2FItinerary%202.png?alt=media&token=5152587b-a0e9-4a84-ae17-78e0ad315350";
@@ -104,7 +105,7 @@ public class AddItineraryFragment extends Fragment {
         if (args != null) {
             userId = args.getString("userId");
         }
-
+        loadLocationsList();
         // Replace this with the actual reference to the TextInputLayout for the itinerary name
         TextInputLayout itineraryNameTextInput = view.findViewById(R.id.textInputLayout);
 
@@ -296,8 +297,15 @@ public class AddItineraryFragment extends Fragment {
                                         String location = Objects.requireNonNull(locationInputLayout.getEditText()).getText().toString();
                                         String origin = Objects.requireNonNull(originInputLayout.getEditText()).getText().toString();
 
+
                                         if (time.isEmpty() || activity.isEmpty() || location.isEmpty() || origin.isEmpty()) {
                                             Toast.makeText(getContext(), "Please fill in all fields for Day 1", Toast.LENGTH_LONG).show();
+                                            allFormsFilled = false;
+                                            break;
+                                        }
+                                        else if (validateLocationsInAllForms(defaultDayRecyclerView)) {
+                                            continue;
+                                        } else {
                                             allFormsFilled = false;
                                             break;
                                         }
@@ -336,6 +344,12 @@ public class AddItineraryFragment extends Fragment {
 
                                         if (time.isEmpty() || activity.isEmpty() || location.isEmpty() || origin.isEmpty()) {
                                             Toast.makeText(getContext(), "Please fill in all fields for Day " + (i + 2), Toast.LENGTH_LONG).show();
+                                            allFormsFilled = false;
+                                            break;
+                                        }
+                                        else if (validateLocationsInAllForms(currentDayRecyclerView)) {
+                                            continue;
+                                        } else {
                                             allFormsFilled = false;
                                             break;
                                         }
@@ -799,6 +813,62 @@ public class AddItineraryFragment extends Fragment {
             addItineraryButton.setVisibility(View.GONE);
         }
     }
+
+    private void loadLocationsList() {
+        DatabaseReference locationsRef = FirebaseDatabase.getInstance().getReference().child("Location");
+        locationsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                locationsList = new ArrayList<>();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String location = snapshot.child("Location").getValue(String.class);
+                    locationsList.add(location);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Handle possible errors
+            }
+        });
+    }
+    private boolean validateLocationsInAllForms(View view) {
+        // Check default form
+        if (!validateFormLocations(view.findViewById(R.id.recyclerView))) {
+            return false;
+        }
+
+        // Check all dynamic forms
+        for (View formView : formViews) {
+            RecyclerView dayRecyclerView = formView.findViewById(R.id.recyclerView);
+            if (!validateFormLocations(dayRecyclerView)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private boolean validateFormLocations(RecyclerView recyclerView) {
+        LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+        for (int i = 0; i < layoutManager.getItemCount(); i++) {
+            View itemView = layoutManager.getChildAt(i);
+            if (itemView != null) {
+                TextInputLayout locationInputLayout = itemView.findViewById(R.id.locationInput);
+                TextInputLayout originInputLayout = itemView.findViewById(R.id.originInput);
+
+                String location = Objects.requireNonNull(locationInputLayout.getEditText()).getText().toString();
+                String origin = Objects.requireNonNull(originInputLayout.getEditText()).getText().toString();
+
+                if (!locationsList.contains(location) || !locationsList.contains(origin)) {
+                    Toast.makeText(getContext(), "Invalid origin or destination in one of the forms", Toast.LENGTH_LONG).show();
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
 
 
 }

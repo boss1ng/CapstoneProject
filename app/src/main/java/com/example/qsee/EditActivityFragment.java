@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.Switch;
@@ -88,7 +89,7 @@ public class EditActivityFragment extends Fragment {
                     }
 
                     // Check if the fragment is attached to a context before using requireContext()
-                    if (isAdded() && getContext() != null) {
+                    if (isAdded()) {
                         // Set up the adapter for the AutoCompleteTextView
                         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, locationsList);
                         originAutoCompleteTextView.setAdapter(adapter);
@@ -197,8 +198,41 @@ public class EditActivityFragment extends Fragment {
                                     // Check the status and set the completion switch
                                     if ("Completed".equals(status)) {
                                         completionSwitch.setChecked(true);
+                                        completionSwitch.setEnabled(false);
                                     } else {
                                         completionSwitch.setChecked(false);
+                                        completionSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                            @Override
+                                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                                if (isChecked) {
+                                                    // Show confirmation dialog when trying to switch on
+                                                    new AlertDialog.Builder(getContext())
+                                                            .setTitle("Confirm Action")
+                                                            .setMessage("Are you sure you want to mark this itinerary as complete? This action cannot be undone.")
+                                                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                                                @Override
+                                                                public void onClick(DialogInterface dialog, int which) {
+                                                                    // User confirmed to complete the itinerary
+                                                                    // Here, handle the logic to mark the itinerary as complete
+                                                                    // ...
+
+                                                                    // Disable the switch to prevent further changes
+                                                                    completionSwitch.setEnabled(false);
+                                                                }
+                                                            })
+                                                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                                                @Override
+                                                                public void onClick(DialogInterface dialog, int which) {
+                                                                    // User cancelled, revert the switch state
+                                                                    completionSwitch.setChecked(false);
+                                                                }
+                                                            })
+                                                            .show();
+                                                } else {
+                                                    // Handle the case if you need to do something when the switch is turned off
+                                                }
+                                            }
+                                        });
                                     }
                                 }
                             }
@@ -212,6 +246,8 @@ public class EditActivityFragment extends Fragment {
                     Log.e("FirebaseError", "Error: " + databaseError.getMessage());
                 }
             });
+
+
 
             // Find the save button by its ID
             Button saveButton = rootView.findViewById(R.id.saveBt);
@@ -336,7 +372,9 @@ public class EditActivityFragment extends Fragment {
                                                         // Check if updatedOrigin and updatedLocation are in locationsList
                                                         if (!locationsList.contains(updatedOrigin) || !locationsList.contains(updatedLocation)) {
                                                             // Display a message that the origin or location is invalid
-                                                            Toast.makeText(getContext(), "Invalid origin or location", Toast.LENGTH_LONG).show();
+                                                            if (isAdded()) {
+                                                                Toast.makeText(getContext(), "Invalid origin or location", Toast.LENGTH_LONG).show();
+                                                            }
                                                         } else if (!completionSwitch.isChecked()) {
                                                             // Remove the old timeSnapshot
                                                             timeSnapshot.getRef().removeValue();
@@ -346,6 +384,11 @@ public class EditActivityFragment extends Fragment {
                                                             newTimeSnapshot.child("activity").setValue(updatedActivity);
                                                             newTimeSnapshot.child("origin").setValue(updatedOrigin);
                                                             newTimeSnapshot.child("status").setValue("Incomplete");
+                                                            // Show a toast to confirm the save
+                                                            if (isAdded()) {
+                                                                Toast.makeText(getContext(), "Changes saved successfully.", Toast.LENGTH_LONG).show();
+                                                            }
+                                                            dialog.dismiss();
                                                         }
                                                     }
 
@@ -368,10 +411,6 @@ public class EditActivityFragment extends Fragment {
                                 }
                             });
                         }
-
-                            // Show a toast to confirm the save
-                            Toast.makeText(getContext(), "Changes saved successfully.", Toast.LENGTH_LONG).show();
-                            dialog.dismiss();
                         }
                         }
                     });
