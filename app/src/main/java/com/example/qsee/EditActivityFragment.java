@@ -265,16 +265,41 @@ public class EditActivityFragment extends Fragment {
                                         for (DataSnapshot timeSnapshot : daySnapshot.getChildren()) {
                                             String retrievedLoc = timeSnapshot.child("location").getValue(String.class);
                                             if (timeSnapshot.getKey().equals(finalTime) && retrievedLoc.equals(location)) {
-                                                // Remove the old timeSnapshot
 
-                                                // Add a new timeSnapshot with the updatedTime as the key
-                                                DatabaseReference newTimeSnapshot = daySnapshot.child(finalTime).getRef();
-                                                newTimeSnapshot.child("status").setValue("Completed");
 
-                                                showRatingDialog();
-                                                // Show a toast to confirm the save
-                                                Toast.makeText(getContext(), "Changes saved successfully.", Toast.LENGTH_LONG).show();
-                                                dialog.dismiss();
+                                                DatabaseReference locationsRef = FirebaseDatabase.getInstance().getReference().child("Location");
+                                                locationsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                                        List<String> locationsList = new ArrayList<>();
+                                                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                                            String Location = snapshot.child("Location").getValue(String.class);
+                                                            locationsList.add(Location);
+                                                        }
+                                                        // Check if updatedOrigin and updatedLocation are in locationsList
+                                                        if (!locationsList.contains(updatedOrigin) || !locationsList.contains(updatedLocation)) {
+                                                            // Display a message that the origin or location is invalid
+                                                            Toast.makeText(getContext(), "Invalid origin or location", Toast.LENGTH_LONG).show();
+                                                        } else if (completionSwitch.isChecked()){
+                                                            // Remove the old timeSnapshot
+
+                                                            // Add a new timeSnapshot with the updatedTime as the key
+                                                            DatabaseReference newTimeSnapshot = daySnapshot.child(finalTime).getRef();
+                                                            newTimeSnapshot.child("status").setValue("Completed");
+
+                                                            showRatingDialog();
+                                                            // Show a toast to confirm the save
+                                                            Toast.makeText(getContext(), "Changes saved successfully.", Toast.LENGTH_LONG).show();
+                                                            dialog.dismiss();
+
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(DatabaseError databaseError) {
+                                                        // Handle any errors
+                                                    }
+                                                });
                                             }
                                         }
                                     }
@@ -298,21 +323,39 @@ public class EditActivityFragment extends Fragment {
                                         for (DataSnapshot timeSnapshot : daySnapshot.getChildren()) {
                                             String retrievedLoc = timeSnapshot.child("location").getValue(String.class);
                                             if (timeSnapshot.getKey().equals(finalTime) && retrievedLoc.equals(location)) {
-                                                // Remove the old timeSnapshot
-                                                timeSnapshot.getRef().removeValue();
+                                                // Fetch data from Firebase Realtime Database
+                                                DatabaseReference locationsRef = FirebaseDatabase.getInstance().getReference().child("Location");
+                                                locationsRef.addValueEventListener(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                                        List<String> locationsList = new ArrayList<>();
+                                                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                                            String Location = snapshot.child("Location").getValue(String.class);
+                                                            locationsList.add(Location);
+                                                        }
+                                                        // Check if updatedOrigin and updatedLocation are in locationsList
+                                                        if (!locationsList.contains(updatedOrigin) || !locationsList.contains(updatedLocation)) {
+                                                            // Display a message that the origin or location is invalid
+                                                            Toast.makeText(getContext(), "Invalid origin or location", Toast.LENGTH_LONG).show();
+                                                        } else if (!completionSwitch.isChecked()) {
+                                                            // Remove the old timeSnapshot
+                                                            timeSnapshot.getRef().removeValue();
+                                                            // Add a new timeSnapshot with the updatedTime as the key
+                                                            DatabaseReference newTimeSnapshot = daySnapshot.child(militaryTime).getRef();
+                                                            newTimeSnapshot.child("location").setValue(updatedLocation);
+                                                            newTimeSnapshot.child("activity").setValue(updatedActivity);
+                                                            newTimeSnapshot.child("origin").setValue(updatedOrigin);
+                                                            newTimeSnapshot.child("status").setValue("Incomplete");
+                                                        }
+                                                    }
 
-                                                // Add a new timeSnapshot with the updatedTime as the key
-                                                DatabaseReference newTimeSnapshot = daySnapshot.child(militaryTime).getRef();
-                                                newTimeSnapshot.child("location").setValue(updatedLocation);
-                                                newTimeSnapshot.child("activity").setValue(updatedActivity);
-                                                newTimeSnapshot.child("origin").setValue(updatedOrigin);
-                                                newTimeSnapshot.child("status").setValue("Incomplete");
-                                                //newTimeSnapshot.child("status").setValue("incomplete");
+                                                    @Override
+                                                    public void onCancelled(DatabaseError databaseError) {
+                                                        // Handle any errors
+                                                    }
+                                                });
 
 
-                                                // Show a toast to confirm the save
-                                                Toast.makeText(getContext(), "Changes saved successfully.", Toast.LENGTH_LONG).show();
-                                                dialog.dismiss();
                                             }
                                         }
                                     }
