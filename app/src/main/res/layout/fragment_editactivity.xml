@@ -6,9 +6,9 @@
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:gravity="center"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -19,23 +19,31 @@
 
         <TextView
             android:id="@+id/editAct"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
             android:layout_gravity="center"
-            android:layout_marginTop="15dp"
+            android:background="@color/shade1"
             android:foregroundGravity="center"
             android:gravity="center"
             android:text="Edit Locname"
+            android:textColor="@color/white"
             android:textSize="20dp"
             android:textStyle="bold" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/locationImage"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp"
+            android:visibility="gone"/>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/originName"
             android:layout_width="342dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="35dp"
             android:layout_marginTop="15dp"
-            android:layout_marginEnd="35dp">
+            android:gravity="center">
 
             <AutoCompleteTextView
                 android:layout_width="match_parent"
@@ -51,9 +59,8 @@
             android:id="@+id/locName"
             android:layout_width="342dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="35dp"
             android:layout_marginTop="15dp"
-            android:layout_marginEnd="35dp">
+            android:gravity="center">
 
             <AutoCompleteTextView
                 android:layout_width="match_parent"
@@ -68,9 +75,8 @@
             android:id="@+id/locTime"
             android:layout_width="342dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="35dp"
             android:layout_marginTop="15dp"
-            android:layout_marginEnd="35dp">
+            android:gravity="center">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="341dp"
@@ -84,9 +90,8 @@
             android:id="@+id/locActivity"
             android:layout_width="342dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="35dp"
             android:layout_marginTop="15dp"
-            android:layout_marginEnd="35dp">
+            android:gravity="center">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="341dp"
@@ -95,21 +100,22 @@
         </com.google.android.material.textfield.TextInputLayout>
 
 
-
         <Switch
             android:id="@+id/completionSwitch"
             android:layout_width="wrap_content"
             android:layout_height="47dp"
+            android:layout_gravity="left"
             android:layout_marginLeft="40dp"
             android:layout_marginTop="15dp"
-            android:text="Completed" />
+            android:text="Completed"
+            tools:ignore="UseSwitchCompatOrMaterialXml" />
 
         <Button
             android:id="@+id/saveBt"
             android:layout_width="310dp"
             android:layout_height="48dp"
             android:layout_gravity="center"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="15dp"
             android:backgroundTint="@color/gradient_start"
             android:foregroundGravity="center"
             android:gravity="center"

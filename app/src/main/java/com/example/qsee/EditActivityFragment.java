@@ -17,6 +17,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -36,6 +37,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -74,6 +76,34 @@ public class EditActivityFragment extends Fragment {
             AutoCompleteTextView originAutoCompleteTextView = (AutoCompleteTextView) Objects.requireNonNull(originTextInputLayout.getEditText());
             AutoCompleteTextView locationAutoCompleteTextView = (AutoCompleteTextView) Objects.requireNonNull(locationTextInputLayout.getEditText()); // Get the AutoCompleteTextView
             locationAutoCompleteTextView.setText(location);
+
+            ImageView locationImage = rootView.findViewById(R.id.locationImage);
+
+            DatabaseReference locationReference = FirebaseDatabase.getInstance().getReference("Location");
+            Query query = locationReference.orderByChild("Location").equalTo(location);
+
+            query.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        // Location data found
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            String link = snapshot.child("Link").getValue(String.class);
+                            locationImage.setVisibility(View.VISIBLE);
+                            // Use Picasso to load the image and set it into locationIcon
+                            Picasso.get().load(link).into(locationImage);
+                        }
+                    } else {
+                        // Location data not found
+                        // You can set a default image or handle the case as needed
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    // Handle the error if any
+                }
+            });
 
             // Fetch data from Firebase Realtime Database
             DatabaseReference locationsRef = FirebaseDatabase.getInstance().getReference().child("Location");
