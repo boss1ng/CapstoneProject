@@ -61,21 +61,21 @@ public class AddItineraryFragment extends Fragment {
     private List<String> selectedDates = new ArrayList<>();
     private List<String> locationsList;
 
-    private String Itinerary1 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup1.png?alt=media&token=3bc087ae-5ed1-426f-a126-b09b35248dd0";
-    private String Itinerary2 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup2.png?alt=media&token=8860d08b-40f6-4a56-942b-7cb2075304e3";
-    private String Itinerary3 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup3.png?alt=media&token=75c15895-e0c7-40b3-b2d7-2830fc7398f2";
-    private String Itinerary4 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup4.png?alt=media&token=200ad3a5-5b72-446d-8291-938673f1061c";
-    private String Itinerary5 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup5.png?alt=media&token=0739f2d7-05f9-4ea3-96aa-a204a66a7beb";
-    private String Itinerary6 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup6.png?alt=media&token=bd749ca2-c997-4302-bd14-d34600fc6b7c";
-    private String Itinerary7 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup7.png?alt=media&token=54940844-fded-4278-94cc-0cedd98cfa90";
-    private String Itinerary8 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup8.png?alt=media&token=f1534918-4510-48b4-aaa2-46d9b32f3b46";
-    private String Itinerary9 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup9.png?alt=media&token=eb600104-3f9c-4b64-b407-1c0b9c22b5a2";
-    private String Itinerary10 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup10.png?alt=media&token=a0a4b8d8-fbcf-4ee3-9f02-47924a417b92";
-    private String Itinerary11 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup11.png?alt=media&token=4fa71607-d156-4440-b1d8-5803c7bca366";
-    private String Itinerary12 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup12.png?alt=media&token=b8a99e22-76a3-48ce-b96f-556ed4014fc5";
-    private String Itinerary13 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup13.png?alt=media&token=bfe1916a-3415-4c7e-bc7f-6abb89418eae";
-    private String Itinerary14 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup14.png?alt=media&token=3e0f0fa1-84c1-466e-b947-b7c75599af6c";
-    private String Itinerary15 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup15.png?alt=media&token=02646a6b-904a-400c-bf3f-7539e5297fdd";
+    private String Itinerary1 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/ItineraryPhoto%2FItinerary1.png?alt=media&token=ee707837-ef46-4185-9195-932c473ea319";
+    private String Itinerary2 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/ItineraryPhoto%2FItinerary2.png?alt=media&token=e0362315-abe3-4faa-951f-61c594544799";
+    private String Itinerary3 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/ItineraryPhoto%2FItinerary3.png?alt=media&token=94336b84-a62c-41b2-bb3f-c2d0002e449a";
+    private String Itinerary4 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/ItineraryPhoto%2FItinerary4.png?alt=media&token=ffaf2f16-5f0d-411c-873e-1369bfe12705";
+    private String Itinerary5 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/ItineraryPhoto%2FItinerary5.png?alt=media&token=9f3671dd-17d5-4c6e-8aed-67036be725a6";
+    private String Itinerary6 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/ItineraryPhoto%2FItinerary6.png?alt=media&token=7a6b7dae-16f7-4d5c-88bd-73decab2f938";
+    private String Itinerary7 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/ItineraryPhoto%2FItinerary7.png?alt=media&token=cfea22ec-ab8e-45f6-99af-063ee90c4751";
+    private String Itinerary8 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/ItineraryPhoto%2FItinerary8.png?alt=media&token=3fc09622-c1cd-400a-8ae7-a4167affb69c";
+    private String Itinerary9 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/ItineraryPhoto%2FItinerary9.png?alt=media&token=28cf51f9-90e2-4c38-8bf7-8b0732e4c110";
+    private String Itinerary10 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/ItineraryPhoto%2FItinerary10.png?alt=media&token=733a68a1-e1cc-4cc9-8d4d-19a801154ef6";
+    private String Itinerary11 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/ItineraryPhoto%2FItinerary11.png?alt=media&token=736b0f33-2a1c-4236-a169-d2dbf1287a48";
+    private String Itinerary12 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/ItineraryPhoto%2FItinerary12.png?alt=media&token=20d6b11d-db86-4519-81f3-db6ecc4b3d3a";
+    private String Itinerary13 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/ItineraryPhoto%2FItinerary13.png?alt=media&token=cb83791e-7ca2-4aee-89a8-66003c98c897";
+    private String Itinerary14 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/ItineraryPhoto%2FItinerary14.png?alt=media&token=0aa608ea-d22e-4d27-9850-902d94277b8b";
+    private String Itinerary15 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/ItineraryPhoto%2FItinerary15.png?alt=media&token=161c7a46-3bbe-4956-af6b-8605bb5342c3";
 
 
     @Nullable
