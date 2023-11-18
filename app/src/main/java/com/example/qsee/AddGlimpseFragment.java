@@ -1,8 +1,12 @@
 package com.example.qsee;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -11,9 +15,11 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.text.InputFilter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,6 +82,7 @@ public class AddGlimpseFragment extends DialogFragment {
     private static final int TARGET_HEIGHT = 1000;
     private static final int LOCATION_PERMISSION_REQUEST = 1;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+    private static final int CAMERA_PERMISSION_REQUEST_CODE = 101;
     private DatabaseReference databaseReference;
     private TextView caption;
     private TextView location;
@@ -212,7 +219,7 @@ public class AddGlimpseFragment extends DialogFragment {
         }
     }
 
-    private void openCamera() {
+    /*private void openCamera() {
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
         if (cameraIntent.resolveActivity(context.getPackageManager()) != null) {
@@ -220,6 +227,37 @@ public class AddGlimpseFragment extends DialogFragment {
         } else {
             Toast.makeText(context, "No camera app found", Toast.LENGTH_LONG).show();
         }
+    }*/
+
+    private void openCamera() {
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Request the camera permission
+            requestPermissions(new String[]{Manifest.permission.CAMERA},
+                    CAMERA_PERMISSION_REQUEST_CODE);
+        } else {
+            // Camera permission is already granted, open the camera
+            launchCameraIntent();
+        }
+    }
+    private void launchCameraIntent() {
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (cameraIntent.resolveActivity(getContext().getPackageManager()) != null) {
+            startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
+        } else {
+            Toast.makeText(getContext(), "No camera app found", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private Uri createImageUri() {
+        ContentResolver contentResolver = context.getContentResolver();
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.DISPLAY_NAME, "Image_" + System.currentTimeMillis() + ".jpg");
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+        values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
+        Log.d(TAG,"Image URI Created Successfully");
+
+        return contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
     }
 
     @Override
@@ -308,18 +346,19 @@ public class AddGlimpseFragment extends DialogFragment {
 
     // Add this method to handle permission request results
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == LOCATION_PERMISSION_REQUEST) {
+        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, proceed to get the location.
-                getUserLocation();
+                // Permission granted, open the camera
+                launchCameraIntent();
             } else {
-                // Permission denied, handle this case (e.g., show a message to the user).
-                Toast.makeText(context, "Location permission denied. Location data won't be available.", Toast.LENGTH_LONG).show();
+                // Permission denied, show a message to the user.
+                Toast.makeText(getContext(), "Camera permission is required to use camera", Toast.LENGTH_SHORT).show();
             }
         }
     }
+
 
     private void saveImageToDatabase(final String downloadUrl) {
         // Get the user-entered location and caption
