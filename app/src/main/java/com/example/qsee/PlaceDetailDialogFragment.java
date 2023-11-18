@@ -16,7 +16,10 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentContainerView;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -49,6 +52,22 @@ public class PlaceDetailDialogFragment extends DialogFragment {
         // Re-enable the ImageButton
         ImageButton filterMenuBar = getParentFragment().getView().findViewById(R.id.filterMenuBar);
         filterMenuBar.setEnabled(true);
+
+        /*
+        BottomNavigationView bottomNavigationView = getParentFragment().getView().findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setVisibility(View.GONE);
+
+        LinearLayout linearLayout = getParentFragment().getView().findViewById(R.id.filterMenu);
+        linearLayout.setVisibility(View.GONE);
+
+        FragmentContainerView fragmentContainerView = getParentFragment().getView().findViewById(R.id.mapsFragment);
+        fragmentContainerView.setVisibility(View.GONE);
+        */
+
+        /*
+        ImageButton filterMenuBar = getParentFragment().getView().findViewById(R.id.filterMenuBar);
+        filterMenuBar.setVisibility(View.VISIBLE);
+        */
     }
 
     @Nullable
@@ -154,14 +173,22 @@ public class PlaceDetailDialogFragment extends DialogFragment {
                     fragmentConfirmation.setArguments(bundle);
                 }
 
+                //ConstraintLayout constraintLayout = getParentFragment().getView().findViewById(R.id.fragment_container);
+                //constraintLayout.setVisibility(View.GONE);
+
+///*
                 BottomNavigationView bottomNavigationView = getParentFragment().getView().findViewById(R.id.bottomNavigationView);
                 bottomNavigationView.setVisibility(View.GONE);
 
                 LinearLayout linearLayout = getParentFragment().getView().findViewById(R.id.filterMenu);
                 linearLayout.setVisibility(View.GONE);
 
+                FragmentContainerView fragmentContainerView = getParentFragment().getView().findViewById(R.id.mapsFragment);
+                fragmentContainerView.setVisibility(View.GONE);
+//*/
+
                 // Replace the current fragment with the receiving fragment
-                transaction.replace(R.id.maps, fragmentConfirmation);
+                transaction.replace(R.id.fragment_container, fragmentConfirmation);
                 transaction.addToBackStack(null);
                 transaction.commit();
 

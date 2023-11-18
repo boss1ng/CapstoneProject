@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -97,7 +98,28 @@ public class GroupViewFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // Pop the back stack when the back button is clicked
-                requireActivity().getSupportFragmentManager().popBackStack();
+                //requireActivity().getSupportFragmentManager().popBackStack();
+
+                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+
+                ProfileFragment profileFragment = new ProfileFragment();
+
+                // Use Bundle to pass values
+                Bundle bundle = new Bundle();
+                bundle.putString("userId", userId);
+                bundle.putString("fromGroup", "1");
+                profileFragment.setArguments(bundle);
+
+                TextView textView2 = view.findViewById(R.id.groupName);
+                textView2.setVisibility(View.GONE);
+                ImageView imageView = view.findViewById(R.id.backButton);
+                imageView.setVisibility(View.GONE);
+                RecyclerView recyclerView = view.findViewById(R.id.groupRecyclerView);
+                recyclerView.setVisibility(View.GONE);
+
+                transaction.replace(R.id.fragment_container, profileFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
             }
         });
 
