@@ -74,6 +74,12 @@ public class GroupEditAdapter extends RecyclerView.Adapter<GroupEditAdapter.View
             }
         });
 
+        if (position == 0) {
+            holder.deleteButton.setVisibility(View.GONE); // or View.INVISIBLE if you want to keep the space
+        } else {
+            holder.deleteButton.setVisibility(View.VISIBLE);
+        }
+
         holder.deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
