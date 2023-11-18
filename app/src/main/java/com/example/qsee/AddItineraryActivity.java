@@ -3,6 +3,8 @@ package com.example.qsee;
 import android.annotation.SuppressLint;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -85,6 +87,52 @@ public class AddItineraryActivity extends Fragment {
                         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, locationsList);
                         originAutoCompleteTextView.setAdapter(adapter);
                         locationAutoCompleteTextView.setAdapter(adapter);
+
+                        originAutoCompleteTextView.addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence charSequence, int start, int before, int count) {
+                                // Not used in this case
+                            }
+
+                            @Override
+                            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                                // Check if the entered text is not present in the locationsList
+                                String locationText = charSequence.toString();
+                                if (!locationsList.contains(locationText)) {
+                                    originAutoCompleteTextView.setError("Invalid location"); // Optionally, you can show an error message
+                                } else {
+                                    originAutoCompleteTextView.setError(null); // Clear the error if the location is valid
+                                }
+                            }
+
+                            @Override
+                            public void afterTextChanged(Editable editable) {
+                                // Not used in this case
+                            }
+                        });
+
+                        locationAutoCompleteTextView.addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence charSequence, int start, int before, int count) {
+                                // Not used in this case
+                            }
+
+                            @Override
+                            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                                // Check if the entered text is not present in the locationsList
+                                String locationText = charSequence.toString();
+                                if (!locationsList.contains(locationText)) {
+                                    locationAutoCompleteTextView.setError("Invalid location"); // Optionally, you can show an error message
+                                } else {
+                                    locationAutoCompleteTextView.setError(null); // Clear the error if the location is valid
+                                }
+                            }
+
+                            @Override
+                            public void afterTextChanged(Editable editable) {
+                                // Not used in this case
+                            }
+                        });
                     }
                 }
 
@@ -106,43 +154,67 @@ public class AddItineraryActivity extends Fragment {
                             .setTitle("Confirmation")
                             .setMessage("Are you sure you want to save this activity?")
                             .setPositiveButton("Yes", (dialog, which) -> {
-                                // Assuming you have initialized the Firebase database reference
-                                DatabaseReference databaseReference = FirebaseDatabase.getInstance()
-                                        .getReference().child("Itinerary").child(iterName).child(day);
+                                // Fetch data from Firebase Realtime Database
+                                DatabaseReference locationsRef = FirebaseDatabase.getInstance().getReference().child("Location");
+                                locationsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        List<String> locationsList = new ArrayList<>();
+                                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                            String Location = snapshot.child("Location").getValue(String.class);
+                                            locationsList.add(Location);
+                                        }
 
-                                String time = timeTextInputLayout.getEditText().getText().toString();
-                                String activity = activityTextInputLayout.getEditText().getText().toString();
-                                String location = locationTextInputLayout.getEditText().getText().toString();
-                                String origin = originTextInputLayout.getEditText().getText().toString();
+                                        String time = timeTextInputLayout.getEditText().getText().toString();
+                                        String activity = activityTextInputLayout.getEditText().getText().toString();
+                                        String location = locationTextInputLayout.getEditText().getText().toString();
+                                        String origin = originTextInputLayout.getEditText().getText().toString();
 
-                                // Check if any of the fields are empty
-                                if (time.isEmpty() || activity.isEmpty() || location.isEmpty()) {
-                                    Toast.makeText(getContext(), "Please fill all fields", Toast.LENGTH_LONG).show();
-                                } else {
+                                        // Check if any of the fields are empty
+                                        if (time.isEmpty() || activity.isEmpty() || location.isEmpty()) {
+                                            Toast.makeText(getContext(), "Please fill all fields", Toast.LENGTH_LONG).show();
+                                            return;
+                                        }
 
-                                    String standardTime = Objects.requireNonNull(time);
-                                    String militaryTime = convertToMilitaryTime(standardTime); // convert to military time
+                                        // Check if origin and location are in locationsList
+                                        if (!locationsList.contains(origin) || !locationsList.contains(location)) {
+                                            Toast.makeText(getContext(), "Origin or Location not in list", Toast.LENGTH_LONG).show();
+                                            return;
+                                        }
 
-                                    databaseReference.child(militaryTime).child("activity").setValue(activity);
-                                    databaseReference.child(militaryTime).child("status").setValue("incomplete");
-                                    databaseReference.child(militaryTime).child("origin").setValue(origin);
-                                    databaseReference.child(militaryTime).child("location").setValue(location)
-                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-                                                    if (task.isSuccessful()) {
-                                                        Toast.makeText(getContext(), "Activity added to " + day, Toast.LENGTH_LONG).show();
-                                                    } else {
-                                                        Toast.makeText(getContext(), "Failed to save data", Toast.LENGTH_LONG).show();
+                                        DatabaseReference databaseReference = FirebaseDatabase.getInstance()
+                                                .getReference().child("Itinerary").child(iterName).child(day);
+
+                                        String standardTime = Objects.requireNonNull(time);
+                                        String militaryTime = convertToMilitaryTime(standardTime); // convert to military time
+
+                                        databaseReference.child(militaryTime).child("activity").setValue(activity);
+                                        databaseReference.child(militaryTime).child("status").setValue("incomplete");
+                                        databaseReference.child(militaryTime).child("origin").setValue(origin);
+                                        databaseReference.child(militaryTime).child("location").setValue(location)
+                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                        if (task.isSuccessful()) {
+                                                            Toast.makeText(getContext(), "Activity added to " + day, Toast.LENGTH_LONG).show();
+                                                        } else {
+                                                            Toast.makeText(getContext(), "Failed to save data", Toast.LENGTH_LONG).show();
+                                                        }
                                                     }
-                                                }
-                                            });
-                                }
+                                                });
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+                                        // Handle any errors
+                                    }
+                                });
                             })
                             .setNegativeButton("No", null)
                             .show();
                 }
             });
+
 
             timeTextInputLayout.getEditText().setOnClickListener(new View.OnClickListener() {
                 @Override

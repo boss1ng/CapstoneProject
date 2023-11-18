@@ -123,14 +123,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                     bottomNavigationView.setVisibility(View.GONE);
                     LinearLayout layoutFilter = view.findViewById(R.id.filterMenu);
                     layoutFilter.setVisibility(View.GONE);
-                    FragmentContainerView fragmentContainerView = view.findViewById(R.id.maps);
+                    FragmentContainerView fragmentContainerView = view.findViewById(R.id.mapsFragment);
                     fragmentContainerView.setVisibility(View.GONE);
                 } else if (itemId == R.id.action_search) {
                     loadFragment(new SearchFragment());
                     bottomNavigationView.setVisibility(View.GONE);
                     LinearLayout layoutFilter = view.findViewById(R.id.filterMenu);
                     layoutFilter.setVisibility(View.GONE);
-                    FragmentContainerView fragmentContainerView = view.findViewById(R.id.maps);
+                    FragmentContainerView fragmentContainerView = view.findViewById(R.id.mapsFragment);
                     fragmentContainerView.setVisibility(View.GONE);
                 } else if (itemId == R.id.action_maps) {
                     loadFragment(new MapsFragment());
@@ -138,21 +138,21 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                     bottomNavigationView.setVisibility(View.GONE);
                     LinearLayout layoutFilter = view.findViewById(R.id.filterMenu);
                     layoutFilter.setVisibility(View.GONE);
-                    FragmentContainerView fragmentContainerView = view.findViewById(R.id.maps);
+                    FragmentContainerView fragmentContainerView = view.findViewById(R.id.mapsFragment);
                     fragmentContainerView.setVisibility(View.GONE);
                 } else if (itemId == R.id.action_quiz) {
                     loadFragment(new StartQuizFragment());
                     bottomNavigationView.setVisibility(View.GONE);
                     LinearLayout layoutFilter = view.findViewById(R.id.filterMenu);
                     layoutFilter.setVisibility(View.GONE);
-                    FragmentContainerView fragmentContainerView = view.findViewById(R.id.maps);
+                    FragmentContainerView fragmentContainerView = view.findViewById(R.id.mapsFragment);
                     fragmentContainerView.setVisibility(View.GONE);
                 } else if (itemId == R.id.action_profile) {
                     loadFragment(new ProfileFragment());
                     bottomNavigationView.setVisibility(View.GONE);
                     LinearLayout layoutFilter = view.findViewById(R.id.filterMenu);
                     layoutFilter.setVisibility(View.GONE);
-                    FragmentContainerView fragmentContainerView = view.findViewById(R.id.maps);
+                    FragmentContainerView fragmentContainerView = view.findViewById(R.id.mapsFragment);
                     fragmentContainerView.setVisibility(View.GONE);
                 }
                 return true;
@@ -170,15 +170,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         // Create a PlacesClient
         placesClient = Places.createClient(requireContext());
 
-        // Find the fragment by ID
-        Fragment fragment = getChildFragmentManager().findFragmentById(R.id.maps);
-
-        // Check if the fragment is an instance of SupportMapFragment
-        if (fragment instanceof SupportMapFragment) {
-            // Safe to cast to SupportMapFragment
-            SupportMapFragment mapFragment = (SupportMapFragment) fragment;
-            mapFragment.getMapAsync(this);  // Or any other operation you need to perform
-
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
+                .findFragmentById(R.id.mapsFragment);
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(this);
+        }
 
         /*
         // Initialize AutocompleteSupportFragment
@@ -260,7 +257,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                                 LinearLayout layoutFilter = view.findViewById(R.id.filterMenu);
                                 layoutFilter.setVisibility(View.GONE);
 
-                                FragmentContainerView fragmentContainerView = view.findViewById(R.id.maps);
+                                FragmentContainerView fragmentContainerView = view.findViewById(R.id.mapsFragment);
                                 fragmentContainerView.setVisibility(View.GONE);
 
                                 // Show the PlaceDetailDialogFragment as a dialog
@@ -272,11 +269,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 });
             }
         });
-        } else {
-            // Handle the situation where the fragment is not the expected type
-            // This could be logging an error, throwing an exception, or any other error handling
-            Log.e("FragmentCasting", "Fragment is not an instance of SupportMapFragment");
-        }
 
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("MyAppPreferences", Context.MODE_PRIVATE);
         String userID = sharedPreferences.getString("user", "0");
@@ -547,7 +539,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                         LinearLayout layoutFilter = getView().findViewById(R.id.filterMenu);
                         layoutFilter.setVisibility(View.GONE);
 
-                        FragmentContainerView fragmentContainerView = getView().findViewById(R.id.maps);
+                        FragmentContainerView fragmentContainerView = getView().findViewById(R.id.mapsFragment);
                         fragmentContainerView.setVisibility(View.GONE);
                     }
                      */
@@ -672,13 +664,19 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                                                     fragment.setArguments(args);
 
                                                     //BottomNavigationView bottomNavigationView = getView().findViewById(R.id.bottomNavigationView);
-                                                    //bottomNavigationView.setVisibility(View.GONE);
+                                                    //=bottomNavigationView.setVisibility(View.GONE);
+
+                                                    //FragmentContainerView fragmentContainerView = getView().findViewById(R.id.mapsFragment);
+                                                    //fragmentContainerView.setVisibility(View.GONE);
 
                                                     ImageButton filterMenuBar = getView().findViewById(R.id.filterMenuBar);
                                                     filterMenuBar.setEnabled(false);
 
                                                     //LinearLayout linearLayout = getView().findViewById(R.id.filterMenu);
                                                     //linearLayout.setVisibility(View.GONE);
+
+                                                    // Detach the MapsFragment
+                                                    //getChildFragmentManager().beginTransaction().detach(MapsFragment.this).commit();
 
                                                     // Show the PlaceDetailDialogFragment as a dialog
                                                     fragment.show(getChildFragmentManager(), "PlaceDetailDialogFragment");
@@ -871,6 +869,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
                                     fragment.setArguments(args);
                                 }
+
+                                //FragmentContainerView fragmentContainerView = getView().findViewById(R.id.mapsFragment);
+                                //fragmentContainerView.setVisibility(View.GONE);
 
                                 ImageButton filterMenuBar = getView().findViewById(R.id.filterMenuBar);
                                 filterMenuBar.setEnabled(false);

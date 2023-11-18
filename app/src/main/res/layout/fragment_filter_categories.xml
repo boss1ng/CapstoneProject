@@ -24,10 +24,11 @@
 
             <ImageButton
                 android:id="@+id/filterMenuBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_margin="10dp"
                 android:backgroundTint="@color/shade1"
-                android:src="@android:drawable/ic_menu_sort_by_size"
+                android:src="@drawable/filter"
                 android:contentDescription="TODO" />
 
         </LinearLayout>
@@ -67,7 +68,7 @@
             android:layout_height="50dp"
             android:layout_gravity="right"
             android:background="@android:color/transparent"
-            android:src="@drawable/quantum_ic_arrow_back_grey600_24"
+            android:src="@drawable/back"
             android:contentDescription="TODO"/>
 
         <ImageView

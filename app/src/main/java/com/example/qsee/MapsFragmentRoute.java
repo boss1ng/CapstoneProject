@@ -121,15 +121,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                     Toast.makeText(getContext(), "Exiting...", Toast.LENGTH_LONG).show();
                     Log.d(TAG, "EXITING via HOME...");
 
-                    // Use a Handler to refresh the map every second
-                    Handler handlerDelay = new Handler();
-                    Runnable runnable = new Runnable() {
-                        @Override
-                        public void run() {
-                            handler.removeCallbacks(mapRefreshRunnable); // Remove any pending callbacks // Dismiss the dialog
-                        }
-                    };
-                    handlerDelay.postDelayed(runnable, 3150); // Schedule it to run after 1 second
+                    loadFragment(new HomeFragment());
 
                     bottomNavigationView.setVisibility(View.GONE);
 
@@ -142,7 +134,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                     LinearLayout linearLayoutOverview = getView().findViewById(R.id.overviewCont);
                     linearLayoutOverview.setVisibility(View.GONE);
 
-                    loadFragment(new HomeFragment());
+                    handler.removeCallbacks(mapRefreshRunnable); // Remove any pending callbacks // Dismiss the dialog
                 }
 
                 else if (itemId == R.id.action_search) {
@@ -150,15 +142,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                     Toast.makeText(getContext(), "Exiting...", Toast.LENGTH_LONG).show();
                     Log.d(TAG, "EXITING via SEARCH...");
 
-                    // Use a Handler to refresh the map every second
-                    Handler handlerDelay = new Handler();
-                    Runnable runnable = new Runnable() {
-                        @Override
-                        public void run() {
-                            handler.removeCallbacks(mapRefreshRunnable); // Remove any pending callbacks // Dismiss the dialog
-                        }
-                    };
-                    handlerDelay.postDelayed(runnable, 3150); // Schedule it to run after 1 second
+                    loadFragment(new SearchFragment());
 
                     bottomNavigationView.setVisibility(View.GONE);
 
@@ -171,7 +155,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                     LinearLayout linearLayoutOverview = getView().findViewById(R.id.overviewCont);
                     linearLayoutOverview.setVisibility(View.GONE);
 
-                    loadFragment(new SearchFragment());
+                    handler.removeCallbacks(mapRefreshRunnable); // Remove any pending callbacks // Dismiss the dialog
                 }
 
                 else if (itemId == R.id.action_maps) {
@@ -188,7 +172,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                             handler.removeCallbacks(mapRefreshRunnable); // Remove any pending callbacks // Dismiss the dialog
                         }
                     };
-                    handlerDelay.postDelayed(runnable, 3150); // Schedule it to run after 1 second
+                    handlerDelay.postDelayed(runnable, 1000); // Schedule it to run after 1 second
 
                     bottomNavigationView.setVisibility(View.GONE);
                     loadFragment(new MapsFragment());
@@ -200,6 +184,8 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                     Toast.makeText(getContext(), "Exiting...", Toast.LENGTH_LONG).show();
                     Log.d(TAG, "EXITING via QUIZ...");
 
+                    loadFragment(new StartQuizFragment());
+
                     // Use a Handler to refresh the map every second
                     Handler handlerDelay = new Handler();
                     Runnable runnable = new Runnable() {
@@ -208,7 +194,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                             handler.removeCallbacks(mapRefreshRunnable); // Remove any pending callbacks // Dismiss the dialog
                         }
                     };
-                    handlerDelay.postDelayed(runnable, 3150); // Schedule it to run after 1 second
+                    handlerDelay.postDelayed(runnable, 1000); // Schedule it to run after 1 second
 
                     bottomNavigationView.setVisibility(View.GONE);
 
@@ -220,8 +206,6 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
 
                     LinearLayout linearLayoutOverview = getView().findViewById(R.id.overviewCont);
                     linearLayoutOverview.setVisibility(View.GONE);
-
-                    loadFragment(new StartQuizFragment());
                 }
 
                 else if (itemId == R.id.action_profile) {
@@ -229,6 +213,8 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                     Toast.makeText(getContext(), "Exiting...", Toast.LENGTH_LONG).show();
                     Log.d(TAG, "EXITING via PROFILE...");
 
+                    loadFragment(new ProfileFragment());
+
                     // Use a Handler to refresh the map every second
                     Handler handlerDelay = new Handler();
                     Runnable runnable = new Runnable() {
@@ -237,7 +223,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                             handler.removeCallbacks(mapRefreshRunnable); // Remove any pending callbacks // Dismiss the dialog
                         }
                     };
-                    handlerDelay.postDelayed(runnable, 3150); // Schedule it to run after 1 second
+                    handlerDelay.postDelayed(runnable, 1000); // Schedule it to run after 1 second
 
                     bottomNavigationView.setVisibility(View.GONE);
 
@@ -249,8 +235,6 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
 
                     LinearLayout linearLayoutOverview = getView().findViewById(R.id.overviewCont);
                     linearLayoutOverview.setVisibility(View.GONE);
-
-                    loadFragment(new ProfileFragment());
                 }
                 return true;
             }
@@ -377,7 +361,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
             viewCurrent.setImageResource(R.drawable.currentloc);
 
             ImageView viewInstructions = getView().findViewById(R.id.btnShowInstructions);
-            viewInstructions.setImageResource(R.drawable.navigate_up_arrow);
+            viewInstructions.setImageResource(R.drawable.expand_route);
             viewInstructions.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

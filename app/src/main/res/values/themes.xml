@@ -2,7 +2,8 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.Qsee" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-        <item name="colorPrimary">#115272</item>
+        <item name="colorPrimary">#3894A3</item>
+        <item name="colorSecondary">#3894A3</item>
         <item name="android:fontFamily">@font/raleway</item>
     </style>
 

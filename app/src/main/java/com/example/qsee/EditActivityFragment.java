@@ -6,6 +6,8 @@ import android.annotation.SuppressLint;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +15,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -24,6 +28,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.textfield.TextInputLayout;
@@ -33,6 +38,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -71,6 +77,36 @@ public class EditActivityFragment extends Fragment {
             AutoCompleteTextView originAutoCompleteTextView = (AutoCompleteTextView) Objects.requireNonNull(originTextInputLayout.getEditText());
             AutoCompleteTextView locationAutoCompleteTextView = (AutoCompleteTextView) Objects.requireNonNull(locationTextInputLayout.getEditText()); // Get the AutoCompleteTextView
             locationAutoCompleteTextView.setText(location);
+            // Find the save button by its ID
+            Button saveButton = rootView.findViewById(R.id.saveBt);
+
+            ImageView locationImage = rootView.findViewById(R.id.locationImage);
+
+            DatabaseReference locationReference = FirebaseDatabase.getInstance().getReference("Location");
+            Query query = locationReference.orderByChild("Location").equalTo(location);
+
+            query.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        // Location data found
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            String link = snapshot.child("Link").getValue(String.class);
+                            locationImage.setVisibility(View.VISIBLE);
+                            // Use Picasso to load the image and set it into locationIcon
+                            Picasso.get().load(link).into(locationImage);
+                        }
+                    } else {
+                        // Location data not found
+                        // You can set a default image or handle the case as needed
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    // Handle the error if any
+                }
+            });
 
             // Fetch data from Firebase Realtime Database
             DatabaseReference locationsRef = FirebaseDatabase.getInstance().getReference().child("Location");
@@ -86,11 +122,57 @@ public class EditActivityFragment extends Fragment {
                     }
 
                     // Check if the fragment is attached to a context before using requireContext()
-                    if (isAdded() && getContext() != null) {
+                    if (isAdded()) {
                         // Set up the adapter for the AutoCompleteTextView
                         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, locationsList);
                         originAutoCompleteTextView.setAdapter(adapter);
                         locationAutoCompleteTextView.setAdapter(adapter);
+
+                        originAutoCompleteTextView.addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence charSequence, int start, int before, int count) {
+                                // Not used in this case
+                            }
+
+                            @Override
+                            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                                // Check if the entered text is not present in the locationsList
+                                String locationText = charSequence.toString();
+                                if (!locationsList.contains(locationText)) {
+                                    originAutoCompleteTextView.setError("Invalid location"); // Optionally, you can show an error message
+                                } else {
+                                    originAutoCompleteTextView.setError(null); // Clear the error if the location is valid
+                                }
+                            }
+
+                            @Override
+                            public void afterTextChanged(Editable editable) {
+                                // Not used in this case
+                            }
+                        });
+
+                        locationAutoCompleteTextView.addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence charSequence, int start, int before, int count) {
+                                // Not used in this case
+                            }
+
+                            @Override
+                            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                                // Check if the entered text is not present in the locationsList
+                                String locationText = charSequence.toString();
+                                if (!locationsList.contains(locationText)) {
+                                    locationAutoCompleteTextView.setError("Invalid location"); // Optionally, you can show an error message
+                                } else {
+                                    locationAutoCompleteTextView.setError(null); // Clear the error if the location is valid
+                                }
+                            }
+
+                            @Override
+                            public void afterTextChanged(Editable editable) {
+                                // Not used in this case
+                            }
+                        });
                     }
                 }
 
@@ -149,8 +231,45 @@ public class EditActivityFragment extends Fragment {
                                     // Check the status and set the completion switch
                                     if ("Completed".equals(status)) {
                                         completionSwitch.setChecked(true);
+                                        completionSwitch.setEnabled(false);
+                                        // Disable and tint the saveButton gray
+                                        saveButton.setEnabled(false);
+                                        saveButton.setBackgroundColor(ContextCompat.getColor(getContext(), com.google.android.libraries.places.R.color.quantum_grey)); // replace R.color.gray with the appropriate color resource
+
+                                        // Disable other input fields
+                                        originTextInputLayout.setEnabled(false);
+                                        locationTextInputLayout.setEnabled(false);
+                                        timeTextInputLayout.setEnabled(false);
+                                        activityTextInputLayout.setEnabled(false);
                                     } else {
                                         completionSwitch.setChecked(false);
+                                        completionSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                            @Override
+                                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                                if (isChecked) {
+                                                    // Show confirmation dialog when trying to switch on
+                                                    new AlertDialog.Builder(getContext())
+                                                            .setTitle("Confirm Action")
+                                                            .setMessage("Are you sure you want to mark this itinerary as complete? This action cannot be undone.")
+                                                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                                                @Override
+                                                                public void onClick(DialogInterface dialog, int which) {
+                                                                    completionSwitch.setEnabled(false);
+                                                                }
+                                                            })
+                                                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                                                @Override
+                                                                public void onClick(DialogInterface dialog, int which) {
+                                                                    // User cancelled, revert the switch state
+                                                                    completionSwitch.setChecked(false);
+                                                                }
+                                                            })
+                                                            .show();
+                                                } else {
+                                                    // Handle the case if you need to do something when the switch is turned off
+                                                }
+                                            }
+                                        });
                                     }
                                 }
                             }
@@ -165,8 +284,9 @@ public class EditActivityFragment extends Fragment {
                 }
             });
 
-            // Find the save button by its ID
-            Button saveButton = rootView.findViewById(R.id.saveBt);
+
+
+
 
             // Set an OnClickListener for the save button
             saveButton.setOnClickListener(new View.OnClickListener() {
@@ -217,16 +337,41 @@ public class EditActivityFragment extends Fragment {
                                         for (DataSnapshot timeSnapshot : daySnapshot.getChildren()) {
                                             String retrievedLoc = timeSnapshot.child("location").getValue(String.class);
                                             if (timeSnapshot.getKey().equals(finalTime) && retrievedLoc.equals(location)) {
-                                                // Remove the old timeSnapshot
 
-                                                // Add a new timeSnapshot with the updatedTime as the key
-                                                DatabaseReference newTimeSnapshot = daySnapshot.child(finalTime).getRef();
-                                                newTimeSnapshot.child("status").setValue("Completed");
 
-                                                showRatingDialog();
-                                                // Show a toast to confirm the save
-                                                Toast.makeText(getContext(), "Changes saved successfully.", Toast.LENGTH_LONG).show();
-                                                dialog.dismiss();
+                                                DatabaseReference locationsRef = FirebaseDatabase.getInstance().getReference().child("Location");
+                                                locationsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                                        List<String> locationsList = new ArrayList<>();
+                                                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                                            String Location = snapshot.child("Location").getValue(String.class);
+                                                            locationsList.add(Location);
+                                                        }
+                                                        // Check if updatedOrigin and updatedLocation are in locationsList
+                                                        if (!locationsList.contains(updatedOrigin) || !locationsList.contains(updatedLocation)) {
+                                                            // Display a message that the origin or location is invalid
+                                                            Toast.makeText(getContext(), "Invalid origin or location", Toast.LENGTH_LONG).show();
+                                                        } else if (completionSwitch.isChecked()){
+                                                            // Remove the old timeSnapshot
+
+                                                            // Add a new timeSnapshot with the updatedTime as the key
+                                                            DatabaseReference newTimeSnapshot = daySnapshot.child(finalTime).getRef();
+                                                            newTimeSnapshot.child("status").setValue("Completed");
+
+                                                            showRatingDialog();
+                                                            // Show a toast to confirm the save
+                                                            Toast.makeText(getContext(), "Changes saved successfully.", Toast.LENGTH_LONG).show();
+                                                            dialog.dismiss();
+
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(DatabaseError databaseError) {
+                                                        // Handle any errors
+                                                    }
+                                                });
                                             }
                                         }
                                     }
@@ -250,21 +395,46 @@ public class EditActivityFragment extends Fragment {
                                         for (DataSnapshot timeSnapshot : daySnapshot.getChildren()) {
                                             String retrievedLoc = timeSnapshot.child("location").getValue(String.class);
                                             if (timeSnapshot.getKey().equals(finalTime) && retrievedLoc.equals(location)) {
-                                                // Remove the old timeSnapshot
-                                                timeSnapshot.getRef().removeValue();
+                                                // Fetch data from Firebase Realtime Database
+                                                DatabaseReference locationsRef = FirebaseDatabase.getInstance().getReference().child("Location");
+                                                locationsRef.addValueEventListener(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                                        List<String> locationsList = new ArrayList<>();
+                                                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                                            String Location = snapshot.child("Location").getValue(String.class);
+                                                            locationsList.add(Location);
+                                                        }
+                                                        // Check if updatedOrigin and updatedLocation are in locationsList
+                                                        if (!locationsList.contains(updatedOrigin) || !locationsList.contains(updatedLocation)) {
+                                                            // Display a message that the origin or location is invalid
+                                                            if (isAdded()) {
+                                                                Toast.makeText(getContext(), "Invalid origin or location", Toast.LENGTH_LONG).show();
+                                                            }
+                                                        } else if (!completionSwitch.isChecked()) {
+                                                            // Remove the old timeSnapshot
+                                                            timeSnapshot.getRef().removeValue();
+                                                            // Add a new timeSnapshot with the updatedTime as the key
+                                                            DatabaseReference newTimeSnapshot = daySnapshot.child(militaryTime).getRef();
+                                                            newTimeSnapshot.child("location").setValue(updatedLocation);
+                                                            newTimeSnapshot.child("activity").setValue(updatedActivity);
+                                                            newTimeSnapshot.child("origin").setValue(updatedOrigin);
+                                                            newTimeSnapshot.child("status").setValue("Incomplete");
+                                                            // Show a toast to confirm the save
+                                                            if (isAdded()) {
+                                                                Toast.makeText(getContext(), "Changes saved successfully.", Toast.LENGTH_LONG).show();
+                                                            }
+                                                            dialog.dismiss();
+                                                        }
+                                                    }
 
-                                                // Add a new timeSnapshot with the updatedTime as the key
-                                                DatabaseReference newTimeSnapshot = daySnapshot.child(militaryTime).getRef();
-                                                newTimeSnapshot.child("location").setValue(updatedLocation);
-                                                newTimeSnapshot.child("activity").setValue(updatedActivity);
-                                                newTimeSnapshot.child("origin").setValue(updatedOrigin);
-                                                newTimeSnapshot.child("status").setValue("Incomplete");
-                                                //newTimeSnapshot.child("status").setValue("incomplete");
+                                                    @Override
+                                                    public void onCancelled(DatabaseError databaseError) {
+                                                        // Handle any errors
+                                                    }
+                                                });
 
 
-                                                // Show a toast to confirm the save
-                                                Toast.makeText(getContext(), "Changes saved successfully.", Toast.LENGTH_LONG).show();
-                                                dialog.dismiss();
                                             }
                                         }
                                     }
@@ -277,10 +447,6 @@ public class EditActivityFragment extends Fragment {
                                 }
                             });
                         }
-
-                            // Show a toast to confirm the save
-                            Toast.makeText(getContext(), "Changes saved successfully.", Toast.LENGTH_LONG).show();
-                            dialog.dismiss();
                         }
                         }
                     });

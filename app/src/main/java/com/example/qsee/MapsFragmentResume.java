@@ -119,7 +119,7 @@ public class MapsFragmentResume extends DialogFragment {
                 LinearLayout linearLayoutFilter = getParentFragment().getView().findViewById(R.id.filterMenu);
                 linearLayoutFilter.setVisibility(View.GONE);
 
-                FragmentContainerView fragmentContainerView = getParentFragment().getView().findViewById(R.id.maps);
+                FragmentContainerView fragmentContainerView = getParentFragment().getView().findViewById(R.id.mapsFragment);
                 fragmentContainerView.setVisibility(View.GONE);
 
                 BottomNavigationView bottomNavigationView = getParentFragment().getView().findViewById(R.id.bottomNavigationView);
@@ -161,7 +161,7 @@ public class MapsFragmentResume extends DialogFragment {
                 LinearLayout linearLayoutFilter = getParentFragment().getView().findViewById(R.id.filterMenu);
                 linearLayoutFilter.setVisibility(View.GONE);
 
-                FragmentContainerView fragmentContainerView = getParentFragment().getView().findViewById(R.id.maps);
+                FragmentContainerView fragmentContainerView = getParentFragment().getView().findViewById(R.id.mapsFragment);
                 fragmentContainerView.setVisibility(View.GONE);
 
                 BottomNavigationView bottomNavigationView = getParentFragment().getView().findViewById(R.id.bottomNavigationView);
