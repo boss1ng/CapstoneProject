@@ -28,6 +28,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.textfield.TextInputLayout;
@@ -76,6 +77,8 @@ public class EditActivityFragment extends Fragment {
             AutoCompleteTextView originAutoCompleteTextView = (AutoCompleteTextView) Objects.requireNonNull(originTextInputLayout.getEditText());
             AutoCompleteTextView locationAutoCompleteTextView = (AutoCompleteTextView) Objects.requireNonNull(locationTextInputLayout.getEditText()); // Get the AutoCompleteTextView
             locationAutoCompleteTextView.setText(location);
+            // Find the save button by its ID
+            Button saveButton = rootView.findViewById(R.id.saveBt);
 
             ImageView locationImage = rootView.findViewById(R.id.locationImage);
 
@@ -229,6 +232,15 @@ public class EditActivityFragment extends Fragment {
                                     if ("Completed".equals(status)) {
                                         completionSwitch.setChecked(true);
                                         completionSwitch.setEnabled(false);
+                                        // Disable and tint the saveButton gray
+                                        saveButton.setEnabled(false);
+                                        saveButton.setBackgroundColor(ContextCompat.getColor(getContext(), com.google.android.libraries.places.R.color.quantum_grey)); // replace R.color.gray with the appropriate color resource
+
+                                        // Disable other input fields
+                                        originTextInputLayout.setEnabled(false);
+                                        locationTextInputLayout.setEnabled(false);
+                                        timeTextInputLayout.setEnabled(false);
+                                        activityTextInputLayout.setEnabled(false);
                                     } else {
                                         completionSwitch.setChecked(false);
                                         completionSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -242,11 +254,6 @@ public class EditActivityFragment extends Fragment {
                                                             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                                                 @Override
                                                                 public void onClick(DialogInterface dialog, int which) {
-                                                                    // User confirmed to complete the itinerary
-                                                                    // Here, handle the logic to mark the itinerary as complete
-                                                                    // ...
-
-                                                                    // Disable the switch to prevent further changes
                                                                     completionSwitch.setEnabled(false);
                                                                 }
                                                             })
@@ -279,8 +286,7 @@ public class EditActivityFragment extends Fragment {
 
 
 
-            // Find the save button by its ID
-            Button saveButton = rootView.findViewById(R.id.saveBt);
+
 
             // Set an OnClickListener for the save button
             saveButton.setOnClickListener(new View.OnClickListener() {
