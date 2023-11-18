@@ -61,21 +61,21 @@ public class AddItineraryFragment extends Fragment {
     private List<String> selectedDates = new ArrayList<>();
     private List<String> locationsList;
 
-    private String Itinerary1 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/ItineraryPhoto%2FItinerary%201.png?alt=media&token=14ec1289-0cf4-41d6-abb5-2f46fe4855e4";
-    private String Itinerary2 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/ItineraryPhoto%2FItinerary%202.png?alt=media&token=5152587b-a0e9-4a84-ae17-78e0ad315350";
-    private String Itinerary3 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/ItineraryPhoto%2FItinerary%203.png?alt=media&token=ad55130a-4b46-4784-95c5-9175112110a0";
-    private String Itinerary4 = "";
-    private String Itinerary5 = "";
-    private String Itinerary6 = "";
-    private String Itinerary7 = "";
-    private String Itinerary8 = "";
-    private String Itinerary9 = "";
-    private String Itinerary10 = "";
-    private String Itinerary11 = "";
-    private String Itinerary12 = "";
-    private String Itinerary13 = "";
-    private String Itinerary14 = "";
-    private String Itinerary15 = "";
+    private String Itinerary1 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup1.png?alt=media&token=3bc087ae-5ed1-426f-a126-b09b35248dd0";
+    private String Itinerary2 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup2.png?alt=media&token=8860d08b-40f6-4a56-942b-7cb2075304e3";
+    private String Itinerary3 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup3.png?alt=media&token=75c15895-e0c7-40b3-b2d7-2830fc7398f2";
+    private String Itinerary4 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup4.png?alt=media&token=200ad3a5-5b72-446d-8291-938673f1061c";
+    private String Itinerary5 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup5.png?alt=media&token=0739f2d7-05f9-4ea3-96aa-a204a66a7beb";
+    private String Itinerary6 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup6.png?alt=media&token=bd749ca2-c997-4302-bd14-d34600fc6b7c";
+    private String Itinerary7 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup7.png?alt=media&token=54940844-fded-4278-94cc-0cedd98cfa90";
+    private String Itinerary8 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup8.png?alt=media&token=f1534918-4510-48b4-aaa2-46d9b32f3b46";
+    private String Itinerary9 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup9.png?alt=media&token=eb600104-3f9c-4b64-b407-1c0b9c22b5a2";
+    private String Itinerary10 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup10.png?alt=media&token=a0a4b8d8-fbcf-4ee3-9f02-47924a417b92";
+    private String Itinerary11 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup11.png?alt=media&token=4fa71607-d156-4440-b1d8-5803c7bca366";
+    private String Itinerary12 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup12.png?alt=media&token=b8a99e22-76a3-48ce-b96f-556ed4014fc5";
+    private String Itinerary13 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup13.png?alt=media&token=bfe1916a-3415-4c7e-bc7f-6abb89418eae";
+    private String Itinerary14 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup14.png?alt=media&token=3e0f0fa1-84c1-466e-b947-b7c75599af6c";
+    private String Itinerary15 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup15.png?alt=media&token=02646a6b-904a-400c-bf3f-7539e5297fdd";
 
 
     @Nullable
@@ -86,7 +86,7 @@ public class AddItineraryFragment extends Fragment {
 
     private String getRandomGroup() {
         // Create an array of your URLs
-        String[] groupUrls = {Itinerary1, Itinerary2, Itinerary3};
+        String[] groupUrls = {Itinerary1, Itinerary2, Itinerary3, Itinerary4, Itinerary5, Itinerary6, Itinerary7, Itinerary8, Itinerary9, Itinerary10, Itinerary11, Itinerary12, Itinerary13, Itinerary14, Itinerary15};
 
         // Use Random to get a random index from the array
         Random random = new Random();

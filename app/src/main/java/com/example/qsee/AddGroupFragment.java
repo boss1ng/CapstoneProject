@@ -32,21 +32,21 @@ public class AddGroupFragment extends DialogFragment {
     private TextInputLayout grpName;
     private String userId;
 
-    private String Group1 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup%201.png?alt=media&token=a61202f9-0f6e-4f2b-a59b-0bdaf152903e";
-    private String Group2 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup%202.png?alt=media&token=9f547f1b-2db9-4746-b428-92b83a6d9183";
-    private String Group3 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup%203.png?alt=media&token=25a226c7-43f6-4d3d-813c-bc8024428570";
-    private String Group4 = "";
-    private String Group5 = "";
-    private String Group6 = "";
-    private String Group7 = "";
-    private String Group8 = "";
-    private String Group9 = "";
-    private String Group10 = "";
-    private String Group11 = "";
-    private String Group12 = "";
-    private String Group13 = "";
-    private String Group14 = "";
-    private String Group15 = "";
+    private String Group1 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup1.png?alt=media&token=3bc087ae-5ed1-426f-a126-b09b35248dd0";
+    private String Group2 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup2.png?alt=media&token=8860d08b-40f6-4a56-942b-7cb2075304e3";
+    private String Group3 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup3.png?alt=media&token=75c15895-e0c7-40b3-b2d7-2830fc7398f2";
+    private String Group4 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup4.png?alt=media&token=200ad3a5-5b72-446d-8291-938673f1061c";
+    private String Group5 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup5.png?alt=media&token=0739f2d7-05f9-4ea3-96aa-a204a66a7beb";
+    private String Group6 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup6.png?alt=media&token=bd749ca2-c997-4302-bd14-d34600fc6b7c";
+    private String Group7 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup7.png?alt=media&token=54940844-fded-4278-94cc-0cedd98cfa90";
+    private String Group8 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup8.png?alt=media&token=f1534918-4510-48b4-aaa2-46d9b32f3b46";
+    private String Group9 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup9.png?alt=media&token=eb600104-3f9c-4b64-b407-1c0b9c22b5a2";
+    private String Group10 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup10.png?alt=media&token=a0a4b8d8-fbcf-4ee3-9f02-47924a417b92";
+    private String Group11 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup11.png?alt=media&token=4fa71607-d156-4440-b1d8-5803c7bca366";
+    private String Group12 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup12.png?alt=media&token=b8a99e22-76a3-48ce-b96f-556ed4014fc5";
+    private String Group13 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup13.png?alt=media&token=bfe1916a-3415-4c7e-bc7f-6abb89418eae";
+    private String Group14 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup14.png?alt=media&token=3e0f0fa1-84c1-466e-b947-b7c75599af6c";
+    private String Group15 = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/CollaborationPhoto%2FGroup15.png?alt=media&token=02646a6b-904a-400c-bf3f-7539e5297fdd";
 
 
     // Constructor to accept the username as an argument
@@ -75,7 +75,7 @@ public class AddGroupFragment extends DialogFragment {
 
     private String getRandomGroup() {
         // Create an array of your URLs
-        String[] groupUrls = {Group1, Group2, Group3};
+        String[] groupUrls = {Group1, Group2, Group3, Group4, Group5,Group6, Group7, Group8, Group9, Group10, Group11, Group12, Group13, Group14, Group15};
 
         // Use Random to get a random index from the array
         Random random = new Random();

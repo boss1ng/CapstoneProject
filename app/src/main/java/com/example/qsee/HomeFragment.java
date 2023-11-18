@@ -147,22 +147,50 @@ public class HomeFragment extends Fragment {
                     bottomNavigationView.setVisibility(View.GONE);
                     ScrollView scrollView = view.findViewById(R.id.homeContainer);
                     scrollView.setVisibility(View.GONE);
+                    LinearLayout linearLayout = view.findViewById(R.id.parentLinearCont);
+                    linearLayout.setVisibility(View.GONE);
+                    LinearLayout linearLayout1 = view.findViewById(R.id.feedDisplayLayout);
+                    linearLayout1.setVisibility(View.GONE);
+                    FloatingActionButton floatingActionButton = view.findViewById(R.id.floatingAddButton);
+                    floatingActionButton.setVisibility(View.GONE);
+
                 } else if (itemId == R.id.action_search) {
                     loadFragment(new SearchFragment());
                     bottomNavigationView.setVisibility(View.GONE);
                     ScrollView scrollView = view.findViewById(R.id.homeContainer);
                     scrollView.setVisibility(View.GONE);
+                    LinearLayout linearLayout = view.findViewById(R.id.parentLinearCont);
+                    linearLayout.setVisibility(View.GONE);
+                    LinearLayout linearLayout1 = view.findViewById(R.id.feedDisplayLayout);
+                    linearLayout1.setVisibility(View.GONE);
+                    FloatingActionButton floatingActionButton = view.findViewById(R.id.floatingAddButton);
+                    floatingActionButton.setVisibility(View.GONE);
+
                 } else if (itemId == R.id.action_maps) {
                     loadFragment(new MapsFragment());
                     //BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
                     bottomNavigationView.setVisibility(View.GONE);
                     ScrollView scrollView = view.findViewById(R.id.homeContainer);
                     scrollView.setVisibility(View.GONE);
+                    LinearLayout linearLayout = view.findViewById(R.id.parentLinearCont);
+                    linearLayout.setVisibility(View.GONE);
+                    LinearLayout linearLayout1 = view.findViewById(R.id.feedDisplayLayout);
+                    linearLayout1.setVisibility(View.GONE);
+                    FloatingActionButton floatingActionButton = view.findViewById(R.id.floatingAddButton);
+                    floatingActionButton.setVisibility(View.GONE);
+
                 } else if (itemId == R.id.action_quiz) {
                     loadFragment(new StartQuizFragment());
                     bottomNavigationView.setVisibility(View.GONE);
                     ScrollView scrollView = view.findViewById(R.id.homeContainer);
                     scrollView.setVisibility(View.GONE);
+                    LinearLayout linearLayout = view.findViewById(R.id.parentLinearCont);
+                    linearLayout.setVisibility(View.GONE);
+                    LinearLayout linearLayout1 = view.findViewById(R.id.feedDisplayLayout);
+                    linearLayout1.setVisibility(View.GONE);
+                    FloatingActionButton floatingActionButton = view.findViewById(R.id.floatingAddButton);
+                    floatingActionButton.setVisibility(View.GONE);
+
                 } else if (itemId == R.id.action_profile) {
                     loadFragment(new ProfileFragment());
                     bottomNavigationView.setVisibility(View.GONE);
@@ -172,6 +200,8 @@ public class HomeFragment extends Fragment {
                     linearLayout.setVisibility(View.GONE);
                     LinearLayout linearLayout1 = view.findViewById(R.id.feedDisplayLayout);
                     linearLayout1.setVisibility(View.GONE);
+                    FloatingActionButton floatingActionButton = view.findViewById(R.id.floatingAddButton);
+                    floatingActionButton.setVisibility(View.GONE);
 
                 }
                 return true;
@@ -306,7 +336,6 @@ public class HomeFragment extends Fragment {
 
         // Create a list to store the retrieved data as maps
         List<Map<String, String>> dataMapList = new ArrayList<>();
-
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

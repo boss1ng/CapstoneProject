@@ -1,5 +1,7 @@
 package com.example.qsee;
 
+import static android.content.ContentValues.TAG;
+
 import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -9,6 +11,7 @@ import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Html;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,8 +41,30 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class MapsInstructions extends DialogFragment {
+public class MapsInstructions extends DialogFragment implements View.OnClickListener {
 
+    public interface OnStopButtonClickListener {
+        void onStopButtonClicked();
+    }
+
+    private OnStopButtonClickListener onStopButtonClickListener;
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.btnStop && onStopButtonClickListener != null) {
+            onStopButtonClickListener.onStopButtonClicked();
+        }
+        dismiss(); // Dismiss the dialog
+
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("MyAppPreferences", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply(); // Apply the changes
+    }
+
+    public void setOnStopButtonClickListener(OnStopButtonClickListener listener) {
+        this.onStopButtonClickListener = listener;
+    }
 
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
@@ -86,6 +111,8 @@ public class MapsInstructions extends DialogFragment {
         //setCancelable(true); // Allow canceling on outside click
 
         Button btnStopRoute = view.findViewById(R.id.btnStop);
+        btnStopRoute.setOnClickListener(this);
+        /*
         btnStopRoute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -94,6 +121,8 @@ public class MapsInstructions extends DialogFragment {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.clear();
                 editor.apply(); // Apply the changes
+
+                onStopButtonPressed();
 
                 dismiss(); // Dismiss the dialog
 
@@ -131,8 +160,10 @@ public class MapsInstructions extends DialogFragment {
                 transaction.replace(R.id.fragment_container, mapsFragment);
                 transaction.addToBackStack(null);
                 transaction.commit();
+
             }
         });
+        */
 
         // Retrieve selected categories from Bundle arguments
         Bundle getBundle = getArguments();
@@ -164,6 +195,7 @@ public class MapsInstructions extends DialogFragment {
             DirectionsTask directionsTask = new DirectionsTask(url);
             directionsTask.execute();
         }
+
 
         return view;
     }
@@ -232,132 +264,134 @@ public class MapsInstructions extends DialogFragment {
                 if (status.equals("OK")) {
                     JSONArray routes = jsonResponse.getJSONArray("routes");
 
-                    LinearLayout dynamicLayoutContainer = getView().findViewById(R.id.instructionsCont); // Replace with your container ID
-                    ScrollView scrollView = getView().findViewById(R.id.scrollCont);
+                    View rootview = getView();
+                    if (rootview != null) {
+                        LinearLayout dynamicLayoutContainer = rootview.findViewById(R.id.instructionsCont); // Replace with your container ID
+                        ScrollView scrollView = rootview.findViewById(R.id.scrollCont);
 
-                    int numberOfIterations = 10; // Set the desired number of iterations
+                        int numberOfIterations = 10; // Set the desired number of iterations
 
-                    for (int i = 0; i < routes.length(); i++) {
-                        JSONObject route = routes.getJSONObject(i);
+                        for (int i = 0; i < routes.length(); i++) {
+                            JSONObject route = routes.getJSONObject(i);
 
-                        JSONArray legs = route.getJSONArray("legs");
+                            JSONArray legs = route.getJSONArray("legs");
 
-                        for (int j = 0; j < legs.length(); j++) {
-                            JSONObject leg = legs.getJSONObject(j);
+                            for (int j = 0; j < legs.length(); j++) {
+                                JSONObject leg = legs.getJSONObject(j);
 
-                            JSONArray steps = leg.getJSONArray("steps");
+                                JSONArray steps = leg.getJSONArray("steps");
 
-                            for (int k = 0; k < steps.length(); k++) {
-                                JSONObject step = steps.getJSONObject(k);
+                                for (int k = 0; k < steps.length(); k++) {
+                                    JSONObject step = steps.getJSONObject(k);
 
-                                // Create a new LinearLayout for each iteration
-                                LinearLayout linearLayout = new LinearLayout(getActivity());
+                                    // Create a new LinearLayout for each iteration
+                                    LinearLayout linearLayout = new LinearLayout(getActivity());
 
-                                // Extract information from the step
-                                String distance = step.getJSONObject("distance").getString("text");
-                                String duration = step.getJSONObject("duration").getString("text");
-                                String htmlInstructions = step.getString("html_instructions");
-                                // Remove HTML tags and display plain text instructions
-                                String plainTextInstructions = Html.fromHtml(htmlInstructions).toString();
+                                    // Extract information from the step
+                                    String distance = step.getJSONObject("distance").getString("text");
+                                    String duration = step.getJSONObject("duration").getString("text");
+                                    String htmlInstructions = step.getString("html_instructions");
+                                    // Remove HTML tags and display plain text instructions
+                                    String plainTextInstructions = Html.fromHtml(htmlInstructions).toString();
 
-                                // Get the maneuver from your API response
-                                // Retrieve maneuver if it's present, or provide a default value
-                                String maneuverType = step.optString("maneuver", "No Maneuver");
-                                //Toast.makeText(getContext(), maneuverType, Toast.LENGTH_LONG).show();
+                                    // Get the maneuver from your API response
+                                    // Retrieve maneuver if it's present, or provide a default value
+                                    String maneuverType = step.optString("maneuver", "No Maneuver");
+                                    //Toast.makeText(getContext(), maneuverType, Toast.LENGTH_LONG).show();
 
-                                // Create a variable to store the drawable resource ID
-                                int drawableResource = R.drawable.straight; // Default drawable
+                                    // Create a variable to store the drawable resource ID
+                                    int drawableResource = R.drawable.straight; // Default drawable
 
-                                // Map maneuver types to corresponding drawable resource IDs
-                                switch (maneuverType) {
-                                    case "keep-left":
-                                        drawableResource = R.drawable.keep_left;
-                                        break;
-                                    case "keep-right":
-                                        drawableResource = R.drawable.keep_right;
-                                        break;
-                                    case "ferry":
-                                        drawableResource = R.drawable.ferry;
-                                        break;
-                                    case "ferry-train":
-                                        drawableResource = R.drawable.ferry_train;
-                                        break;
-                                    case "fork-left":
-                                        drawableResource = R.drawable.fork_left;
-                                        break;
-                                    case "fork-right":
-                                        drawableResource = R.drawable.fork_right;
-                                        break;
-                                    case "merge":
-                                        drawableResource = R.drawable.merge;
-                                        break;
-                                    case "ramp-left":
-                                        drawableResource = R.drawable.ramp_left;
-                                        break;
-                                    case "ramp-right":
-                                        drawableResource = R.drawable.ramp_right;
-                                        break;
-                                    case "roundabout-left":
-                                        drawableResource = R.drawable.roundabout_left;
-                                        break;
-                                    case "roundabout-right":
-                                        drawableResource = R.drawable.roundabout_right;
-                                        break;
-                                    case "straight":
-                                        drawableResource = R.drawable.straight;
-                                        break;
-                                    case "turn-right":
-                                        drawableResource = R.drawable.turn_right;
-                                        break;
-                                    case "turn-left":
-                                        drawableResource = R.drawable.turn_left;
-                                        break;
-                                    case "turn-sharp-right":
-                                        drawableResource = R.drawable.turn_sharp_right;
-                                        break;
-                                    case "turn-sharp-left":
-                                        drawableResource = R.drawable.turn_sharp_left;
-                                        break;
-                                    case "turn-slight-right":
-                                        drawableResource = R.drawable.turn_slight_right;
-                                        break;
-                                    case "turn-slight-left":
-                                        drawableResource = R.drawable.turn_slight_left;
-                                        break;
-                                    case "uturn-right":
-                                        drawableResource = R.drawable.uturn_right;
-                                        break;
-                                    case "uturn-left":
-                                        drawableResource = R.drawable.uturn_left;
-                                        break;
+                                    // Map maneuver types to corresponding drawable resource IDs
+                                    switch (maneuverType) {
+                                        case "keep-left":
+                                            drawableResource = R.drawable.keep_left;
+                                            break;
+                                        case "keep-right":
+                                            drawableResource = R.drawable.keep_right;
+                                            break;
+                                        case "ferry":
+                                            drawableResource = R.drawable.ferry;
+                                            break;
+                                        case "ferry-train":
+                                            drawableResource = R.drawable.ferry_train;
+                                            break;
+                                        case "fork-left":
+                                            drawableResource = R.drawable.fork_left;
+                                            break;
+                                        case "fork-right":
+                                            drawableResource = R.drawable.fork_right;
+                                            break;
+                                        case "merge":
+                                            drawableResource = R.drawable.merge;
+                                            break;
+                                        case "ramp-left":
+                                            drawableResource = R.drawable.ramp_left;
+                                            break;
+                                        case "ramp-right":
+                                            drawableResource = R.drawable.ramp_right;
+                                            break;
+                                        case "roundabout-left":
+                                            drawableResource = R.drawable.roundabout_left;
+                                            break;
+                                        case "roundabout-right":
+                                            drawableResource = R.drawable.roundabout_right;
+                                            break;
+                                        case "straight":
+                                            drawableResource = R.drawable.straight;
+                                            break;
+                                        case "turn-right":
+                                            drawableResource = R.drawable.turn_right;
+                                            break;
+                                        case "turn-left":
+                                            drawableResource = R.drawable.turn_left;
+                                            break;
+                                        case "turn-sharp-right":
+                                            drawableResource = R.drawable.turn_sharp_right;
+                                            break;
+                                        case "turn-sharp-left":
+                                            drawableResource = R.drawable.turn_sharp_left;
+                                            break;
+                                        case "turn-slight-right":
+                                            drawableResource = R.drawable.turn_slight_right;
+                                            break;
+                                        case "turn-slight-left":
+                                            drawableResource = R.drawable.turn_slight_left;
+                                            break;
+                                        case "uturn-right":
+                                            drawableResource = R.drawable.uturn_right;
+                                            break;
+                                        case "uturn-left":
+                                            drawableResource = R.drawable.uturn_left;
+                                            break;
 
-                                    default:
-                                        drawableResource = R.drawable.straight;
-                                        break;
-                                }
+                                        default:
+                                            drawableResource = R.drawable.straight;
+                                            break;
+                                    }
 
-                                linearLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
-                                ));
-                                linearLayout.setPadding(25, 25, 25, 25);
-                                linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+                                    linearLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                                            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+                                    ));
+                                    linearLayout.setPadding(25, 25, 25, 25);
+                                    linearLayout.setOrientation(LinearLayout.HORIZONTAL);
 
-                                // Create an ImageView
-                                ImageView imageView = new ImageView(getActivity());
-                                imageView.setLayoutParams(new LinearLayout.LayoutParams(
-                                        200, 200
-                                ));
-                                imageView.setImageResource(drawableResource); // Set your image resource
-                                imageView.setPadding(0, 0, 25, 0);
-                                //android:layout_gravity="center_vertical"
-                                //android:layout_weight="1"
+                                    // Create an ImageView
+                                    ImageView imageView = new ImageView(getActivity());
+                                    imageView.setLayoutParams(new LinearLayout.LayoutParams(
+                                            200, 200
+                                    ));
+                                    imageView.setImageResource(drawableResource); // Set your image resource
+                                    imageView.setPadding(0, 0, 25, 0);
+                                    //android:layout_gravity="center_vertical"
+                                    //android:layout_weight="1"
 
-                                View horizontalLine = new View(getActivity());
-                                horizontalLine.setLayoutParams(new ViewGroup.LayoutParams(
-                                        ViewGroup.LayoutParams.MATCH_PARENT,
-                                        1 // Height of the horizontal line in pixels or dp
-                                ));
-                                horizontalLine.setBackgroundColor(Color.WHITE); // Set the color of the line
+                                    View horizontalLine = new View(getActivity());
+                                    horizontalLine.setLayoutParams(new ViewGroup.LayoutParams(
+                                            ViewGroup.LayoutParams.MATCH_PARENT,
+                                            1 // Height of the horizontal line in pixels or dp
+                                    ));
+                                    horizontalLine.setBackgroundColor(Color.WHITE); // Set the color of the line
 
                                     LinearLayout linearLayoutVertical = new LinearLayout(getActivity());
                                     linearLayoutVertical.setLayoutParams(new LinearLayout.LayoutParams(
@@ -400,42 +434,42 @@ public class MapsInstructions extends DialogFragment {
                                     textView2.setTextColor(Color.WHITE); // Set the text color to white
 
 
-
-                                // Add the ImageView and TextViews to the LinearLayout
-                                linearLayout.addView(imageView);
-                                linearLayout.addView(linearLayoutVertical);
+                                    // Add the ImageView and TextViews to the LinearLayout
+                                    linearLayout.addView(imageView);
+                                    linearLayout.addView(linearLayoutVertical);
                                     linearLayoutVertical.addView(textView1);
                                     linearLayoutVertical.addView(textView2);
 
-                                // Add the new LinearLayout to the container
-                                dynamicLayoutContainer.addView(linearLayout);
-                                dynamicLayoutContainer.addView(horizontalLine);
+                                    // Add the new LinearLayout to the container
+                                    dynamicLayoutContainer.addView(linearLayout);
+                                    dynamicLayoutContainer.addView(horizontalLine);
 
-                                // Measure the total height of the LinearLayout
-                                dynamicLayoutContainer.measure(
-                                        View.MeasureSpec.UNSPECIFIED, // Width constraint
-                                        View.MeasureSpec.UNSPECIFIED  // Height constraint
-                                );
+                                    // Measure the total height of the LinearLayout
+                                    dynamicLayoutContainer.measure(
+                                            View.MeasureSpec.UNSPECIFIED, // Width constraint
+                                            View.MeasureSpec.UNSPECIFIED  // Height constraint
+                                    );
 
-                                int linearLayoutHeight = dynamicLayoutContainer.getMeasuredHeight();
+                                    int linearLayoutHeight = dynamicLayoutContainer.getMeasuredHeight();
 
-                                // Calculate the height in pixels of 500dp
-                                int dp500 = (int) TypedValue.applyDimension(
-                                        TypedValue.COMPLEX_UNIT_DIP, 500, getResources().getDisplayMetrics()
-                                );
+                                    // Calculate the height in pixels of 500dp
+                                    int dp500 = (int) TypedValue.applyDimension(
+                                            TypedValue.COMPLEX_UNIT_DIP, 500, getResources().getDisplayMetrics()
+                                    );
 
-                                // Set the ScrollView's height based on the calculation
-                                if (linearLayoutHeight < dp500) {
-                                    // If the LinearLayout's height is less than 500dp, set the ScrollView's height to WRAP_CONTENT
-                                    scrollView.getLayoutParams().height = LinearLayout.LayoutParams.WRAP_CONTENT;
-                                } else {
-                                    // Otherwise, set the ScrollView's height to 500dp
-                                    scrollView.getLayoutParams().height = dp500;
+                                    // Set the ScrollView's height based on the calculation
+                                    if (linearLayoutHeight < dp500) {
+                                        // If the LinearLayout's height is less than 500dp, set the ScrollView's height to WRAP_CONTENT
+                                        scrollView.getLayoutParams().height = LinearLayout.LayoutParams.WRAP_CONTENT;
+                                    } else {
+                                        // Otherwise, set the ScrollView's height to 500dp
+                                        scrollView.getLayoutParams().height = dp500;
+                                    }
+
+                                    // Request layout to apply the new height
+                                    scrollView.requestLayout();
+
                                 }
-
-                                // Request layout to apply the new height
-                                scrollView.requestLayout();
-
                             }
                         }
                     }

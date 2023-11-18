@@ -13,6 +13,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentContainerView;
 import androidx.fragment.app.FragmentTransaction;
@@ -65,6 +67,10 @@ public class MapsFragmentArrivedDialog extends DialogFragment {
                 FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
 
                 MapsFragment mapsFragment = new MapsFragment();
+
+                ConstraintLayout constraintLayout = getParentFragment().getView().findViewById(R.id.fragment_container_arrived);
+                constraintLayout.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.transparent));
+                //constraintLayout.setVisibility(View.GONE);
 
                 BottomNavigationView bottomNavigationView = getParentFragment().getView().findViewById(R.id.bottomNavigationView);
                 bottomNavigationView.setVisibility(View.GONE);

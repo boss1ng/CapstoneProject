@@ -75,7 +75,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 
-public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
+public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback, MapsInstructions.OnStopButtonClickListener {
 
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -101,6 +101,31 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
     Handler handler;
     Runnable mapRefreshRunnable;
 
+    @Override
+    public void onStopButtonClicked() {
+        // This method will be called when the Stop button is pressed in MapsInstruction
+        isRunning = false;
+        // Add any additional logic you need to perform when the Stop button is pressed.
+
+        Toast.makeText(getContext(), "Exiting...", Toast.LENGTH_LONG).show();
+        Log.d(TAG, "EXITING via STOP BUTTON...");
+
+        loadFragment(new MapsFragment());
+
+        BottomNavigationView bottomNavigationView = getView().findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setVisibility(View.GONE);
+
+        LinearLayout linearLayoutDirections = getView().findViewById(R.id.directionsCont);
+        linearLayoutDirections.setVisibility(View.GONE);
+
+        FragmentContainerView fragmentContainerView = getView().findViewById(R.id.mapsRoute);
+        fragmentContainerView.setVisibility(View.GONE);
+
+        LinearLayout linearLayoutOverview = getView().findViewById(R.id.overviewCont);
+        linearLayoutOverview.setVisibility(View.GONE);
+
+        handler.removeCallbacks(mapRefreshRunnable); // Remove any pending callbacks // Dismiss the dialog
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -422,6 +447,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                             fragment.setArguments(bundle);
                         }
 
+                        fragment.setOnStopButtonClickListener(MapsFragmentRoute.this);
                         // Show the PlaceDetailDialogFragment as a dialog
                         fragment.show(getChildFragmentManager(), "MapsInstructions");
                     });
@@ -1801,7 +1827,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback {
                             // Format totalDistanceKm with 2 decimal places
                             String formattedDistance = String.format("%.2f", totalDistanceKm);
 
-                            double thresholdDistance = 0.015; // 0.015=15 meters threshold    1.2
+                            double thresholdDistance = 1.2; // 0.015=15 meters threshold    1.2
 
                             if (textViewDistance != null && textViewDirection != null && buttonFinish != null && imageViewDirections != null) {
                                 if (totalDistanceKm <= thresholdDistance) {

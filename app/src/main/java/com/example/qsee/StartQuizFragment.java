@@ -7,6 +7,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -72,19 +73,34 @@ public class StartQuizFragment extends Fragment {
                 if (itemId == R.id.action_home) {
                     loadFragment(new HomeFragment());
                     bottomNavigationView.setVisibility(View.GONE);
+                    LinearLayout linearLayout = view.findViewById(R.id.quizCont);
+                    linearLayout.setVisibility(View.GONE);
+
                 } else if (itemId == R.id.action_search) {
                     loadFragment(new SearchFragment());
                     bottomNavigationView.setVisibility(View.GONE);
+                    LinearLayout linearLayout = view.findViewById(R.id.quizCont);
+                    linearLayout.setVisibility(View.GONE);
+
                 } else if (itemId == R.id.action_maps) {
                     loadFragment(new MapsFragment());
                     //BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
                     bottomNavigationView.setVisibility(View.GONE);
+                    LinearLayout linearLayout = view.findViewById(R.id.quizCont);
+                    linearLayout.setVisibility(View.GONE);
+
                 } else if (itemId == R.id.action_quiz) {
                     loadFragment(new StartQuizFragment());
                     bottomNavigationView.setVisibility(View.GONE);
+                    LinearLayout linearLayout = view.findViewById(R.id.quizCont);
+                    linearLayout.setVisibility(View.GONE);
+
                 } else if (itemId == R.id.action_profile) {
                     loadFragment(new ProfileFragment());
                     bottomNavigationView.setVisibility(View.GONE);
+                    LinearLayout linearLayout = view.findViewById(R.id.quizCont);
+                    linearLayout.setVisibility(View.GONE);
+
                 }
                 return true;
             }

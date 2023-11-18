@@ -5,7 +5,7 @@ xmlns:app="http://schemas.android.com/apk/res-auto"
 xmlns:tools="http://schemas.android.com/tools"
 android:layout_width="match_parent"
 android:layout_height="match_parent"
-android:background="@color/shade1"
+android:background="@color/shade4"
 android:id="@+id/fragment_container_arrived"
     >
 
@@ -71,7 +71,6 @@ android:id="@+id/fragment_container_arrived"
         android:layout_height="wrap_content"
         android:gravity="right"
         android:orientation="horizontal"
-        android:layout_marginEnd="15dp"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="80dp"
         tools:ignore="MissingConstraints">
