@@ -623,6 +623,27 @@ public class ProfileFragment extends Fragment {
                             break;
                     }
                 }).attach();
+
+        if (getArguments() != null) {
+            String caseNumber1 = getArguments().getString("fromGroup");
+            if (caseNumber1 != null) {
+                if (caseNumber1.equals("1")) {
+                    // Set the current item to the second tab (Group)
+                    viewPager.setCurrentItem(Integer.parseInt(caseNumber1), false); // 'false' means no smooth scroll
+                }
+            }
+
+            String caseNumber2 = getArguments().getString("fromItinerary");
+            if (caseNumber2 != null) {
+                if (caseNumber2.equals("2")) {
+                    // Set the current item to the second tab (Group)
+                    viewPager.setCurrentItem(Integer.parseInt(caseNumber2), false); // 'false' means no smooth scroll
+                }
+            }
+        }
+
+        //bundle.putString("fromGroup", "1");
+
     }
     private void loadProfilePicture(String profilePictureUrl) {
         // Use a library like Picasso or Glide to load and display the image

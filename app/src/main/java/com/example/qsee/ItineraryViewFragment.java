@@ -35,6 +35,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -241,7 +242,52 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
             @Override
             public void onClick(View v) {
                 // Pop the back stack when the back button is clicked
-                requireActivity().getSupportFragmentManager().popBackStack();
+                //requireActivity().getSupportFragmentManager().popBackStack();
+
+                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+
+                ProfileFragment profileFragment = new ProfileFragment();
+
+                // Use Bundle to pass values
+                Bundle bundle = new Bundle();
+                bundle.putString("userId", userId);
+                bundle.putString("fromItinerary", "2");
+                profileFragment.setArguments(bundle);
+
+                TextView textView2 = view.findViewById(R.id.locName);
+                textView2.setVisibility(View.GONE);
+                TextView textView3 = view.findViewById(R.id.dateDuration);
+                textView3.setVisibility(View.GONE);
+                ImageView imageView = view.findViewById(R.id.backButton);
+                imageView.setVisibility(View.GONE);
+                ImageView imageView1 = view.findViewById(R.id.downloadBtn);
+                imageView1.setVisibility(View.GONE);
+
+                TextView textView4 = view.findViewById(R.id.dayTitle1);
+                textView4.setVisibility(View.GONE);
+                TextView textView5 = view.findViewById(R.id.dayTitle2);
+                textView5.setVisibility(View.GONE);
+                TextView textView6 = view.findViewById(R.id.dayTitle3);
+                textView6.setVisibility(View.GONE);
+                TextView textView7 = view.findViewById(R.id.dayTitle4);
+                textView7.setVisibility(View.GONE);
+                TextView textView8 = view.findViewById(R.id.dayTitle5);
+                textView8.setVisibility(View.GONE);
+
+                RecyclerView day1Recycler = view.findViewById(R.id.day1Recycler);
+                day1Recycler.setVisibility(View.GONE);
+                RecyclerView day2Recycler = view.findViewById(R.id.day2Recycler);
+                day2Recycler.setVisibility(View.GONE);
+                RecyclerView day3Recycler = view.findViewById(R.id.day3Recycler);
+                day3Recycler.setVisibility(View.GONE);
+                RecyclerView day4Recycler = view.findViewById(R.id.day4Recycler);
+                day4Recycler.setVisibility(View.GONE);
+                RecyclerView day5Recycler = view.findViewById(R.id.day5Recycler);
+                day5Recycler.setVisibility(View.GONE);
+
+                transaction.replace(R.id.fragment_container, profileFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
             }
         });
 
