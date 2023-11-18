@@ -10,6 +10,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
+import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -46,6 +47,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -79,6 +81,26 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the fragment_profile.xml layout
         View rootView = inflater.inflate(R.layout.fragment_profile, container, false);
+
+        // Load the background image using Picasso
+        String imageUrl = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/profbg.jpg?alt=media&token=4b33d94a-47f5-48f3-90f4-c768b7f0480f";
+        ImageView backgroundImageView = new ImageView(getActivity());
+
+        // Set a listener to be notified when the image is loaded
+        Picasso.get().load(imageUrl).into(backgroundImageView, new Callback() {
+            @Override
+            public void onSuccess() {
+                // Set the background of the profileCont LinearLayout
+                LinearLayout profileContLayout = rootView.findViewById(R.id.profileCont);
+                profileContLayout.setBackground(backgroundImageView.getDrawable());
+            }
+
+            @Override
+            public void onError(Exception e) {
+                // Handle error if necessary
+            }
+        });
+
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         context = getActivity(); // Get the context
 
@@ -132,7 +154,7 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        Button addButton = rootView.findViewById(R.id.addButton);
+        ImageView addButton = rootView.findViewById(R.id.addButton);
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -245,7 +267,7 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        Button notifButton = rootView.findViewById(R.id.notifButton);
+        ImageView notifButton = rootView.findViewById(R.id.notifButton);
         notifButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -255,8 +277,8 @@ public class ProfileFragment extends Fragment {
         });
 
         // Find the "Change Username" button
-        Button unameButton = rootView.findViewById(R.id.unameButton);
-        Button editProfile = rootView.findViewById(R.id.editButton);
+        ImageView unameButton = rootView.findViewById(R.id.unameButton);
+        ImageView editProfile = rootView.findViewById(R.id.editButton);
         unameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

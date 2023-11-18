@@ -5,8 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/userProfileCont"
-    android:backgroundTint="#000000">
+    android:id="@+id/userProfileCont">
 
     <LinearLayout
         android:id="@+id/profileCont"
@@ -24,7 +23,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
-            android:layout_marginBottom="30dp"
+            android:layout_marginBottom="10dp"
             android:orientation="horizontal">
 
             <TextView
@@ -35,23 +34,23 @@
                 android:layout_marginTop="10dp"
                 android:clickable="true"
                 android:text="username"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
                 android:textSize="17dp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right"
+                android:layout_gravity="center"
                 android:orientation="horizontal">
 
-                <Button
+                <ImageView
                     android:id="@+id/unameButton"
-                    android:layout_width="25dp"
-                    android:layout_height="28dp"
-                    android:backgroundTint="#FFFFFF"
-                    android:layout_marginTop="5dp"
-
-                    android:drawableTop="@drawable/ic_carret_down"
+                    android:layout_width="15dp"
+                    android:layout_height="20dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_carret_down"
                     app:layout_constraintBaseline_toBottomOf="parent" />
 
             </LinearLayout>
@@ -69,12 +68,13 @@
                     android:layout_marginRight="5dp">
 
 
-                    <Button
+                    <ImageView
                         android:id="@+id/notifButton"
-                        android:layout_width="30dp"
-                        android:layout_height="34dp"
-                        android:backgroundTint="#FFFFFF"
-                        android:drawableTop="@drawable/ic_bell"
+                        android:layout_width="25dp"
+                        android:layout_height="35dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginStart="5dp"
+                        android:src="@drawable/ic_bell"
                         app:layout_constraintBaseline_toBottomOf="parent" />
 
                     <TextView
@@ -91,34 +91,32 @@
                         android:visibility="gone" />
                 </FrameLayout>
 
-                <Button
+                <ImageView
                     android:id="@+id/editButton"
                     android:layout_width="27dp"
                     android:layout_height="34dp"
+                    android:layout_marginTop="9dp"
                     android:layout_marginRight="6dp"
-                    android:backgroundTint="#FFFFFF"
-                    android:drawableTop="@drawable/ic_edit"
+                    android:src="@drawable/ic_edit"
                     app:layout_constraintBaseline_toBottomOf="parent" />
 
-                <Button
+                <ImageView
                     android:id="@+id/addButton"
                     android:layout_width="27dp"
                     android:layout_height="34dp"
+                    android:layout_marginTop="9dp"
                     android:layout_marginRight="15dp"
-                    android:backgroundTint="#FFFFFF"
-                    android:drawableTop="@drawable/ic_add_square"
+                    android:src="@drawable/ic_add_square"
                     app:layout_constraintBaseline_toBottomOf="parent" />
             </LinearLayout>
         </LinearLayout>
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/profilePic"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
             android:layout_gravity="center"
             android:layout_marginBottom="5dp"
-            android:adjustViewBounds="true"
-            android:outlineAmbientShadowColor="@color/black"
             android:scaleType="centerCrop"
             android:src="@drawable/profilepicture" />
 
@@ -152,10 +150,13 @@
                 android:id="@+id/tabLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
                 android:layout_alignParentTop="true"
                 android:background="#E5E4E2"
+                android:backgroundTint="@color/transparent"
                 app:tabIndicatorColor="?attr/colorAccent"
-                app:tabTextColor="@android:color/white" />
+                app:tabTextColor="@android:color/white"
+                app:tabIndicatorFullWidth="true"/>
 
             <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/viewPager"

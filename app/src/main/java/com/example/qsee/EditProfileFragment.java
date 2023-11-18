@@ -33,6 +33,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -57,6 +58,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
@@ -77,6 +79,7 @@ public class EditProfileFragment extends Fragment {
     private TextInputLayout contactNoInputLayout;
     private TextInputLayout birthdateEditText;
     private TextInputLayout usernameEditText;
+    private LinearLayout linearLayout;
     private DatabaseReference userReference;
     private Uri selectedProfilePictureUri = null;
     private FirebaseStorage storage;
@@ -97,6 +100,25 @@ public class EditProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_editprofile, container, false);
+
+        // Load the background image using Picasso
+        String imageUrl = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/profbg.jpg?alt=media&token=4b33d94a-47f5-48f3-90f4-c768b7f0480f";
+        ImageView backgroundImageView = new ImageView(getActivity());
+
+        // Set a listener to be notified when the image is loaded
+        Picasso.get().load(imageUrl).into(backgroundImageView, new Callback() {
+            @Override
+            public void onSuccess() {
+                // Set the background of the profileCont LinearLayout
+                LinearLayout linearLayout = view.findViewById(R.id.editprofcont);
+                linearLayout.setBackground(backgroundImageView.getDrawable());
+            }
+
+            @Override
+            public void onError(Exception e) {
+                // Handle error if necessary
+            }
+        });
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         context = getActivity();
@@ -114,7 +136,7 @@ public class EditProfileFragment extends Fragment {
         birthdateEditText = view.findViewById(R.id.birthdate);
         usernameEditText = view.findViewById(R.id.username);
 
-        Button changePictureButton = view.findViewById(R.id.pfpBtn);
+        ImageView changePictureButton = view.findViewById(R.id.pfpBtn);
 
 
         changePictureButton.setOnClickListener(new View.OnClickListener() {

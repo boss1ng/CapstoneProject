@@ -5,36 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/profilePic_edit"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:outlineAmbientShadowColor="@color/black"
-        android:src="@drawable/profilepicture"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.06" />
-
-    <Button
-        android:id="@+id/pfpBtn"
-        android:layout_width="122dp"
-        android:layout_height="32dp"
-        android:backgroundTint="@color/white"
-        android:text="Change Picture"
-        android:textColor="@color/blue"
-        android:textSize="9dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.214" />
-
     <LinearLayout
-        android:id="@+id/linearLayout"
+        android:id="@+id/editprofcont"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -43,12 +15,43 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent">
 
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginTop="70dp"
+            android:layout_gravity="center">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profilePic_edit"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
+            android:layout_gravity="center"
+            android:outlineAmbientShadowColor="@color/black"
+            android:src="@drawable/profilepicture"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.06" />
+
+            <ImageView
+                android:id="@+id/pfpBtn"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="80dp"
+                android:layout_marginTop="80dp"
+                android:src="@drawable/editprofilepic"
+                android:gravity="center"
+                android:visibility="visible" />
+        </FrameLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/firstName"
             android:layout_width="342dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_marginTop="15dp"
             android:layout_marginBottom="15dp">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -117,7 +120,6 @@
             android:layout_width="308dp"
             android:layout_height="48dp"
             android:layout_gravity="center"
-            android:layout_marginBottom="15dp"
             android:backgroundTint="@color/gradient_start"
             android:text="Save" />
 
