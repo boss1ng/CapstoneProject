@@ -29,7 +29,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import android.Manifest;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -93,7 +93,7 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
 
     private static final int REQUEST_CODE_WRITE_EXTERNAL_STORAGE = 101;
     private static final int REQUEST_CODE_SAVE_PDF = 102;
-
+    private static final int REQUEST_CODE_MANAGE_EXTERNAL_STORAGE = 123; // You can use any unique integer value
     private String responseString = null;
     private String jsonResponseString = null;
     private HttpURLConnection urlConnection = null;
@@ -292,27 +292,30 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
         });
 
         // Add the download button functionality
+        // Add the download button functionality
         ImageView downloadBtn = view.findViewById(R.id.downloadBtn);
         downloadBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Check for the permission
-                if (ContextCompat.checkSelfPermission(requireContext(), WRITE_EXTERNAL_STORAGE)
+                /*if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.MANAGE_EXTERNAL_STORAGE)
                         != PackageManager.PERMISSION_GRANTED) {
                     // Permission is not granted, request it
                     ActivityCompat.requestPermissions(requireActivity(),
-                            new String[]{WRITE_EXTERNAL_STORAGE},
-                            REQUEST_CODE_WRITE_EXTERNAL_STORAGE);
+                            new String[]{Manifest.permission.MANAGE_EXTERNAL_STORAGE},
+                            REQUEST_CODE_MANAGE_EXTERNAL_STORAGE);
                 } else {
                     // Permission has already been granted, proceed with the PDF generation and saving
-                    //generatePDF();
+                    // generatePDF();
 
                     downloadBtn.setEnabled(false);
                     backButton.setEnabled(false);
                     createPdfWithTable();
                     downloadBtn.setEnabled(true);
                     backButton.setEnabled(true);
-                }
+                }*/
+
+                createPdfAndSave();
             }
         });
     }
@@ -788,21 +791,22 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
         return jsonResponse;
     }
 
-
-
-
-
-
-
+    private void createPdfAndSave() {
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("application/pdf");
+        intent.putExtra(Intent.EXTRA_TITLE, locationName + ".pdf");
+        startActivityForResult(intent, REQUEST_CODE_SAVE_PDF);
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (requestCode == REQUEST_CODE_SAVE_PDF && resultCode == Activity.RESULT_OK && data != null) {
-            // Save the PDF content to the chosen location
             Uri uri = data.getData();
-            savePdfToUri(uri);
+            if (uri != null) {
+                savePdfToUri(uri);
+            }
         }
     }
 
@@ -810,21 +814,32 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
         try {
             ParcelFileDescriptor pfd = requireActivity().getContentResolver().openFileDescriptor(uri, "w");
             if (pfd != null) {
-                FileOutputStream outputStream = new FileOutputStream(pfd.getFileDescriptor());
-                document.writeTo(outputStream);
-                outputStream.close();
-                pfd.close();
+                FileOutputStream fileOutputStream = new FileOutputStream(pfd.getFileDescriptor());
+
+                // Create a new document
+                Document document = new Document();
+                PdfWriter.getInstance(document, fileOutputStream);
+
+                // Open the document
+                document.open();
+
+                // Add content to the document
+                // For example:
+                document.add(new Paragraph("Your PDF Content Here"));
 
                 // Close the document
                 document.close();
+                fileOutputStream.close();
+                pfd.close();
 
-                // Show a toast indicating that the PDF has been saved
                 Toast.makeText(requireContext(), "Itinerary saved to chosen location.", Toast.LENGTH_LONG).show();
             }
-        } catch (IOException e) {
+        } catch (IOException | DocumentException e) {
             e.printStackTrace();
         }
     }
+
+
 
 
 }
