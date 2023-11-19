@@ -219,9 +219,6 @@ public class QuizFragment extends Fragment {
         List<String> question19Choices = Arrays.asList("Our Lady of the Miraculous Medal Parish Church", "Parish of the Holy Sacrifice Church", "Santo Domingo Church", "Church of the Risen Lord");
         quizQuestions.add(new QuizQuestion("Question 19?", question19Choices, 0, R.drawable.pic19, "Our Lady of the Miraculous Medal Parish of the Roman Catholic Diocese of Cubao\n\nEstablished on September 4, 1976. It is located in Project 4, City of Quezon. The Parish Fiesta is celebrated every 27th day of November."));
 
-        List<String> question20Choices = Arrays.asList("Choice T1", "Choice T2", "Choice T3", "Choice T4");
-        quizQuestions.add(new QuizQuestion("Question 20?", question20Choices, 1, R.drawable.logo, "Choice T2\n\nDescription for correct answer 20"));
-
         // Add more quiz questions with images and descriptions as needed
         Collections.shuffle(quizQuestions);
     }
