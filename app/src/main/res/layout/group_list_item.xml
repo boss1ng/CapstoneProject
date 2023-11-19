@@ -11,7 +11,8 @@
         android:id="@+id/groupIcon"
         android:layout_width="45dp"
         android:layout_height="45dp"
-        android:layout_marginStart="10dp"/>
+        android:layout_marginStart="10dp"
+        android:layout_gravity="center"/>
 
     <TextView
         android:id="@+id/groupName"
