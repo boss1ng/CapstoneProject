@@ -315,7 +315,8 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
                     backButton.setEnabled(true);
                 }*/
 
-                createPdfAndSave();
+                //createPdfAndSave();
+                createPdfWithTable();
             }
         });
     }
