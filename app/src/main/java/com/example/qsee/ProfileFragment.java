@@ -62,7 +62,6 @@ public class ProfileFragment extends Fragment {
 
 
     private TextView userFullNameTextView;
-    private TextView userIdTextView;
     private TextView usernameTextView;
     private Context context;
     private String userId;
@@ -306,37 +305,7 @@ public class ProfileFragment extends Fragment {
 
         // Find the userFullNameTextView and userIdTextView by their IDs
         userFullNameTextView = rootView.findViewById(R.id.UserFullName);
-        userIdTextView = rootView.findViewById(R.id.UserId);
 
-        // Set a click listener for userIdTextView to copy its text to the clipboard
-        userIdTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Get the text from userIdTextView
-                String userId = userIdTextView.getText().toString().trim();
-
-                // Extract only the numeric part from the text
-                String numericPart = userId.replaceAll("[^0-9]", "");
-
-                if (!numericPart.isEmpty()) {
-                    try {
-                        // Copy the numeric part to the clipboard
-                        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                        ClipData clip = ClipData.newPlainText("UserId", numericPart);
-                        clipboard.setPrimaryClip(clip);
-
-                        // Show a toast message indicating that the numeric part has been copied
-                        Toast.makeText(context, "User ID copied to clipboard.", Toast.LENGTH_LONG).show();
-                    } catch (Exception e) {
-                        // Handle the exception (e.g., show a message to the user)
-                        Toast.makeText(context, "Clipboard functionality is not available.", Toast.LENGTH_LONG).show();
-                    }
-                } else {
-                    // Show a message if there are no numeric characters to copy
-                    Toast.makeText(context, "No numeric part found in User ID.", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
 
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -356,8 +325,6 @@ public class ProfileFragment extends Fragment {
                         // Set the text of userFullNameTextView with the full name
                         userFullNameTextView.setText(firstName + " " + lastName);
 
-                        // Set the text of userIdTextView with the userId
-                        userIdTextView.setText("User ID: " + userId);
 
                         // Find the usernameTextView by its ID
                         usernameTextView = rootView.findViewById(R.id.ProfileUsername);

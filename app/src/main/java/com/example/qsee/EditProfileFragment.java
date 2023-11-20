@@ -34,6 +34,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -78,7 +79,7 @@ public class EditProfileFragment extends Fragment {
     private TextInputLayout lastNameEditText;
     private TextInputLayout contactNoInputLayout;
     private TextInputLayout birthdateEditText;
-    private TextInputLayout usernameEditText;
+    private TextView usernameEditText;
     private LinearLayout linearLayout;
     private DatabaseReference userReference;
     private Uri selectedProfilePictureUri = null;
@@ -179,7 +180,7 @@ public class EditProfileFragment extends Fragment {
                         lastNameEditText.getEditText().setText(lastName);
                         contactNoInputLayout.getEditText().setText(contactNumber);
                         birthdateEditText.getEditText().setText(birthdate);
-                        usernameEditText.getEditText().setText(username);
+                        usernameEditText.setText(username);
                         bindData(profilePic);
                     }
                 } else {
@@ -224,13 +225,11 @@ public class EditProfileFragment extends Fragment {
                 String newLastName = lastNameEditText.getEditText().getText().toString();
                 String newContactNumber = contactNoInputLayout.getEditText().getText().toString();
                 String newBirthdate = birthdateEditText.getEditText().getText().toString();
-                String newUsername = usernameEditText.getEditText().getText().toString();
 
                 String encryptedFirstName = AESUtils.encrypt(newFirstName);
                 String encryptedLastName = AESUtils.encrypt(newLastName);
                 String encryptedContactNumber = AESUtils.encrypt(newContactNumber);
                 String encryptedBirthdate = AESUtils.encrypt(newBirthdate);
-                String encryptedUsername = AESUtils.encrypt(newUsername);
 
                 DatabaseReference usersReference = FirebaseDatabase.getInstance().getReference("MobileUsers");
                 Query query = usersReference.orderByChild("userId").equalTo(userId);
@@ -244,7 +243,6 @@ public class EditProfileFragment extends Fragment {
                                 userSnapshot.getRef().child("lastName").setValue(encryptedLastName);
                                 userSnapshot.getRef().child("contactNumber").setValue(encryptedContactNumber);
                                 userSnapshot.getRef().child("birthdate").setValue(encryptedBirthdate);
-                                userSnapshot.getRef().child("username").setValue(encryptedUsername);
 
                                 // Only upload the profile picture if selectedProfilePictureUri is not null
                                 if (selectedProfilePictureUri != null) {

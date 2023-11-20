@@ -76,7 +76,7 @@ public class AddUserFinder extends DialogFragment {
                     // Retrieve user details (firstname and lastname) based on userId
                     retrieveUserDetails(enteredUserId);
                 } else {
-                    Toast.makeText(getActivity(), "Please enter a User ID", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), "Please enter a username", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -84,25 +84,45 @@ public class AddUserFinder extends DialogFragment {
         return view;
     }
 
-    private void retrieveUserDetails(String member) {
-        // Find the user details (encrypted firstname and lastname) based on userId
-        databaseReference.child("MobileUsers").child(member).addListenerForSingleValueEvent(new ValueEventListener() {
+    private void retrieveUserDetails(final String member) {
+        databaseReference.child("MobileUsers").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot userSnapshot) {
+                boolean userFound = false; // Flag to check if a user is found
+
                 if (userSnapshot.exists()) {
-                    // User with the provided userId exists
-                    String encryptedFirstName = userSnapshot.child("firstName").getValue(String.class);
-                    String encryptedLastName = userSnapshot.child("lastName").getValue(String.class);
+                    for (DataSnapshot user : userSnapshot.getChildren()) {
+                        // Assuming each child has an "encryptedUsername" field
+                        String encryptedUsername = user.child("username").getValue(String.class);
 
-                    // Decrypt firstname and lastname
-                    String firstName = AESUtils.decrypt(encryptedFirstName);
-                    String lastName = AESUtils.decrypt(encryptedLastName);
+                        if (encryptedUsername != null) {
+                            // Decrypt the username
+                            String username = AESUtils.decrypt(encryptedUsername);
 
-                    // Now, you have decrypted firstname and lastname
-                    // Display the AddUserToGroup dialog with user details
-                    showAddUserToGroupDialog(userId, groupName, member, firstName, lastName);
-                } else {
-                    Toast.makeText(getActivity(), "User does not exist", Toast.LENGTH_LONG).show();
+                            if (username != null && username.toLowerCase().equals(member.toLowerCase())) {
+                                // Match found, retrieve user details
+                                userFound = true;
+
+                                String encryptedFirstName = user.child("firstName").getValue(String.class);
+                                String encryptedLastName = user.child("lastName").getValue(String.class);
+                                String ID = user.child("userId").getValue(String.class);
+
+                                // Decrypt firstname and lastname
+                                String firstName = AESUtils.decrypt(encryptedFirstName);
+                                String lastName = AESUtils.decrypt(encryptedLastName);
+
+                                // Now, you have decrypted firstname and lastname
+                                // Display the AddUserToGroup dialog with user details
+                                showAddUserToGroupDialog(userId, groupName, ID, firstName, lastName);
+                            }
+                        }
+                    }
+
+                    // Check if no user was found and show toast
+                    if (!userFound) {
+                        // If no match is found after iterating through all children
+                        Toast.makeText(getActivity(), "User not found", Toast.LENGTH_LONG).show();
+                    }
                 }
             }
 
@@ -112,6 +132,8 @@ public class AddUserFinder extends DialogFragment {
             }
         });
     }
+
+
 
 
     private void showAddUserToGroupDialog(String userId, String groupName, String member, String firstname, String lastname) {
