@@ -420,6 +420,45 @@ public class EditActivityFragment extends Fragment {
                                                             newTimeSnapshot.child("activity").setValue(updatedActivity);
                                                             newTimeSnapshot.child("origin").setValue(updatedOrigin);
                                                             newTimeSnapshot.child("status").setValue("Incomplete");
+
+                                                            DatabaseReference originReference = FirebaseDatabase.getInstance().getReference("Location");
+                                                            originReference.orderByChild("Location").equalTo(updatedOrigin).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                @Override
+                                                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                                                    for (DataSnapshot locationSnapshot : dataSnapshot.getChildren()) {
+                                                                        // Retrieve latitude and longitude for the origin
+                                                                        String firebaseOrigLat = locationSnapshot.child("Latitude").getValue(String.class);
+                                                                        String firebaseOrigLong = locationSnapshot.child("Longitude").getValue(String.class);
+
+                                                                        newTimeSnapshot.child("originLat").setValue(firebaseOrigLat);
+                                                                        newTimeSnapshot.child("originLong").setValue(firebaseOrigLong);
+                                                                    }
+                                                                }
+                                                                @Override
+                                                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                                                }
+                                                            });
+
+                                                            DatabaseReference destReference = FirebaseDatabase.getInstance().getReference("Location");
+                                                            destReference.orderByChild("Location").equalTo(updatedLocation).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                @Override
+                                                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                                                    for (DataSnapshot locationSnapshot : dataSnapshot.getChildren()) {
+                                                                        // Retrieve latitude and longitude for the origin
+                                                                        String firebaseOrigLat = locationSnapshot.child("Latitude").getValue(String.class);
+                                                                        String firebaseOrigLong = locationSnapshot.child("Longitude").getValue(String.class);
+
+                                                                        newTimeSnapshot.child("locationLat").setValue(firebaseOrigLat);
+                                                                        newTimeSnapshot.child("locationLong").setValue(firebaseOrigLong);
+                                                                    }
+                                                                }
+                                                                @Override
+                                                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                                                }
+                                                            });
+
                                                             // Show a toast to confirm the save
                                                             if (isAdded()) {
                                                                 Toast.makeText(getContext(), "Changes saved successfully.", Toast.LENGTH_LONG).show();
