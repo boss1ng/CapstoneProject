@@ -18,6 +18,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
@@ -297,26 +298,23 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
         downloadBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Check for the permission
-                /*if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.MANAGE_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    // Permission is not granted, request it
-                    ActivityCompat.requestPermissions(requireActivity(),
-                            new String[]{Manifest.permission.MANAGE_EXTERNAL_STORAGE},
-                            REQUEST_CODE_MANAGE_EXTERNAL_STORAGE);
-                } else {
-                    // Permission has already been granted, proceed with the PDF generation and saving
-                    // generatePDF();
 
-                    downloadBtn.setEnabled(false);
-                    backButton.setEnabled(false);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    // Android 13 (API level 33) or higher
                     createPdfWithTable();
-                    downloadBtn.setEnabled(true);
-                    backButton.setEnabled(true);
-                }*/
-
-                //createPdfAndSave();
-                createPdfWithTable();
+                } else {
+                    // Below Android 13
+                    if (ContextCompat.checkSelfPermission(requireContext(), WRITE_EXTERNAL_STORAGE)
+                            != PackageManager.PERMISSION_GRANTED) {
+                        // Permission is not granted, request it
+                        ActivityCompat.requestPermissions(requireActivity(),
+                                new String[]{WRITE_EXTERNAL_STORAGE},
+                                REQUEST_CODE_WRITE_EXTERNAL_STORAGE);
+                    } else {
+                        // Permission has already been granted
+                        createPdfWithTable();
+                    }
+                }
             }
         });
     }
