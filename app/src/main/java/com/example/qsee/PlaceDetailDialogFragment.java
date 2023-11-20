@@ -93,7 +93,7 @@ public class PlaceDetailDialogFragment extends DialogFragment {
         TextView ratingTextView = view.findViewById(R.id.placeRatingTextView);
         Button directionsButton = view.findViewById(R.id.directionsButton);
         ImageView reportButton = view.findViewById(R.id.reportButton);
-        reportButton.setImageResource(R.drawable.report);
+        reportButton.setImageResource(R.drawable.report_dialog);
         ImageView imageViewLocation = view.findViewById(R.id.imageViewLocation);
         TextView priceTextView = view.findViewById(R.id.placePriceTextView);
 

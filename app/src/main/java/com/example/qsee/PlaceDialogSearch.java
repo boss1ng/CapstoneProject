@@ -72,7 +72,7 @@ public class PlaceDialogSearch extends DialogFragment {
             // Change the text of the button
             directionsButton.setText("Go to Maps");
         ImageView reportButton = view.findViewById(R.id.reportButton);
-        reportButton.setImageResource(R.drawable.report);
+        reportButton.setImageResource(R.drawable.report_dialog);
         ImageView imageViewLocation = view.findViewById(R.id.imageViewLocation);
         TextView priceTextView = view.findViewById(R.id.placePriceTextView);
 
