@@ -64,7 +64,7 @@
         android:layout_height="53dp"
         android:layout_marginTop="24dp"
         android:layout_marginBottom="24dp"
-        android:backgroundTint="#E47473"
+        android:backgroundTint="@color/gradient_end"
         android:clickable="true"
         android:text="Decline"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -80,7 +80,7 @@
         android:layout_marginTop="24dp"
         android:layout_marginBottom="24dp"
 
-        android:backgroundTint="#79BF49"
+        android:backgroundTint="@color/gradient_start"
         android:clickable="true"
         android:text="Accept"
         app:layout_constraintEnd_toEndOf="parent"

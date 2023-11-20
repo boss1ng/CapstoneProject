@@ -162,6 +162,7 @@
                             android:layout_gravity="right"
                             android:enabled="false"
                             android:text="Directions"
+                            android:textColor="#FFFFFF"
                             android:backgroundTint="@color/shade2"/>
                 </LinearLayout>
 

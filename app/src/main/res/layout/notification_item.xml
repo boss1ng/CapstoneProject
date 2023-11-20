@@ -46,7 +46,7 @@
         android:layout_alignParentEnd="true"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="105dp"
-        android:backgroundTint="#79BF49"
+        android:backgroundTint="@color/gradient_start"
         android:text="Accept" />
 
     <Button
@@ -60,6 +60,6 @@
         android:layout_marginEnd="7dp"
         android:layout_toStartOf="@id/acceptButton"
         android:layout_toRightOf="@id/acceptButton"
-        android:backgroundTint="#E47473"
+        android:backgroundTint="@color/gradient_end"
         android:text="Reject" />
 </RelativeLayout>
