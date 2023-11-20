@@ -7,14 +7,12 @@
 
     <TextView
         android:id="@+id/groupName"
-        android:layout_width="wrap_content"
-        android:layout_height="27dp"
-        android:layout_marginStart="175dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="174dp"
-        android:layout_marginBottom="692dp"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
         android:gravity="center"
         android:text="Group"
+        android:textColor="@color/white"
+        android:background="@color/shade1"
         android:textSize="20dp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -36,7 +34,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
-        app:srcCompat="@drawable/baseline_keyboard_arrow_left_24" />
+        app:srcCompat="@drawable/baseline_keyboard_arrow_left_24white" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/groupRecyclerView"
@@ -46,6 +44,7 @@
         android:layout_marginEnd="1dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0.625"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:listitem="@layout/groupview_list_item" />

@@ -7,7 +7,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
-    <!-- Add a title or any other UI elements you want in the dialog -->
+    <TextView
+        android:id="@+id/categoryName"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="@color/shade1"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:text="Collaboration Requests"
+        android:textSize="20dp"
+        android:textStyle="bold" />
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/notificationRecyclerView"
