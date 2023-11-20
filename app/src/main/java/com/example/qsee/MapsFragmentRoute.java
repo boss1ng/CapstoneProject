@@ -1779,6 +1779,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback, M
 
                             double totalDistanceKm = 0.0;
                             int totalDurationMinutes = 0;
+                            String totalDuration = null;
 
                             for (int i = 0; i < routes.length(); i++) {
                                 JSONObject route = routes.getJSONObject(i);
@@ -1801,6 +1802,20 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback, M
                                         // Extract and add up the distance and duration for each leg
                                         totalDistanceKm += step.getJSONObject("distance").getDouble("value") / 1000.0; // Convert meters to kilometers
                                         totalDurationMinutes += step.getJSONObject("duration").getInt("value") / 60; // Convert seconds to minutes
+
+                                        // Check if the total duration is more than 60 minutes
+                                        if (totalDurationMinutes > 60) {
+                                            // Calculate the number of hours
+                                            int hours = (int) totalDurationMinutes / 60;
+
+                                            // Calculate the remaining minutes
+                                            int remainingMinutes = (int) totalDurationMinutes % 60;
+
+                                            totalDuration = hours + " hr " + remainingMinutes + " mins";
+                                        } else {
+                                            // Display or use the total duration in minutes as needed
+                                            totalDuration = totalDurationMinutes + " mins";
+                                        }
 
                                         //String[] splitDistance = distance.split(" ");
                                         //String[] splitTime = duration.split(" ");
@@ -1845,7 +1860,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback, M
 
                             TextView textViewTotal = getView().findViewById(R.id.textViewTotalMinKm);
                             if (textViewTotal != null) {
-                                textViewTotal.setText(formattedDistance + " km • " + totalDurationMinutes + " mins");
+                                textViewTotal.setText(formattedDistance + " km • " + totalDuration);
                             }
                         }
 
