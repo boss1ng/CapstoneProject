@@ -75,10 +75,38 @@ public class Register extends AppCompatActivity {
             contactNoEditText.setFilters(filters);
         }
 
-        consentCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        // Show the dialog when the checkbox is checked
+        AlertDialog.Builder builder = new AlertDialog.Builder(Register.this);
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.tos, null);
+        builder.setView(dialogView);
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        Button acceptBtn = dialogView.findViewById(R.id.AcceptBtn);
+        acceptBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
+            public void onClick(View v) {
+                consentCheckbox.setChecked(true); // Check the checkbox when the accept button is clicked
+                dialog.dismiss(); // Close the dialog
+            }
+        });
+
+        // Uncheck the checkbox if the user does not accept the terms
+        Button declineBtn = dialogView.findViewById(R.id.DeclineBtn);
+        declineBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                consentCheckbox.setChecked(false); // Uncheck the checkbox
+                dialog.dismiss(); // Close the dialog
+            }
+        });
+
+        // Assuming consentCheckbox is already defined and initialized
+        consentCheckbox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                     // Show the dialog when the checkbox is checked
                     AlertDialog.Builder builder = new AlertDialog.Builder(Register.this);
                     LayoutInflater inflater = getLayoutInflater();
@@ -106,9 +134,9 @@ public class Register extends AppCompatActivity {
                             dialog.dismiss(); // Close the dialog
                         }
                     });
-                }
             }
         });
+
 
 
         registerButton.setOnClickListener(new View.OnClickListener() {
