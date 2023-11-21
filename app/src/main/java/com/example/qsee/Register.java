@@ -224,10 +224,14 @@ public class Register extends AppCompatActivity {
                         if (dataSnapshot.exists()) {
                             for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
                                 User existingUser = userSnapshot.getValue(User.class);
-                                if (existingUser != null && existingUser.getUsername().equals(username)) {
-                                    // Username already exists, set the flag and break
-                                    isUsernameTaken = true;
-                                    break;
+                                if (existingUser != null) {
+                                    // Decrypt the encrypted username
+                                    String decryptedUsername = AESUtils.decrypt(existingUser.getUsername());
+                                    if (decryptedUsername.equals(username)) {
+                                        // Username already exists, set the flag and break
+                                        isUsernameTaken = true;
+                                        break;
+                                    }
                                 }
                             }
                         }
