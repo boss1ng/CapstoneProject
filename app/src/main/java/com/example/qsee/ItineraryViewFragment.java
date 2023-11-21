@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -78,6 +79,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -389,10 +392,18 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
             // Open the document for writing
             document.open();
 
+            StringBuilder distancesBuilder = new StringBuilder();
+
             // Create a Font with a larger size
             Font largeFont = new Font(Font.FontFamily.TIMES_ROMAN, 20, Font.BOLD);
             Font tableHeader = new Font(Font.FontFamily.TIMES_ROMAN, 16, Font.BOLD);
             Font activityHeader = new Font(Font.FontFamily.TIMES_ROMAN, 14, Font.BOLD);
+
+            PdfPCell transitionRow = new PdfPCell(new Paragraph(" "));
+            transitionRow.setColspan(5); // Set the number of columns to span
+            transitionRow.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
+            transitionRow.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
+            transitionRow.setBorder(Rectangle.NO_BORDER); // Remove borders from the cell
 
             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Itinerary");
             databaseReference.orderByChild("iterName").equalTo(locationName).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -419,7 +430,7 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
 
                             // Add content to the document
                             // Create a table with five columns
-                            final PdfPTable table = new PdfPTable(5);
+                            final PdfPTable table = new PdfPTable(4);
 
                             for (int i = 1; i <= 5; i++) {
                                 String dayKey = "Day" + i;
@@ -447,15 +458,17 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
 
                                 // Create a cell with the text "Merged Columns" that spans all five columns
                                 PdfPCell cell = new PdfPCell(new Paragraph("Day " + i + " - " + dateText, tableHeader));
-                                cell.setColspan(5); // Set the number of columns to span
+                                cell.setColspan(4); // Set the number of columns to span
                                 cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
                                 cell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
                                 cell.setPadding(10);
                                 cell.setBackgroundColor(hexToBaseColor("#3894A3"));
+                                cell.setBorder(Rectangle.NO_BORDER); // Remove borders from the cell
 
                                 // Add the cell to the table
                                 table.addCell(cell);
 
+                                /*
                                 PdfPCell timeCell = new PdfPCell(new Paragraph("Time", activityHeader));
                                 timeCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
                                 timeCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
@@ -479,12 +492,7 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
                                 destCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
                                 destCell.setPadding(10);
                                 table.addCell(destCell);
-
-                                PdfPCell routeCell = new PdfPCell(new Paragraph("Route Information", activityHeader));
-                                routeCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
-                                routeCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
-                                routeCell.setPadding(10);
-                                table.addCell(routeCell);
+                                 */
 
                                 for (DataSnapshot timeSnapshot : childSnapshot.child(dayKey).getChildren()) {
                                     // Add headers to the table
@@ -512,32 +520,79 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
                                     }
 
                                     else {
+                                        PdfPCell timeCell = new PdfPCell(new Paragraph("Time", activityHeader));
+                                        timeCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
+                                        timeCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
+                                        timeCell.setPadding(10);
+                                        timeCell.setBackgroundColor(hexToBaseColor("#A9D9E1"));
+                                        table.addCell(timeCell);
+
+                                        PdfPCell activityCell = new PdfPCell(new Paragraph("Activity", activityHeader));
+                                        activityCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
+                                        activityCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
+                                        activityCell.setPadding(10);
+                                        activityCell.setBackgroundColor(hexToBaseColor("#A9D9E1"));
+                                        table.addCell(activityCell);
+
+                                        PdfPCell originCell = new PdfPCell(new Paragraph("Origin", activityHeader));
+                                        originCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
+                                        originCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
+                                        originCell.setPadding(10);
+                                        originCell.setBackgroundColor(hexToBaseColor("#A9D9E1"));
+                                        table.addCell(originCell);
+
+                                        PdfPCell destCell = new PdfPCell(new Paragraph("Destination", activityHeader));
+                                        destCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
+                                        destCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
+                                        destCell.setPadding(10);
+                                        destCell.setBackgroundColor(hexToBaseColor("#A9D9E1"));
+                                        table.addCell(destCell);
+
                                         PdfPCell specificTimeCell = new PdfPCell(new Paragraph(outputTime));
                                         specificTimeCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
                                         specificTimeCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
+                                        specificTimeCell.setPadding(10);
                                         table.addCell(specificTimeCell);
 
                                         PdfPCell specificActivityCell = new PdfPCell(new Paragraph(timeSnapshot.child("activity").getValue(String.class)));
                                         specificActivityCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
                                         specificActivityCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
+                                        specificActivityCell.setPadding(10);
                                         table.addCell(specificActivityCell);
 
                                         String origin = timeSnapshot.child("origin").getValue(String.class);
                                         PdfPCell specificOriginCell = new PdfPCell(new Paragraph(origin));
                                         specificOriginCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
                                         specificOriginCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
+                                        specificOriginCell.setPadding(10);
                                         table.addCell(specificOriginCell);
 
                                         String destination = timeSnapshot.child("location").getValue(String.class);
                                         PdfPCell specificDestCell = new PdfPCell(new Paragraph(destination));
                                         specificDestCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
                                         specificDestCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
+                                        specificDestCell.setPadding(10);
                                         table.addCell(specificDestCell);
 
                                         //ROUTE INFORMATION
-                                        //table.addCell("ROUTE");
+                                        PdfPCell routeCell = new PdfPCell(new Paragraph("Route Information", activityHeader));
+                                        routeCell.setColspan(4); // Set the number of columns to span
+                                        routeCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
+                                        routeCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
+                                        routeCell.setPadding(10);
+                                        routeCell.setBackgroundColor(hexToBaseColor("#A9D9E1"));
+                                        table.addCell(routeCell);
+
+                                        /*PdfPCell lol = new PdfPCell(new Paragraph("NGI"));
+                                        lol.setColspan(4); // Set the number of columns to span
+                                        lol.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
+                                        lol.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
+                                        lol.setPadding(10);
+                                        table.addCell(lol);*/
+
+                                        ///*
                                         Log.d(TAG, "RESPONSE STRING" + response);
-                                        StringBuilder distancesBuilder = new StringBuilder();
+
 
                                         try {
                                             if (response != null) {
@@ -566,65 +621,67 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
 
                                                                 // Extract information from the step
                                                                 String distance = step.getJSONObject("distance").getString("text");
-                                                                String duration = step.getJSONObject("duration").getString("text");
                                                                 String htmlInstructions = step.getString("html_instructions");
+
                                                                 // Remove HTML tags and display plain text instructions
-                                                                String plainTextInstructions = Html.fromHtml(htmlInstructions).toString();
+                                                                String plainTextInstructions = removeHtmlTags(htmlInstructions);
 
-                                                                // Get the maneuver from your API response
-                                                                // Retrieve maneuver if it's present, or provide a default value
-                                                                String maneuverType = step.optString("maneuver", "No Maneuver");
-                                                                //Toast.makeText(getContext(), maneuverType, Toast.LENGTH_LONG).show();
+                                                                //String routeInstruction = "After " + distance + ", " + plainTextInstructions;
+                                                                Log.d(TAG, plainTextInstructions);
 
-                                                                //String routeInstruction = "In " + duration + ", " + plainTextInstructions + " after " + distance + ".";
-                                                                String routeInstruction = "After " + distance + ", " + plainTextInstructions + ".";
-
-                                                                distancesBuilder.append(routeInstruction).append("\n\n"); // Append distance and a newline
+                                                                PdfPCell distanceCell = new PdfPCell(new Phrase("After " + distance + ", " + plainTextInstructions));
+                                                                distanceCell.setColspan(4); // Set the number of columns to span
+                                                                distanceCell.setPadding(10);
+                                                                table.addCell(distanceCell);
                                                             }
                                                         }
                                                     }
 
-                                                    if (distancesBuilder.length() > 0) {
+                                                    /*if (distancesBuilder.length() > 0) {
                                                         // Route Information
-                                                        //table.addCell("ROUTE");
-                                                        //table.addCell(distance);
                                                         PdfPCell distanceCell = new PdfPCell(new Phrase(distancesBuilder.toString()));
+                                                        distanceCell.setColspan(4); // Set the number of columns to span
+                                                        distanceCell.setPadding(10);
                                                         table.addCell(distanceCell);
-                                                        Log.d(TAG, "BE HAPPY NOW :)");
-                                                    }
+                                                    }*/
 
                                                 } else {
                                                     // Handle the case when the API request returns a status other than "OK"
                                                 }
                                             }
-                                        } catch (JSONException e) {
+                                        }
+
+                                        catch (JSONException e) {
                                             e.printStackTrace();
                                             // Handle JSON parsing errors
                                         }
+                                        //*/
+
+                                        table.addCell(transitionRow);
+
                                     }
                                 }
 
-                                PdfPCell transitionRow = new PdfPCell(new Paragraph(" "));
-                                transitionRow.setColspan(5); // Set the number of columns to span
-                                transitionRow.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
-                                transitionRow.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
-                                transitionRow.setBorder(Rectangle.NO_BORDER); // Remove borders from the cell
-
-                                // Add the cell to the table
+                                // END of Foreach loop (timeSnapshot)
                                 table.addCell(transitionRow);
                             }
+
+                            // END of For loop (5 days)
 
                             // Add the table to the document
                             document.add(table);
 
                             // End of Table
                             document.add(lineBreak);
+
                         } catch (DocumentException e) {
                             throw new RuntimeException(e);
                         } finally {
                             // Close the document
                             if (document.isOpen()) {
                                 document.close();
+
+                                Log.d(TAG, "EXPORT DONE");
                             }
                         }
                     }
@@ -643,6 +700,23 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    // Method to remove HTML tags from a string
+    private static String removeHtmlTags(String input) {
+        if (input == null) {
+            return "";
+        }
+
+        // Use a regular expression to remove HTML tags
+        String regex = "<[^>]*>";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+
+        // Replace all occurrences of HTML tags with an empty string
+        String result = matcher.replaceAll("");
+
+        return result;
     }
 
     public void createPdfWithTable() {
