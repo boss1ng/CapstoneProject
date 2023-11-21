@@ -10,18 +10,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,6 +43,7 @@ public class QuizFragment extends Fragment {
     private Button btA, btB, btC, btD;
     private TextView Q1, Q2, Q3, Q4;
     private AlertDialog wrongAnswerDialog;
+    private AlertDialog correctAnswerDialog;
 
 
     @Override
@@ -55,6 +60,25 @@ public class QuizFragment extends Fragment {
         Q3 = rootView.findViewById(R.id.Q3);
         Q4 = rootView.findViewById(R.id.Q4);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        // Load the background image using Picasso
+        String imageUrl = "https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/quizbg.jpg?alt=media&token=86983ed2-0bfe-4908-9224-14ce5f9cdd04";
+        ImageView backgroundImageView = new ImageView(getActivity());
+
+        // Set a listener to be notified when the image is loaded
+        Picasso.get().load(imageUrl).into(backgroundImageView, new Callback() {
+            @Override
+            public void onSuccess() {
+                // Set the background of the profileCont LinearLayout
+                ConstraintLayout quizLayout = rootView.findViewById(R.id.QuizLayout);
+                quizLayout.setBackground(backgroundImageView.getDrawable());
+            }
+
+            @Override
+            public void onError(Exception e) {
+                // Handle error if necessary
+            }
+        });
 
         // Initialize the quiz questions
         initializeQuizQuestions();
@@ -283,34 +307,88 @@ public class QuizFragment extends Fragment {
 
     private void showCorrectAnswerDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("Correct Answer")
-                .setMessage(currentQuestion.getCorrectAnswerDescription()) // Use the description from the current question
-                .setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        // Reset button colors
-                        resetButtonColors();
 
-                        // Proceed to the next question
-                        int nextQuestionIndex = quizQuestions.indexOf(currentQuestion) + 1;
-                        if (nextQuestionIndex < quizQuestions.size()) {
+        int nextQuestionIndex = quizQuestions.indexOf(currentQuestion) + 1;
+
+        if (nextQuestionIndex < quizQuestions.size()) {
+            // There are more questions
+            builder.setTitle("Correct Answer")
+                    .setMessage(currentQuestion.getCorrectAnswerDescription())
+                    .setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            // Reset button colors
+                            resetButtonColors();
+
+                            // Proceed to the next question
                             displayQuizQuestion(nextQuestionIndex);
-                        } else {
-                            // Handle the case where there are no more questions (quiz is finished)
-                            // You can display a message or take any other appropriate action
                         }
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        // Reset button colors on Cancel
-                        resetButtonColors();
-                    }
-                })
-                .show();
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            // Reset button colors on Cancel
+                            resetButtonColors();
+                            dialogInterface.dismiss(); // Dismiss the correct answer dialog
+                        }
+                    });
+
+            correctAnswerDialog = builder.create();
+            correctAnswerDialog.show();
+        } else {
+            builder.setTitle("Correct Answer")
+                    .setMessage(currentQuestion.getCorrectAnswerDescription())
+                    .setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            // Reset button colors
+                            resetButtonColors();
+
+                            // Proceed to the next question
+                            displayQuizQuestion(nextQuestionIndex);
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            // Reset button colors on Cancel
+                            resetButtonColors();
+                            dialogInterface.dismiss(); // Dismiss the correct answer dialog
+                        }
+                    });
+
+            correctAnswerDialog = builder.create();
+            correctAnswerDialog.show();
+
+            // All questions are answered, including the last one
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    AlertDialog.Builder congratsBuilder = new AlertDialog.Builder(requireContext());
+                    congratsBuilder.setTitle("Congratulations!")
+                            .setMessage("You have reached the end, Try Again?")
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    // Handle the completion, for example, go back to the home screen
+                                    correctAnswerDialog.dismiss(); // Dismiss the correct answer dialog
+                                    loadFragment(new StartQuizFragment());
+                                }
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    // Reset button colors on Cancel
+                                    correctAnswerDialog.dismiss(); // Dismiss the correct answer dialog
+                                    loadFragment(new HomeFragment());
+                                }
+                            })
+                            .show();
+                }
+            }, 2000); // Delay in milliseconds (adjust as needed)
+        }
     }
-    
+
 
     private void resetButtonColors() {
         btA.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.default_button_color));

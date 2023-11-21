@@ -11,16 +11,16 @@
         android:id="@+id/groupIcon"
         android:layout_width="45dp"
         android:layout_height="45dp"
-        android:layout_marginStart="10dp"
         android:layout_gravity="center"/>
 
     <TextView
         android:id="@+id/groupName"
-        android:layout_width="175dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:textSize="18sp"
-        android:layout_marginStart="5dp" />
+        android:layout_marginStart="5dp"
+        android:layout_weight="1"/>
 
     <ImageView
         android:id="@+id/adduser"

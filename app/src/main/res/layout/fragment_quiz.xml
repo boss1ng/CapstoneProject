@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:ignore="ExtraText">
+    tools:ignore="ExtraText"
+    android:id="@+id/QuizLayout">
 
 
         <Button
@@ -12,7 +13,7 @@
             android:layout_width="341dp"
             android:layout_height="57dp"
             android:layout_centerInParent="true"
-            android:backgroundTint="#e6e2e5"
+            android:backgroundTint="@color/white"
             android:textAlignment="textStart"
             android:textColor="@color/black"
             android:textSize="20dp"
@@ -38,7 +39,7 @@
             android:layout_width="341dp"
             android:layout_height="57dp"
             android:layout_centerInParent="true"
-            android:backgroundTint="#e6e2e5"
+            android:backgroundTint="@color/white"
             android:textAlignment="textStart"
             android:textColor="@color/black"
             android:textSize="20dp"
@@ -67,7 +68,7 @@
             android:layout_width="341dp"
             android:layout_height="57dp"
             android:layout_centerInParent="true"
-            android:backgroundTint="#e6e2e5"
+            android:backgroundTint="@color/white"
             android:textAlignment="textStart"
             android:textColor="@color/black"
             android:textSize="20dp"
@@ -94,7 +95,7 @@
             android:layout_width="341dp"
             android:layout_height="57dp"
             android:layout_centerInParent="true"
-            android:backgroundTint="#e6e2e5"
+            android:backgroundTint="@color/white"
             android:textAlignment="textStart"
             android:textColor="@color/black"
             android:textSize="20dp"
