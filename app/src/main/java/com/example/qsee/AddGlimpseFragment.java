@@ -200,7 +200,7 @@ public class AddGlimpseFragment extends DialogFragment {
 
                 // Check if the location is empty
                 if (userLocation.trim().isEmpty()) {
-                    Toast.makeText(context, "Kindly input the establishment name.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, "Kindly input an establishment name.", Toast.LENGTH_LONG).show();
                     return; // Exit the method early
                 }
 
