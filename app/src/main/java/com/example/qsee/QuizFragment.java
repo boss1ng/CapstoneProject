@@ -391,10 +391,10 @@ public class QuizFragment extends Fragment {
 
 
     private void resetButtonColors() {
-        btA.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.default_button_color));
-        btB.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.default_button_color));
-        btC.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.default_button_color));
-        btD.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.default_button_color));
+        btA.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.white));
+        btB.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.white));
+        btC.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.white));
+        btD.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.white));
         ViewCompat.setElevation(btA, 0);
         ViewCompat.setElevation(btB, 0);
         ViewCompat.setElevation(btC, 0);
