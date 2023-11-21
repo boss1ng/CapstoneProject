@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -11,59 +11,39 @@
         android:id="@+id/groupRecyclerView"
         android:layout_width="375dp"
         android:layout_height="370dp"
+        android:layout_gravity="center_horizontal"
         android:layout_marginBottom="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintDimensionRatio="16:9"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.444"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
         tools:listitem="@layout/group_list_item" />
 
     <ImageView
         android:id="@+id/noGroups"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:layout_centerInParent="true"
-        android:layout_marginBottom="10dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="30dp"
         android:alpha=".8"
         android:src="@drawable/group"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/noGroupsTextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.93" />
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/noGroupsTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="No Groups Added"
+        android:layout_gravity="center"
+        android:layout_marginTop="25dp"
         android:textSize="18sp"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:visibility="visible" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addGroupBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_margin="16dp"
         android:clickable="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.976"
+        android:layout_marginTop="150dp"
         app:srcCompat="@drawable/ic_addcollab"
         app:backgroundTint="@color/shade1"
         android:backgroundTint="@color/shade4"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>
