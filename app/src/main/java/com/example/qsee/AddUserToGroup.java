@@ -119,7 +119,7 @@ public class AddUserToGroup extends DialogFragment {
                         createNotification(member, groupId);
 
                         // Display a confirmation to the user
-                        Toast.makeText(context, "Invitation sent to " + member, Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, "Invitation sent to " + firstName + " " + lastName, Toast.LENGTH_LONG).show();
                     }
                 } else {
                     // The group doesn't exist for this user
