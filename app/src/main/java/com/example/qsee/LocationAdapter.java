@@ -217,7 +217,7 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
                 if (adminId != null && adminId.equals(userId)) {
                     // Current user is the admin, show delete confirmation dialog
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                    builder.setMessage("Are you sure you want to delete this location?")
+                    builder.setMessage("Are you sure you want to delete this itinerary?")
                             .setPositiveButton("Yes", (dialog, which) -> {
                                 // Delete the item from the database and the list
                                 DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Itinerary");
