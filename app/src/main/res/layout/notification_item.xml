@@ -61,5 +61,5 @@
         android:layout_toStartOf="@id/acceptButton"
         android:layout_toRightOf="@id/acceptButton"
         android:backgroundTint="@color/gradient_end"
-        android:text="Reject" />
+        android:text="Decline" />
 </RelativeLayout>
