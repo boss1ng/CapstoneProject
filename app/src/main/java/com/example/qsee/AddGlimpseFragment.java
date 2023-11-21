@@ -70,10 +70,13 @@ import com.squareup.picasso.Picasso;
 import org.w3c.dom.Text;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class AddGlimpseFragment extends DialogFragment {
@@ -178,7 +181,11 @@ public class AddGlimpseFragment extends DialogFragment {
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openCamera();
+                try {
+                    openCamera();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -229,7 +236,7 @@ public class AddGlimpseFragment extends DialogFragment {
         }
     }*/
 
-    private void openCamera() {
+    private void openCamera() throws IOException {
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
             // Request the camera permission
@@ -240,50 +247,64 @@ public class AddGlimpseFragment extends DialogFragment {
             launchCameraIntent();
         }
     }
-    private void launchCameraIntent() {
+
+    private void launchCameraIntent() throws IOException {
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (cameraIntent.resolveActivity(getContext().getPackageManager()) != null) {
+            imageUri = createImageFileUri(); // Save the file URI
+            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri); // Tell camera to save the full image
             startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
         } else {
             Toast.makeText(getContext(), "No camera app found", Toast.LENGTH_LONG).show();
         }
     }
 
-    private Uri createImageUri() {
-        ContentResolver contentResolver = context.getContentResolver();
-        ContentValues values = new ContentValues();
-        values.put(MediaStore.Images.Media.DISPLAY_NAME, "Image_" + System.currentTimeMillis() + ".jpg");
-        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
-        values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
-        Log.d(TAG,"Image URI Created Successfully");
+    private Uri createImageFileUri() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
 
-        return contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+        // Save a file: path for use with ACTION_VIEW intents
+        return Uri.fromFile(image);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == CAMERA_REQUEST_CODE) {
-            if (resultCode == Activity.RESULT_OK) {
-                Bundle extras = data.getExtras();
-                if (extras != null) {
-                    Bitmap originalImage = (Bitmap) extras.get("data");
-                    imageBitmap = adjustImage(originalImage);
-                    imageDisplay.setImageBitmap(imageBitmap);
-                    imageDisplay.setVisibility(View.VISIBLE);
-                }
-            } else if (resultCode == Activity.RESULT_CANCELED) {
-                // Handle the user canceling the camera action
+        if (requestCode == CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            try {
+                Bitmap fullResolutionImage = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), imageUri);
+                imageBitmap = adjustImage(fullResolutionImage); // Adjust the image if necessary
+                imageDisplay.setImageBitmap(imageBitmap);
+                imageDisplay.setVisibility(View.VISIBLE);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
+
 
     private Bitmap adjustImage(Bitmap inputBitmap) {
         if (inputBitmap == null) {
             return null;
         }
-        return Bitmap.createScaledBitmap(inputBitmap, TARGET_WIDTH, TARGET_HEIGHT, true);
+
+        // Calculate the dimensions for the centered square crop
+        int dimension = Math.min(inputBitmap.getWidth(), inputBitmap.getHeight());
+        int x = (inputBitmap.getWidth() - dimension) / 2;
+        int y = (inputBitmap.getHeight() - dimension) / 2;
+
+        // Crop the square from the center of the original image
+        Bitmap croppedBitmap = Bitmap.createBitmap(inputBitmap, x, y, dimension, dimension);
+
+        return Bitmap.createScaledBitmap(croppedBitmap, TARGET_WIDTH, TARGET_HEIGHT, true);
     }
 
     private void uploadImageToFirebaseStorage(Bitmap imageBitmap) {
@@ -351,7 +372,11 @@ public class AddGlimpseFragment extends DialogFragment {
         if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission granted, open the camera
-                launchCameraIntent();
+                try {
+                    launchCameraIntent();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             } else {
                 // Permission denied, show a message to the user.
                 Toast.makeText(getContext(), "Camera permission is required to use camera", Toast.LENGTH_SHORT).show();
