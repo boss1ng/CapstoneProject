@@ -641,11 +641,20 @@ public class ProfileFragment extends Fragment {
     private void loadProfilePicture(String profilePictureUrl) {
         // Use a library like Picasso or Glide to load and display the image
         if (getContext() != null && profilePictureUrl != null) {
+            // Instead of using getView().getMinimumHeight(), set a fixed size or use a dynamically calculated size.
+            // For example, using a fixed size:
+            int size = convertDpToPixel(200, getContext()); // 200dp converted to pixels
+
             Picasso.get()
                     .load(profilePictureUrl)
-                    .resize(200, getView().getMinimumHeight()) // Set the target dimensions
+                    .resize(size, size) // Set the target dimensions
                     .centerCrop()
                     .into(Pfp);
         }
+    }
+
+    // Helper method to convert DP to Pixels
+    private int convertDpToPixel(int dp, Context context){
+        return (int) (dp * context.getResources().getDisplayMetrics().density);
     }
 }

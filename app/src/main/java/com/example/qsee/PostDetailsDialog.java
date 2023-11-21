@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -298,33 +300,52 @@ public class PostDetailsDialog extends DialogFragment {
 
     // Method to show dialog for editing caption
     private void showEditCaptionDialog() {
-        // Create a dialog or use an AlertDialog.Builder to get user input
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Edit Caption");
 
-        // Set up the input
-        final EditText input = new EditText(getActivity());
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        // Inflate the custom layout
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_edit_caption, null);
+
+        // Find the EditText in the inflated layout
+        final EditText input = dialogView.findViewById(R.id.editTextCaption);
         input.setText(caption);
-        builder.setView(input);
+
+        builder.setView(dialogView);
 
         // Set up the buttons
         builder.setPositiveButton("Update", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(DialogInterface dialogInterface, int which) {
+                // Update caption
                 String newCaption = input.getText().toString();
                 updateCaptionInFirebase(userId, caption, newCaption, category, location);
             }
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("Cancel", null);
+
+        AlertDialog dialog = builder.create();
+
+        // Resize the dialog
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
+            public void onShow(DialogInterface dialogInterface) {
+                // Calculate the width of the dialog based on the screen width
+                DisplayMetrics displayMetrics = new DisplayMetrics();
+                getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+                int width = displayMetrics.widthPixels;
+                dialog.getWindow().setLayout((int) (width * 0.90), WindowManager.LayoutParams.WRAP_CONTENT);
             }
         });
 
-        builder.show();
+        dialog.show();
     }
+
+    // Helper method to convert DP to Pixels
+    public static int convertDpToPixel(float dp, Context context){
+        return (int) (dp * context.getResources().getDisplayMetrics().density);
+    }
+
 
     // Method to update caption in Firebase
     private void updateCaptionInFirebase(final String userId, final String oldCaption, final String newCaption, final String category, final String location) {
