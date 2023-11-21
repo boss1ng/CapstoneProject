@@ -250,3 +250,29 @@ button {
     width: 100%;
     font-size: large;
 }
+
+
+
+
+.exclamation {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+    color: #2F414F; /* You can change the color as needed */
+}
+
+.exclamation:hover .message {
+    opacity: 1; /* Display on hover */
+}
+
+.exclamation:hover::before {
+    content: attr(title);
+    background-color: #2F414F;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    position: absolute;
+    z-index: 1;
+    white-space: nowrap;
+    font-size: 12px; /* Set the font size as needed */
+}

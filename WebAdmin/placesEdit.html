@@ -24,6 +24,9 @@
     <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-storage.js"></script>
 
+    <!-- BOOTSTRAP ICONS-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+
 </head>
 <body style="background-color: #2F414F;">
     <div class="sidebar">
@@ -51,7 +54,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="white" class="bi bi-map" id="placeCont" style="margin-left: 40px;" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M15.817.113A.5.5 0 0 1 16 .5v14a.5.5 0 0 1-.402.49l-5 1a.502.502 0 0 1-.196 0L5.5 15.01l-4.902.98A.5.5 0 0 1 0 15.5v-14a.5.5 0 0 1 .402-.49l5-1a.5.5 0 0 1 .196 0L10.5.99l4.902-.98a.5.5 0 0 1 .415.103zM10 1.91l-4-.8v12.98l4 .8V1.91zm1 12.98 4-.8V1.11l-4 .8v12.98zm-6-.8V1.11l-4 .8v12.98l4-.8z"/>
             </svg>
-            <a href="places.html" class="mx-4">Places</a>
+            <a href="places.html" class="mx-4">Establishments</a>
         </div>
 
         <div class="aCont container d-flex align-items-center mt-3" id="signoutCont">
@@ -68,7 +71,7 @@
 
             <div class="container d-flex">
                 <div class="container d-flex align-items-center justify-content-center">
-                    <h1 class="mt-5">Add Place</h1>
+                    <h1 class="mt-5">Edit Establishment</h1>
                 </div>
             </div>
             
@@ -162,6 +165,7 @@
                 <div class="container d-flex align-items-center my-3">
                     <div class="headerCont">
                         <span class="">Highest Price</span>
+                        <span class="exclamation mx-2" title="Enter the estimated highest price in the establishment."><i class="bi bi-question-circle"></i></span>
                     </div>
                     <div class="container">
                         <input type="text" class="form-control" id="estabHighPrice" onchange="updateInput()" aria-label="Username" aria-describedby="addon-wrapping"/>
@@ -171,6 +175,7 @@
                 <div class="container d-flex align-items-center my-3">
                     <div class="headerCont">
                         <span class="">Lowest Price</span>
+                        <span class="exclamation mx-2" title="Enter the estimated lowest price in the establishment."><i class="bi bi-question-circle"></i></span>
                     </div>
                     <div class="container">
                         <input type="text" class="form-control" id="estabLowPrice" onchange="updateInput()" aria-label="Username" aria-describedby="addon-wrapping"/>
