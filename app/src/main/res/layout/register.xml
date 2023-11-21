@@ -62,22 +62,47 @@
             android:hint="Last Name" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/contactNo"
-        android:layout_width="327dp"
-        android:layout_height="56dp"
+    <LinearLayout
+        android:id="@+id/contactNoLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/lnameInput"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintVertical_bias="0.0"
+        >
+<!--        327 -->
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Contact Number"
-            android:inputType="number"/>
-    </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="60dp"
+            android:layout_height="56dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="09"
+                android:inputType="none"
+                android:gravity="center"
+                android:clickable="false"
+                android:focusable="false" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/contactNo"
+            android:layout_width="262dp"
+            android:layout_height="56dp"
+            android:layout_marginLeft="5dp">>
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Contact Number"
+                android:inputType="number" />
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/bdate"
@@ -86,7 +111,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/contactNo"
+        app:layout_constraintTop_toBottomOf="@+id/contactNoLayout"
         app:layout_constraintVertical_bias="0.0">
 
 

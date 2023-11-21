@@ -69,7 +69,7 @@ public class Register extends AppCompatActivity {
         if (contactNoEditText != null) {
             // Create an InputFilter to limit the input to 11 digits
             InputFilter[] filters = new InputFilter[1];
-            filters[0] = new InputFilter.LengthFilter(11);
+            filters[0] = new InputFilter.LengthFilter(9);
 
             // Apply the InputFilter to the EditText
             contactNoEditText.setFilters(filters);
@@ -146,6 +146,9 @@ public class Register extends AppCompatActivity {
                 String firstName = fnameInputLayout.getEditText().getText().toString();
                 String lastName = lnameInputLayout.getEditText().getText().toString();
                 String contactNumber = contactNoInputLayout.getEditText().getText().toString();
+
+                String modifiedContactNo = "09" + contactNumber;
+
                 String birthdate = bdateInputLayout.getEditText().getText().toString();
                 String username = unameregInputLayout.getEditText().getText().toString().toLowerCase();
                 String password = passregInputLayout.getEditText().getText().toString();
@@ -202,7 +205,8 @@ public class Register extends AppCompatActivity {
                 User user = new User();
                 user.setFirstName(AESUtils.encrypt(firstName));
                 user.setLastName(AESUtils.encrypt(lastName));
-                user.setContactNumber(AESUtils.encrypt(contactNumber));
+                //user.setContactNumber(AESUtils.encrypt(contactNumber));
+                user.setContactNumber(AESUtils.encrypt(modifiedContactNo));
                 user.setBirthdate(AESUtils.encrypt(birthdate));
                 user.setUsername(AESUtils.encrypt(username));
                 user.setPassword(AESUtils.encrypt(password));

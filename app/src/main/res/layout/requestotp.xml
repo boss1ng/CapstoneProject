@@ -142,7 +142,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="416dp"
-        android:text="Haven't recieved OTP?"
+        android:text="Haven't received OTP?"
         android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

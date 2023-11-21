@@ -151,7 +151,7 @@ public class EditProfileFragment extends Fragment {
 
         if (contactNumberEditText != null) {
             InputFilter[] filters = new InputFilter[1];
-            filters[0] = new InputFilter.LengthFilter(11);
+            filters[0] = new InputFilter.LengthFilter(9);
             contactNumberEditText.setFilters(filters);
         }
 
@@ -173,6 +173,8 @@ public class EditProfileFragment extends Fragment {
                         String firstName = AESUtils.decrypt(encryptedFirstName);
                         String lastName = AESUtils.decrypt(encryptedLastName);
                         String contactNumber = AESUtils.decrypt(encryptedContactNumber);
+                        contactNumber = contactNumber.substring(2);
+
                         String birthdate = AESUtils.decrypt(encryptedBirthdate);
                         String username = AESUtils.decrypt(encryptedUsername);
 
@@ -224,11 +226,14 @@ public class EditProfileFragment extends Fragment {
                 String newFirstName = firstNameEditText.getEditText().getText().toString();
                 String newLastName = lastNameEditText.getEditText().getText().toString();
                 String newContactNumber = contactNoInputLayout.getEditText().getText().toString();
+                String modifiedContactNo = "09" + newContactNumber;
+
                 String newBirthdate = birthdateEditText.getEditText().getText().toString();
 
                 String encryptedFirstName = AESUtils.encrypt(newFirstName);
                 String encryptedLastName = AESUtils.encrypt(newLastName);
-                String encryptedContactNumber = AESUtils.encrypt(newContactNumber);
+                //String encryptedContactNumber = AESUtils.encrypt(newContactNumber);
+                String encryptedContactNumber = AESUtils.encrypt(modifiedContactNo);
                 String encryptedBirthdate = AESUtils.encrypt(newBirthdate);
 
                 DatabaseReference usersReference = FirebaseDatabase.getInstance().getReference("MobileUsers");
