@@ -155,7 +155,7 @@ public class AddGroupFragment extends DialogFragment {
                                             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Icons").child(group.getGroupName());
                                             databaseReference.child("GroupPhoto").setValue(randomUrl);
                                             // Display a Toast for successful group creation
-                                            Toast.makeText(getActivity(), "Group created successfully", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(getActivity(), "Group " + groupName + " created", Toast.LENGTH_LONG).show();
 
                                             // Close the dialog
                                             dismiss();

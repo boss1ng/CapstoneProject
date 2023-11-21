@@ -402,6 +402,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
                             // Delete the group in Firebase
                             deleteGroup(groupName);
                             dialog.dismiss();
+                            Toast.makeText(context, "Group " + groupName + " deleted", Toast.LENGTH_LONG).show();
                         }
                     });
 
