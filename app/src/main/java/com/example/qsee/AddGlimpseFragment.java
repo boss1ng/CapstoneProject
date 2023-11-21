@@ -37,6 +37,7 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -271,7 +272,8 @@ public class AddGlimpseFragment extends DialogFragment {
         );
 
         // Save a file: path for use with ACTION_VIEW intents
-        return Uri.fromFile(image);
+        return FileProvider.getUriForFile(getContext(), getContext().getPackageName() + ".provider", image);
+
     }
 
     @Override
