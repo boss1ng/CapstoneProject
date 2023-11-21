@@ -247,7 +247,11 @@ public class AddGlimpseFragment extends DialogFragment {
                     CAMERA_PERMISSION_REQUEST_CODE);
         } else {
             // Camera permission is already granted, open the camera
-            launchCameraIntent();
+            try {
+                launchCameraIntent();
+            } catch (IOException e) {
+                Log.e(TAG, "Error opening camera", e);
+            }
         }
     }
 
@@ -255,8 +259,10 @@ public class AddGlimpseFragment extends DialogFragment {
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (cameraIntent.resolveActivity(getContext().getPackageManager()) != null) {
             imageUri = createImageFileUri(); // Save the file URI
+            if ( imageUri != null){
             cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri); // Tell camera to save the full image
             startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
+            }
         } else {
             Toast.makeText(getContext(), "No camera app found", Toast.LENGTH_LONG).show();
         }
@@ -307,11 +313,17 @@ public class AddGlimpseFragment extends DialogFragment {
 
         if (requestCode == CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             try {
-                Bitmap fullResolutionImage = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), imageUri);
-                Bitmap orientedImage = adjustImageOrientation(imageUri, fullResolutionImage);
-                imageBitmap = adjustImage(orientedImage); // Adjust the image if necessary
-                imageDisplay.setImageBitmap(imageBitmap);
-                imageDisplay.setVisibility(View.VISIBLE);
+                if (imageUri != null) {
+                    Bitmap fullResolutionImage = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), imageUri);
+                    Bitmap orientedImage = adjustImageOrientation(imageUri, fullResolutionImage);
+                    imageBitmap = adjustImage(orientedImage); // Adjust the image if necessary
+                    imageDisplay.setImageBitmap(imageBitmap);
+                    imageDisplay.setVisibility(View.VISIBLE);
+                } else {
+                    // Handle the null URI scenario
+                    Log.e("AddGlimpseFragment", "Image URI is null");
+                    Toast.makeText(context, "Please take a picture again.", Toast.LENGTH_SHORT).show();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
