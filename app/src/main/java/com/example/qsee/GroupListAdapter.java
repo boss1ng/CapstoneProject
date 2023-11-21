@@ -307,6 +307,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
                         updateGroupAdmin(groupName, newAdminId, newAdminName);
                     }
                     dialog.dismiss(); // Dismiss the dialog when "OK" is clicked
+                    Toast.makeText(context, "Left the group " + groupName, Toast.LENGTH_LONG).show();
                 }
             });
 
@@ -339,6 +340,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
                 // Leave the group (you can implement the leave action here)
                 leaveGroup(groupName);
                 dialog.dismiss();
+                Toast.makeText(context, "Left the group " + groupName, Toast.LENGTH_LONG).show();
             }
         });
 
