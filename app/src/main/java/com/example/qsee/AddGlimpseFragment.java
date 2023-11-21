@@ -11,8 +11,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.location.Address;
 import android.location.Geocoder;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -276,6 +278,29 @@ public class AddGlimpseFragment extends DialogFragment {
 
     }
 
+    private Bitmap adjustImageOrientation(Uri imageUri, Bitmap bitmap) throws IOException {
+        ExifInterface exifInterface = new ExifInterface(context.getContentResolver().openInputStream(imageUri));
+        int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+        Matrix matrix = new Matrix();
+
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                matrix.postRotate(90);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                matrix.postRotate(180);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                matrix.postRotate(270);
+                break;
+            default:
+                return bitmap;
+        }
+
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+    }
+
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -283,7 +308,8 @@ public class AddGlimpseFragment extends DialogFragment {
         if (requestCode == CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             try {
                 Bitmap fullResolutionImage = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), imageUri);
-                imageBitmap = adjustImage(fullResolutionImage); // Adjust the image if necessary
+                Bitmap orientedImage = adjustImageOrientation(imageUri, fullResolutionImage);
+                imageBitmap = adjustImage(orientedImage); // Adjust the image if necessary
                 imageDisplay.setImageBitmap(imageBitmap);
                 imageDisplay.setVisibility(View.VISIBLE);
             } catch (IOException e) {
@@ -291,6 +317,7 @@ public class AddGlimpseFragment extends DialogFragment {
             }
         }
     }
+
 
 
     private Bitmap adjustImage(Bitmap inputBitmap) {
