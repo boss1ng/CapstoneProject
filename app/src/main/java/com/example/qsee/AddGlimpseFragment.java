@@ -361,7 +361,7 @@ public class AddGlimpseFragment extends DialogFragment {
         uniqueId = String.valueOf(System.currentTimeMillis());
 
         // Create a filename using the user's ID and the unique ID
-        filename = userId + "_" + uniqueId + ".png";
+        filename = userId + "_" + uniqueId + ".jpeg";
 
         // Initialize Firebase Storage with the correct bucket name.
         FirebaseStorage storage = FirebaseStorage.getInstance("gs://capstone-project-ffe21.appspot.com");
@@ -371,7 +371,7 @@ public class AddGlimpseFragment extends DialogFragment {
 
         // Convert the Bitmap to a byte array (PNG format for better quality).
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        imageBitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos);
         byte[] data = baos.toByteArray();
 
         // Upload the image to Firebase Storage
@@ -528,64 +528,6 @@ public class AddGlimpseFragment extends DialogFragment {
 
                     // Dismiss the dialog after a successful upload
                     dismiss();
-/*
-                    Bundle getBundle = getArguments();
-                    if (getBundle != null) {
-                        String fromHome = getBundle.getString("fromHome");
-                        //String hasSwitchedPages = getBundle.getString("hasSwitchedPages");
-
-                        if (fromHome != null) {
-
-
-                            HomeFragment homeFragment = new HomeFragment();
-                            //ProfileFragment homeFragment = new ProfileFragment();
-
-                            // Use Bundle to pass values
-                            Bundle bundle = new Bundle();
-
-                            if (getBundle != null) {
-                                String userID = getBundle.getString("userId");
-                                bundle.putString("userId", userID);
-                                homeFragment.setArguments(bundle);
-                            }
-
-                            ScrollView scrollView = getParentFragment().getView().findViewById(R.id.homeContainer);
-                            scrollView.setVisibility(View.GONE);
-
-                            BottomNavigationView bottomNavigationView = getParentFragment().getView().findViewById(R.id.bottomNavigationView);
-                            bottomNavigationView.setVisibility(View.GONE);
-
-                            FloatingActionButton floatingActionButton = getParentFragment().getView().findViewById(R.id.floatingAddButton);
-                            floatingActionButton.setVisibility(View.GONE);
-
-                            LinearLayout linearLayout = getParentFragment().getView().findViewById(R.id.parentLinearCont);
-                            linearLayout.setVisibility(View.GONE);
-
-                            LinearLayout linearLayout1 = getParentFragment().getView().findViewById(R.id.feedDisplayLayout);
-                            linearLayout1.setVisibility(View.GONE);
-
-                            FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-                            transaction.replace(R.id.homeFragmentContainer, homeFragment);
-                            / *
-                            if (hasSwitchedPages != null) {
-                                if (hasSwitchedPages.equals("YES")) {
-                                    transaction.replace(R.id.fragment_container, homeFragment);
-                                }
-                            }
-
-                            else {
-                                transaction.replace(R.id.homeFragmentContainer, homeFragment);
-                            }
-                            * /
-
-                            transaction.addToBackStack(null);
-                            transaction.commit();
-
-
-
-                        }
-                    }
-*/
                 }
 
                 else {
