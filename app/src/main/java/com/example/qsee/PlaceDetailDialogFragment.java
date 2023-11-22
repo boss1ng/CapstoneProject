@@ -143,7 +143,7 @@ public class PlaceDetailDialogFragment extends DialogFragment {
         if (isUserInQuezonCity.equals("true"))
             directionsButton.setEnabled(true);
         else    // IF RESTRICTION TO QUEZON CITY IS REMOVED, change false to true.
-            directionsButton.setEnabled(true);
+            directionsButton.setEnabled(false);
         //directionsButton.setEnabled(false);
 
 
