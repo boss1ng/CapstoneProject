@@ -11,6 +11,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -28,6 +29,8 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
 import com.android.volley.toolbox.StringRequest;
@@ -80,6 +83,17 @@ public class HomeFragment extends Fragment {
     private int currentDayIndex = 0; // Track the currently displayed day index.
     private final Map<String, List<Double>> dailyForecasts = new HashMap<>(); // Declare dailyForecasts as a class-level variable
     private String postUsername;
+    private ImageView imageView12;
+    private ImageView imageView13;
+    private ImageView imageView14;
+    private ImageView imageView15;
+    private ImageView imageView16;
+    private ImageView imageView17;
+
+
+    private RecyclerView feedRecyclerView;
+    private PostAdapter postAdapter;
+    private List<Post> postList; // Your data source
 
     public HomeFragment() {
         // Required empty public constructor
@@ -90,7 +104,27 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        LinearLayout dynamicLayoutContainer = view.findViewById(R.id.feedDisplayLayout); // Replace with your container ID
+        imageView12 = view.findViewById(R.id.imageView12);
+        imageView13 = view.findViewById(R.id.imageView13);
+        imageView14 = view.findViewById(R.id.imageView14);
+        imageView15 = view.findViewById(R.id.imageView15);
+        imageView16 = view.findViewById(R.id.imageView16);
+        imageView17 = view.findViewById(R.id.imageView17);
+
+        Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/sliders%2Fslider_1.jpg?alt=media&token=83a13343-b5bd-42bd-98ca-a234e13be324").into(imageView12);
+        Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/sliders%2Fslider_2.jpg?alt=media&token=dd113988-1a86-40e1-9e42-e8947e798b67").into(imageView13);
+        Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/sliders%2Fslider_3.jpg?alt=media&token=8a9a8d6b-5736-4b81-b2a2-579a1b08d1c6").into(imageView14);
+        Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/sliders%2Fslider_4.jpg?alt=media&token=0c163b54-da16-4514-9869-5262e8824108").into(imageView15);
+        Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/sliders%2Fslider_5.jpg?alt=media&token=36192c6c-0818-4ee5-9b6c-dc3ee1809a71").into(imageView16);
+        Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/sliders%2Fslider_6.jpg?alt=media&token=24bf286a-554f-4f74-8016-8c9eabe0b7de").into(imageView17);
+
+        feedRecyclerView = view.findViewById(R.id.feedRecyclerView);
+        feedRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        // Initialize your data list and adapter
+        postList = new ArrayList<>();
+        postAdapter = new PostAdapter(postList);
+        feedRecyclerView.setAdapter(postAdapter);
 
         // Initialize the FusedLocationProviderClient
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
@@ -145,23 +179,17 @@ public class HomeFragment extends Fragment {
                 if (itemId == R.id.action_home) {
                     loadFragment(new HomeFragment());
                     bottomNavigationView.setVisibility(View.GONE);
-                    ScrollView scrollView = view.findViewById(R.id.homeContainer);
-                    scrollView.setVisibility(View.GONE);
                     LinearLayout linearLayout = view.findViewById(R.id.parentLinearCont);
                     linearLayout.setVisibility(View.GONE);
-                    LinearLayout linearLayout1 = view.findViewById(R.id.feedDisplayLayout);
-                    linearLayout1.setVisibility(View.GONE);
                     FloatingActionButton floatingActionButton = view.findViewById(R.id.floatingAddButton);
                     floatingActionButton.setVisibility(View.GONE);
 
                 } else if (itemId == R.id.action_search) {
                     loadFragment(new SearchFragment());
                     bottomNavigationView.setVisibility(View.GONE);
-                    ScrollView scrollView = view.findViewById(R.id.homeContainer);
-                    scrollView.setVisibility(View.GONE);
                     LinearLayout linearLayout = view.findViewById(R.id.parentLinearCont);
                     linearLayout.setVisibility(View.GONE);
-                    LinearLayout linearLayout1 = view.findViewById(R.id.feedDisplayLayout);
+                    RecyclerView linearLayout1 = view.findViewById(R.id.feedRecyclerView);
                     linearLayout1.setVisibility(View.GONE);
                     FloatingActionButton floatingActionButton = view.findViewById(R.id.floatingAddButton);
                     floatingActionButton.setVisibility(View.GONE);
@@ -170,11 +198,9 @@ public class HomeFragment extends Fragment {
                     loadFragment(new MapsFragment());
                     //BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
                     bottomNavigationView.setVisibility(View.GONE);
-                    ScrollView scrollView = view.findViewById(R.id.homeContainer);
-                    scrollView.setVisibility(View.GONE);
                     LinearLayout linearLayout = view.findViewById(R.id.parentLinearCont);
                     linearLayout.setVisibility(View.GONE);
-                    LinearLayout linearLayout1 = view.findViewById(R.id.feedDisplayLayout);
+                    RecyclerView linearLayout1 = view.findViewById(R.id.feedRecyclerView);
                     linearLayout1.setVisibility(View.GONE);
                     FloatingActionButton floatingActionButton = view.findViewById(R.id.floatingAddButton);
                     floatingActionButton.setVisibility(View.GONE);
@@ -182,11 +208,9 @@ public class HomeFragment extends Fragment {
                 } else if (itemId == R.id.action_quiz) {
                     loadFragment(new StartQuizFragment());
                     bottomNavigationView.setVisibility(View.GONE);
-                    ScrollView scrollView = view.findViewById(R.id.homeContainer);
-                    scrollView.setVisibility(View.GONE);
                     LinearLayout linearLayout = view.findViewById(R.id.parentLinearCont);
                     linearLayout.setVisibility(View.GONE);
-                    LinearLayout linearLayout1 = view.findViewById(R.id.feedDisplayLayout);
+                    RecyclerView linearLayout1 = view.findViewById(R.id.feedRecyclerView);
                     linearLayout1.setVisibility(View.GONE);
                     FloatingActionButton floatingActionButton = view.findViewById(R.id.floatingAddButton);
                     floatingActionButton.setVisibility(View.GONE);
@@ -194,11 +218,9 @@ public class HomeFragment extends Fragment {
                 } else if (itemId == R.id.action_profile) {
                     loadFragment(new ProfileFragment());
                     bottomNavigationView.setVisibility(View.GONE);
-                    ScrollView scrollView = view.findViewById(R.id.homeContainer);
-                    scrollView.setVisibility(View.GONE);
                     LinearLayout linearLayout = view.findViewById(R.id.parentLinearCont);
                     linearLayout.setVisibility(View.GONE);
-                    LinearLayout linearLayout1 = view.findViewById(R.id.feedDisplayLayout);
+                    RecyclerView linearLayout1 = view.findViewById(R.id.feedRecyclerView);
                     linearLayout1.setVisibility(View.GONE);
                     FloatingActionButton floatingActionButton = view.findViewById(R.id.floatingAddButton);
                     floatingActionButton.setVisibility(View.GONE);
@@ -331,6 +353,7 @@ public class HomeFragment extends Fragment {
         // For Reading the Database
         // Initialize Firebase Database reference
         // Reference to the "Location" node in Firebase
+
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Posts");
         DatabaseReference mobileUsersReference = FirebaseDatabase.getInstance().getReference().child("MobileUsers");
 
@@ -340,7 +363,8 @@ public class HomeFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-
+                    dataMapList.clear();
+                    postList.clear();
                     for (DataSnapshot placeSnapshot : snapshot.getChildren()) {
 
                         // Extract user posts data
@@ -354,17 +378,6 @@ public class HomeFragment extends Fragment {
                         // Create a data map and add the values
                         Map<String, String> dataMap = new HashMap<>();
 
-                        /*
-                        if (postCaption.equals("")) {
-                            dataMap.put("caption", "NULL");
-                            //Toast.makeText(getContext(), "NO CAPTION", Toast.LENGTH_LONG).show();
-                        }
-
-                        else {
-                            dataMap.put("caption", postCaption);
-                        }
-                         */
-
                         dataMap.put("caption", postCaption);
                         dataMap.put("imageUrl", postImage);
                         dataMap.put("timestamp", stringTimeStamp);
@@ -374,9 +387,6 @@ public class HomeFragment extends Fragment {
                         dataMapList.add(dataMap);
                     }
 
-                    // Reverse the list
-                    Collections.reverse(dataMapList);
-
                     // Now, dataMapList contains the data in reverse order as maps
                     // You can iterate over it to access the data
                     for (Map<String, String> dataMap : dataMapList) {
@@ -384,232 +394,56 @@ public class HomeFragment extends Fragment {
                         String imageUrl = dataMap.get("imageUrl");
                         String timestamp = dataMap.get("timestamp");
                         String userId = dataMap.get("userId");
-                        //String usernamePost = dataMap.get("username");
-
-                        final String[] username_post = new String[1];
-
-                        LinearLayout innerLayout1 = new LinearLayout(getActivity());
-                        innerLayout1.setLayoutParams(new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
-                        ));
-                        innerLayout1.setPadding(25, 25, 25, 0);
-                        innerLayout1.setOrientation(LinearLayout.HORIZONTAL);
-                        //innerLayout1.setBackgroundColor(0xffefefef);
-                        innerLayout1.setBackgroundColor(Color.parseColor("#F1F1EF")); // 2F414F F1F1EF
-                        //innerLayout1.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.shade3));
-
-                        // Get the existing layout parameters of innerLayout1
-                        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) innerLayout1.getLayoutParams();
-
-                        // Set the margins
-                        layoutParams.setMargins(0, 20, 0, 0);
-
-                        // Apply the layout parameters to innerLayout1
-                        innerLayout1.setLayoutParams(layoutParams);
-
-                        LinearLayout innerLayout2 = new LinearLayout(getActivity());
-                        innerLayout2.setLayoutParams(new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-                        innerLayout2.setOrientation(LinearLayout.HORIZONTAL);
-                        innerLayout2.setPadding(10, 10, 10, 10);
-
-                        LinearLayout innerLayout3 = new LinearLayout(getActivity());
-                        innerLayout3.setLayoutParams(new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT));
-                        innerLayout3.setOrientation(LinearLayout.HORIZONTAL);
-
-                        CircleImageView imageView15 = new CircleImageView (getActivity());
-                        imageView15.setId(View.generateViewId());
-                        imageView15.setLayoutParams(new LinearLayout.LayoutParams(150, 150));
-
-                        TextView userName = new TextView(getActivity());
-                        userName.setId(View.generateViewId());
-                        userName.setLayoutParams(new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-                        userName.setPadding(10, 0, 0, 0);
+                        Log.d("PostDebug", "Adding post with timestamp: " + timestamp);
 
                         mobileUsersReference.orderByChild("userId").equalTo(userId)
-                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                .addValueEventListener(new ValueEventListener() {
+                                    @SuppressLint("NotifyDataSetChanged")
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot mobileUsersSnapshot) {
                                         for (DataSnapshot userSnapshot : mobileUsersSnapshot.getChildren()) {
-                                            username_post[0] = AESUtils.decrypt(userSnapshot.child("username").getValue(String.class));
+                                            postUsername = AESUtils.decrypt(userSnapshot.child("username").getValue(String.class));
                                             String profilePictureUrl = userSnapshot.child("profilePictureUrl").getValue(String.class);
                                             //Toast.makeText(getContext(), username_post[0], Toast.LENGTH_LONG).show();
 
-                                            if (profilePictureUrl == null)
-                                                imageView15.setImageResource(R.drawable.profilepicture);
-                                            else
-                                                loadUserPostImage(profilePictureUrl, imageView15);
-
-                                            //userName.setText("Username");
-                                            userName.setText(username_post[0]);
-                                            userName.setTypeface(null, Typeface.BOLD);
-
+                                            if (timestamp != null && !timestamp.equalsIgnoreCase("null") && !timestamp.isEmpty()) {
+                                                long timestampLong = Long.parseLong(timestamp);
+                                                String timeAgo = getTimeAgo(timestampLong);
+                                            // Create a new Post object and add it to the list
+                                            Post newPost = new Post(postUsername, profilePictureUrl, imageUrl, caption, timeAgo);
+                                            postList.add(newPost);
+                                            }
                                         }
+                                        // Sort the postList based on converted timestamps in descending order (latest first)
+                                        postList.sort((post1, post2) -> {
+                                            long timestampMillis1 = convertTimeAgoToMillis(post1.getPostTime());
+                                            long timestampMillis2 = convertTimeAgoToMillis(post2.getPostTime());
+                                            return Long.compare(timestampMillis2, timestampMillis1);
+                                        });
+
+                                        postAdapter.notifyDataSetChanged();
                                     }
+
 
                                     @Override
                                     public void onCancelled(@NonNull DatabaseError error) {
                                         // Handle database query errors for MobileUsers
                                     }
                                 });
-
-
-
-
-
-
-                        LinearLayout innerLayout4 = new LinearLayout(getActivity());
-                        innerLayout4.setLayoutParams(new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-                        innerLayout4.setOrientation(LinearLayout.HORIZONTAL);
-                        innerLayout4.setGravity(Gravity.END);
-
-                        TextView time = new TextView(getActivity());
-                        time.setId(View.generateViewId());
-                        time.setLayoutParams(new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-                        //time.setText("an hour ago");
-
-                        if (timestamp != null && !timestamp.equalsIgnoreCase("null") && !timestamp.isEmpty()) {
-                            long timestampLong = Long.parseLong(timestamp);
-                            String timeAgo = getTimeAgo(timestampLong);
-                            time.setText(timeAgo);
-                        }
-
-                        //time.setText(getTimeAgo(Long.parseLong(timestamp)));
-                        //time.setText(timestamp);
-                        //time.setTypeface(null, Typeface.ITALIC);
-                        time.setTypeface(Typeface.defaultFromStyle(Typeface.ITALIC));
-
-                        LinearLayout innerLayout7 = new LinearLayout(getActivity());
-                        innerLayout7.setLayoutParams(new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
-                        ));
-                        innerLayout7.setPadding(0, 20, 0, 0);
-                        innerLayout7.setOrientation(LinearLayout.VERTICAL);
-                        //innerLayout7.setBackgroundColor(0xffefefef);
-                        innerLayout7.setBackgroundColor(Color.parseColor("#F1F1EF")); // 2F414F F1F1EF
-
-                        LinearLayout innerLayout5 = new LinearLayout(getActivity());
-                        innerLayout5.setLayoutParams(new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-                        innerLayout5.setOrientation(LinearLayout.VERTICAL);
-                        innerLayout5.setPadding(10, 0, 10, 10);
-
-                        ImageView postView = new ImageView(getActivity());
-                        //loadUserPostImage(postImage, postView);
-                        postView.setId(View.generateViewId());
-                        postView.setLayoutParams(new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-                        postView.setPadding(0, 0, 0, 10);
-                        //postView.setImageResource(R.drawable.logo);
-                        loadUserPostImage(imageUrl, postView);
-
-                        LinearLayout innerLayout6 = new LinearLayout(getActivity());
-                        innerLayout6.setLayoutParams(new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-                        innerLayout6.setOrientation(LinearLayout.HORIZONTAL);
-                        innerLayout6.setPadding(25, 25, 25, 25);
-
-                        TextView userNameBelow = new TextView(getActivity());
-                        userNameBelow.setId(View.generateViewId());
-                        userNameBelow.setLayoutParams(new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT));
-
-                        mobileUsersReference.orderByChild("userId").equalTo(userId)
-                                .addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot mobileUsersSnapshot) {
-                                        for (DataSnapshot userSnapshot : mobileUsersSnapshot.getChildren()) {
-                                            username_post[0] = AESUtils.decrypt(userSnapshot.child("username").getValue(String.class));
-                                            String profilePictureUrl = userSnapshot.child("profilePictureUrl").getValue(String.class);
-                                            //Toast.makeText(getContext(), username_post[0], Toast.LENGTH_LONG).show();
-
-                                            //userNameBelow.setText("Username");
-                                            userNameBelow.setText(username_post[0]);
-                                            //userNameBelow.setTypeface(null, Typeface.BOLD);
-                                            userNameBelow.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
-
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError error) {
-                                        // Handle database query errors for MobileUsers
-                                    }
-                                });
-
-                        TextView descriptionView = new TextView(getActivity());
-                        descriptionView.setId(View.generateViewId());
-                        descriptionView.setLayoutParams(new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-                        descriptionView.setPadding(20, 0, 0, 0);
-                        //descriptionView.setText("Hello, this is a description here...");
-                        descriptionView.setText(caption);
-
-                        if (caption != null && !caption.equalsIgnoreCase("null") && !caption.isEmpty()) {
-
-                            // Add views to their respective parent layouts
-                            dynamicLayoutContainer.addView(innerLayout1);
-                            innerLayout1.addView(innerLayout2);
-                            innerLayout2.addView(innerLayout3);
-                            innerLayout3.addView(imageView15);
-                            innerLayout3.addView(userName);
-                            innerLayout2.addView(innerLayout4);
-                            innerLayout4.addView(time);
-
-                            dynamicLayoutContainer.addView(innerLayout7);
-                            innerLayout7.addView(innerLayout5);
-                            innerLayout5.addView(postView);
-                            innerLayout5.addView(innerLayout6);
-                            innerLayout6.addView(userNameBelow);
-                            innerLayout6.addView(descriptionView);
-                        }
-
-                        else {
-                            // Add views to their respective parent layouts
-                            dynamicLayoutContainer.addView(innerLayout1);
-                            innerLayout1.addView(innerLayout2);
-                            innerLayout2.addView(innerLayout3);
-                            innerLayout3.addView(imageView15);
-                            innerLayout3.addView(userName);
-                            innerLayout2.addView(innerLayout4);
-                            innerLayout4.addView(time);
-
-                            dynamicLayoutContainer.addView(innerLayout7);
-                            innerLayout7.addView(innerLayout5);
-                            innerLayout5.addView(postView);
-                            innerLayout5.addView(innerLayout6);
-                        }
-
-
                     }
-
                 }
-
                 else
                     Toast.makeText(getContext(), "No Activity Posted.", Toast.LENGTH_LONG).show();
-
+                // Update the RecyclerView adapter with the retrieved user groups
             }
+
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
         });
-
-
-
         return view;
-    }
-
-    private void loadUserPostImage(String imageUrl, ImageView postView) {
-        // Use a library like Picasso or Glide to load and display the image
-        if (getContext() != null && imageUrl != null) {
-            Picasso.get().load(imageUrl).into(postView);
-        }
     }
 
     public String getTimeAgo(Long timestamp) {
@@ -669,7 +503,6 @@ public class HomeFragment extends Fragment {
 
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, fragment);
-        transaction.addToBackStack(null);
         transaction.commit();
     }
 
@@ -970,4 +803,54 @@ public class HomeFragment extends Fragment {
         }
         return sum / numbers.size();
     }
+    public long convertTimeAgoToMillis(String timeAgo) {
+        // Assuming "timeAgo" is in the format "X unit(s) ago"
+        if ("just now".equalsIgnoreCase(timeAgo.trim())) {
+            // "just now" case means the timestamp is already in milliseconds
+            return System.currentTimeMillis();
+        }
+
+        String[] parts = timeAgo.split(" ");
+
+        if (parts.length >= 2) {
+            int value;
+            try {
+                value = Integer.parseInt(parts[0]);
+            } catch (NumberFormatException e) {
+                // Handle the case where the value is not a valid integer
+                return -1;
+            }
+
+            String unit = parts[1].toLowerCase();
+
+            long multiplier;
+            switch (unit) {
+                case "min":
+                case "mins":
+                    multiplier = 60 * 1000L;
+                    break;
+                case "hour":
+                case "hours":
+                    multiplier = 60 * 60 * 1000L;
+                    break;
+                case "day":
+                case "days":
+                    multiplier = 24 * 60 * 60 * 1000L;
+                    break;
+                // Add more cases for other units if needed
+
+                default:
+                    // Unknown unit or unsupported unit, return -1 or handle accordingly
+                    return -1;
+            }
+
+            // Calculate the timestamp in milliseconds
+            return System.currentTimeMillis() - value * multiplier;
+        }
+
+        // Invalid format, return -1 or handle accordingly
+        return -1;
+    }
+
+
 }

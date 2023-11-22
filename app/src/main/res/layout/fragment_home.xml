@@ -9,14 +9,11 @@
     <ScrollView
         android:id="@+id/homeContainer"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_margin="10dp"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
+        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.473"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.842">
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:id="@+id/parentLinearCont"
@@ -40,38 +37,32 @@
                 <ImageView
                     android:id="@+id/imageView12"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:srcCompat="@drawable/slider_1" />
+                    android:layout_height="wrap_content" />
 
                 <ImageView
                     android:id="@+id/imageView13"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:srcCompat="@drawable/slider_2" />
+                    android:layout_height="wrap_content" />
 
                 <ImageView
                     android:id="@+id/imageView14"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:srcCompat="@drawable/slider_3" />
+                    android:layout_height="wrap_content" />
 
                 <ImageView
                     android:id="@+id/imageView15"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:srcCompat="@drawable/slider_4" />
+                    android:layout_height="wrap_content" />
 
                 <ImageView
                     android:id="@+id/imageView16"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:srcCompat="@drawable/slider_5" />
+                    android:layout_height="wrap_content" />
 
                 <ImageView
                     android:id="@+id/imageView17"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:srcCompat="@drawable/slider_6" />
+                    android:layout_height="wrap_content" />
             </ViewFlipper>
 
             <FrameLayout
@@ -170,14 +161,26 @@
                 android:layout_marginTop="15dp"
                 android:fontFamily="@font/barabara_font"
                 android:text="DISCOVER MORE"
+                android:layout_marginStart="5dp"
                 android:textColor="#3894A3"
                 android:textSize="30dp" />
 
             <LinearLayout
-                android:id="@+id/feedDisplayLayout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_height="750dp"
+                android:layout_marginBottom="80dp">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/feedRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="5dp"
+                    android:layout_marginBottom="10dp"
+                    android:scrollbars="vertical"
+                    tools:listitem="@layout/post_item_layout"/>
+            </LinearLayout>
+
+
                 <!--
                                 <LinearLayout
                                     android:layout_width="match_parent"
@@ -269,7 +272,7 @@
 
                                 </LinearLayout>
                 -->
-            </LinearLayout>
+
 
         </LinearLayout>
 
