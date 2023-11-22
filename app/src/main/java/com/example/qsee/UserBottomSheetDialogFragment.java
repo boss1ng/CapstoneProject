@@ -65,10 +65,13 @@ public class UserBottomSheetDialogFragment extends BottomSheetDialogFragment {
             public void onClick(View v) {
                 // Handle Sign Out option click
                 Intent intent = new Intent(getContext(), MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
+                requireActivity().finish(); // Finish the current activity to clear the back stack
                 dismiss(); // Close the bottom sheet dialog after starting the new activity
             }
         });
+
 
         return rootView;
     }
