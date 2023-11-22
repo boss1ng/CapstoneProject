@@ -15,18 +15,11 @@
             android:layout_height="wrap_content"
             >
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="30dp"
-                    android:orientation="vertical"
-                    android:background="@color/transparent"
-                    >
-                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="30dp"
-                    android:layout_marginTop="30dp"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="15dp"
                     android:background="@color/white"
                     android:gravity="center"
                     android:orientation="vertical">
@@ -34,8 +27,7 @@
                         <ImageView
                             android:id="@+id/imageMarker"
                             android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:layout_marginTop="-20dp"
+                            android:layout_height="wrap_content"
                             app:srcCompat="@drawable/red_marker"
                             tools:srcCompat="@drawable/red_marker" />
                 </LinearLayout>
