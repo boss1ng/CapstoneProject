@@ -59,7 +59,7 @@
         android:layout_width="250dp"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="@drawable/bordered_background"
+        android:background="@color/shade3"
         >
 
         <ImageButton
@@ -68,8 +68,8 @@
             android:layout_height="50dp"
             android:layout_gravity="right"
             android:background="@android:color/transparent"
-            android:src="@drawable/back"
-            android:contentDescription="TODO"/>
+            android:contentDescription="TODO"
+            android:src="@drawable/back" />
 
         <ImageView
             android:id="@+id/imageView10"
@@ -84,9 +84,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="20dp"
-            android:divider="@color/shade3"
-            android:dividerHeight="1dp"
-            />
+            android:divider="@color/shade1"
+            android:dividerHeight="1dp" />
 
     </LinearLayout>
 

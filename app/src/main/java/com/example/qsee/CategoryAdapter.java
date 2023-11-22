@@ -1,6 +1,7 @@
 package com.example.qsee;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +32,8 @@ public class CategoryAdapter extends ArrayAdapter<String> {
         }
 
         TextView textView = convertView.findViewById(R.id.textViewItem);
+        textView.setTextColor(Color.parseColor("#2f414f"));
+
         CheckBox checkBox = convertView.findViewById(R.id.checkBox);
 
         String category = getItem(position);
