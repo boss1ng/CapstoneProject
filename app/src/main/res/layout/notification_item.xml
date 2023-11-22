@@ -45,7 +45,7 @@
         android:layout_below="@id/inviteTextView"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="4dp"
-        android:layout_marginEnd="105dp"
+        android:layout_marginEnd="110dp"
         android:backgroundTint="@color/gradient_start"
         android:text="Accept" />
 
