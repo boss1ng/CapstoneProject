@@ -384,6 +384,9 @@ public class EditActivityFragment extends Fragment {
                                 }
 
                             });
+
+
+
                         } else {
                             // If the switch is not checked, set the status to "Incompleted" in the database
                             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Itinerary");
@@ -599,7 +602,9 @@ public class EditActivityFragment extends Fragment {
 
                     dialog.dismiss();
 
-
+                    if (getFragmentManager() != null) {
+                        getFragmentManager().popBackStack();
+                    }
                 }
             }
         });
