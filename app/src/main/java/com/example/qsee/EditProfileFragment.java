@@ -517,6 +517,7 @@ public class EditProfileFragment extends Fragment {
                                     profilePictureRef.getDownloadUrl().addOnSuccessListener(uri -> {
                                         String imageUrl = uri.toString();
 
+                                        // Update profile picture URL in "MobileUsers" node
                                         DatabaseReference usersReference = FirebaseDatabase.getInstance().getReference("MobileUsers");
                                         Query query = usersReference.orderByChild("userId").equalTo(userId);
 
@@ -528,15 +529,37 @@ public class EditProfileFragment extends Fragment {
                                                         userSnapshot.getRef().child("profilePictureUrl").setValue(imageUrl);
                                                         Toast.makeText(getContext(), "Profile updated successfully.", Toast.LENGTH_LONG).show();
                                                         getParentFragmentManager().popBackStack();
+
+                                                        // Update profile picture URL in "Posts" node
+                                                        DatabaseReference postsReference = FirebaseDatabase.getInstance().getReference("Posts");
+                                                        Query postsQuery = postsReference.orderByChild("userId").equalTo(userId);
+
+                                                        postsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                            @Override
+                                                            public void onDataChange(@NonNull DataSnapshot postsDataSnapshot) {
+                                                                if (postsDataSnapshot.exists()) {
+                                                                    for (DataSnapshot postSnapshot : postsDataSnapshot.getChildren()) {
+                                                                        postSnapshot.getRef().child("profilePictureUrl").setValue(imageUrl);
+                                                                    }
+                                                                } else {
+                                                                    Log.e("EditProfileFragment", "No posts found for the user.");
+                                                                }
+                                                            }
+
+                                                            @Override
+                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                                Log.e("EditProfileFragment", "Database Error: " + databaseError.getMessage());
+                                                            }
+                                                        });
                                                     }
                                                 } else {
                                                     Log.e("EditProfileFragment", "User with username not found.");
                                                 }
                                             }
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                                Log.e("EditProfileFragment", "Database Error: " + databaseError.getMessage());
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                Log.e("EditProfileFragment", "Database Error: " + databaseError.getMessage());
                                             }
                                         });
                                     });
@@ -546,6 +569,7 @@ public class EditProfileFragment extends Fragment {
                             e.printStackTrace();
                             Log.e("EditProfileFragment", "Error uploading profile picture: " + e.getMessage());
                         }
+
                     }
                 } else {
                     Log.e("EditProfileFragment", "User with username not found.");
