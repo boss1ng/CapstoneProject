@@ -80,6 +80,30 @@ public class LocationFragment extends Fragment {
                 itineraryRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot itineraryDataSnapshot) {
+                        for (DataSnapshot itinerarySnapshot : itineraryDataSnapshot.getChildren()) {
+                            // Check if the itinerary has the same admin and the same groupName or just the same userId
+                            String admin = itinerarySnapshot.child("admin").getValue(String.class);
+                            String iterName = itinerarySnapshot.child("iterName").getValue(String.class);
+
+                            if ((admin != null && admin.equals(userId))) {
+                                // Check if the entry already exists in the locationList
+                                boolean isAlreadyAdded = false;
+                                for (Location loc : locationList) {
+                                    if (loc.getLocationAdmin().equals(admin) && loc.getLocationName().equals(iterName)) {
+                                        isAlreadyAdded = true;
+                                        break;
+                                    }
+                                }
+
+                                // If not already added, add the entry to locationList
+                                if (!isAlreadyAdded) {
+                                    Location location = new Location();
+                                    location.setLocationAdmin(admin);
+                                    location.setLocationName(iterName);
+                                    locationList.add(location);
+                                }
+                            }
+                        }
                         // Loop through each group
                         for (DataSnapshot groupSnapshot : dataSnapshot.getChildren()) {
                             // Check if the userId exists in any of the member fields
@@ -115,32 +139,6 @@ public class LocationFragment extends Fragment {
                                         }
                                     }
                                     break; // Exit the loop once the userId is found in a member field
-                                }
-                                else {
-                                    for (DataSnapshot itinerarySnapshot : itineraryDataSnapshot.getChildren()) {
-                                        // Check if the itinerary has the same admin and the same groupName or just the same userId
-                                        String admin = itinerarySnapshot.child("admin").getValue(String.class);
-                                        String iterName = itinerarySnapshot.child("iterName").getValue(String.class);
-
-                                        if ((admin != null && admin.equals(userId))) {
-                                            // Check if the entry already exists in the locationList
-                                            boolean isAlreadyAdded = false;
-                                            for (Location loc : locationList) {
-                                                if (loc.getLocationAdmin().equals(admin) && loc.getLocationName().equals(iterName)) {
-                                                    isAlreadyAdded = true;
-                                                    break;
-                                                }
-                                            }
-
-                                            // If not already added, add the entry to locationList
-                                            if (!isAlreadyAdded) {
-                                                Location location = new Location();
-                                                location.setLocationAdmin(admin);
-                                                location.setLocationName(iterName);
-                                                locationList.add(location);
-                                            }
-                                        }
-                                    }
                                 }
                             }
                         }
