@@ -260,9 +260,10 @@ public class PostDetailsDialog extends DialogFragment {
                         String postLocation = postSnapshot.child("location").getValue(String.class);
                         String postCategory = postSnapshot.child("category").getValue(String.class);
                         String postCaption = postSnapshot.child("caption").getValue(String.class);
+                        long postTimestamp = postSnapshot.child("timestamp").getValue(Long.class);
 
                         if (postLocation != null && postCategory != null && postCaption != null &&
-                                postLocation.equals(location) && postCategory.equals(category) && postCaption.equals(caption)) {
+                                postLocation.equals(location) && postCategory.equals(category) && postCaption.equals(caption) && postTimestamp == timestamp) {
                             // Matched the criteria, delete the post
                             DatabaseReference postRef = postSnapshot.getRef();
                             postRef.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -296,6 +297,7 @@ public class PostDetailsDialog extends DialogFragment {
             }
         });
     }
+
 
 
     // Method to show dialog for editing caption
