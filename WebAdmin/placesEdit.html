@@ -197,18 +197,9 @@
                             </span>
                             
                             <span id="passwordHelpInline" class="px-3" style="font-size: medium; font-style: italic;">
-                                Image Resolution (600 x 300)
+                                Image Resolution (600 x 400)
                             </span>
                         </div>
-                    </div>
-                </div>
-                
-                <div class="container d-flex align-items-center my-3">
-                    <div class="headerCont">
-                        <span class="">Image Description</span>
-                    </div>
-                    <div class="container">
-                        <input type="text" class="form-control" id="estabImageDesc" onchange="updateInput()" aria-label="Username" aria-describedby="addon-wrapping"/>
                     </div>
                 </div>
                 
@@ -296,7 +287,6 @@
             var inputLocationHigh = document.querySelector("#estabHighPrice");
             var inputLocationLow = document.querySelector("#estabLowPrice");
             var inputLocationImage = document.querySelector("#inputLocImage");
-            var inputLocationImageDesc = document.querySelector("#estabImageDesc");
             var inputLocationDesc = document.querySelector("#estabDesc");
 
             var buttonCancel = document.querySelector("#actionCancelPlace");
@@ -308,7 +298,7 @@
                 img.onload = function() {
                     var width = this.width;
                     var height = this.height;
-                    if (width === 600 && height === 300) {
+                    if (width === 600 && height === 400) {
                         // Image resolution is acceptable
                         var selectedFile = inputFile.files[0];
 
@@ -330,7 +320,6 @@
                         inputLocationCont.disabled = true;
                         inputLocationImage.disabled = true;
                         inputLocImageEdit.disabled = true;
-                        inputLocationImageDesc.disabled = true;
                         inputLocationDesc.disabled = true;
                         // alert("Please upload an image with the correct resolution.");
 
@@ -348,7 +337,6 @@
                                 inputLocationCont.disabled = false;
                                 inputLocationImage.disabled = false;
                                 inputLocImageEdit.disabled = false;
-                                inputLocationImageDesc.disabled = false;
                                 inputLocationDesc.disabled = false;
                             }, 2000);
                     }
@@ -371,20 +359,21 @@
             const selectedCat = document.getElementById('selectedCategory');
             var inputLocationHigh = document.querySelector("#estabHighPrice");
             var inputLocationLow = document.querySelector("#estabLowPrice");
+            var inputLocationCont = document.querySelector("#estabContact");
 
             selectedCat.value = categoryOption;
 
-            if (selectedCat.value == "Schools" || selectedCat.value == "Religious Sites") {
-                inputLocationHigh.disabled = true;
+            if (selectedCat.value == "Accommodations" || selectedCat.value == "Restaurants and Cafes") {
+                inputLocationHigh.disabled = false;
                 inputLocationHigh.value = "";
-                inputLocationLow.disabled = true;
+                inputLocationLow.disabled = false;
                 inputLocationLow.value = "";
             }
 
             else {
-                inputLocationHigh.disabled = false;
+                inputLocationHigh.disabled = true;
                 inputLocationHigh.value = "";
-                inputLocationLow.disabled = false;
+                inputLocationLow.disabled = true;
                 inputLocationLow.value = "";
             }
 
@@ -438,7 +427,6 @@
         var inputLocationHigh = document.querySelector("#estabHighPrice");
         var inputLocationLow = document.querySelector("#estabLowPrice");
         var inputLocationImage = document.querySelector("#inputLocImage");
-        var inputLocationImageDesc = document.querySelector("#estabImageDesc");
         var inputLocationDesc = document.querySelector("#estabDesc");
 
         var inputLocImageEdit = document.querySelector("#inputLocImageEdit");
@@ -477,7 +465,6 @@
                     inputLocationLow.value = snapshot.val().LowestPrice;
                     inputLocationHigh.value = snapshot.val().HighestPrice;
                     inputLocImageEdit.value = snapshot.val().Image;
-                    inputLocationImageDesc.value = snapshot.val().ImageDescription;
 
                     createdBy = snapshot.val().CreatedBy;
                     if (createdBy == "RSS") {
@@ -544,7 +531,6 @@
             inputLocationLow.disabled = true;
             inputLocationImage.disabled = true;
             inputLocImageEdit.disabled = true;
-            inputLocationImageDesc.disabled = true;
             inputLocationDesc.disabled = true;
 
             if (inputLocationImage.value == "" || inputLocationImage.value == null) {
@@ -559,7 +545,6 @@
                     Description: inputLocationDesc.value,               // 
                     LowestPrice: inputLocationLow.value,                // 
                     HighestPrice: inputLocationHigh.value,              // 
-                    ImageDescription: inputLocationImageDesc.value,     // 
                 })
 
                 .then( ()=>{
@@ -639,7 +624,6 @@
                                 HighestPrice: inputLocationHigh.value,              // 
                                 Image: fileInputName,                               // 
                                 Link: url,
-                                ImageDescription: inputLocationImageDesc.value,     // 
                             })
 
                             .then( ()=>{

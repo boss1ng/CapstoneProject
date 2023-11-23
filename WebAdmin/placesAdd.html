@@ -196,21 +196,12 @@
                             </span>
                             
                             <span id="passwordHelpInline" class="mx-3" style="font-size: large; font-style: italic;">
-                                Image Resolution (600 x 300)
+                                Image Resolution (600 x 400)
                             </span>
                         </div>
                             <!-- <p class="mx-3">File Types: .JPG .JPEG .PNG</p> -->
                             <!-- <p>Image Resolution: 200 x 200</p> -->
                                                
-                    </div>
-                </div>
-                
-                <div class="container d-flex align-items-center my-3">
-                    <div class="headerCont">
-                        <span class="">Image Description</span>
-                    </div>
-                    <div class="container">
-                        <input type="text" class="form-control" id="estabImageDesc" aria-label="Username" aria-describedby="addon-wrapping"/>
                     </div>
                 </div>
                 
@@ -299,22 +290,24 @@
             const selectedCat = document.getElementById('selectedCategory');
             var inputLocationHigh = document.querySelector("#estabHighPrice");
             var inputLocationLow = document.querySelector("#estabLowPrice");
+            var inputLocationCont = document.querySelector("#estabContact");
 
             selectedCat.value = categoryOption;
 
-            if (selectedCat.value == "Schools" || selectedCat.value == "Religious Sites") {
+            if (selectedCat.value == "Accommodations" || selectedCat.value == "Restaurants and Cafes") {
+                inputLocationHigh.disabled = false;
+                inputLocationHigh.value = "";
+                inputLocationLow.disabled = false;
+                inputLocationLow.value = "";
+            }
+
+            else {
                 inputLocationHigh.disabled = true;
                 inputLocationHigh.value = "";
                 inputLocationLow.disabled = true;
                 inputLocationLow.value = "";
             }
 
-            else {
-                inputLocationHigh.disabled = false;
-                inputLocationHigh.value = "";
-                inputLocationLow.disabled = false;
-                inputLocationLow.value = "";
-            }
         }
 
         function validateImage(input) {
@@ -326,7 +319,7 @@
                 img.onload = function() {
                     var width = this.width;
                     var height = this.height;
-                    if (width === 600 && height === 300) {
+                    if (width === 600 && height === 400) {
                         // Image resolution is acceptable
                     } else {
                         // alert("Please upload an image with the correct resolution.");
@@ -386,7 +379,6 @@
         var inputLocationHigh = document.querySelector("#estabHighPrice");
         var inputLocationLow = document.querySelector("#estabLowPrice");
         var inputLocationImage = document.querySelector("#imageFile");
-        var inputLocationImageDesc = document.querySelector("#estabImageDesc");
         var inputLocationDesc = document.querySelector("#estabDesc");
 
         var addSuccessAlert = document.getElementById("addSuccess");
@@ -451,10 +443,12 @@
             inputLocationCatDropdown.disabled = true;
             inputLocationCont.disabled = true;
             inputLocationImage.disabled = true;
-            inputLocationImageDesc.disabled = true;
             inputLocationDesc.disabled = true;
 
-            if (!(inputLocation.value == "" || inputLocationAdd.value == ""  || inputLocationCat.value == ""  || inputLocationCont.value == ""  || inputLocationImage.value == ""  || inputLocationImageDesc.value == ""  || inputLocationDesc.value == "")) {
+            inputLocationHigh.disabled = true;
+            inputLocationLow.disabled = true;
+
+            if (!(inputLocation.value == "" || inputLocationAdd.value == ""  || inputLocationCat.value == ""  || inputLocationImage.value == "" || inputLocationDesc.value == "")) {
                 // inputLocationHigh.value == ""  || inputLocationLow.value == ""  || 
 
                 var uploadedFile = inputLocationImage.files[0]; // Get the selected file
@@ -497,8 +491,9 @@
                                 inputLocationCatDropdown.disabled = false;
                                 inputLocationCont.disabled = false;
                                 inputLocationImage.disabled = false;
-                                inputLocationImageDesc.disabled = false;
                                 inputLocationDesc.disabled = false;
+                                inputLocationHigh.disabled = false;
+                                inputLocationLow.disabled = false;
                             }, 2000);
                         }
 
@@ -537,7 +532,6 @@
                                             HighestPrice: inputLocationHigh.value,              // 101,900
                                             Image: fileInputName,                               // 
                                             Link: url,
-                                            ImageDescription: inputLocationImageDesc.value,     // Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
                                             AverageRate: "0",
                                             CreatedBy: "Administrator",
                                         })
@@ -590,7 +584,6 @@
                                     HighestPrice: inputLocationHigh.value,              // 101,900
                                     Image: fileInputName,                               // 
                                     Link: url,
-                                    ImageDescription: inputLocationImageDesc.value,     // Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
                                     AverateRate: "0",
                                     CreatedBy: "Administrator",
                                 })
@@ -635,8 +628,9 @@
                     inputLocationCatDropdown.disabled = false;
                     inputLocationCont.disabled = false;
                     inputLocationImage.disabled = false;
-                    inputLocationImageDesc.disabled = false;
                     inputLocationDesc.disabled = false;
+                    inputLocationHigh.disabled = false;
+                    inputLocationLow.disabled = false;
                 }, 1500);
             }
         }
