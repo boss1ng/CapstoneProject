@@ -2,6 +2,7 @@ package com.example.qsee;
 
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,6 +18,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
     public ImageView postImage;
     public TextView postCaption;
     public TextView usernameBelow;
+    public LinearLayout infoBelow;
 
     public PostViewHolder(View itemView) {
         super(itemView);
@@ -26,6 +28,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         postImage = itemView.findViewById(R.id.postImage);
         postCaption = itemView.findViewById(R.id.postCaption);
         usernameBelow = itemView.findViewById(R.id.userNameCap);
+        infoBelow = itemView.findViewById(R.id.infoBelow);
     }
 }
 

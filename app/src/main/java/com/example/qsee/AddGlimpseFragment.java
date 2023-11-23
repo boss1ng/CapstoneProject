@@ -524,6 +524,28 @@ public class AddGlimpseFragment extends DialogFragment {
                     newPostRef.child("longitude").setValue(longitude);
                     newPostRef.child("timestamp").setValue(ServerValue.TIMESTAMP);
 
+                    // Query "mobileusers" node to get username and profile picture URL
+                    DatabaseReference userRef = databaseReference.child("MobileUsers").child(userId);
+                    userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.exists()) {
+                                String username = AESUtils.decrypt(dataSnapshot.child("username").getValue(String.class));
+                                String profilePictureUrl = dataSnapshot.child("profilePictureUrl").getValue(String.class);
+
+                                newPostRef.child("username").setValue(username);
+                                newPostRef.child("profilePictureUrl").setValue(profilePictureUrl);
+                            } else {
+                                Toast.makeText(context, "Location data not available", Toast.LENGTH_LONG).show();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            // Handle any errors that may occur
+                        }
+                    });
+
                     Toast.makeText(context, "Activity Posted.", Toast.LENGTH_LONG).show();
 
                     // Dismiss the dialog after a successful upload

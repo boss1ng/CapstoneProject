@@ -2,4 +2,5 @@
 <resources>
     <dimen name="button_elevation">8dp</dimen> <!-- Change the value as needed -->
     <dimen name="textview_elevation">8dp</dimen> <!-- Change the value as needed -->
+    <dimen name="spacing">8dp</dimen>
 </resources>

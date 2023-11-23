@@ -103,7 +103,7 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
+        LinearLayout linearLayout = view.findViewById(R.id.recycleLinear);
         imageView12 = view.findViewById(R.id.imageView12);
         imageView13 = view.findViewById(R.id.imageView13);
         imageView14 = view.findViewById(R.id.imageView14);
@@ -119,6 +119,10 @@ public class HomeFragment extends Fragment {
         Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/sliders%2Fslider_6.jpg?alt=media&token=24bf286a-554f-4f74-8016-8c9eabe0b7de").into(imageView17);
 
         feedRecyclerView = view.findViewById(R.id.feedRecyclerView);
+
+        // Apply the ItemDecoration with the desired spacing (in pixels)
+        int spacingInPixels = getResources().getDimensionPixelSize(R.dimen.spacing); // Define your desired spacing in dimens.xml
+        feedRecyclerView.addItemDecoration(new ItemSpacingDecoration(spacingInPixels));
         feedRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         // Initialize your data list and adapter
@@ -360,9 +364,11 @@ public class HomeFragment extends Fragment {
         // Create a list to store the retrieved data as maps
         List<Map<String, String>> dataMapList = new ArrayList<>();
         databaseReference.addValueEventListener(new ValueEventListener() {
+            @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
+                    linearLayout.setVisibility(View.VISIBLE);
                     dataMapList.clear();
                     postList.clear();
                     for (DataSnapshot placeSnapshot : snapshot.getChildren()) {
@@ -372,6 +378,8 @@ public class HomeFragment extends Fragment {
                         String postImage = placeSnapshot.child("imageUrl").getValue(String.class);
                         Long postTimestamp = placeSnapshot.child("timestamp").getValue(Long.class);
                         String postUserId = placeSnapshot.child("userId").getValue(String.class);
+                        String postUsername = placeSnapshot.child("username").getValue(String.class);
+                        String postProfilePic = placeSnapshot.child("profilePictureUrl").getValue(String.class);
 
                         String stringTimeStamp = String.valueOf(postTimestamp);
 
@@ -382,6 +390,8 @@ public class HomeFragment extends Fragment {
                         dataMap.put("imageUrl", postImage);
                         dataMap.put("timestamp", stringTimeStamp);
                         dataMap.put("userId", postUserId);
+                        dataMap.put("postUsername", postUsername);
+                        dataMap.put("postProfilePic",postProfilePic);
 
                         // Add the data map to the list
                         dataMapList.add(dataMap);
@@ -393,47 +403,36 @@ public class HomeFragment extends Fragment {
                         String caption = dataMap.get("caption");
                         String imageUrl = dataMap.get("imageUrl");
                         String timestamp = dataMap.get("timestamp");
-                        String userId = dataMap.get("userId");
+                        String username = dataMap.get("postUsername");
+                        String profurl = dataMap.get("postProfilePic");
                         Log.d("PostDebug", "Adding post with timestamp: " + timestamp);
 
-                        mobileUsersReference.orderByChild("userId").equalTo(userId)
-                                .addValueEventListener(new ValueEventListener() {
-                                    @SuppressLint("NotifyDataSetChanged")
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot mobileUsersSnapshot) {
-                                        for (DataSnapshot userSnapshot : mobileUsersSnapshot.getChildren()) {
-                                            postUsername = AESUtils.decrypt(userSnapshot.child("username").getValue(String.class));
-                                            String profilePictureUrl = userSnapshot.child("profilePictureUrl").getValue(String.class);
-                                            //Toast.makeText(getContext(), username_post[0], Toast.LENGTH_LONG).show();
 
-                                            if (timestamp != null && !timestamp.equalsIgnoreCase("null") && !timestamp.isEmpty()) {
-                                                long timestampLong = Long.parseLong(timestamp);
-                                                String timeAgo = getTimeAgo(timestampLong);
-                                            // Create a new Post object and add it to the list
-                                            Post newPost = new Post(postUsername, profilePictureUrl, imageUrl, caption, timeAgo);
-                                            postList.add(newPost);
-                                            }
-                                        }
+                        if (timestamp != null && !timestamp.equalsIgnoreCase("null") && !timestamp.isEmpty()) {
+                            long timestampLong = Long.parseLong(timestamp);
+                            String timeAgo = getTimeAgo(timestampLong);
+                            // Create a new Post object and add it to the list
+                            Post newPost = new Post(username, profurl, imageUrl, caption, timeAgo);
+                            postList.add(newPost);
+                        }
+
                                         // Sort the postList based on converted timestamps in descending order (latest first)
-                                        postList.sort((post1, post2) -> {
-                                            long timestampMillis1 = convertTimeAgoToMillis(post1.getPostTime());
-                                            long timestampMillis2 = convertTimeAgoToMillis(post2.getPostTime());
-                                            return Long.compare(timestampMillis2, timestampMillis1);
-                                        });
+                        postList.sort((post1, post2) -> {
+                            long timestampMillis1 = convertTimeAgoToMillis(post1.getPostTime());
+                            long timestampMillis2 = convertTimeAgoToMillis(post2.getPostTime());
+                            return Long.compare(timestampMillis2, timestampMillis1);
+                        });
 
-                                        postAdapter.notifyDataSetChanged();
-                                    }
+                        postAdapter.notifyDataSetChanged();
 
 
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError error) {
-                                        // Handle database query errors for MobileUsers
-                                    }
-                                });
+
                     }
                 }
-                else
+                else {
                     Toast.makeText(getContext(), "No Activity Posted.", Toast.LENGTH_LONG).show();
+                    linearLayout.setVisibility(View.GONE);
+                }
                 // Update the RecyclerView adapter with the retrieved user groups
             }
 

@@ -84,7 +84,7 @@
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:layout_gravity="center"
-                    android:layout_marginEnd="165dp"
+                    android:layout_marginEnd="180dp"
                     android:background="@drawable/baseline_keyboard_arrow_left_24"
                     android:backgroundTint="#FFFFFF"
                     android:clickable="true"
@@ -147,7 +147,7 @@
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:layout_gravity="center"
-                    android:layout_marginStart="165dp"
+                    android:layout_marginStart="180dp"
                     android:background="@drawable/baseline_keyboard_arrow_right_24"
                     android:backgroundTint="#FFFFFF"
                     android:clickable="true"
@@ -166,9 +166,10 @@
                 android:textSize="30dp" />
 
             <LinearLayout
+                android:id="@+id/recycleLinear"
                 android:layout_width="match_parent"
-                android:layout_height="750dp"
-                android:layout_marginBottom="80dp">
+                android:layout_height="630dp"
+                android:layout_marginBottom="70dp">
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/feedRecyclerView"
