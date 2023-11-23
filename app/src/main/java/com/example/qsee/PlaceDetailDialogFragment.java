@@ -92,6 +92,7 @@ public class PlaceDetailDialogFragment extends DialogFragment {
         TextView descriptionTextView = view.findViewById(R.id.placeDescriptionTextView);
         TextView ratingTextView = view.findViewById(R.id.placeRatingTextView);
         Button directionsButton = view.findViewById(R.id.directionsButton);
+        TextView contactView = view.findViewById(R.id.placeContactTextView);
         ImageView reportButton = view.findViewById(R.id.reportButton);
         reportButton.setImageResource(R.drawable.report_dialog);
         ImageView imageViewLocation = view.findViewById(R.id.imageViewLocation);
@@ -106,7 +107,6 @@ public class PlaceDetailDialogFragment extends DialogFragment {
             placeDescription = getArguments().getString("placeDescription");
 
         String placeRating = getArguments().getString("placeRating");
-        Double doubleRating = Double.parseDouble(placeRating);
         String placeLink = getArguments().getString("placeLink");
 
         String placePrice;
@@ -118,6 +118,14 @@ public class PlaceDetailDialogFragment extends DialogFragment {
             priceTextView.setText(placePrice);
         }
 
+        String placeContact;
+        if (!getArguments().getString("contact").equals("-")) {
+            contactView.setVisibility(View.VISIBLE);
+            placeContact = getArguments().getString("contact");
+            contactView.setText(placeContact);
+        }
+
+
         Double currentUserLat = getArguments().getDouble("userLatitude");
         Double currentUserLong = getArguments().getDouble("userLongitude");
         String destinationLat = getArguments().getString("destinationLatitude");
@@ -128,13 +136,22 @@ public class PlaceDetailDialogFragment extends DialogFragment {
         nameTextView.setText(placeName);
         addressTextView.setText(placeAddress);
         descriptionTextView.setText(placeDescription);
-        // Format the rating to one decimal place
-        DecimalFormat df = new DecimalFormat(doubleRating == 0 ? "0" : "#0.0");
-        String formattedRating = df.format(doubleRating);
-        ratingTextView.setText(String.valueOf(formattedRating));
-        Picasso.get()
-                .load(placeLink)
-                .into(imageViewLocation);
+
+        if (placeRating != null) {
+            try {
+                Double doubleRating = Double.parseDouble(placeRating);
+                DecimalFormat df = new DecimalFormat(doubleRating == 0 ? "0" : "#0.0");
+                String formattedRating = df.format(doubleRating);
+                ratingTextView.setText(String.valueOf(formattedRating));
+                Picasso.get().load(placeLink).into(imageViewLocation);
+            } catch (NumberFormatException e) {
+                // Handle the exception or log an error message
+                e.printStackTrace();
+            }
+        } else {
+            // Handle the case where placeRating is null
+            // You might want to set a default value or display a message
+        }
 
 
         String isUserInQuezonCity = getArguments().getString("isUserInQuezonCity");

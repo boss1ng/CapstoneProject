@@ -34,6 +34,7 @@ public class PlaceDetailFragment extends Fragment {
             String placeLink = args.getString("placeLink", "");
             String placePrice = args.getString("placePrice", "");
             String isUserInQuezonCity = args.getString("isUserInQuezonCity", "");
+            String contact = args.getString("contact","");
 
             // Populate UI elements with place details
             TextView nameTextView = view.findViewById(R.id.placeNameTextView);
@@ -44,9 +45,14 @@ public class PlaceDetailFragment extends Fragment {
             ImageView reportButton = view.findViewById(R.id.reportButton);
             ImageView imageViewLocation = view.findViewById(R.id.imageViewLocation);
             TextView priceTextView = view.findViewById(R.id.placePriceTextView);
+            TextView contactTextView = view.findViewById(R.id.placeContactTextView);
 
             if (nameTextView != null) {
                 nameTextView.setText(placeName);
+            }
+
+            if(contactTextView != null) {
+                contactTextView.setText(contact);
             }
 
             if (addressTextView != null) {

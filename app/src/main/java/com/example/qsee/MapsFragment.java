@@ -1,6 +1,7 @@
 package com.example.qsee;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -522,6 +523,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
         // Add markers for places retrieved from Firebase
         databaseReference.addValueEventListener(new ValueEventListener() {
+            @SuppressLint("PotentialBehaviorOverride")
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
@@ -575,21 +577,28 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                                     String latitude = placeSnapshot.child("Latitude").getValue(String.class);
                                     String longitude = placeSnapshot.child("Longitude").getValue(String.class);
                                     String stringRating = placeSnapshot.child("AverageRate").getValue(String.class);
+                                    String contact = placeSnapshot.child("ContactNo").getValue(String.class);
+
+                                    if (contact.equals("")){
+                                        contact ="-";
+                                    }
 
                                     if (placeSnapshot.child("Description").getValue(String.class) == null)
                                         description = "-";
                                     else
                                         description = placeSnapshot.child("Description").getValue(String.class);
 
-                                    if (placeSnapshot.child("LowestPrice").getValue(String.class) == null || placeSnapshot.child("HighestPrice").getValue(String.class) == null) {
-                                        lowestPrice = "-";
-                                        highestPrice = "-";
-                                        placePrice = "-";
-                                    }
-                                    else {
-                                        lowestPrice = placeSnapshot.child("LowestPrice").getValue(String.class);
-                                        highestPrice = placeSnapshot.child("HighestPrice").getValue(String.class);
-                                        placePrice = "₱" + lowestPrice + " - ₱" + highestPrice;
+                                    if (placeSnapshot.child("LowestPrice").getValue(String.class) != null && placeSnapshot.child("HighestPrice").getValue(String.class) != null) {
+                                        if (placeSnapshot.child("LowestPrice").getValue(String.class).equals("") || placeSnapshot.child("HighestPrice").getValue(String.class).equals("")) {
+                                            lowestPrice = "-";
+                                            highestPrice = "-";
+                                            placePrice = "-";
+                                        }
+                                        else {
+                                            lowestPrice = placeSnapshot.child("LowestPrice").getValue(String.class);
+                                            highestPrice = placeSnapshot.child("HighestPrice").getValue(String.class);
+                                            placePrice = "₱" + lowestPrice + " - ₱" + highestPrice;
+                                        }
                                     }
 
                                     String imageLink = placeSnapshot.child("Link").getValue(String.class);
@@ -609,13 +618,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                                                     .position(location)
                                                     .title(name)
                                                     //.title(rating)
-                                                    .snippet(address + "@" + stringRating + "@" + description + "@" + imageLink + "@" + placePrice + "@" + doubleLatitude + "@" + doubleLongitude);
+                                                    .snippet(address + "@" + stringRating + "@" + description + "@" + imageLink + "@" + placePrice + "@" + doubleLatitude + "@" + doubleLongitude + "@" + contact);
 
                                             // Add markers to the Google Map
                                             Marker marker = mMap.addMarker(markerOptions);
 
                                             // Set a click listener for each marker
                                             mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                                                @SuppressLint("PotentialBehaviorOverride")
                                                 @Override
                                                 public boolean onMarkerClick(Marker marker) {
                                                     // Handle marker click event here
@@ -645,6 +655,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                                                     args.putDouble("userLongitude", currentUserLocationLong);
                                                     args.putString("destinationLatitude", parts[5]);
                                                     args.putString("destinationLongitude", parts[6]);
+                                                    args.putString("contact", parts[7]);
 
                                                     args.putString("isUserInQuezonCity", String.valueOf(isUserInQuezonCity));
 
@@ -776,6 +787,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                     String latitude = placeSnapshot.child("Latitude").getValue(String.class);
                     String longitude = placeSnapshot.child("Longitude").getValue(String.class);
                     String stringRating = placeSnapshot.child("AverageRate").getValue(String.class);
+                    String contact = placeSnapshot.child("ContactNo").getValue(String.class);
+
+                    if (contact.equals("")){
+                        contact ="-";
+                    }
 
                     if (placeSnapshot.child("Description").getValue(String.class) != null) {
                         if (placeSnapshot.child("Description").getValue(String.class).equals(""))
@@ -810,7 +826,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                                 .position(location)
                                 .title(name)
                                 //.title(rating)
-                                .snippet(address + "@" + stringRating + "@" + description + "@" + imageLink + "@" + placePrice + "@" + doubleLatitude + "@" + doubleLongitude);
+                                .snippet(address + "@" + stringRating + "@" + description + "@" + imageLink + "@" + placePrice + "@" + doubleLatitude + "@" + doubleLongitude + "@" + contact);
 
                         Bundle args = getArguments();
                         if (args != null) {
@@ -864,6 +880,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                                     args.putDouble("userLongitude", currentUserLocationLong);
                                     args.putString("destinationLatitude", parts[5]);
                                     args.putString("destinationLongitude", parts[6]);
+                                    args.putString("contact", parts[7]);
 
                                     args.putString("isUserInQuezonCity", String.valueOf(isUserInQuezonCity));
 

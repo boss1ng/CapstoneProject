@@ -464,6 +464,7 @@ public class SearchFragment extends Fragment {
                         String latitude = snapshot.child("Latitude").getValue(String.class);
                         String longitude = snapshot.child("Longitude").getValue(String.class);
                         String placePrice = "₱" + lowestPrice + " - ₱" + highestPrice;
+                        String contact = snapshot.child("ContactNo").getValue(String.class);
 
                         if (lowestPrice != null && highestPrice != null) {
                             if (lowestPrice.equals("") || highestPrice.equals("")) {
@@ -485,6 +486,7 @@ public class SearchFragment extends Fragment {
                         args.putString("placePrice", placePrice);
                         args.putString("destinationLatitude", latitude);
                         args.putString("destinationLongitude", longitude);
+                        args.putString("contact", contact);
 
                         args.putString("isUserInQuezonCity", String.valueOf(isUserInQuezonCity));
 

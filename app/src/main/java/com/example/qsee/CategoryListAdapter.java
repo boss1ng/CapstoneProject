@@ -76,7 +76,9 @@ public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapte
                                 String lowestPrice = snapshot.child("LowestPrice").getValue(String.class);
                                 String latitude = snapshot.child("Latitude").getValue(String.class);
                                 String longitude = snapshot.child("Longitude").getValue(String.class);
+                                String contact = snapshot.child("ContactNo").getValue(String.class);
                                 String placePrice = "₱" + lowestPrice + " - ₱" + highestPrice;
+
 
                                 if (lowestPrice != null && highestPrice != null) {
                                     if (lowestPrice.equals("") || highestPrice.equals("")) {
@@ -99,6 +101,7 @@ public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapte
                                 args.putString("placePrice", placePrice);
                                 args.putString("destinationLatitude", latitude);
                                 args.putString("destinationLongitude", longitude);
+                                args.putString("contact", contact);
 
                                 args.putString("isUserInQuezonCity", String.valueOf(isUserInQuezonCity));
 

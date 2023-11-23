@@ -69,6 +69,7 @@ public class PlaceDialogSearch extends DialogFragment {
         TextView descriptionTextView = view.findViewById(R.id.placeDescriptionTextView);
         TextView ratingTextView = view.findViewById(R.id.placeRatingTextView);
         Button directionsButton = view.findViewById(R.id.directionsButton);
+        TextView contactView = view.findViewById(R.id.placeContactTextView);
             // Change the text of the button
             directionsButton.setText("Go to Maps");
         ImageView reportButton = view.findViewById(R.id.reportButton);
@@ -85,7 +86,7 @@ public class PlaceDialogSearch extends DialogFragment {
             placeDescription = getArguments().getString("placeDescription");
 
         String placeRating = getArguments().getString("placeRating");
-        Double doubleRating = Double.parseDouble(placeRating);
+
 
         String placeLink = getArguments().getString("placeLink");
 
@@ -96,6 +97,12 @@ public class PlaceDialogSearch extends DialogFragment {
         else {
             placePrice = getArguments().getString("placePrice");
             priceTextView.setText(placePrice);
+        }
+        String placeContact;
+        if (!getArguments().getString("contact").equals("")) {
+            contactView.setVisibility(View.VISIBLE);
+            placeContact = getArguments().getString("contact");
+            contactView.setText(placeContact);
         }
 
         Double currentUserLat = getArguments().getDouble("userLatitude");
@@ -108,15 +115,24 @@ public class PlaceDialogSearch extends DialogFragment {
         nameTextView.setText(placeName);
         addressTextView.setText(placeAddress);
         descriptionTextView.setText(placeDescription);
-        DecimalFormat df = new DecimalFormat(doubleRating == 0 ? "0" : "#0.0");
-        String formattedRating = df.format(doubleRating);
-        ratingTextView.setText(String.valueOf(formattedRating));
-        Picasso.get()
-                .load(placeLink)
-                .into(imageViewLocation);
 
+            if (placeRating != null) {
+                try {
+                    Double doubleRating = Double.parseDouble(placeRating);
+                    DecimalFormat df = new DecimalFormat(doubleRating == 0 ? "0" : "#0.0");
+                    String formattedRating = df.format(doubleRating);
+                    ratingTextView.setText(String.valueOf(formattedRating));
+                    Picasso.get().load(placeLink).into(imageViewLocation);
+                } catch (NumberFormatException e) {
+                    // Handle the exception or log an error message
+                    e.printStackTrace();
+                }
+            } else {
+                // Handle the case where placeRating is null
+                // You might want to set a default value or display a message
+            }
 
-        String isUserInQuezonCity = getArguments().getString("isUserInQuezonCity");
+            String isUserInQuezonCity = getArguments().getString("isUserInQuezonCity");
         //Toast.makeText(getContext(), isUserInQuezonCity, Toast.LENGTH_LONG).show();
 
         if (isUserInQuezonCity.equals("true"))
