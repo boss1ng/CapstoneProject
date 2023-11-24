@@ -99,7 +99,10 @@
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPassword" />
+            android:inputType="textPassword"
+            android:drawableEnd="@drawable/ic_eye"
+            android:drawablePadding="8dp"
+            app:passwordToggleEnabled="false"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button

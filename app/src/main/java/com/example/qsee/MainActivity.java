@@ -2,12 +2,18 @@ package com.example.qsee;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
+
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.InputType;
 import android.text.TextUtils;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -24,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
     private TextInputLayout unameInputLayout;
     private TextInputLayout passInputLayout;
+    private boolean isPasswordVisible = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,6 +38,27 @@ public class MainActivity extends AppCompatActivity {
         unameInputLayout = findViewById(R.id.unameInput);
         passInputLayout = findViewById(R.id.passInput);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        EditText passwordEditText = passInputLayout.getEditText();
+
+        passwordEditText.setOnTouchListener((v, event) -> {
+            int DRAWABLE_RIGHT = 2;
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                if (event.getRawX() >= (passwordEditText.getRight() - passwordEditText.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                    isPasswordVisible = !isPasswordVisible;
+                    int inputType = isPasswordVisible ? InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                            : InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD;
+                    passwordEditText.setInputType(inputType);
+
+                    // Apply the custom font after changing the InputType
+                    applyCustomFont(passwordEditText);
+
+                    passwordEditText.setSelection(passwordEditText.getText().length());
+                    return true;
+                }
+            }
+            return false;
+        });
 
         // Find the "Create an Account" button by its ID
         View createAccountButton = findViewById(R.id.createAccount);
@@ -163,6 +191,13 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Database error: " + databaseError.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
+    }
+    private void applyCustomFont(EditText editText) {
+        // Load the Raleway font from the res/font directory
+        Typeface ralewayFont = ResourcesCompat.getFont(this, R.font.raleway_regular);
+
+        // Apply the custom font to the EditText
+        editText.setTypeface(ralewayFont);
     }
 
 }

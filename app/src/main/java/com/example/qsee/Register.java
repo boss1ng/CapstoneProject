@@ -3,13 +3,20 @@ package com.example.qsee;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.InputFilter;
+import android.text.InputType;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -42,11 +49,16 @@ public class Register extends AppCompatActivity {
     private TextInputLayout unameregInputLayout;
     private TextInputLayout passregInputLayout;
     private TextInputLayout repassregInputLayout;
+    private boolean isPasswordVisible = false;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register);
+
+        // Define the regex pattern
+        String passwordPattern = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}$";
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
@@ -58,6 +70,148 @@ public class Register extends AppCompatActivity {
         unameregInputLayout = findViewById(R.id.unamereg);
         passregInputLayout = findViewById(R.id.passreg);
         repassregInputLayout = findViewById(R.id.repassreg);
+
+        // Find the EditText associated with passregInputLayout
+        EditText passwordEditText = passregInputLayout.getEditText();
+        EditText repasswordEditText = repassregInputLayout.getEditText();
+        // Find the EditText associated with unameregInputLayout
+        EditText usernameEditText = unameregInputLayout.getEditText();
+
+        if (usernameEditText != null) {
+            // Add a TextWatcher to the username EditText
+            usernameEditText.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int start, int before, int count) {
+                    // This method is called to notify you that characters within `charSequence` are about to be replaced with new text with length `count`
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                    // This method is called to notify you that somewhere within `charSequence`, the text has been replaced with new text with length `count`
+                }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+                    // This method is called to notify you that somewhere within `editable`, the text has been changed.
+
+                    // Get the entered username
+                    String enteredUsername = editable.toString();
+
+                    // Validate the username
+                    String errorMessage = validateUsername(enteredUsername);
+                    if (errorMessage != null) {
+                        // Show the specific error for the invalid username
+                        usernameEditText.setError(errorMessage);
+                    } else {
+                        // Clear the error if the username is valid
+                        usernameEditText.setError(null);
+                        // Check username availability
+                        checkUsernameAvailability(enteredUsername);
+                    }
+                }
+            });
+        }
+
+        passwordEditText.setOnTouchListener((v, event) -> {
+            int DRAWABLE_RIGHT = 2;
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                if (event.getRawX() >= (passwordEditText.getRight() - passwordEditText.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                    isPasswordVisible = !isPasswordVisible;
+                    int inputType = isPasswordVisible ? InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                            : InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD;
+                    passwordEditText.setInputType(inputType);
+
+                    // Apply the custom font after changing the InputType
+                    applyCustomFont(passwordEditText);
+
+                    passwordEditText.setSelection(passwordEditText.getText().length());
+                    return true;
+                }
+            }
+            return false;
+        });
+
+        repasswordEditText.setOnTouchListener((v, event) -> {
+            int DRAWABLE_RIGHT = 2;
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                if (event.getRawX() >= (repasswordEditText.getRight() - repasswordEditText.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                    isPasswordVisible = !isPasswordVisible;
+                    int inputType = isPasswordVisible ? InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                            : InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD;
+                    repasswordEditText.setInputType(inputType);
+
+                    // Apply the custom font after changing the InputType
+                    applyCustomFont(repasswordEditText);
+
+                    repasswordEditText.setSelection(repasswordEditText.getText().length());
+                    return true;
+                }
+            }
+            return false;
+        });
+
+        if (repasswordEditText != null) {
+            // Add a TextWatcher to the re-entered password EditText
+            repasswordEditText.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int start, int before, int count) {
+                    // This method is called to notify you that characters within `charSequence` are about to be replaced with new text with length `count`
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                    // This method is called to notify you that somewhere within `charSequence`, the text has been replaced with new text with length `count`
+                }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+                    // This method is called to notify you that somewhere within `editable`, the text has been changed.
+
+                    // Get the entered password and re-entered password
+                    String password = passwordEditText != null ? passwordEditText.getText().toString() : "";
+                    String reEnteredPassword = editable.toString();
+
+                    // Check if the passwords match
+                    if (!TextUtils.isEmpty(password) && !password.equals(reEnteredPassword)) {
+                        // Set an error if the passwords don't match
+                        repasswordEditText.setError("Passwords do not match.");
+                    } else {
+                        // Clear the error if the passwords match
+                        repasswordEditText.setError(null);
+                    }
+                }
+            });
+        }
+
+        if (passwordEditText != null) {
+            // Add a TextWatcher to the password EditText
+            passwordEditText.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    // This method is called to notify you that characters within `s` are about to be replaced with new text with length `after`
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    // This method is called to notify you that somewhere within `s`, the text has been replaced with new text with length `count`
+                }
+
+                public void afterTextChanged(Editable s) {
+                    // This method is called to notify you that somewhere within `s`, the text has been changed.
+                    String password = s.toString();
+
+                    // Check if the password matches the pattern
+                    if (password.matches(passwordPattern)) {
+                        // Password is valid, clear the error
+                        passwordEditText.setError(null);
+                    } else {
+                        // Password is not valid, set error on the password field
+                        String errorMessage = getErrorMessage(password);
+                        passwordEditText.setError(errorMessage);
+                    }
+                }
+            });
+        }
 
         View registerButton = findViewById(R.id.RegisterButton);
         View regLoginButton = findViewById(R.id.regLogin);
@@ -156,8 +310,7 @@ public class Register extends AppCompatActivity {
 
 
 
-                // Define the regex pattern
-                String passwordPattern = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}$";
+
 
                 // Check if any of the input fields are empty
                 if (TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) ||
@@ -307,6 +460,132 @@ public class Register extends AppCompatActivity {
                         }, year, month, day);
 
                 datePickerDialog.show();
+            }
+        });
+    }
+    private void showPasswordInfoPopup() {
+        // Create a string with bulleted list
+        String passwordRequirements = "Password must have:\n\n" +
+                "\u2022 At least 8 characters\n" +
+                "\u2022 At least one uppercase letter\n" +
+                "\u2022 At least one lowercase letter\n" +
+                "\u2022 At least one special character\n" +
+                "\u2022 At least one numeric character";
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(Register.this);
+        builder.setTitle("Password Requirements");
+        builder.setMessage(passwordRequirements);
+        builder.setPositiveButton("OK", null); // You can add a listener if needed
+        builder.create().show();
+    }
+    private String getErrorMessage(String password) {
+        StringBuilder errorMessage = new StringBuilder();
+
+        if (password.length() < 8) {
+            errorMessage.append("At least 8 characters\n");
+        }
+
+        if (!containsUppercase(password)) {
+            errorMessage.append("At least one uppercase letter\n");
+        }
+
+        if (!containsLowercase(password)) {
+            errorMessage.append("At least one lowercase letter\n");
+        }
+
+        if (!containsSpecialCharacter(password)) {
+            errorMessage.append("At least one special character\n");
+        }
+
+        if (!containsNumericCharacter(password)) {
+            errorMessage.append("At least one numeric character\n");
+        }
+
+        return errorMessage.length() > 0 ? errorMessage.toString() : null;
+    }
+
+
+    private boolean containsUppercase(String password) {
+        return !password.equals(password.toLowerCase());
+    }
+
+    private boolean containsLowercase(String password) {
+        return !password.equals(password.toUpperCase());
+    }
+
+    private boolean containsSpecialCharacter(String password) {
+        // Check if the password contains at least one special character
+        String specialCharacters = "!@#$%^&*()-_=+\\|[{]};:'\",<.>/?";
+        for (char c : specialCharacters.toCharArray()) {
+            if (password.contains(String.valueOf(c))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean containsNumericCharacter(String password) {
+        // Check if the password contains at least one numeric character
+        return password.matches(".*\\d.*");
+    }
+
+    private void applyCustomFont(EditText editText) {
+        // Load the Raleway font from the res/font directory
+        Typeface ralewayFont = ResourcesCompat.getFont(this, R.font.raleway_regular);
+
+        // Apply the custom font to the EditText
+        editText.setTypeface(ralewayFont);
+    }
+
+    private String validateUsername(String username) {
+        // Check if the username is at least 4 characters long
+        if (username.length() < 4) {
+            return "Username must be at least 4 characters long.";
+        }
+
+        // Check if the username contains '.', '$', '#', '[', ']', '/', or ASCII control characters 0-31 or 127
+        String invalidCharacters = ".#$[]/";
+        for (char c : invalidCharacters.toCharArray()) {
+            if (username.contains(String.valueOf(c)) || (c <= 31 || c == 127)) {
+                return "Username cannot contain ' " + c + " '";
+            }
+        }
+
+        return null; // Return null if the username is valid
+    }
+
+    // Add a method to check if the username is already taken
+    private void checkUsernameAvailability(String username) {
+        // Get a reference to the Firebase Realtime Database
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+
+        // Check if the username already exists in the database
+        databaseReference.child("MobileUsers").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                EditText usernameEditText = unameregInputLayout.getEditText();
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                        User existingUser = userSnapshot.getValue(User.class);
+                        if (existingUser != null) {
+                            // Decrypt the encrypted username
+                            String decryptedUsername = AESUtils.decrypt(existingUser.getUsername());
+                            if (decryptedUsername.equals(username)) {
+                                // Username already exists, show an error message
+                                usernameEditText.setError("Username is already taken.");
+                                return;
+                            }
+                        }
+                    }
+                }
+                // Username is available, clear the error
+                usernameEditText.setError(null);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle database error, if any
+                Toast.makeText(Register.this, "Database error: " + databaseError.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
