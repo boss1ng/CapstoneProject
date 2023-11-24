@@ -534,7 +534,11 @@ public class AddGlimpseFragment extends DialogFragment {
                                 String profilePictureUrl = dataSnapshot.child("profilePictureUrl").getValue(String.class);
 
                                 newPostRef.child("username").setValue(username);
-                                newPostRef.child("profilePictureUrl").setValue(profilePictureUrl);
+                                if (profilePictureUrl == null){
+                                    newPostRef.child("profilePictureUrl").setValue("https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/profilepicture.png?alt=media&token=434ea657-4982-4a1d-b4e8-a37e89dfb29e");
+                                }else{
+                                    newPostRef.child("profilePictureUrl").setValue(profilePictureUrl);
+                                }
                             } else {
                                 Toast.makeText(context, "Location data not available", Toast.LENGTH_LONG).show();
                             }
