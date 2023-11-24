@@ -1842,7 +1842,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback, M
                             // Format totalDistanceKm with 2 decimal places
                             String formattedDistance = String.format("%.2f", totalDistanceKm);
 
-                            double thresholdDistance = 1.2; // 0.015=15 meters threshold    1.2
+                            double thresholdDistance = 0.015; // 0.015=15 meters threshold    1.2
 
                             if (textViewDistance != null && textViewDirection != null && buttonFinish != null && imageViewDirections != null) {
                                 if (totalDistanceKm <= thresholdDistance) {
