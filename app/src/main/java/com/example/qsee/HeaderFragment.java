@@ -1,5 +1,4 @@
 package com.example.qsee;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -69,7 +68,10 @@ import java.util.TimeZone;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class HomeFragment extends Fragment {
+import androidx.fragment.app.Fragment;
+
+public class HeaderFragment extends Fragment {
+
     boolean isUserInQuezonCity = true;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
@@ -93,30 +95,30 @@ public class HomeFragment extends Fragment {
     private PostAdapter postAdapter;
     private List<Post> postList; // Your data source
 
-    public HomeFragment() {
-        // Required empty public constructor
+    private HeaderFragment() {
+        //Required Empty Constructor
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        View view = inflater.inflate(R.layout.header_layout, container, false);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        LinearLayout linearLayout = view.findViewById(R.id.recycleLinear);
-        /*imageView12 = view.findViewById(R.id.imageView12);
+        //LinearLayout linearLayout = view.findViewById(R.id.recycleLinear);
+        imageView12 = view.findViewById(R.id.imageView12);
         imageView13 = view.findViewById(R.id.imageView13);
         imageView14 = view.findViewById(R.id.imageView14);
         imageView15 = view.findViewById(R.id.imageView15);
         imageView16 = view.findViewById(R.id.imageView16);
-        imageView17 = view.findViewById(R.id.imageView17);*/
+        imageView17 = view.findViewById(R.id.imageView17);
 
-        /*Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/sliders%2Fslider_1.jpg?alt=media&token=83a13343-b5bd-42bd-98ca-a234e13be324").into(imageView12);
+        Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/sliders%2Fslider_1.jpg?alt=media&token=83a13343-b5bd-42bd-98ca-a234e13be324").into(imageView12);
         Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/sliders%2Fslider_2.jpg?alt=media&token=dd113988-1a86-40e1-9e42-e8947e798b67").into(imageView13);
         Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/sliders%2Fslider_3.jpg?alt=media&token=8a9a8d6b-5736-4b81-b2a2-579a1b08d1c6").into(imageView14);
         Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/sliders%2Fslider_4.jpg?alt=media&token=0c163b54-da16-4514-9869-5262e8824108").into(imageView15);
         Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/sliders%2Fslider_5.jpg?alt=media&token=36192c6c-0818-4ee5-9b6c-dc3ee1809a71").into(imageView16);
-        Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/sliders%2Fslider_6.jpg?alt=media&token=24bf286a-554f-4f74-8016-8c9eabe0b7de").into(imageView17);*/
+        Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/sliders%2Fslider_6.jpg?alt=media&token=24bf286a-554f-4f74-8016-8c9eabe0b7de").into(imageView17);
 
-        feedRecyclerView = view.findViewById(R.id.feedRecyclerView);
+        //feedRecyclerView = view.findViewById(R.id.feedRecyclerView);
 
         // Apply the ItemDecoration with the desired spacing (in pixels)
         int spacingInPixels = getResources().getDimensionPixelSize(R.dimen.spacing); // Define your desired spacing in dimens.xml
@@ -144,23 +146,23 @@ public class HomeFragment extends Fragment {
             }, LOCATION_PERMISSION_REQUEST_CODE);
         }
 
-        /*textView = view.findViewById(R.id.textView);
+        textView = view.findViewById(R.id.textView);
         dateText = view.findViewById(R.id.date);
         wC = view.findViewById(R.id.weatherCondition);
         rP = view.findViewById(R.id.rainPercentage);
 
         ImageView previousImageView = view.findViewById(R.id.previousButton);
-        ImageView nextImageView = view.findViewById(R.id.nextButton);*/
+        ImageView nextImageView = view.findViewById(R.id.nextButton);
 
         // Set click listeners for previous and next ImageViews
-        /*previousImageView.setOnClickListener(v -> showPreviousDay());
+        previousImageView.setOnClickListener(v -> showPreviousDay());
         nextImageView.setOnClickListener(v -> showNextDay());
 
         // Automatically load the weather forecast for Quezon City
         getWeatherForecastByLocationName();
 
         // Initially, display the first day's information (dayIndex = 0)
-        displayDay(currentDayIndex);*/
+        displayDay(currentDayIndex);
 
         // Retrieve selected categories from Bundle arguments
         Bundle getBundle = getArguments();
@@ -170,278 +172,10 @@ public class HomeFragment extends Fragment {
             //Toast.makeText(getContext(), userID, Toast.LENGTH_LONG).show();
         }
 
-        BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottomNavigationView);
-        // Set the default item as highlighted
-        MenuItem defaultItem = bottomNavigationView.getMenu().findItem(R.id.action_home);
-        defaultItem.setChecked(true);
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int itemId = item.getItemId();
-                if (itemId == R.id.action_home) {
-                    loadFragment(new HomeFragment());
-                    bottomNavigationView.setVisibility(View.GONE);
-                    LinearLayout linearLayout = view.findViewById(R.id.parentLinearCont);
-                    linearLayout.setVisibility(View.GONE);
-                    FloatingActionButton floatingActionButton = view.findViewById(R.id.floatingAddButton);
-                    floatingActionButton.setVisibility(View.GONE);
 
-                } else if (itemId == R.id.action_search) {
-                    loadFragment(new SearchFragment());
-                    bottomNavigationView.setVisibility(View.GONE);
-                    LinearLayout linearLayout = view.findViewById(R.id.parentLinearCont);
-                    linearLayout.setVisibility(View.GONE);
-                    RecyclerView linearLayout1 = view.findViewById(R.id.feedRecyclerView);
-                    linearLayout1.setVisibility(View.GONE);
-                    FloatingActionButton floatingActionButton = view.findViewById(R.id.floatingAddButton);
-                    floatingActionButton.setVisibility(View.GONE);
-
-                } else if (itemId == R.id.action_maps) {
-                    loadFragment(new MapsFragment());
-                    //BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
-                    bottomNavigationView.setVisibility(View.GONE);
-                    LinearLayout linearLayout = view.findViewById(R.id.parentLinearCont);
-                    linearLayout.setVisibility(View.GONE);
-                    RecyclerView linearLayout1 = view.findViewById(R.id.feedRecyclerView);
-                    linearLayout1.setVisibility(View.GONE);
-                    FloatingActionButton floatingActionButton = view.findViewById(R.id.floatingAddButton);
-                    floatingActionButton.setVisibility(View.GONE);
-
-                } else if (itemId == R.id.action_quiz) {
-                    loadFragment(new StartQuizFragment());
-                    bottomNavigationView.setVisibility(View.GONE);
-                    LinearLayout linearLayout = view.findViewById(R.id.parentLinearCont);
-                    linearLayout.setVisibility(View.GONE);
-                    RecyclerView linearLayout1 = view.findViewById(R.id.feedRecyclerView);
-                    linearLayout1.setVisibility(View.GONE);
-                    FloatingActionButton floatingActionButton = view.findViewById(R.id.floatingAddButton);
-                    floatingActionButton.setVisibility(View.GONE);
-
-                } else if (itemId == R.id.action_profile) {
-                    loadFragment(new ProfileFragment());
-                    bottomNavigationView.setVisibility(View.GONE);
-                    LinearLayout linearLayout = view.findViewById(R.id.parentLinearCont);
-                    linearLayout.setVisibility(View.GONE);
-                    RecyclerView linearLayout1 = view.findViewById(R.id.feedRecyclerView);
-                    linearLayout1.setVisibility(View.GONE);
-                    FloatingActionButton floatingActionButton = view.findViewById(R.id.floatingAddButton);
-                    floatingActionButton.setVisibility(View.GONE);
-
-                }
-                return true;
-            }
-        });
-
-        // Find the FloatingActionButton by ID
-        FloatingActionButton fab = view.findViewById(R.id.floatingAddButton);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                // Check if location permission is granted
-                if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED
-                        && ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED) {
-
-                    // Request location permission if not granted
-                    requestPermissions(new String[]{
-                            android.Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.ACCESS_COARSE_LOCATION
-                    }, LOCATION_PERMISSION_REQUEST_CODE);
-                }
-
-                // Get the user's last known location and move the camera there
-                fusedLocationProviderClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
-                    if (location != null) {
-                        double latitude = location.getLatitude();
-                        double longitude = location.getLongitude();
-
-// RESTRICTION TO QUEZON CITY.
-///*
-                        Geocoder geocoder = new Geocoder(getContext());
-
-                        try {
-                            List<android.location.Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
-
-                            if (addresses != null && addresses.size() > 0) {
-                                Address address = addresses.get(0);
-
-                                // You can now extract address components
-                                String completeAddress = address.getAddressLine(0); // Full street address
-                                String city = address.getLocality();
-                                String state = address.getAdminArea();
-                                String postalCode = address.getPostalCode();
-                                String country = address.getCountryName();
-
-                                /*
-                                https://quezoncity.com/000001a/000001b/qc+links/backups/quezon+city+zip+code+6.html
-                                1105	1102	1106	1116	1109	1111	1119	1110	1115	1126	1120	1101	1117	1100	1121
-                                1128	1104	1112	1123	1113	1125	1118	1122	1114	1127	1124	1103	1108	1107
-                                 */
-
-                                if (completeAddress.contains("Metro Manila")) {
-
-                                    if (completeAddress.contains("1105") || completeAddress.contains("1102") || completeAddress.contains("1106") || completeAddress.contains("1116") ||
-                                            completeAddress.contains("1109") || completeAddress.contains("1111") || completeAddress.contains("1119") || completeAddress.contains("1110") ||
-                                            completeAddress.contains("1115") || completeAddress.contains("1126") || completeAddress.contains("1120") || completeAddress.contains("1101") ||
-                                            completeAddress.contains("1117") || completeAddress.contains("1100") || completeAddress.contains("1121") || completeAddress.contains("1128") ||
-                                            completeAddress.contains("1104") || completeAddress.contains("1112") || completeAddress.contains("1123") || completeAddress.contains("1113") ||
-                                            completeAddress.contains("1125") || completeAddress.contains("1118") || completeAddress.contains("1122") || completeAddress.contains("1114") ||
-                                            completeAddress.contains("1127") || completeAddress.contains("1124") || completeAddress.contains("1103") || completeAddress.contains("1108") ||
-                                            completeAddress.contains("1107") || completeAddress.contains("Quezon City")) {
-
-                                        isUserInQuezonCity = true;
-                                    }
-
-                                    else
-                                        isUserInQuezonCity = false;
-                                }
-
-                                else
-                                    isUserInQuezonCity = false;
-
-                            } else {
-                                // Geocoder couldn't find an address for the given latitude and longitude
-                            }
-                        } catch (IOException e) {
-                            // Handle geocoding errors (e.g., network issues, service not available)
-                            throw new RuntimeException(e);
-                        }
-//*/
-
-                        if (isUserInQuezonCity) {
-                            // The user is within Quezon City
-                            // Create an instance of the AddGlimpseFragment
-                            AddGlimpseFragment addGlimpseFragment = new AddGlimpseFragment();
-
-                            if (getBundle != null) {
-                                String userID = getBundle.getString("userId");
-
-                                // Create a Bundle to pass the userId as an argument
-                                Bundle args = new Bundle();
-                                args.putString("userId", userID); // Replace "your_user_id_here" with the actual user ID
-                                args.putString("fromHome", "From Home Fragment");
-                                addGlimpseFragment.setArguments(args);
-                            }
-
-                            // Show the AddGlimpseFragment as a dialog
-                            FragmentManager fragmentManager = getChildFragmentManager();
-                            FragmentTransaction transaction = fragmentManager.beginTransaction();
-                            addGlimpseFragment.show(transaction, "add_glimpse_dialog"); // You can provide a tag for the dialog
-                        }
-
-                        else {
-                            // The user is outside Quezon City
-                            fab.setEnabled(false);
-
-                            Toast.makeText(getContext(), "You are outside Quezon City.", Toast.LENGTH_LONG).show();
-
-                            // Create a Handler to introduce a delay
-                            Handler handler = new Handler();
-                            handler.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    // Display the second Toast with LENGTH_LONG duration after a delay
-                                    Toast.makeText(getContext(), "You won't be able to post.", Toast.LENGTH_LONG).show();
-                                }
-                            }, 3500); // 2000 milliseconds (2 seconds) delay
-                        }
-                    }
-                });
-            }
-        });
-
-        // For Reading the Database
-        // Initialize Firebase Database reference
-        // Reference to the "Location" node in Firebase
-
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Posts");
-        DatabaseReference mobileUsersReference = FirebaseDatabase.getInstance().getReference().child("MobileUsers");
-
-        // Create a list to store the retrieved data as maps
-        List<Map<String, String>> dataMapList = new ArrayList<>();
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @SuppressLint("NotifyDataSetChanged")
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    linearLayout.setVisibility(View.VISIBLE);
-                    dataMapList.clear();
-                    postList.clear();
-                    for (DataSnapshot placeSnapshot : snapshot.getChildren()) {
-
-                        // Extract user posts data
-                        String postCaption = placeSnapshot.child("caption").getValue(String.class);
-                        String postImage = placeSnapshot.child("imageUrl").getValue(String.class);
-                        Long postTimestamp = placeSnapshot.child("timestamp").getValue(Long.class);
-                        String postUserId = placeSnapshot.child("userId").getValue(String.class);
-                        String postUsername = placeSnapshot.child("username").getValue(String.class);
-                        String postProfilePic = placeSnapshot.child("profilePictureUrl").getValue(String.class);
-
-                        String stringTimeStamp = String.valueOf(postTimestamp);
-
-                        // Create a data map and add the values
-                        Map<String, String> dataMap = new HashMap<>();
-
-                        dataMap.put("caption", postCaption);
-                        dataMap.put("imageUrl", postImage);
-                        dataMap.put("timestamp", stringTimeStamp);
-                        dataMap.put("userId", postUserId);
-                        dataMap.put("postUsername", postUsername);
-                        dataMap.put("postProfilePic",postProfilePic);
-
-                        // Add the data map to the list
-                        dataMapList.add(dataMap);
-                    }
-
-                    // Now, dataMapList contains the data in reverse order as maps
-                    // You can iterate over it to access the data
-                    for (Map<String, String> dataMap : dataMapList) {
-                        String caption = dataMap.get("caption");
-                        String imageUrl = dataMap.get("imageUrl");
-                        String timestamp = dataMap.get("timestamp");
-                        String username = dataMap.get("postUsername");
-                        String profurl = dataMap.get("postProfilePic");
-                        Log.d("PostDebug", "Adding post with timestamp: " + timestamp);
-
-
-                        if (timestamp != null && !timestamp.equalsIgnoreCase("null") && !timestamp.isEmpty()) {
-                            long timestampLong = Long.parseLong(timestamp);
-                            String timeAgo = getTimeAgo(timestampLong);
-                            // Create a new Post object and add it to the list
-                            Post newPost = new Post(username, profurl, imageUrl, caption, timeAgo);
-                            postList.add(newPost);
-                        }
-
-                                        // Sort the postList based on converted timestamps in descending order (latest first)
-                        postList.sort((post1, post2) -> {
-                            long timestampMillis1 = convertTimeAgoToMillis(post1.getPostTime());
-                            long timestampMillis2 = convertTimeAgoToMillis(post2.getPostTime());
-                            return Long.compare(timestampMillis2, timestampMillis1);
-                        });
-
-                        postAdapter.notifyDataSetChanged();
-
-
-
-                    }
-                }
-                else {
-                    Toast.makeText(getContext(), "No Activity Posted.", Toast.LENGTH_LONG).show();
-                    linearLayout.setVisibility(View.GONE);
-                }
-                // Update the RecyclerView adapter with the retrieved user groups
-            }
-
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
         return view;
     }
+
 
     public String getTimeAgo(Long timestamp) {
 
@@ -503,7 +237,7 @@ public class HomeFragment extends Fragment {
         transaction.commit();
     }
 
-    /*@SuppressLint({"SetTextI18n", "DefaultLocale"})
+    @SuppressLint({"SetTextI18n", "DefaultLocale"})
     private void displayDay(int dayIndex) {
         if (dayIndex >= 0 && dayIndex < dailyForecasts.size()) {
             List<String> sortedDates = new ArrayList<>(dailyForecasts.keySet());
@@ -800,8 +534,6 @@ public class HomeFragment extends Fragment {
         }
         return sum / numbers.size();
     }
-    */
-
     public long convertTimeAgoToMillis(String timeAgo) {
         // Assuming "timeAgo" is in the format "X unit(s) ago"
         if ("just now".equalsIgnoreCase(timeAgo.trim())) {
@@ -853,3 +585,5 @@ public class HomeFragment extends Fragment {
 
 
 }
+
+
