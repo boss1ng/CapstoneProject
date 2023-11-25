@@ -333,6 +333,11 @@ public class Register extends AppCompatActivity {
                     return; // Don't proceed with registration
                 }
 
+                if (username.length() < 4) {
+                    Toast.makeText(Register.this, "Username must be at least 4 characters long.", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
                 // Check if the password and re-typed password match
                 if (!password.equals(reTypedPassword)) {
                     // Show an error Toast message if the passwords do not match
