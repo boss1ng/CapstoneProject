@@ -298,7 +298,7 @@ public class EditItineraryAdapter extends RecyclerView.Adapter<EditItineraryAdap
                                 }
                             }
                         }
-                        if (dataSnapshot.getChildrenCount() == 3) {
+                        if (dataSnapshot.getChildrenCount() == 3 || dataSnapshot .getChildrenCount() == 4) {
                             // Remove the day from the database
                             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Itinerary");
                             databaseReference.child(iterName).removeValue();
