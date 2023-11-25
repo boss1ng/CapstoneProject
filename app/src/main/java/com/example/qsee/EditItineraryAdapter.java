@@ -298,7 +298,17 @@ public class EditItineraryAdapter extends RecyclerView.Adapter<EditItineraryAdap
                                 }
                             }
                         }
-                        if (dataSnapshot.getChildrenCount() == 3 || dataSnapshot .getChildrenCount() == 4) {
+                        if (dataSnapshot.getChildrenCount() == 3){
+                            // Remove the day from the database
+                            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Itinerary");
+                            databaseReference.child(iterName).removeValue();
+
+                            Toast.makeText(context, "Last activity removed, The Itinerary will be deleted.", Toast.LENGTH_LONG).show();
+
+                            // Pop back the fragment when the itinerary is deleted
+                            FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
+                            fragmentManager.popBackStack();
+                        } else if (dataSnapshot.getChildrenCount() == 4) {
                             // Remove the day from the database
                             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Itinerary");
                             databaseReference.child(iterName).removeValue();
