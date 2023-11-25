@@ -62,7 +62,7 @@ public class AddUserFinder extends DialogFragment {
         TextInputEditText userIdTextView = view.findViewById(R.id.editTextUserId);
         Button inviteBtn = view.findViewById(R.id.inviteBtn);
 
-        int maxLength = 10;
+        int maxLength = 20;
         userIdTextView.setFilters(new InputFilter[] { new InputFilter.LengthFilter(maxLength) });
 
         // Set a click listener for the "Invite" button
