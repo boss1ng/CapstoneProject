@@ -24,6 +24,7 @@ import android.Manifest;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.InputFilter;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -229,6 +230,19 @@ public class EditProfileFragment extends Fragment {
                 String modifiedContactNo = "09" + newContactNumber;
 
                 String newBirthdate = birthdateEditText.getEditText().getText().toString();
+
+                // Validate user-input data
+                if (TextUtils.isEmpty(newFirstName) || TextUtils.isEmpty(newLastName)
+                        || TextUtils.isEmpty(newContactNumber) || TextUtils.isEmpty(newBirthdate)
+                        || newContactNumber.length() != 9) {
+                    Toast.makeText(getContext(), "Please fill in all the fields.", Toast.LENGTH_SHORT).show();
+                    if (TextUtils.isEmpty(newContactNumber)) {
+                        Toast.makeText(getContext(), "Please fill in all the fields.", Toast.LENGTH_SHORT).show();
+                    } else if (newContactNumber.length() != 9) {
+                        Toast.makeText(getContext(), "Invalid Contact Number.", Toast.LENGTH_SHORT).show();
+                    }
+                    return; // Do not proceed with database update
+                }
 
                 String encryptedFirstName = AESUtils.encrypt(newFirstName);
                 String encryptedLastName = AESUtils.encrypt(newLastName);

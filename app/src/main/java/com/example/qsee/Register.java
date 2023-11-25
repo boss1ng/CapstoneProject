@@ -322,6 +322,11 @@ public class Register extends AppCompatActivity {
                     return; // Don't proceed with registration
                 }
 
+                if (contactNumber.length() != 9) {
+                    Toast.makeText(Register.this, "Invalid Contact Number.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 // Check if the password matches the pattern
                 if (password.matches(passwordPattern)) {
                     // Password is valid
