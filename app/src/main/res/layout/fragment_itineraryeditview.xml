@@ -55,7 +55,7 @@
 
         <TextView
             android:id="@+id/dayTitle1"
-            android:layout_width="412dp"
+            android:layout_width="match_parent"
             android:layout_height="37dp"
             android:layout_marginTop="4dp"
             android:background="@color/shade1"
@@ -84,7 +84,7 @@
 
         <TextView
             android:id="@+id/dayTitle2"
-            android:layout_width="412dp"
+            android:layout_width="match_parent"
             android:layout_height="37dp"
             android:background="@color/shade1"
             android:padding="6dp"
@@ -112,7 +112,7 @@
 
         <TextView
             android:id="@+id/dayTitle3"
-            android:layout_width="412dp"
+            android:layout_width="match_parent"
             android:layout_height="37dp"
             android:background="@color/shade1"
             android:padding="6dp"
@@ -141,7 +141,7 @@
 
         <TextView
             android:id="@+id/dayTitle4"
-            android:layout_width="412dp"
+            android:layout_width="match_parent"
             android:layout_height="37dp"
             android:background="@color/shade1"
             android:padding="6dp"
@@ -166,7 +166,7 @@
 
         <TextView
             android:id="@+id/dayTitle5"
-            android:layout_width="412dp"
+            android:layout_width="match_parent"
             android:layout_height="37dp"
             android:background="@color/shade1"
             android:padding="6dp"
