@@ -930,7 +930,6 @@ public class AddGlimpseFragment extends DialogFragment {
                             rssPostNewLoc.child("Description").setValue("");
                             rssPostNewLoc.child("HighestPrice").setValue("");
                             rssPostNewLoc.child("Image").setValue(filename);
-                            rssPostNewLoc.child("ImageDescription").setValue(""); // NULL
                             rssPostNewLoc.child("Latitude").setValue(String.valueOf(firebaseLat));
                             rssPostNewLoc.child("Link").setValue(downloadUrl);
                             rssPostNewLoc.child("Location").setValue(userLocation);
