@@ -305,9 +305,17 @@ public class EditItineraryAdapter extends RecyclerView.Adapter<EditItineraryAdap
 
                             Toast.makeText(context, "Last activity removed, The Itinerary will be deleted.", Toast.LENGTH_LONG).show();
 
-                            // Pop back the fragment when the itinerary is deleted
+                            // Redirect to ProfileFragment
                             FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
-                            fragmentManager.popBackStack();
+                            ProfileFragment profileFragment = new ProfileFragment();
+                            // Use Bundle to pass values
+                            Bundle bundle = new Bundle();
+                            bundle.putString("userId", userId);
+                            bundle.putString("fromItinerary", "2");
+                            profileFragment.setArguments(bundle);
+                            FragmentTransaction transaction = fragmentManager.beginTransaction();
+                            transaction.replace(R.id.fragment_container, profileFragment); // Replace R.id.fragment_container with your actual container ID
+                            transaction.commit();
                         } else if (dataSnapshot.getChildrenCount() == 4) {
                             // Remove the day from the database
                             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Itinerary");
@@ -315,9 +323,17 @@ public class EditItineraryAdapter extends RecyclerView.Adapter<EditItineraryAdap
 
                             Toast.makeText(context, "Last activity removed, The Itinerary will be deleted.", Toast.LENGTH_LONG).show();
 
-                            // Pop back the fragment when the itinerary is deleted
+                            // Redirect to ProfileFragment
                             FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
-                            fragmentManager.popBackStack();
+                            ProfileFragment profileFragment = new ProfileFragment();
+                            // Use Bundle to pass values
+                            Bundle bundle = new Bundle();
+                            bundle.putString("userId", userId);
+                            bundle.putString("fromItinerary", "2");
+                            profileFragment.setArguments(bundle);
+                            FragmentTransaction transaction = fragmentManager.beginTransaction();
+                            transaction.replace(R.id.fragment_container, profileFragment); // Replace R.id.fragment_container with your actual container ID
+                            transaction.commit();
                         }
 
                     }

@@ -12,7 +12,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:gravity="center">
 
             <TextView
                 android:id="@+id/textView28"
@@ -22,13 +23,13 @@
                 android:layout_marginTop="16dp"
                 android:text="Itinerary Name:"
                 android:textColor="@color/black"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                android:layout_gravity="left"/>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayout"
                 android:layout_width="353dp"
                 android:layout_height="63dp"
-                android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp">
 
                 <com.google.android.material.textfield.TextInputEditText
