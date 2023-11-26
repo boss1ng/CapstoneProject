@@ -316,7 +316,7 @@ public class EditItineraryAdapter extends RecyclerView.Adapter<EditItineraryAdap
                             FragmentTransaction transaction = fragmentManager.beginTransaction();
                             transaction.replace(R.id.fragment_container, profileFragment); // Replace R.id.fragment_container with your actual container ID
                             transaction.commit();
-                        } else if (dataSnapshot.getChildrenCount() == 4) {
+                        } else if (dataSnapshot.getChildrenCount() == 4 && dataSnapshot.hasChild("groupName")) {
                             // Remove the day from the database
                             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Itinerary");
                             databaseReference.child(iterName).removeValue();
