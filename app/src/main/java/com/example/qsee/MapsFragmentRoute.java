@@ -1069,7 +1069,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback, M
                         }
                     }
                 };
-                handler.postDelayed(mapRefreshRunnable, 800); // Schedule it to run after 0.3 second
+                handler.postDelayed(mapRefreshRunnable, 600); // Schedule it to run after 0.3 second
             }
         }
 
@@ -1289,7 +1289,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback, M
                 }
             }
         };
-        handler.postDelayed(mapRefreshRunnable, 800); // Schedule it to run after 0.5 second
+        handler.postDelayed(mapRefreshRunnable, 600); // Schedule it to run after 0.5 second
 
     }
 
@@ -1550,7 +1550,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback, M
                     }
                 }
             };
-            handler.postDelayed(mapRefreshRunnable, 800); // Schedule it to run after 0.3 second
+            handler.postDelayed(mapRefreshRunnable, 600); // Schedule it to run after 0.3 second
 
         }
 
@@ -2077,7 +2077,7 @@ public class MapsFragmentRoute extends Fragment implements OnMapReadyCallback, M
                 }
             }
         };
-        handler.postDelayed(mapRefreshRunnable, 1000); // Schedule it to run after 0.5 seconds
+        handler.postDelayed(mapRefreshRunnable, 600); // Schedule it to run after 0.5 seconds
 
 
     }

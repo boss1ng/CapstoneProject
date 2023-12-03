@@ -284,28 +284,42 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
         if (!(userID.equals("0")) || !(destinationLatitude.equals("0.0")) || !(destinationLongitude.equals("0.0")) || !(originLatitude.equals("0.0")) || !(originLongitude.equals("0.0"))) {
 
-            if (getBundle != null) {
-                String passUserID = getBundle.getString("userId");
+            Bundle args = getArguments();
+            if (args != null) {
+                placeLatitude = args.getDouble("placeLatitude");
+                placeLongitude = args.getDouble("placeLongitude");
 
-                if (passUserID.equals(userID)) {
-                    MapsFragmentResume mapsFragmentResume = new MapsFragmentResume();
-                    mapsFragmentResume.setCancelable(false);
+                if (placeLatitude != 0.0 && placeLongitude != 0.0) {
 
-                    String placeName = getBundle.getString("placeName");
+                }
 
-                    // Use Bundle to pass values
-                    Bundle bundle = new Bundle();
-                    bundle.putString("userId", passUserID);
-                    bundle.putString("placeName", placeName);
-                    bundle.putString("userCurrentLatitude", originLatitude);
-                    bundle.putString("userCurrentLongitude", originLongitude);
-                    bundle.putString("destinationLatitude", destinationLatitude);
-                    bundle.putString("destinationLongitude", destinationLongitude);
-                    mapsFragmentResume.setArguments(bundle);
+                else { // placeLatitude and placeLongitude are NULL
+                    if (getBundle != null) {
+                        String passUserID = getBundle.getString("userId");
 
-                    mapsFragmentResume.show(getChildFragmentManager(), "MapsFragmentResume");
+                        if (passUserID.equals(userID)) {
+                            MapsFragmentResume mapsFragmentResume = new MapsFragmentResume();
+                            mapsFragmentResume.setCancelable(false);
+
+                            String placeName = getBundle.getString("placeName");
+
+                            // Use Bundle to pass values
+                            Bundle bundle = new Bundle();
+                            bundle.putString("userId", passUserID);
+                            bundle.putString("placeName", placeName);
+                            bundle.putString("userCurrentLatitude", originLatitude);
+                            bundle.putString("userCurrentLongitude", originLongitude);
+                            bundle.putString("destinationLatitude", destinationLatitude);
+                            bundle.putString("destinationLongitude", destinationLongitude);
+                            mapsFragmentResume.setArguments(bundle);
+
+                            mapsFragmentResume.show(getChildFragmentManager(), "MapsFragmentResume");
+                        }
+                    }
                 }
             }
+
+
         }
 
         return view;
