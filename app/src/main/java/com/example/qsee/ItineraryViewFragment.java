@@ -510,11 +510,11 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
                                     } catch (java.text.ParseException e) {
                                         e.printStackTrace();
                                     }
-                                } else
-                                    break;
-
+                                } else {
+                                    continue;
+                                }
                                 // Create a cell with the text "Merged Columns" that spans all five columns
-                                PdfPCell cell = new PdfPCell(new Paragraph("Day " + i + " - " + dateText, tableHeader));
+                                PdfPCell cell = new PdfPCell(new Paragraph(dateText, tableHeader));
                                 cell.setColspan(4); // Set the number of columns to span
                                 cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
                                 cell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
@@ -740,9 +740,9 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
                             }
                         }
 
-                        else
-                            break;
-
+                        else {
+                            continue;
+                        }
                         for (DataSnapshot timeSnapshot : childSnapshot.child(dayKey).getChildren()) {
                             String key = timeSnapshot.getKey();
                             if (key.contains("date")) {
