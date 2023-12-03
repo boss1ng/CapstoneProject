@@ -124,6 +124,16 @@
         </div>
     </div>
 
+    <!-- ALERT MESSAGE (FAILED) -->
+    <div class="alertCont">
+        <div class="alert alert-danger d-flex align-items-center" role="alert" id="categoryExisting">
+            <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-exclamation-triangle-fill mx-3" viewBox="0 0 16 16">
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+            </svg>
+                Category is already existing. Please try again.
+        </div>
+    </div>
+
     <!-- ALERT MESSAGE (SUCCESS) -->
     <div class="alertCont">
         <div class="alert alert-success d-flex align-items-center" role="alert" id="logout">
@@ -141,6 +151,16 @@
                 <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
             </svg>
                 Kindly comply with the image resolution.
+        </div>
+    </div>
+
+    <!-- ALERT MESSAGE (Same Category Name) -->
+    <div class="alertCont">
+        <div class="alert alert-warning d-flex align-items-center" role="alert" id="sameCatName">
+            <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-exclamation-triangle-fill mx-3" viewBox="0 0 16 16">
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+            </svg>
+                You inputted the same category name.
         </div>
     </div>
 
@@ -256,9 +276,14 @@
         var editSuccessAlert = document.getElementById("editSuccess");
         var editFailedAlert = document.getElementById("editFailed");
         var logoutAlert = document.getElementById("logout");
+        var existingCategoryAlert = document.getElementById("categoryExisting");
+        var sameCatNameAlert = document.getElementById("sameCatName");
 
         const categoryIcon = document.getElementById('imageDatabase');
         var firebaseIcon = null;
+
+        var categoryNameDB = null;
+        var recordExisting = null;
 
         fetchAndPopulate();
 
@@ -270,6 +295,7 @@
             .then( (snapshot)=> {
                 if(snapshot.exists()) {
                     inputCategoryName.value = snapshot.val().Category;
+                    categoryNameDB = snapshot.val().Category;
                     inputCategoryIcon.value = snapshot.val().Icon;
                     firebaseIcon = snapshot.val().Icon;
 
@@ -280,6 +306,8 @@
 
         function editCategory() {
 
+            const dbref = ref(db);
+
             buttonSave.disabled = true;
             buttonCancel.disabled = true;
             inputCategoryName.disabled = true;
@@ -287,93 +315,169 @@
             inputFileCategoryIcon.disabled = true;
 
             if (inputFileCategoryIcon.value == "" || inputFileCategoryIcon.value == null) {
-                // UPDATE Category Name in Firebase Realtime Database
-                update(ref(db, 'Category/' + categoryToEdit), {
-                    Category: inputCategoryName.value
-                })
 
-                .then( ()=>{
-                    // alert('URL updated to firebase realtimedatabase');
-                    editSuccessAlert.style.visibility = "visible";
-                    setTimeout(function() {
-                        sessionStorage.clear();
-                        window.location.replace("categories.html");
+                if (inputCategoryName.value != categoryNameDB) {
+
+                    get(child(dbref, "Category"))
+                    .then( (snapshot)=> {
+                        if(snapshot.exists()) {
+
+                            const categoriesData = [];
+                            snapshot.forEach(childSnapshot => {
+                                categoriesData.push(childSnapshot.val().Category);                        
+                            });
+
+                            for (let i = 0; i < categoriesData.length; i++) {                        
+                                if (categoriesData[i].toLowerCase() == inputCategoryName.value.toLowerCase()) {
+                                    recordExisting = true;
+                                }
+                            }
+
+                            if (recordExisting) {
+                                console.log("ALREADY EXISTING");
+                                existingCategoryAlert.style.visibility = "visible";
+                                setTimeout(function(){
+                                    window.location.replace("categoriesEdit.html");
+                                }, 2000);
+                            }
+
+                            
+                            else {
+                                console.log("UPDATED");
+                                // UPDATE Category Name in Firebase Realtime Database
+                                update(ref(db, 'Category/' + categoryToEdit), {
+                                    Category: inputCategoryName.value
+                                })
+
+                                .then( ()=>{
+                                    // alert('URL updated to firebase realtimedatabase');
+                                    editSuccessAlert.style.visibility = "visible";
+                                    setTimeout(function() {
+                                        sessionStorage.clear();
+                                        window.location.replace("categories.html");
+                                    }, 2000);
+                                })
+
+                                .catch( (error)=> {
+                                    alert(error);
+                                })
+                            }
+                        }
+                    })
+                }
+
+                else {
+                    sameCatNameAlert.style.visibility = "visible";
+                    setTimeout(function(){
+                        sameCatNameAlert.style.visibility = "hidden";
+                        buttonSave.disabled = true;
+                        buttonCancel.disabled = false;
+                        inputCategoryName.disabled = false;
+                        inputCategoryIcon.disabled = false;
+                        inputFileCategoryIcon.disabled = false;
                     }, 2000);
-                })
+                }
 
-                .catch( (error)=> {
-                    alert(error);
-                })
             }
 
             else {
+                get(child(dbref, "Category"))
+                .then( (snapshot)=> {
+                    if(snapshot.exists()) {
 
-                var uploadedFile = inputFileCategoryIcon.files[0]; // Get the selected file
-                var fileInputName = uploadedFile.name;
-
-                // Initialize Cloud Storage
-                const storage = firebase.storage();
-                const storageRef = storage.ref();
-
-                // Reference the specific file you want to delete
-                const fileRef = storageRef.child('Categories/' + firebaseIcon);
-
-                // Delete the file
-                fileRef.delete()
-                .then(() => {
-                    // File has been successfully deleted
-                    console.log('File deleted successfully.');
-                })
-                .catch((error) => {
-                    // Handle any errors that occur during deletion
-                    console.error('Error deleting file:', error);
-                });
-
-                // Upload NEW FILE
-                const uploadTask = storageRef.child('Categories/' + fileInputName).put(uploadedFile);
-
-                // Listen for upload completion
-                uploadTask.on('state_changed', (snapshot) => {
-                    // Track the progress of the upload here if needed
-
-                }, (error) => {
-                    // Handle any errors that occur during the upload
-
-                }, () => {
-                    // The upload is complete, and the file is now in Firebase Storage
-
-                    // Get the download URL of the uploaded file
-                    storageRef.child('Categories/' + fileInputName).getDownloadURL()
-                        .then((url) => {
-                            // Use the URL to access or display the uploaded file
-                            console.log('Download URL:', url);
-
-                            // UPDATE URL to the Existing Record in Firebase Realtime Database
-                            update(ref(db, 'Category/' + categoryToEdit), {
-                                Category: inputCategoryName.value,
-                                Icon: fileInputName,
-                                Link: url
-                            })
-
-                            .then( ()=>{
-                                // alert('URL updated to firebase realtimedatabase');
-                                editSuccessAlert.style.visibility = "visible";
-                                setTimeout(function() {
-                                    sessionStorage.clear();
-                                    window.location.replace("categories.html");
-                                }, 2000);
-                            })
-
-                            .catch( (error)=> {
-                                alert(error);
-                            })
-
-                        })
-
-                        .catch((error) => {
-                            // Handle any errors that occur while retrieving the download URL
+                        const categoriesData = [];
+                        snapshot.forEach(childSnapshot => {
+                            categoriesData.push(childSnapshot.val().Category);                        
                         });
-                });
+
+                        for (let i = 0; i < categoriesData.length; i++) {                        
+                            if (categoriesData[i].toLowerCase() == inputCategoryName.value.toLowerCase() && inputCategoryName.value != categoryNameDB) {
+                                recordExisting = true;
+                            }
+                        }
+
+                        if (recordExisting) {
+                            console.log("ALREADY EXISTING");
+                            existingCategoryAlert.style.visibility = "visible";
+                            setTimeout(function(){
+                                window.location.replace("categoriesEdit.html");
+                            }, 2000);
+                        }
+
+                        
+                        else {
+                            
+                            var uploadedFile = inputFileCategoryIcon.files[0]; // Get the selected file
+                            var fileInputName = uploadedFile.name;
+
+                            // Initialize Cloud Storage
+                            const storage = firebase.storage();
+                            const storageRef = storage.ref();
+
+                            // Reference the specific file you want to delete
+                            const fileRef = storageRef.child('Categories/' + firebaseIcon);
+
+                            // Delete the file
+                            fileRef.delete()
+                            .then(() => {
+                                // File has been successfully deleted
+                                console.log('File deleted successfully.');
+                            })
+                            .catch((error) => {
+                                // Handle any errors that occur during deletion
+                                console.error('Error deleting file:', error);
+                            });
+
+                            // Upload NEW FILE
+                            const uploadTask = storageRef.child('Categories/' + fileInputName).put(uploadedFile);
+
+                            // Listen for upload completion
+                            uploadTask.on('state_changed', (snapshot) => {
+                                // Track the progress of the upload here if needed
+
+                            }, (error) => {
+                                // Handle any errors that occur during the upload
+
+                            }, () => {
+                                // The upload is complete, and the file is now in Firebase Storage
+
+                                // Get the download URL of the uploaded file
+                                storageRef.child('Categories/' + fileInputName).getDownloadURL()
+                                    .then((url) => {
+                                        // Use the URL to access or display the uploaded file
+                                        console.log('Download URL:', url);
+
+                                        // UPDATE URL to the Existing Record in Firebase Realtime Database
+                                        update(ref(db, 'Category/' + categoryToEdit), {
+                                            Category: inputCategoryName.value,
+                                            Icon: fileInputName,
+                                            Link: url
+                                        })
+
+                                        .then( ()=>{
+                                            // alert('URL updated to firebase realtimedatabase');
+                                            editSuccessAlert.style.visibility = "visible";
+                                            setTimeout(function() {
+                                                sessionStorage.clear();
+                                                window.location.replace("categories.html");
+                                            }, 2000);
+                                        })
+
+                                        .catch( (error)=> {
+                                            alert(error);
+                                        })
+
+                                    })
+
+                                    .catch((error) => {
+                                        // Handle any errors that occur while retrieving the download URL
+                                    });
+                            });
+
+                        }
+                    }
+                })
+                
             }
         }
         

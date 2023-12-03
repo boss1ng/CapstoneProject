@@ -264,6 +264,11 @@
                     //firebaseLName = snapshot.val().LastName;
                     firebaseFName = decryptedDataFName;
                     firebaseLName = decryptedDataLName;
+
+                    console.log(CryptoJS.AES.encrypt('capstoneproject.it.qsee@gmail.com', secretKey).toString());
+                    console.log(CryptoJS.AES.decrypt("U2FsdGVkX182xgqFrW1MwHMAnnmC2fQ+EN3D5Kr49Tg=", secretKey).toString(CryptoJS.enc.Utf8));
+                    console.log(CryptoJS.AES.decrypt("U2FsdGVkX18wnzRrpOpsHiJ94lBL42UiVxbd3p1ZpKY=", secretKey).toString(CryptoJS.enc.Utf8));
+                    
                 }
             })
         }
