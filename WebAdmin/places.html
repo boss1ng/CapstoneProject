@@ -15,6 +15,9 @@
     <!-- BOOTSTRAP v5.0 -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
+    <!-- BOOTSTRAP ICONS-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+
 </head>
 <body style="background-color: #2F414F;">
     <div class="sidebar">
@@ -96,10 +99,16 @@
                             </tr>
                         </thead>
 
-                        <tbody></tbody>
+                        <tbody id="categoryTableBody"></tbody>
                     </table>
 
                 </div>
+            </div>
+
+            <div class="d-flex justify-content-end mt-3 mx-4" id="pagination-controls">
+                <button class="btn btn-secondary mx-2" id="previousBtn">Previous</button>
+                <!-- Dynamically add page number buttons here -->
+                <button class="btn btn-secondary" id="nextBtn">Next</button>
             </div>
 
         </div>
@@ -177,16 +186,6 @@
             window.location.href = "placesEdit.html";
         }
 
-        /*
-        const form = document.getElementById('searchForm');
-        form.addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevents the default form submission behavior
-            const inputValue = form.querySelector('#searchInput').value;
-            alert(`You entered: ${inputValue}`);
-            // You can add your custom JavaScript logic here
-        });
-        */
-
         function searchLocation(input) {
             const searchInput = input.value.toLowerCase();
             sessionStorage.setItem('searchLoc', searchInput);
@@ -242,11 +241,21 @@
         const filterLocationsBasedOnCategoryPage = sessionStorage.getItem('filterCategory');
 
         var logoutAlert = document.getElementById("logout");
+
+        // Constants
+        const recordsPerPage = 20;
+        let currentPage = 1;
+        let startPage = 1;
+        let lastPage = null;
+
+        const locationsData = [];
+        const categoriesData = [];
+        let paginatedItems = [];
+
+        var currentRecordNum = 0;
         
         fetchAndPopulate();
 
-        // Fetch data from the database and populate the table
-        /*
         function fetchAndPopulate() {
             const dbref = ref(db)
 
@@ -254,7 +263,6 @@
             .then( (snapshot)=> {
                 if(snapshot.exists()) {
                     
-                    const locationsData = [];
                     snapshot.forEach(childSnapshot => {
                         const location = {
                             Key: childSnapshot.key,
@@ -270,44 +278,70 @@
                             Image: childSnapshot.val().Image,
                             ImageDescription: childSnapshot.val().ImageDescription
                         };
+                        currentRecordNum++; // 213
                         locationsData.push(location);
                     });
 
-                    populateTable(locationsData);
-                }
-            })
-        }*/
+                    const start = (currentPage - 1) * recordsPerPage;
+                    let end = start + recordsPerPage;
 
-        function fetchAndPopulate() {
-            const dbref = ref(db)
+                    for (let i = start; i < end && i < locationsData.length; i++) {
+                        paginatedItems.push(locationsData[i]);
+                    }
 
-            get(child(dbref, "Location"))
-            .then( (snapshot)=> {
-                if(snapshot.exists()) {
-                    
-                    const locationsData = [];
-                    snapshot.forEach(childSnapshot => {
-                        const location = {
-                            Key: childSnapshot.key,
-                            Location: childSnapshot.val().Location,
-                            Category: childSnapshot.val().Category,
-                            Address: childSnapshot.val().Address,
-                            ContactNo: childSnapshot.val().ContactNo,
-                            Latitude: childSnapshot.val().Latitude,
-                            Longitude: childSnapshot.val().Longitude,
-                            Description: childSnapshot.val().Description,
-                            LowestPrice: childSnapshot.val().LowestPrice,
-                            HighestPrice: childSnapshot.val().HighestPrice,
-                            Image: childSnapshot.val().Image,
-                            ImageDescription: childSnapshot.val().ImageDescription
-                        };
-                        locationsData.push(location);
-                    });
+                    lastPage = Math.ceil(currentRecordNum / recordsPerPage);
+                    console.log(lastPage);
 
-                    fetchAndPopulateCat(locationsData);
+                    fetchAndPopulateCat(paginatedItems);
                 }
             })
         }
+
+        // ---------------------------------------------------------------------------------------------------------------
+
+        var previousBtn = document.querySelector("#previousBtn");
+        var nextBtn = document.querySelector("#nextBtn");
+        previousBtn.addEventListener('click', previousPage)
+        nextBtn.addEventListener('click', nextPage)
+
+        // FOR PRE-EXISITNG PAGINATION
+        function previousPage() {
+
+            if (currentPage == startPage) {
+                document.getElementById('previousBtn').disabled = true;
+            }
+
+            else {
+                document.getElementById('nextBtn').disabled = false;
+                currentPage--;
+                console.log(currentPage);
+                updatePagination();
+            }
+        }
+
+        function nextPage() {
+
+            if (currentPage == lastPage) {
+                document.getElementById('nextBtn').disabled = true;
+            }
+
+            else {
+                document.getElementById('previousBtn').disabled = false;
+                currentPage++;
+                console.log(currentPage);
+                updatePagination();
+            }
+        }
+
+        function updatePagination() {
+            const start = (currentPage - 1) * recordsPerPage;
+            const end = start + recordsPerPage;
+            paginatedItems = locationsData.slice(start, end);
+
+            fetchAndPopulateCat(paginatedItems);
+        }
+
+        // ---------------------------------------------------------------------------------------------------------------
 
         function fetchAndPopulateCat(locationData) {
             const dbref = ref(db)
@@ -316,7 +350,6 @@
             .then( (snapshot)=> {
                 if(snapshot.exists()) {
                     
-                    const categoriesData = [];
                     snapshot.forEach(childSnapshot => {
                         const category = {
                             Key: childSnapshot.key,
@@ -333,7 +366,8 @@
 
         // Populate the table with the fetched data                 filterLocationsBasedOnCategoryPage
         function populateTable(categoryData, locationData) {
-            const tbody = document.querySelector('#categoryTable tbody');
+
+            const tbody = document.querySelector('#categoryTableBody');
             tbody.innerHTML = ''; // Clear existing rows
 
             locationData.forEach(location => {
@@ -358,8 +392,6 @@
                                 tbody.appendChild(row);
 
                             }
-                         
-                            
                         }
                     });  
                 }
@@ -404,25 +436,6 @@
 
                 }
 
-                
-
-                /*
-                if (location.Location.toLowerCase().includes(inputSearchLoc) || inputSearchLoc == undefined) {
-                    // alert(inputSearchLoc)
-
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td class="">${location.Location}</td>
-                        <td class="actionCol">
-                            <button type="button" class="btn btn-success btn-md rounded-pill mx-3" id="btnEdit" onclick="editLocation('${location.Key}')">Edit</button>
-                            <button type="button" class="btn btn-danger btn-md rounded-pill mx-3" id="btnDelete" onclick="deleteLocation('${location.Key}')" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Delete</button>
-                        </td>
-                    `;
-                    tbody.appendChild(row);
-                }
-                */
-
-                
             });
         }
 
