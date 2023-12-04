@@ -445,8 +445,6 @@ public class HomeFragment extends Fragment {
 
     public String getTimeAgo(Long timestamp) {
 
-        //long convertedTimestamp = Long.parseLong(timestamp);
-
         long currentTime = System.currentTimeMillis();
         long timeDifference = currentTime - timestamp;
 
@@ -455,6 +453,7 @@ public class HomeFragment extends Fragment {
         long hourInMillis = 60 * minuteInMillis;
         long dayInMillis = 24 * hourInMillis;
         long weekInMillis = 7 * dayInMillis;
+        long monthInMillis = (long) (30.44 * dayInMillis); // Average month duration
 
         if (timeDifference < minuteInMillis) {
             // Less than a minute ago
@@ -471,13 +470,19 @@ public class HomeFragment extends Fragment {
             // Days ago
             int daysAgo = (int) (timeDifference / dayInMillis);
             return daysAgo + " " + (daysAgo == 1 ? "day" : "days") + " ago";
+        } else if (timeDifference < monthInMillis) {
+            // Weeks ago
+            int weeksAgo = (int) (timeDifference / weekInMillis);
+            return weeksAgo + " " + (weeksAgo == 1 ? "week" : "weeks") + " ago";
+        } else if (timeDifference < 12 * monthInMillis) {
+            // Months ago
+            int monthsAgo = (int) (timeDifference / monthInMillis);
+            return monthsAgo + " " + (monthsAgo == 1 ? "month" : "months") + " ago";
         } else {
-            // More than a week ago, return the date
+            // More than 12 months ago, return the specific date
             Date date = new Date(timestamp);
-            // Format the date as needed, e.g., using SimpleDateFormat
-            // SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
-            // return dateFormat.format(date);
-            return date.toString();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy");
+            return dateFormat.format(date);
         }
     }
 
