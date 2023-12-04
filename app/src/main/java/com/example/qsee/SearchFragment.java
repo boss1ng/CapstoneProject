@@ -1,6 +1,11 @@
 package com.example.qsee;
 
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -29,6 +35,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -50,21 +57,74 @@ public class SearchFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_search, container, false);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         ImageView background = view.findViewById(R.id.imageView4);
-        ImageButton accommodationsButton = view.findViewById(R.id.accomodation);
-        ImageButton restaurantButton = view.findViewById(R.id.restaurant);
-        ImageButton shoppingButton = view.findViewById(R.id.shopping);
-        ImageButton religiousButton = view.findViewById(R.id.religious);
-        ImageButton recreationButton = view.findViewById(R.id.recreation);
-        ImageButton hospitalButton = view.findViewById(R.id.hospital);
-        ImageButton schoolButton = view.findViewById(R.id.school);
-        ImageButton attractionButton = view.findViewById(R.id.attraction);
-
-        Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/bg_quezonmemorialcircle.jpg?alt=media&token=b297a47e-b875-404c-b5a9-903f1a45c60f").into(background);
-        // Retrieve selected categories from Bundle arguments
         Bundle getBundle = getArguments();
 
         if (getBundle != null) {
             String userID = getBundle.getString("userId");
+        // Assume you have a DatabaseReference pointing to your "Category" node
+        DatabaseReference categoryRef = FirebaseDatabase.getInstance().getReference().child("Category");
+
+        categoryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                List<Category> categories = new ArrayList<>();
+
+                for (DataSnapshot categorySnapshot : dataSnapshot.getChildren()) {
+                    String key = categorySnapshot.getKey();
+                    String name = categorySnapshot.child("Category").getValue(String.class);
+                    String iconLink = categorySnapshot.child("Link").getValue(String.class);
+
+                    Category category = new Category(key, name, iconLink);
+                    categories.add(category);
+                }
+
+                // Inside your onDataChange method
+                LinearLayout categoryContainer = view.findViewById(R.id.categoryContainer);
+
+                for (Category category : categories) {
+                    // Inflate a custom layout for each category
+                    View categoryItem = LayoutInflater.from(requireContext()).inflate(R.layout.category_item_layout, null);
+
+                    // Find views within the custom layout
+                    ImageButton categoryButton = categoryItem.findViewById(R.id.categoryButton);
+                    TextView textView = categoryItem.findViewById(R.id.textView8);
+
+                    // Set the text and icon using Picasso
+                    textView.setText(truncateText(category.getName(), 12));
+
+                    // Use Picasso to load the icon from the link
+                    Picasso.get().load(category.getIconLink()).into(categoryButton);
+
+                    // Set a click listener for the button
+                    categoryButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            openCategoryListFragment(category.getName(), userID);
+                        }
+                    });
+
+                    // Set margins for the category item (adjust values as needed)
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.WRAP_CONTENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                    );
+                    params.setMargins(0, 0, 16, 0); // Adjust the right margin as needed
+                    categoryItem.setLayoutParams(params);
+                    categoryContainer.addView(categoryItem);
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle error
+            }
+        });
+
+        Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/bg_quezonmemorialcircle.jpg?alt=media&token=b297a47e-b875-404c-b5a9-903f1a45c60f").into(background);
+        // Retrieve selected categories from Bundle arguments
+
             //Toast.makeText(getContext(), userID, Toast.LENGTH_LONG).show();
 
         DatabaseReference destinationsRef = FirebaseDatabase.getInstance().getReference("Location");
@@ -111,66 +171,6 @@ public class SearchFragment extends Fragment {
 
 
 
-
-
-
-
-            accommodationsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openCategoryListFragment("Accommodations",userID);
-            }
-        });
-
-
-        restaurantButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openCategoryListFragment("Restaurants and Cafes",userID);
-            }
-        });
-
-        shoppingButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openCategoryListFragment("Shopping",userID);
-            }
-        });
-
-        religiousButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openCategoryListFragment("Religious Sites",userID);
-            }
-        });
-
-        recreationButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openCategoryListFragment("Sports and Recreation",userID);
-            }
-        });
-
-        hospitalButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openCategoryListFragment("Health and Wellness",userID);
-            }
-        });
-
-        schoolButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openCategoryListFragment("Schools",userID);
-            }
-        });
-
-        attractionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openCategoryListFragment("Attractions",userID);
-            }
-        });
 
 
         TextInputLayout locationTextInputLayout = view.findViewById(R.id.searchText);
@@ -504,4 +504,11 @@ public class SearchFragment extends Fragment {
             }
         });
     }
+    private String truncateText(String text, int maxLength) {
+        if (text.length() > maxLength) {
+            return text.substring(0, maxLength) + "...";
+        }
+        return text;
+    }
+
 }
