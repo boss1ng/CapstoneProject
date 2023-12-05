@@ -1,7 +1,7 @@
 <!-- res/layout/category_item_layout.xml -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="0dp"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_weight="1"
     android:layout_marginRight="80dp"
@@ -10,9 +10,11 @@
 
     <ImageButton
     android:id="@+id/categoryButton"
-    android:layout_width="75dp"
-    android:layout_height="75dp"
-        android:layout_gravity="center"/>
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_gravity="center"
+        android:background="@color/white"
+        android:scaleType="centerCrop" />
 
     <!-- TextView for the category name -->
     <TextView
@@ -21,5 +23,5 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:gravity="center"
-        android:textSize="10sp" />
+        android:textSize="11dp" />
     </LinearLayout>
