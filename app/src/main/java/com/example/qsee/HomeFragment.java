@@ -841,6 +841,15 @@ public class HomeFragment extends Fragment {
                 case "days":
                     multiplier = 24 * 60 * 60 * 1000L;
                     break;
+                case "week":
+                case "weeks":
+                    multiplier = 7 * 24 * 60 * 60 * 1000L;
+                    break;
+                case "month":
+                case "months":
+                    // Assuming a month is 30 days for simplicity
+                    multiplier = 30 * 24 * 60 * 60 * 1000L;
+                    break;
                 // Add more cases for other units if needed
 
                 default:
@@ -855,6 +864,7 @@ public class HomeFragment extends Fragment {
         // Invalid format, return -1 or handle accordingly
         return -1;
     }
+
 
 
 }
