@@ -1,13 +1,18 @@
 package com.example.qsee;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +26,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -31,7 +37,7 @@ public class EditPasswordFragment extends Fragment {
     private TextInputLayout newPasswordEditText; // Add this
     private TextInputLayout reEnterPasswordEditText; // Add this
     private TextView forgotPass;
-
+    private boolean isPasswordVisible = false;
     public static EditPasswordFragment newInstance(String userId) {
         EditPasswordFragment fragment = new EditPasswordFragment();
         Bundle args = new Bundle();
@@ -40,6 +46,7 @@ public class EditPasswordFragment extends Fragment {
         return fragment;
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -50,8 +57,67 @@ public class EditPasswordFragment extends Fragment {
         newPasswordEditText = view.findViewById(R.id.newPwd);
         // Find the TextInputEditText for re-entering the new password
         reEnterPasswordEditText = view.findViewById(R.id.reNewPwd);
-        forgotPass = view.findViewById(R.id.forgotPassword);
 
+        EditText passwordEditText = currentPasswordEditText.getEditText();
+        EditText newpassword = newPasswordEditText.getEditText();
+        EditText renewpasswordEditText = reEnterPasswordEditText.getEditText();
+
+        passwordEditText.setOnTouchListener((v, event) -> {
+            int DRAWABLE_RIGHT = 2;
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                if (event.getRawX() >= (passwordEditText.getRight() - passwordEditText.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                    isPasswordVisible = !isPasswordVisible;
+                    int inputType = isPasswordVisible ? InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                            : InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD;
+                    passwordEditText.setInputType(inputType);
+
+                    // Apply the custom font after changing the InputType
+                    applyCustomFont(passwordEditText);
+
+                    passwordEditText.setSelection(passwordEditText.getText().length());
+                    return true;
+                }
+            }
+            return false;
+        });
+
+        newpassword.setOnTouchListener((v, event) -> {
+            int DRAWABLE_RIGHT = 2;
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                if (event.getRawX() >= (newpassword.getRight() - newpassword.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                    isPasswordVisible = !isPasswordVisible;
+                    int inputType = isPasswordVisible ? InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                            : InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD;
+                    newpassword.setInputType(inputType);
+
+                    // Apply the custom font after changing the InputType
+                    applyCustomFont(newpassword);
+
+                    newpassword.setSelection(newpassword.getText().length());
+                    return true;
+                }
+            }
+            return false;
+        });
+
+        renewpasswordEditText.setOnTouchListener((v, event) -> {
+            int DRAWABLE_RIGHT = 2;
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                if (event.getRawX() >= (renewpasswordEditText.getRight() - renewpasswordEditText.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                    isPasswordVisible = !isPasswordVisible;
+                    int inputType = isPasswordVisible ? InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                            : InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD;
+                    renewpasswordEditText.setInputType(inputType);
+
+                    // Apply the custom font after changing the InputType
+                    applyCustomFont(renewpasswordEditText);
+
+                    renewpasswordEditText.setSelection(renewpasswordEditText.getText().length());
+                    return true;
+                }
+            }
+            return false;
+        });
 
         // Retrieve the userId argument inside onCreateView
         Bundle args = getArguments();
@@ -59,15 +125,6 @@ public class EditPasswordFragment extends Fragment {
             userId = args.getString("userId");
         }
         Log.d("EditPasswordFragment", "Received userId: " + userId);
-
-        forgotPass = view.findViewById(R.id.forgotPassword);
-        forgotPass.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Handle the click on the "Forgot Password" text
-                openForgotPassActivity(userId);
-            }
-        });
 
 
         Button changePasswordButton = view.findViewById(R.id.changePwd);
@@ -163,6 +220,13 @@ public class EditPasswordFragment extends Fragment {
     private boolean isValidPassword(String password) {
         String passwordPattern = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*(),.?\":{}|<>])(?=.*[0-9]).{8,}$";
         return password.matches(passwordPattern);
+    }
+    private void applyCustomFont(EditText editText) {
+        // Load the Raleway font from the res/font directory
+        Typeface ralewayFont = ResourcesCompat.getFont(requireContext(), R.font.raleway_regular);
+
+        // Apply the custom font to the EditText
+        editText.setTypeface(ralewayFont);
     }
 }
 

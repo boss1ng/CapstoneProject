@@ -57,7 +57,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:hint="Current Password"
-                android:inputType="textPassword" />
+                android:inputType="textPassword"
+                android:drawableEnd="@drawable/ic_eye"
+                android:drawablePadding="8dp"
+                app:passwordToggleEnabled="false"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -72,7 +75,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:hint="New Password"
-                android:inputType="textPassword" />
+                android:inputType="textPassword"
+                android:drawableEnd="@drawable/ic_eye"
+                android:drawablePadding="8dp"
+                app:passwordToggleEnabled="false"/>
 
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -89,30 +95,20 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:hint="Re-type New Password"
-                android:inputType="textPassword" />
+                android:inputType="textPassword"
+                android:drawableEnd="@drawable/ic_eye"
+                android:drawablePadding="8dp"
+                app:passwordToggleEnabled="false"/>
 
 
         </com.google.android.material.textfield.TextInputLayout>
-
-        <TextView
-            android:id="@+id/forgotPassword"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="10dp"
-            android:autoLink="web"
-            android:clickable="true"
-            android:text="Forgot Password?"
-            android:textColor="@color/blue"
-            android:textSize="15dp" />
 
         <Button
             android:id="@+id/changePwd"
             android:layout_width="308dp"
             android:layout_height="48dp"
             android:layout_gravity="center"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="20dp"
             android:layout_marginBottom="10dp"
             android:backgroundTint="@color/gradient_start"
             android:text="Change Password" />
