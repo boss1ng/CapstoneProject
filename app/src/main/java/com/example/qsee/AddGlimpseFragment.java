@@ -903,7 +903,14 @@ public class AddGlimpseFragment extends DialogFragment {
                 // Use the Places API client to fetch the details
                 placesClient.fetchPlace(requestDetails).addOnSuccessListener((responseDetails) -> {
                     Place placeDetails = responseDetails.getPlace();
-                    String phoneNumber = placeDetails.getPhoneNumber();
+                    String phoneNumber;
+                    if (placeDetails.getPhoneNumber() != null) {
+                        phoneNumber = placeDetails.getPhoneNumber();
+                    }
+
+                    else {
+                        phoneNumber = "";
+                    }
                     //String description = placeDetails.getName(); // This is just an example; you can retrieve a relevant description field
 
                     //Toast.makeText(context, phoneNumber, Toast.LENGTH_LONG).show();
