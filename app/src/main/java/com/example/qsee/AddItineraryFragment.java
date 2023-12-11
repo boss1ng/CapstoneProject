@@ -356,11 +356,19 @@ public class AddItineraryFragment extends Fragment {
                                     }
                                 }
                             }
+                            // Check if the group name contains restricted characters
+                            if (itineraryName.contains(".") || itineraryName.contains("#") || itineraryName.contains("$") || itineraryName.contains("[") || itineraryName.contains("]")) {
+                                // Display a Toast message for invalid group name
+                                Toast.makeText(getActivity(), "Itinerary name cannot contain ., #, $, [, or ]", Toast.LENGTH_LONG).show();
+                                return;
+                            }
 
                             if (allFormsFilled) {
                                 DatabaseReference userRef = itineraryRef.child(itineraryName);
                                 userRef.child("admin").setValue(userId);
                                 userRef.child("iterName").setValue(itineraryName);
+
+
 
                                 // Image of the Group
                                 // Call getRandomGroup to get a random URL among 15 choices

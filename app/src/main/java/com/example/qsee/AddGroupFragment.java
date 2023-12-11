@@ -116,6 +116,12 @@ public class AddGroupFragment extends DialogFragment {
                     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
                     DatabaseReference groupsReference = databaseReference.child("Groups");
 
+                    // Check if the group name contains restricted characters
+                    if (groupName.contains(".") || groupName.contains("#") || groupName.contains("$") || groupName.contains("[") || groupName.contains("]")) {
+                        // Display a Toast message for invalid group name
+                        Toast.makeText(getActivity(), "Group name cannot contain ., #, $, [, or ]", Toast.LENGTH_LONG).show();
+                        return;
+                    }
                     // Check if the group name already exists
                     groupsReference.child(groupName).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
