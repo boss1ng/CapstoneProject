@@ -178,7 +178,7 @@ public class AddItineraryActivity extends Fragment {
 
                                         // Check if origin and location are in locationsList
                                         if (!locationsList.contains(origin) || !locationsList.contains(location)) {
-                                            Toast.makeText(getContext(), "Origin or Location not in list", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(getContext(), "Invalid origin or destination", Toast.LENGTH_LONG).show();
                                             return;
                                         }
 

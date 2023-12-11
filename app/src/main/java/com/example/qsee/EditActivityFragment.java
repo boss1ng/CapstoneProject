@@ -351,7 +351,7 @@ public class EditActivityFragment extends Fragment {
                                                         // Check if updatedOrigin and updatedLocation are in locationsList
                                                         if (!locationsList.contains(updatedOrigin) || !locationsList.contains(updatedLocation)) {
                                                             // Display a message that the origin or location is invalid
-                                                            Toast.makeText(getContext(), "Invalid origin or location", Toast.LENGTH_LONG).show();
+                                                            Toast.makeText(getContext(), "Invalid origin or destination", Toast.LENGTH_LONG).show();
                                                         } else if (completionSwitch.isChecked()){
                                                             // Remove the old timeSnapshot
 
