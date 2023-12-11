@@ -459,6 +459,7 @@
 
         const categoryIcon = document.getElementById('imageDatabase');
         var firebaseImage = null;
+        var createdBy = null;
         var isRSS = false;
 
         var establishmentNameDB = null;
@@ -623,6 +624,35 @@
                 }
 
                 else {
+                    console.log("UPDATED");
+                    // UPDATE Location Information (except Image) in Firebase Realtime Database
+                    update(ref(db, 'Location/' + locationToEdit), {
+                        Location: inputLocation.value,                      // 
+                        Category: inputLocationCat.value,
+                        Address: inputLocationAdd.value,                    // 
+                        ContactNo: inputLocationCont.value,                 // 
+                        Latitude: inputLocationLat.value,
+                        Longitude: inputLocationLong.value,
+                        Description: inputLocationDesc.value,               // 
+                        LowestPrice: inputLocationLow.value,                // 
+                        HighestPrice: inputLocationHigh.value,              // 
+                    })
+
+                    .then( ()=>{
+                        editSuccessAlert.style.visibility = "visible";
+                        setTimeout(function() {
+                            sessionStorage.clear();
+                            window.location.replace("places.html");
+                        }, 2000);
+                    })
+
+                    .catch( (error)=> {
+                        alert(error);
+                    })
+                }
+
+                /*
+                else {
                     sameCatNameAlert.style.visibility = "visible";
                     setTimeout(function(){
                         sameCatNameAlert.style.visibility = "hidden";
@@ -640,6 +670,7 @@
                         inputLocationDesc.disabled = false;
                     }, 2000);
                 }
+                */
             }
 
             else {

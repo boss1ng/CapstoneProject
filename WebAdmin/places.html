@@ -250,9 +250,31 @@
 
         const locationsData = [];
         const categoriesData = [];
+
         let paginatedItems = [];
+        
+        let searchPaginatedItems = [];
+        let placeFilterPaginatedItems = [];
+        let categoryFilterPaginatedItems = [];
 
         var currentRecordNum = 0;
+
+        var searchNumberRecords = 0;
+        var placeFilterNumberRecords = 0;
+        var categoryFilterNumberRecords = 0;
+
+        let start;
+        let end;
+
+        var nextPressed = null;
+        var previousPressed = null;
+
+        var isNothing = false;
+        var isSearched = false;
+        var isPlaceFiltered = false;
+        var isCategoryFiltered = false;
+
+        const tbody = document.querySelector('#categoryTableBody');
         
         fetchAndPopulate();
 
@@ -282,17 +304,121 @@
                         locationsData.push(location);
                     });
 
-                    const start = (currentPage - 1) * recordsPerPage;
-                    let end = start + recordsPerPage;
+                    start = (currentPage - 1) * recordsPerPage;
+                    end = start + recordsPerPage;
 
-                    for (let i = start; i < end && i < locationsData.length; i++) {
-                        paginatedItems.push(locationsData[i]);
+                    //fetchAndPopulateCat(paginatedItems);
+
+                    if ((inputSearchLoc == null || inputSearchLoc == "") && (filterLocations == null || filterLocations == "") && (filterLocationsBasedOnCategoryPage == null || filterLocationsBasedOnCategoryPage == "")) {
+                        console.log("TRUE");
+
+                        for (let i = start; i < end && i < locationsData.length; i++) {
+                            paginatedItems.push(locationsData[i]);
+                            //console.log(locationsData[i].Location);
+                        }
+
+                        lastPage = Math.ceil(currentRecordNum / recordsPerPage);
+                        console.log(lastPage);
+
+                        isNothing = true;
+                        isSearched = false;
+                        isPlaceFiltered = false;
+                        isCategoryFiltered = false;
+
+                        fetchAndPopulateCat(paginatedItems);
                     }
 
-                    lastPage = Math.ceil(currentRecordNum / recordsPerPage);
-                    console.log(lastPage);
+                    else {
 
-                    fetchAndPopulateCat(paginatedItems);
+                        console.log("FALSE");
+                        // SEARCH
+                        if (inputSearchLoc != null && inputSearchLoc != "") {
+
+                            console.log("SEARCH");
+
+                            locationsData.forEach(location => {
+                                if (location.Location.toLowerCase().includes(inputSearchLoc) || inputSearchLoc == undefined) {
+                                    console.log(location.Location + " CONTAINS " + inputSearchLoc);
+        
+                                    searchNumberRecords++;
+                                    searchPaginatedItems.push(location);
+                                }
+        
+                                lastPage = Math.ceil(searchNumberRecords / recordsPerPage);
+                                console.log(lastPage);
+                            });
+
+                            isNothing = false;
+                            isSearched = true;
+                            isPlaceFiltered = false;
+                            isCategoryFiltered = false;
+
+                            fetchAndPopulateCat(searchPaginatedItems.slice(start, end));
+                        }
+
+                        // PLACES Filter Category
+                        if (filterLocations != null && filterLocations != "") {
+
+                            console.log("PLACES Filter");
+
+                            for (let i = 0; i < locationsData.length; i++) {
+                                //paginatedItems.push(locationsData[i]);
+                                //console.log(locationsData[i].Location);
+                                //console.log(locationsData[i].Category);
+
+                                if (locationsData[i].Category == filterLocations) {
+                                    console.log(locationsData[i].Location);
+                                    //console.log(locationsData[i].Category + " EQUAL " + filterLocations);
+
+                                    placeFilterNumberRecords++;
+                                    placeFilterPaginatedItems.push(locationsData[i]);
+                                }
+
+                                lastPage = Math.ceil(placeFilterNumberRecords / recordsPerPage);
+                                console.log(lastPage);
+                            }
+
+                            isNothing = false;
+                            isSearched = false;
+                            isPlaceFiltered = true;
+                            isCategoryFiltered = false;
+
+                            fetchAndPopulateCat(placeFilterPaginatedItems.slice(start, end));
+
+                            console.log(placeFilterPaginatedItems.slice(start, end));
+                        }
+
+                        // CATEGORIES Filter Category
+                        if (filterLocationsBasedOnCategoryPage != null && filterLocationsBasedOnCategoryPage != "") {
+
+                            console.log("CATEGORIES Filter");
+
+                            for (let i = 0; i < locationsData.length; i++) {
+                                //paginatedItems.push(locationsData[i]);
+                                //console.log(locationsData[i].Location);
+                                //console.log(locationsData[i].Category);
+
+                                if (locationsData[i].Category == filterLocationsBasedOnCategoryPage) {
+                                    console.log(locationsData[i].Location);
+                                    //console.log(locationsData[i].Category + " EQUAL " + filterLocationsBasedOnCategoryPage);
+
+                                    categoryFilterNumberRecords++;
+                                    categoryFilterPaginatedItems.push(locationsData[i]);
+                                }
+
+                                lastPage = Math.ceil(categoryFilterNumberRecords / recordsPerPage);
+                                console.log(lastPage);
+                            }
+
+                            isNothing = false;
+                            isSearched = false;
+                            isPlaceFiltered = false;
+                            isCategoryFiltered = true;
+
+                            fetchAndPopulateCat(categoryFilterPaginatedItems.slice(start, end));
+                        }
+                    }
+                    
                 }
             })
         }
@@ -315,6 +441,11 @@
                 document.getElementById('nextBtn').disabled = false;
                 currentPage--;
                 console.log(currentPage);
+
+                if (currentPage == startPage) {
+                    document.getElementById('previousBtn').disabled = true;
+                }
+
                 updatePagination();
             }
         }
@@ -329,22 +460,56 @@
                 document.getElementById('previousBtn').disabled = false;
                 currentPage++;
                 console.log(currentPage);
+
+                if (currentPage == lastPage) {
+                    document.getElementById('nextBtn').disabled = true;
+                }
+
                 updatePagination();
             }
         }
 
         function updatePagination() {
-            const start = (currentPage - 1) * recordsPerPage;
-            const end = start + recordsPerPage;
-            paginatedItems = locationsData.slice(start, end);
+            
+            start = (currentPage - 1) * recordsPerPage;
+            end = start + recordsPerPage;
 
-            fetchAndPopulateCat(paginatedItems);
+            if (isSearched) {
+                isPlaceFiltered = false;
+                isCategoryFiltered = false;
+                isNothing = false;
+                fetchAndPopulateCat(searchPaginatedItems.slice(start, end));
+            }
+
+            else if (isPlaceFiltered) {
+                isSearched = false;
+                isCategoryFiltered = false;
+                isNothing = false;
+                fetchAndPopulateCat(placeFilterPaginatedItems.slice(start, end));
+                console.log(placeFilterPaginatedItems.slice(start, end));
+            }
+
+            else if (isCategoryFiltered) {
+                isSearched = false;
+                isPlaceFiltered = false;
+                isNothing = false;
+                fetchAndPopulateCat(categoryFilterPaginatedItems.slice(start, end));
+            }
+
+            else if (isNothing) {
+                isSearched = false;
+                isPlaceFiltered = false;
+                isCategoryFiltered = false;
+                fetchAndPopulateCat(locationsData.slice(start, end));
+            }
         }
 
         // ---------------------------------------------------------------------------------------------------------------
 
         function fetchAndPopulateCat(locationData) {
             const dbref = ref(db)
+
+            //tbody.innerHTML = ''; // Clear existing rows
 
             get(child(dbref, "Category"))
             .then( (snapshot)=> {
@@ -367,12 +532,14 @@
         // Populate the table with the fetched data                 filterLocationsBasedOnCategoryPage
         function populateTable(categoryData, locationData) {
 
-            const tbody = document.querySelector('#categoryTableBody');
             tbody.innerHTML = ''; // Clear existing rows
+
+            console.log("INNER HTML (Before): " + tbody.innerHTML);
 
             locationData.forEach(location => {
 
                 if (filterLocationsBasedOnCategoryPage != undefined) {
+
                     categoryData.forEach(category => {
         
                         if (filterLocationsBasedOnCategoryPage == category.Category) {
@@ -396,10 +563,14 @@
                     });  
                 }
 
+                ///*
                 else {
 
                     if (location.Location.toLowerCase().includes(inputSearchLoc) || inputSearchLoc == undefined) {
                         if (filterLocations == "-" || filterLocations == undefined) {
+
+                            //tbody.innerHTML = ''; // Clear existing rows
+
                             const row = document.createElement('tr');
                             row.innerHTML = `
                                 <td class="">${location.Location}</td>
@@ -417,6 +588,9 @@
                                 categoryData.forEach(category => {
         
                                     if (location.Category == category.Category) {
+
+                                        //tbody.innerHTML = ''; // Clear existing rows
+                                        
                                         const row = document.createElement('tr');
                                         row.innerHTML = `
                                             <td class="">${location.Location}</td>
@@ -435,9 +609,15 @@
                     }
 
                 }
-
+                //*/
             });
+
+            //console.log("INNER HTML (After): " + tbody.innerHTML);
+
         }
+
+
+
 
         // ---------------------------------------------------------------------------------
 
