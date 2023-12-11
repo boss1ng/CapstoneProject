@@ -125,7 +125,12 @@ public class PostDetailsDialog extends DialogFragment {
                     // Set the text of usernameTextView with the retrieved username
                     dialogUserTextView.setText(username);
                     dialogUsernTextView.setText(username);
-                    Picasso.get().load(pfp).into(dialogUserImageView);
+                    if(pfp == null){
+                        Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/capstone-project-ffe21.appspot.com/o/profilepicture.png?alt=media&token=434ea657-4982-4a1d-b4e8-a37e89dfb29e").into(dialogUserImageView);
+                    }else{
+                        Picasso.get().load(pfp).into(dialogUserImageView);
+                    }
+
                 }
             }
 
