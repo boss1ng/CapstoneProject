@@ -453,8 +453,9 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
 
             // Create a Font with a larger size
             Font largeFont = new Font(Font.FontFamily.TIMES_ROMAN, 20, Font.BOLD);
-            Font tableHeader = new Font(Font.FontFamily.TIMES_ROMAN, 16, Font.BOLD);
-            Font activityHeader = new Font(Font.FontFamily.TIMES_ROMAN, 14, Font.BOLD);
+            Font tableHeader = new Font(Font.FontFamily.TIMES_ROMAN, 18, Font.BOLD);
+            Font activityHeader = new Font(Font.FontFamily.TIMES_ROMAN, 16, Font.BOLD);
+            Font cellData = new Font(Font.FontFamily.TIMES_ROMAN, 14);
 
             PdfPCell transitionRow = new PdfPCell(new Paragraph(" "));
             transitionRow.setColspan(5); // Set the number of columns to span
@@ -585,27 +586,27 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
                                         destCell.setBackgroundColor(hexToBaseColor("#A9D9E1"));
                                         table.addCell(destCell);
 
-                                        PdfPCell specificTimeCell = new PdfPCell(new Paragraph(outputTime));
+                                        PdfPCell specificTimeCell = new PdfPCell(new Paragraph(outputTime, cellData));
                                         specificTimeCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
                                         specificTimeCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
                                         specificTimeCell.setPadding(10);
                                         table.addCell(specificTimeCell);
 
-                                        PdfPCell specificActivityCell = new PdfPCell(new Paragraph(timeSnapshot.child("activity").getValue(String.class)));
+                                        PdfPCell specificActivityCell = new PdfPCell(new Paragraph(timeSnapshot.child("activity").getValue(String.class), cellData));
                                         specificActivityCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
                                         specificActivityCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
                                         specificActivityCell.setPadding(10);
                                         table.addCell(specificActivityCell);
 
                                         String origin = timeSnapshot.child("origin").getValue(String.class);
-                                        PdfPCell specificOriginCell = new PdfPCell(new Paragraph(origin));
+                                        PdfPCell specificOriginCell = new PdfPCell(new Paragraph(origin, cellData));
                                         specificOriginCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
                                         specificOriginCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
                                         specificOriginCell.setPadding(10);
                                         table.addCell(specificOriginCell);
 
                                         String destination = timeSnapshot.child("location").getValue(String.class);
-                                        PdfPCell specificDestCell = new PdfPCell(new Paragraph(destination));
+                                        PdfPCell specificDestCell = new PdfPCell(new Paragraph(destination, cellData));
                                         specificDestCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
                                         specificDestCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
                                         specificDestCell.setPadding(10);
@@ -631,7 +632,7 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
                                             // Iterate over the instructionsList and create PdfPCell instances
                                             for (String instruction : instructionsList) {
                                                 // Create a PdfPCell with the instruction text
-                                                PdfPCell distanceCell = new PdfPCell(new Phrase(instruction));
+                                                PdfPCell distanceCell = new PdfPCell(new Phrase(instruction, cellData));
 
                                                 // Set the properties for the cell
                                                 distanceCell.setColspan(4); // Set the number of columns to span
