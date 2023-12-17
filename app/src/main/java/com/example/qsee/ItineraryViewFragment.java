@@ -22,8 +22,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
+import android.telephony.TelephonyManager;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -89,6 +91,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -332,7 +335,7 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                GeolocationService geolocationService = new GeolocationService();
+                                GeolocationService geolocationService = new GeolocationService(getContext());
                                 String location = geolocationService.getDeviceLocation();
                                 // Handle the location data
                                 Log.d("Geolocation Result", location);
@@ -958,14 +961,60 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
 
 
 
-
     public class GeolocationService {
         private final String GEOLOCATION_API_URL = "https://www.googleapis.com/geolocation/v1/geolocate?key=" + getResources().getString(R.string.google_maps_api_key);
+        private Context context;
+
+        public GeolocationService(Context context) {
+            this.context = context;
+        }
 
         public String getDeviceLocation() {
             try {
                 OkHttpClient client = new OkHttpClient();
-                RequestBody body = RequestBody.create(null, new byte[0]);
+                MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+
+                // Get telephony information
+                TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+                String mcc = "";
+                String mnc = "";
+                String carrierName = "";
+                String radioType = "unknown";
+
+                if (telephonyManager != null) {
+                    carrierName = telephonyManager.getNetworkOperatorName();
+
+                    String networkOperator = telephonyManager.getNetworkOperator();
+                    if (!TextUtils.isEmpty(networkOperator)) {
+                        mcc = networkOperator.substring(0, 3);
+                        mnc = networkOperator.substring(3);
+                    }
+
+                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+                        // Permission is granted, safe to use TelephonyManager
+                        radioType = getRadioType(telephonyManager.getNetworkType());
+                    }
+
+                }
+
+                int networkType = telephonyManager.getNetworkType();
+                radioType = getRadioType(networkType);
+
+                // Construct JSON data
+                JSONObject data = new JSONObject();
+                data.put("homeMobileCountryCode", mcc);
+                data.put("homeMobileNetworkCode", mnc);
+                data.put("radioType", radioType);
+                data.put("carrier", carrierName);
+                data.put("considerIp", true);
+
+                Log.d("homeMobileCountryCode", mcc);
+                Log.d("homeMobileNetworkCode", mnc);
+                Log.d("radioType", radioType);
+                Log.d("carrier", carrierName);
+                Log.d("considerIp", "true");
+
+                RequestBody body = RequestBody.create(JSON, data.toString());
 
                 Request request = new Request.Builder()
                         .url(GEOLOCATION_API_URL)
@@ -979,6 +1028,33 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
                 return null;
             }
         }
+
+        private String getRadioType(int networkType) {
+            switch (networkType) {
+                case TelephonyManager.NETWORK_TYPE_GPRS:
+                case TelephonyManager.NETWORK_TYPE_EDGE:
+                case TelephonyManager.NETWORK_TYPE_CDMA:
+                case TelephonyManager.NETWORK_TYPE_1xRTT:
+                case TelephonyManager.NETWORK_TYPE_IDEN:
+                    return "gsm";
+                case TelephonyManager.NETWORK_TYPE_UMTS:
+                case TelephonyManager.NETWORK_TYPE_EVDO_0:
+                case TelephonyManager.NETWORK_TYPE_EVDO_A:
+                case TelephonyManager.NETWORK_TYPE_HSDPA:
+                case TelephonyManager.NETWORK_TYPE_HSUPA:
+                case TelephonyManager.NETWORK_TYPE_HSPA:
+                case TelephonyManager.NETWORK_TYPE_EVDO_B:
+                case TelephonyManager.NETWORK_TYPE_EHRPD:
+                case TelephonyManager.NETWORK_TYPE_HSPAP:
+                    return "cdma";
+                case TelephonyManager.NETWORK_TYPE_LTE:
+                    return "lte";
+                default:
+                    return "unknown";
+            }
+        }
     }
+
+
 
 }
