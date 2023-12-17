@@ -70,6 +70,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -87,6 +88,11 @@ import java.util.regex.Pattern;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 interface TaskCompletedCallback {
     void onTaskCompleted(String response);
@@ -320,7 +326,37 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
                                 REQUEST_CODE_WRITE_EXTERNAL_STORAGE);
                     } else {
                         // Permission has already been granted
-                        createPdfWithTable();
+                        //createPdfWithTable();
+
+                        // Ensure this is done in a background thread to avoid NetworkOnMainThreadException
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                GeolocationService geolocationService = new GeolocationService();
+                                String location = geolocationService.getDeviceLocation();
+                                // Handle the location data
+                                Log.d("Geolocation Result", location);
+                                try {
+                                    JSONObject jsonObject = new JSONObject(location);
+                                    JSONObject locationObj = jsonObject.getJSONObject("location");
+                                    double latitude = locationObj.getDouble("lat");
+                                    double longitude = locationObj.getDouble("lng");
+                                    double accuracy = jsonObject.getDouble("accuracy");
+
+                                    // Now you can use latitude, longitude, and accuracy as needed
+                                    Log.d("Geolocation Result LATITUDE", String.valueOf(latitude));
+                                    Log.d("Geolocation Result LONGITUDE", String.valueOf(longitude));
+                                    Log.d("Geolocation Result ACCURACY", String.valueOf(accuracy));
+
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    // Handle the error
+                                }
+                            }
+                        }).start();
+                        //new GeolocationTask().execute();
+                        //GeolocationTask geolocationTask = new GeolocationTask();
+                        //geolocationTask.getGeolocationData();
                     }
                 }
             }
@@ -901,5 +937,48 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public class GeolocationService {
+        private final String GEOLOCATION_API_URL = "https://www.googleapis.com/geolocation/v1/geolocate?key=" + getResources().getString(R.string.google_maps_api_key);
+
+        public String getDeviceLocation() {
+            try {
+                OkHttpClient client = new OkHttpClient();
+                RequestBody body = RequestBody.create(null, new byte[0]);
+
+                Request request = new Request.Builder()
+                        .url(GEOLOCATION_API_URL)
+                        .post(body)
+                        .build();
+
+                Response response = client.newCall(request).execute();
+                return response.body().string();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+    }
 
 }
