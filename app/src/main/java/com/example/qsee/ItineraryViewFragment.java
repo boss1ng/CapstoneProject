@@ -320,6 +320,7 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
                     // Android 13 (API level 33) or higher
                     //createPdfWithTable();
                     new GeolocationTask().execute();
+
                 } else {
                     // Below Android 13
                     if (ContextCompat.checkSelfPermission(requireContext(), WRITE_EXTERNAL_STORAGE)
@@ -333,6 +334,7 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
                         //createPdfWithTable();
 
                         new GeolocationTask().execute();
+
                         //GeolocationTask geolocationTask = new GeolocationTask();
                         //geolocationTask.getGeolocationData();
                     }
@@ -947,7 +949,29 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
         protected void onPostExecute(String result) {
             // Handle the result, parse JSON, etc.
             Log.d("Geolocation Result", result);
-            Toast.makeText(getContext(), result, Toast.LENGTH_LONG).show();
+            //Toast.makeText(getContext(), result, Toast.LENGTH_LONG).show();
+
+            try {
+                JSONObject jsonObject = new JSONObject(result);
+                JSONObject locationObject = jsonObject.getJSONObject("location");
+                double latitude = locationObject.getDouble("lat");
+                double longitude = locationObject.getDouble("lng");
+                double accuracy = jsonObject.getDouble("accuracy");
+
+                // Now you have latitude, longitude, and accuracy values
+                Log.d("Latitude", "Latitude: " + String.valueOf(latitude));
+                Log.d("Longitude", "Longitude: " + String.valueOf(longitude));
+                Log.d("Accuracy", "Accuracy: " + String.valueOf(accuracy));
+                Toast.makeText(getContext(), "Latitude: " + String.valueOf(latitude) + " Longitude: " + String.valueOf(longitude), Toast.LENGTH_LONG).show();
+                //Toast.makeText(getContext(), String.valueOf(accuracy), Toast.LENGTH_LONG).show();
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+                // Handle JSON parsing error
+            }
+
+            // End the AsyncTask
+            cancel(true);
         }
 
         private String getGeolocationData() {
