@@ -318,7 +318,32 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     // Android 13 (API level 33) or higher
-                    createPdfWithTable();
+                    //createPdfWithTable();
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            GeolocationService geolocationService = new GeolocationService(getContext());
+                            String location = geolocationService.getDeviceLocation();
+                            // Handle the location data
+                            Log.d("Geolocation Result", location);
+                            try {
+                                JSONObject jsonObject = new JSONObject(location);
+                                JSONObject locationObj = jsonObject.getJSONObject("location");
+                                double latitude = locationObj.getDouble("lat");
+                                double longitude = locationObj.getDouble("lng");
+                                double accuracy = jsonObject.getDouble("accuracy");
+
+                                // Now you can use latitude, longitude, and accuracy as needed
+                                Log.d("Geolocation Result LATITUDE", String.valueOf(latitude));
+                                Log.d("Geolocation Result LONGITUDE", String.valueOf(longitude));
+                                Log.d("Geolocation Result ACCURACY", String.valueOf(accuracy));
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                // Handle the error
+                            }
+                        }
+                    }).start();
                 } else {
                     // Below Android 13
                     if (ContextCompat.checkSelfPermission(requireContext(), WRITE_EXTERNAL_STORAGE)
