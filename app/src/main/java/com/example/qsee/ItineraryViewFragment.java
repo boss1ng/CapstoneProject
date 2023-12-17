@@ -319,31 +319,7 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     // Android 13 (API level 33) or higher
                     //createPdfWithTable();
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            GeolocationService geolocationService = new GeolocationService(getContext());
-                            String location = geolocationService.getDeviceLocation();
-                            // Handle the location data
-                            Log.d("Geolocation Result", location);
-                            try {
-                                JSONObject jsonObject = new JSONObject(location);
-                                JSONObject locationObj = jsonObject.getJSONObject("location");
-                                double latitude = locationObj.getDouble("lat");
-                                double longitude = locationObj.getDouble("lng");
-                                double accuracy = jsonObject.getDouble("accuracy");
-
-                                // Now you can use latitude, longitude, and accuracy as needed
-                                Log.d("Geolocation Result LATITUDE", String.valueOf(latitude));
-                                Log.d("Geolocation Result LONGITUDE", String.valueOf(longitude));
-                                Log.d("Geolocation Result ACCURACY", String.valueOf(accuracy));
-
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                // Handle the error
-                            }
-                        }
-                    }).start();
+                    new GeolocationTask().execute();
                 } else {
                     // Below Android 13
                     if (ContextCompat.checkSelfPermission(requireContext(), WRITE_EXTERNAL_STORAGE)
@@ -356,33 +332,7 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
                         // Permission has already been granted
                         //createPdfWithTable();
 
-                        // Ensure this is done in a background thread to avoid NetworkOnMainThreadException
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                GeolocationService geolocationService = new GeolocationService(getContext());
-                                String location = geolocationService.getDeviceLocation();
-                                // Handle the location data
-                                Log.d("Geolocation Result", location);
-                                try {
-                                    JSONObject jsonObject = new JSONObject(location);
-                                    JSONObject locationObj = jsonObject.getJSONObject("location");
-                                    double latitude = locationObj.getDouble("lat");
-                                    double longitude = locationObj.getDouble("lng");
-                                    double accuracy = jsonObject.getDouble("accuracy");
-
-                                    // Now you can use latitude, longitude, and accuracy as needed
-                                    Log.d("Geolocation Result LATITUDE", String.valueOf(latitude));
-                                    Log.d("Geolocation Result LONGITUDE", String.valueOf(longitude));
-                                    Log.d("Geolocation Result ACCURACY", String.valueOf(accuracy));
-
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    // Handle the error
-                                }
-                            }
-                        }).start();
-                        //new GeolocationTask().execute();
+                        new GeolocationTask().execute();
                         //GeolocationTask geolocationTask = new GeolocationTask();
                         //geolocationTask.getGeolocationData();
                     }
@@ -986,99 +936,69 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
 
 
 
-    public class GeolocationService {
-        private final String GEOLOCATION_API_URL = "https://www.googleapis.com/geolocation/v1/geolocate?key=" + getResources().getString(R.string.google_maps_api_key);
-        private Context context;
+    public class GeolocationTask extends AsyncTask<Void, Void, String> {
 
-        public GeolocationService(Context context) {
-            this.context = context;
+        @Override
+        protected String doInBackground(Void... voids) {
+            return getGeolocationData();
         }
 
-        public String getDeviceLocation() {
+        @Override
+        protected void onPostExecute(String result) {
+            // Handle the result, parse JSON, etc.
+            Log.d("Geolocation Result", result);
+            Toast.makeText(getContext(), result, Toast.LENGTH_LONG).show();
+        }
+
+        private String getGeolocationData() {
+            String apiUrl = "https://www.googleapis.com/geolocation/v1/geolocate?key=" + getResources().getString(R.string.google_maps_api_key);
+
             try {
-                OkHttpClient client = new OkHttpClient();
-                MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+                URL url = new URL(apiUrl);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
-                // Get telephony information
-                TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-                String mcc = "";
-                String mnc = "";
-                String carrierName = "";
-                String radioType = "unknown";
+                // Set the request method to POST
+                urlConnection.setRequestMethod("POST");
+                urlConnection.setRequestProperty("Content-Type", "application/json");
 
-                if (telephonyManager != null) {
-                    carrierName = telephonyManager.getNetworkOperatorName();
+                // Enable input/output streams
+                urlConnection.setDoOutput(true);
+                urlConnection.setDoInput(true);
 
-                    String networkOperator = telephonyManager.getNetworkOperator();
-                    if (!TextUtils.isEmpty(networkOperator)) {
-                        mcc = networkOperator.substring(0, 3);
-                        mnc = networkOperator.substring(3);
+                // Write an empty JSON object to the request body
+                String requestBody = "{}";
+                OutputStream outputStream = urlConnection.getOutputStream();
+                outputStream.write(requestBody.getBytes());
+                outputStream.flush();
+
+                // Get the response
+                int responseCode = urlConnection.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    InputStream inputStream = urlConnection.getInputStream();
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                    StringBuilder response = new StringBuilder();
+                    String line;
+
+                    while ((line = bufferedReader.readLine()) != null) {
+                        response.append(line);
                     }
 
-                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
-                        // Permission is granted, safe to use TelephonyManager
-                        radioType = getRadioType(telephonyManager.getNetworkType());
-                    }
-
+                    bufferedReader.close();
+                    return response.toString();
+                } else {
+                    Log.e("Geolocation API", "Error response code: " + responseCode);
                 }
 
-                int networkType = telephonyManager.getNetworkType();
-                radioType = getRadioType(networkType);
-
-                // Construct JSON data
-                JSONObject data = new JSONObject();
-                data.put("homeMobileCountryCode", mcc);
-                data.put("homeMobileNetworkCode", mnc);
-                data.put("radioType", radioType);
-                data.put("carrier", carrierName);
-                data.put("considerIp", true);
-
-                Log.d("homeMobileCountryCode", mcc);
-                Log.d("homeMobileNetworkCode", mnc);
-                Log.d("radioType", radioType);
-                Log.d("carrier", carrierName);
-                Log.d("considerIp", "true");
-
-                RequestBody body = RequestBody.create(JSON, data.toString());
-
-                Request request = new Request.Builder()
-                        .url(GEOLOCATION_API_URL)
-                        .post(body)
-                        .build();
-
-                Response response = client.newCall(request).execute();
-                return response.body().string();
-            } catch (Exception e) {
+                urlConnection.disconnect();
+            } catch (IOException e) {
                 e.printStackTrace();
-                return null;
             }
-        }
 
-        private String getRadioType(int networkType) {
-            switch (networkType) {
-                case TelephonyManager.NETWORK_TYPE_GPRS:
-                case TelephonyManager.NETWORK_TYPE_EDGE:
-                case TelephonyManager.NETWORK_TYPE_CDMA:
-                case TelephonyManager.NETWORK_TYPE_1xRTT:
-                case TelephonyManager.NETWORK_TYPE_IDEN:
-                    return "gsm";
-                case TelephonyManager.NETWORK_TYPE_UMTS:
-                case TelephonyManager.NETWORK_TYPE_EVDO_0:
-                case TelephonyManager.NETWORK_TYPE_EVDO_A:
-                case TelephonyManager.NETWORK_TYPE_HSDPA:
-                case TelephonyManager.NETWORK_TYPE_HSUPA:
-                case TelephonyManager.NETWORK_TYPE_HSPA:
-                case TelephonyManager.NETWORK_TYPE_EVDO_B:
-                case TelephonyManager.NETWORK_TYPE_EHRPD:
-                case TelephonyManager.NETWORK_TYPE_HSPAP:
-                    return "cdma";
-                case TelephonyManager.NETWORK_TYPE_LTE:
-                    return "lte";
-                default:
-                    return "unknown";
-            }
+            return null;
         }
     }
+
+
 
 
 
