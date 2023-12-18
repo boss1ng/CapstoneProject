@@ -97,6 +97,7 @@ import org.json.JSONObject;
 import android.location.Location;
 import android.location.LocationManager;
 
+
 interface TaskCompletedCallback {
     void onTaskCompleted(String response);
 }
@@ -319,8 +320,7 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     // Android 13 (API level 33) or higher
                     //createPdfWithTable();
-                    //new GeolocationTask().execute();
-                    new GeolocationTask(getContext()).execute();
+
 
                 } else {
                     // Below Android 13
@@ -334,11 +334,18 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
                         // Permission has already been granted
                         //createPdfWithTable();
 
-                        //new GeolocationTask().execute(getContext().getApplicationContext());
-                        new GeolocationTask(getContext()).execute();
+                        //new GeolocationTask(getContext()).execute();
 
-                        //GeolocationTask geolocationTask = new GeolocationTask();
-                        //geolocationTask.getGeolocationData();
+                        locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+
+                        // Check for location permission
+                        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                            // Request location permission
+                            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
+                        } else {
+                            // Initialize location updates
+                            initLocationUpdates();
+                        }
                     }
                 }
             }
@@ -938,112 +945,76 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
 
 
 
+    private static final String TAG = "LocationExample";
+    private static final int REQUEST_LOCATION_PERMISSION = 1;
+    private boolean isFirstLocation = true;
+    private LocationManager locationManager;
 
-
-    public class GeolocationTask extends AsyncTask<Context, Void, String> {
-
-        private static final String TAG = "GeolocationTask";
-        private Context context;
-
-        public GeolocationTask(Context context) {
-            this.context = context;
-        }
-
+    // LocationListener to receive updates
+    private final android.location.LocationListener locationListener = new android.location.LocationListener() {
         @Override
-        protected String doInBackground(Context... contexts) {
-            if (checkLocationPermission()) {
-                try {
-                    // Get the last known GPS location
-                    LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-                    Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        public void onLocationChanged(@NonNull Location location) {
+            // Handle new location updates here
+            double latitude = location.getLatitude();
+            double longitude = location.getLongitude();
+            float accuracy = location.getAccuracy();
 
-                    // API endpoint
-                    String apiUrl = "https://www.googleapis.com/geolocation/v1/geolocate?key=" + getResources().getString(R.string.google_maps_api_key);
+            Log.d(TAG, "Latitude: " + latitude + ", Longitude: " + longitude + ", Accuracy: " + accuracy);
 
-                    URL url = new URL(apiUrl);
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            // Check if this is the first location
+            if (isFirstLocation) {
+                Log.d(TAG, "First Location Received");
+                isFirstLocation = false;
 
-                    // Set the necessary HTTP method and headers
-                    connection.setRequestMethod("POST");
-                    connection.setRequestProperty("Content-Type", "application/json");
-                    connection.setDoOutput(true);
-
-                    // Construct the JSON data
-                    String jsonData = "{ \"homeMobileCountryCode\":310, \"homeMobileNetworkCode\":410, \"radioType\":\"lte\", \"carrier\":\"Globe Telecom\", \"considerIp\":true, \"cellTowers\": [], \"wifiAccessPoints\": [], \"location\": { \"lat\": " + lastKnownLocation.getLatitude() + ", \"lng\": " + lastKnownLocation.getLongitude() + " }, \"accuracy\": " + lastKnownLocation.getAccuracy() + " }";
-
-                    // Send the JSON data in the request body
-                    try (DataOutputStream wr = new DataOutputStream(connection.getOutputStream())) {
-                        wr.writeBytes(jsonData);
-                        wr.flush();
-                    }
-
-                    // Get the response from the server
-                    int responseCode = connection.getResponseCode();
-                    BufferedReader reader;
-
-                    if (responseCode == HttpURLConnection.HTTP_OK) {
-                        reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                    } else {
-                        reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
-                    }
-
-                    String line;
-                    StringBuilder response = new StringBuilder();
-
-                    while ((line = reader.readLine()) != null) {
-                        response.append(line);
-                    }
-
-                    reader.close();
-
-                    // Close the connection
-                    connection.disconnect();
-
-                    return "Response Code: " + responseCode + "\nResponse: " + response.toString();
-
-                    //return "Location obtained successfully";
-
-                } catch (SecurityException e) {
-                    Log.e(TAG, "Error: " + e.getMessage());
-                    return "Error: " + e.getMessage();
-                } catch (ProtocolException e) {
-                    throw new RuntimeException(e);
-                } catch (MalformedURLException e) {
-                    throw new RuntimeException(e);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            } else {
-                return "Location permission not granted";
-            }
-        }
-
-        private boolean checkLocationPermission() {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                return ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-            } else {
-                return true; // Permissions are granted at install time on earlier SDK versions
+                // Stop location updates after the first location
+                stopLocationUpdates();
             }
         }
 
         @Override
-        protected void onPostExecute(String result) {
-            // Handle the result here (e.g., update UI, show a toast, etc.)
-            Log.d(TAG, "onPostExecute: " + result);
-
-            cancel(true);
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+            // Handle location provider status changes (if needed)
         }
 
+        @Override
+        public void onProviderEnabled(@NonNull String provider) {
+            // Handle location provider enabled (if needed)
+        }
+
+        @Override
+        public void onProviderDisabled(@NonNull String provider) {
+            // Handle location provider disabled (if needed)
+        }
+    };
+
+    private void initLocationUpdates() {
+        try {
+            // Request location updates with a listener
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        }
     }
 
+    private void stopLocationUpdates() {
+        // Stop location updates when the first location is received
+        if (locationManager != null && locationListener != null) {
+            locationManager.removeUpdates(locationListener);
+            Log.d(TAG, "Location updates stopped");
+        }
+    }
 
-
-
-
-
-
-
-
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_LOCATION_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, initialize location updates
+                initLocationUpdates();
+            } else {
+                // Permission denied, handle accordingly
+            }
+        }
+    }
 
 
 
