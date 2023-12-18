@@ -319,8 +319,7 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     // Android 13 (API level 33) or higher
-                    //createPdfWithTable();
-
+                    createPdfWithTable();
 
                 } else {
                     // Below Android 13
@@ -332,20 +331,7 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
                                 REQUEST_CODE_WRITE_EXTERNAL_STORAGE);
                     } else {
                         // Permission has already been granted
-                        //createPdfWithTable();
-
-                        //new GeolocationTask(getContext()).execute();
-
-                        locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
-
-                        // Check for location permission
-                        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                            // Request location permission
-                            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
-                        } else {
-                            // Initialize location updates
-                            initLocationUpdates();
-                        }
+                        createPdfWithTable();
                     }
                 }
             }
@@ -923,106 +909,5 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
             e.printStackTrace();
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    private static final String TAG = "LocationExample";
-    private static final int REQUEST_LOCATION_PERMISSION = 1;
-    private boolean isFirstLocation = true;
-    private LocationManager locationManager;
-
-    // LocationListener to receive updates
-    private final android.location.LocationListener locationListener = new android.location.LocationListener() {
-        @Override
-        public void onLocationChanged(@NonNull Location location) {
-            // Handle new location updates here
-            double latitude = location.getLatitude();
-            double longitude = location.getLongitude();
-            float accuracy = location.getAccuracy();
-
-            Log.d(TAG, "Latitude: " + latitude + ", Longitude: " + longitude + ", Accuracy: " + accuracy);
-
-            // Check if this is the first location
-            if (isFirstLocation) {
-                Log.d(TAG, "First Location Received");
-                isFirstLocation = false;
-
-                // Stop location updates after the first location
-                stopLocationUpdates();
-            }
-        }
-
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-            // Handle location provider status changes (if needed)
-        }
-
-        @Override
-        public void onProviderEnabled(@NonNull String provider) {
-            // Handle location provider enabled (if needed)
-        }
-
-        @Override
-        public void onProviderDisabled(@NonNull String provider) {
-            // Handle location provider disabled (if needed)
-        }
-    };
-
-    private void initLocationUpdates() {
-        try {
-            // Request location updates with a listener
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void stopLocationUpdates() {
-        // Stop location updates when the first location is received
-        if (locationManager != null && locationListener != null) {
-            locationManager.removeUpdates(locationListener);
-            Log.d(TAG, "Location updates stopped");
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_LOCATION_PERMISSION) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, initialize location updates
-                initLocationUpdates();
-            } else {
-                // Permission denied, handle accordingly
-            }
-        }
-    }
-
-
-
-
-
-
-
-
-
 
 }

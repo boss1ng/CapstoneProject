@@ -14,6 +14,7 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.LocationManager;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -69,6 +70,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
+import org.apache.commons.lang3.text.WordUtils;
 
 import org.w3c.dom.Text;
 
@@ -106,6 +108,12 @@ public class AddGlimpseFragment extends DialogFragment {
 
     private String filename;
     private String uniqueId;
+
+    private static final String TAG = "LocationExample";
+    private static final int REQUEST_LOCATION_PERMISSION = 1;
+    private boolean isFirstLocation = true;
+    private LocationManager locationManager;
+    private double accuracyRetrieved = 0;
 
     @Override
     public void onAttach(Context context) {
@@ -423,6 +431,15 @@ public class AddGlimpseFragment extends DialogFragment {
                 Toast.makeText(getContext(), "Camera permission is required to use camera", Toast.LENGTH_SHORT).show();
             }
         }
+
+        if (requestCode == REQUEST_LOCATION_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, initialize location updates
+                initLocationUpdates();
+            } else {
+                // Permission denied, handle accordingly
+            }
+        }
     }
 
 
@@ -606,8 +623,13 @@ public class AddGlimpseFragment extends DialogFragment {
                     // Initialize the Firebase Database reference
                     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("RSS");
 
-                    // Create a query to check if EstablishmentName matches the target name
-                    Query query = databaseReference.orderByChild("EstablishmentName").equalTo(userLocation);
+                    // Convert userLocation to lowercase for case-insensitive comparison
+                    final String lowerCaseUserLocation = userLocation.toLowerCase();
+
+                    // Create a query to check if EstablishmentName matches the target name (case-insensitive)
+                    Query query = databaseReference.orderByChild("EstablishmentName")
+                            .startAt(lowerCaseUserLocation)
+                            .endAt(lowerCaseUserLocation + "\uf8ff");
                     query.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -648,15 +670,41 @@ public class AddGlimpseFragment extends DialogFragment {
                                         // Verify if current loc is within the 0.000807 (90m) radius
                                         Double firebaseLat = postSnapshot.child("Latitude").getValue(Double.class);
                                         Double firebaseLong = postSnapshot.child("Longitude").getValue(Double.class);
+                                        Double accuracyLong = postSnapshot.child("Accuracy").getValue(Double.class);
 
-                                        double radius = 0.000807; // 90 meters in degrees
+                                        /*
+                                        double radius;
+                                        double lowerBound = 0;
+                                        double upperBound = 0;
+                                        double leftBound = 0;
+                                        double rightBound = 0;
+
+                                        if (accuracyLong != null) {
+                                            radius = accuracyLong / 111319.9;  // 111319.9 is one degree of latitude
+                                            String formattedNumber = String.format("%.8f", radius);
+                                            radius = Double.parseDouble(formattedNumber);
+
+                                            radius = 0.0001797;
+
+                                            Log.d(TAG, "RADIUS: " + radius);
+
+                                            lowerBound = firebaseLat - radius;
+                                            upperBound = firebaseLat + radius;
+                                            leftBound = firebaseLong - radius;
+                                            rightBound = firebaseLong + radius;
+                                        }
+                                         */
+
+                                        double radius = 0.0001797;
                                         double lowerBound = firebaseLat - radius;
                                         double upperBound = firebaseLat + radius;
                                         double leftBound = firebaseLong - radius;
                                         double rightBound = firebaseLong + radius;
 
-                                        if ((latitude >= lowerBound || latitude <= upperBound) && (longitude >= leftBound || longitude <= rightBound)) {
+                                        if ((latitude >= lowerBound && latitude <= upperBound) && (longitude >= leftBound && longitude <= rightBound)) {
                                             //Toast.makeText(context, "WITHIN 90", Toast.LENGTH_LONG).show();
+
+                                            Log.d(TAG, "WITHIN");
 
                                             isWithinRadius[0] = true;
 
@@ -814,7 +862,38 @@ public class AddGlimpseFragment extends DialogFragment {
 
                                         } else {
                                             //Toast.makeText(context, "OUTSIDE", Toast.LENGTH_LONG).show();
+                                            Log.d(TAG, "RADIUS: Outside radius");
 
+                                            // new record of RSS
+
+                                            locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+
+                                            // Check for location permission
+                                            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                                // Request location permission
+                                                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
+                                            } else {
+                                                // Initialize location updates
+                                                initLocationUpdates();
+
+                                                // Save the data to the Firebase Realtime Database after a 1-second delay
+                                                new Handler().postDelayed(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        DatabaseReference rssPost = databaseReference.push();
+
+                                                        rssPost.child("EstablishmentName").setValue(userLocation);
+                                                        //rssPost.child("userId").setValue(userId);
+                                                        rssPost.child("NumPosts").setValue("1");
+                                                        rssPost.child("Users").push().setValue(userId);
+                                                        rssPost.child("Category").child(selectedCategory).child("Timestamp").setValue(ServerValue.TIMESTAMP);
+                                                        rssPost.child("Category").child(selectedCategory).child("Number").setValue("1");
+                                                        rssPost.child("Latitude").setValue(latitude);
+                                                        rssPost.child("Longitude").setValue(longitude);
+                                                        rssPost.child("Accuracy").setValue(accuracyRetrieved);
+                                                    }
+                                                }, 1000); // 1000 milliseconds = 1 second
+                                            }
                                         }
 
                                     }
@@ -828,18 +907,36 @@ public class AddGlimpseFragment extends DialogFragment {
                             else {
                                 // new record of RSS
 
-                                // Save the data to the Firebase Realtime Database
-                                DatabaseReference rssPost = databaseReference.push();
+                                    locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
-                                rssPost.child("EstablishmentName").setValue(userLocation);
-                                //rssPost.child("userId").setValue(userId);
-                                rssPost.child("NumPosts").setValue("1");
-                                rssPost.child("Users").push().setValue(userId);
-                                rssPost.child("Category").child(selectedCategory).child("Timestamp").setValue(ServerValue.TIMESTAMP);
-                                rssPost.child("Category").child(selectedCategory).child("Number").setValue("1");
-                                rssPost.child("Latitude").setValue(latitude);
-                                rssPost.child("Longitude").setValue(longitude);
+                                    // Check for location permission
+                                    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                        // Request location permission
+                                        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
+                                    } else {
+                                        // Initialize location updates
+                                        initLocationUpdates();
 
+                                        // Save the data to the Firebase Realtime Database after a 1-second delay
+                                        new Handler().postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                Log.d(TAG, "Accuracy Retrieved INSIDE: " + accuracyRetrieved);
+
+                                                DatabaseReference rssPost = databaseReference.push();
+
+                                                rssPost.child("EstablishmentName").setValue(userLocation);
+                                                //rssPost.child("userId").setValue(userId);
+                                                rssPost.child("NumPosts").setValue("1");
+                                                rssPost.child("Users").push().setValue(userId);
+                                                rssPost.child("Category").child(selectedCategory).child("Timestamp").setValue(ServerValue.TIMESTAMP);
+                                                rssPost.child("Category").child(selectedCategory).child("Number").setValue("1");
+                                                rssPost.child("Latitude").setValue(latitude);
+                                                rssPost.child("Longitude").setValue(longitude);
+                                                rssPost.child("Accuracy").setValue(accuracyRetrieved);
+                                            }
+                                        }, 1000); // 1000 milliseconds = 1 second
+                                    }
                             }
                         }
                         @Override
@@ -852,6 +949,67 @@ public class AddGlimpseFragment extends DialogFragment {
             }
         });
     }
+
+    private final android.location.LocationListener locationListener = new android.location.LocationListener() {
+        @Override
+        public void onLocationChanged(@NonNull Location location) {
+            // Handle new location updates here
+            double latitude = location.getLatitude();
+            double longitude = location.getLongitude();
+            float accuracy = location.getAccuracy();
+
+            accuracyRetrieved = accuracy;
+
+            Log.d(TAG, "Latitude: " + latitude + ", Longitude: " + longitude + ", Accuracy: " + accuracy);
+            Log.d(TAG, "Accuracy Retrieved OUTSIDE RSS METHOD: " + accuracyRetrieved);
+
+            // Check if this is the first location
+            if (isFirstLocation) {
+                Log.d(TAG, "First Location Received");
+                isFirstLocation = false;
+
+                // Stop location updates after the first location
+                stopLocationUpdates();
+            }
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+            // Handle location provider status changes (if needed)
+        }
+
+        @Override
+        public void onProviderEnabled(@NonNull String provider) {
+            // Handle location provider enabled (if needed)
+        }
+
+        @Override
+        public void onProviderDisabled(@NonNull String provider) {
+            // Handle location provider disabled (if needed)
+        }
+    };
+
+    private void initLocationUpdates() {
+        try {
+            // Request location updates with a listener
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void stopLocationUpdates() {
+        // Stop location updates when the first location is received
+        if (locationManager != null && locationListener != null) {
+            locationManager.removeUpdates(locationListener);
+            Log.d(TAG, "Location updates stopped");
+        }
+    }
+
+
+
+
+
 
     public void reachThresholdPostLocation(Double firebaseLat, Double firebaseLong, DatabaseReference rssPostNewLoc, String downloadUrl, String userLocation, String highestCategory) {
 
@@ -929,6 +1087,9 @@ public class AddGlimpseFragment extends DialogFragment {
                             String postalCode = address.getPostalCode();
                             String country = address.getCountryName();
 
+                            // Convert to proper capitalization
+                            String properCapitalizationUserLocation = WordUtils.capitalizeFully(userLocation);
+
                             rssPostNewLoc.child("Address").setValue(completeAddress);
                             rssPostNewLoc.child("AverageRate").setValue("0");
                             rssPostNewLoc.child("Category").setValue(highestCategory);
@@ -939,7 +1100,7 @@ public class AddGlimpseFragment extends DialogFragment {
                             rssPostNewLoc.child("Image").setValue(filename);
                             rssPostNewLoc.child("Latitude").setValue(String.valueOf(firebaseLat));
                             rssPostNewLoc.child("Link").setValue(downloadUrl);
-                            rssPostNewLoc.child("Location").setValue(userLocation);
+                            rssPostNewLoc.child("Location").setValue(properCapitalizationUserLocation);
                             rssPostNewLoc.child("Longitude").setValue(String.valueOf(firebaseLong));
                             rssPostNewLoc.child("LowestPrice").setValue("");
 
