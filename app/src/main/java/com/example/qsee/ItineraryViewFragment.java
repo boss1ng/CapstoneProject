@@ -43,6 +43,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.location.LocationListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -67,6 +68,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -75,6 +77,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -91,11 +94,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import android.location.Location;
+import android.location.LocationManager;
 
 interface TaskCompletedCallback {
     void onTaskCompleted(String response);
@@ -319,7 +319,8 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     // Android 13 (API level 33) or higher
                     //createPdfWithTable();
-                    new GeolocationTask().execute();
+                    //new GeolocationTask().execute();
+                    new GeolocationTask(getContext()).execute();
 
                 } else {
                     // Below Android 13
@@ -333,7 +334,8 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
                         // Permission has already been granted
                         //createPdfWithTable();
 
-                        new GeolocationTask().execute();
+                        //new GeolocationTask().execute(getContext().getApplicationContext());
+                        new GeolocationTask(getContext()).execute();
 
                         //GeolocationTask geolocationTask = new GeolocationTask();
                         //geolocationTask.getGeolocationData();
@@ -938,89 +940,115 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
 
 
 
-    public class GeolocationTask extends AsyncTask<Void, Void, String> {
+    public class GeolocationTask extends AsyncTask<Context, Void, String> {
+
+        private static final String TAG = "GeolocationTask";
+        private Context context;
+
+        public GeolocationTask(Context context) {
+            this.context = context;
+        }
 
         @Override
-        protected String doInBackground(Void... voids) {
-            return getGeolocationData();
+        protected String doInBackground(Context... contexts) {
+            if (checkLocationPermission()) {
+                try {
+                    // Get the last known GPS location
+                    LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+                    Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+                    // API endpoint
+                    String apiUrl = "https://www.googleapis.com/geolocation/v1/geolocate?key=" + getResources().getString(R.string.google_maps_api_key);
+
+                    URL url = new URL(apiUrl);
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+                    // Set the necessary HTTP method and headers
+                    connection.setRequestMethod("POST");
+                    connection.setRequestProperty("Content-Type", "application/json");
+                    connection.setDoOutput(true);
+
+                    // Construct the JSON data
+                    String jsonData = "{ \"homeMobileCountryCode\":310, \"homeMobileNetworkCode\":410, \"radioType\":\"lte\", \"carrier\":\"Globe Telecom\", \"considerIp\":true, \"cellTowers\": [], \"wifiAccessPoints\": [], \"location\": { \"lat\": " + lastKnownLocation.getLatitude() + ", \"lng\": " + lastKnownLocation.getLongitude() + " }, \"accuracy\": " + lastKnownLocation.getAccuracy() + " }";
+
+                    // Send the JSON data in the request body
+                    try (DataOutputStream wr = new DataOutputStream(connection.getOutputStream())) {
+                        wr.writeBytes(jsonData);
+                        wr.flush();
+                    }
+
+                    // Get the response from the server
+                    int responseCode = connection.getResponseCode();
+                    BufferedReader reader;
+
+                    if (responseCode == HttpURLConnection.HTTP_OK) {
+                        reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    } else {
+                        reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+                    }
+
+                    String line;
+                    StringBuilder response = new StringBuilder();
+
+                    while ((line = reader.readLine()) != null) {
+                        response.append(line);
+                    }
+
+                    reader.close();
+
+                    // Close the connection
+                    connection.disconnect();
+
+                    return "Response Code: " + responseCode + "\nResponse: " + response.toString();
+
+                    //return "Location obtained successfully";
+
+                } catch (SecurityException e) {
+                    Log.e(TAG, "Error: " + e.getMessage());
+                    return "Error: " + e.getMessage();
+                } catch (ProtocolException e) {
+                    throw new RuntimeException(e);
+                } catch (MalformedURLException e) {
+                    throw new RuntimeException(e);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                return "Location permission not granted";
+            }
+        }
+
+        private boolean checkLocationPermission() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                return ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+            } else {
+                return true; // Permissions are granted at install time on earlier SDK versions
+            }
         }
 
         @Override
         protected void onPostExecute(String result) {
-            // Handle the result, parse JSON, etc.
-            Log.d("Geolocation Result", result);
-            //Toast.makeText(getContext(), result, Toast.LENGTH_LONG).show();
+            // Handle the result here (e.g., update UI, show a toast, etc.)
+            Log.d(TAG, "onPostExecute: " + result);
 
-            try {
-                JSONObject jsonObject = new JSONObject(result);
-                JSONObject locationObject = jsonObject.getJSONObject("location");
-                double latitude = locationObject.getDouble("lat");
-                double longitude = locationObject.getDouble("lng");
-                double accuracy = jsonObject.getDouble("accuracy");
-
-                // Now you have latitude, longitude, and accuracy values
-                Log.d("Latitude", "Latitude: " + String.valueOf(latitude));
-                Log.d("Longitude", "Longitude: " + String.valueOf(longitude));
-                Log.d("Accuracy", "Accuracy: " + String.valueOf(accuracy));
-                Toast.makeText(getContext(), "Latitude: " + String.valueOf(latitude) + " Longitude: " + String.valueOf(longitude), Toast.LENGTH_LONG).show();
-                //Toast.makeText(getContext(), String.valueOf(accuracy), Toast.LENGTH_LONG).show();
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-                // Handle JSON parsing error
-            }
-
-            // End the AsyncTask
             cancel(true);
         }
 
-        private String getGeolocationData() {
-            String apiUrl = "https://www.googleapis.com/geolocation/v1/geolocate?key=" + getResources().getString(R.string.google_maps_api_key);
-
-            try {
-                URL url = new URL(apiUrl);
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-                // Set the request method to POST
-                urlConnection.setRequestMethod("POST");
-                urlConnection.setRequestProperty("Content-Type", "application/json");
-
-                // Enable input/output streams
-                urlConnection.setDoOutput(true);
-                urlConnection.setDoInput(true);
-
-                // Write an empty JSON object to the request body
-                String requestBody = "{}";
-                OutputStream outputStream = urlConnection.getOutputStream();
-                outputStream.write(requestBody.getBytes());
-                outputStream.flush();
-
-                // Get the response
-                int responseCode = urlConnection.getResponseCode();
-                if (responseCode == HttpURLConnection.HTTP_OK) {
-                    InputStream inputStream = urlConnection.getInputStream();
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-                    StringBuilder response = new StringBuilder();
-                    String line;
-
-                    while ((line = bufferedReader.readLine()) != null) {
-                        response.append(line);
-                    }
-
-                    bufferedReader.close();
-                    return response.toString();
-                } else {
-                    Log.e("Geolocation API", "Error response code: " + responseCode);
-                }
-
-                urlConnection.disconnect();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
