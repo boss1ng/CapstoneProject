@@ -104,7 +104,10 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             public void onDataChange(DataSnapshot groupSnapshot) {
                 for (DataSnapshot group : groupSnapshot.getChildren()) {
                     String adminUserId = group.child("admin").getValue(String.class);
-
+                    if (group.getChildrenCount() == 52) {
+                        Toast.makeText(context, "Group " + groupName +  " is full.", Toast.LENGTH_LONG).show();
+                        break;
+                    }
                     // Check if the user is already a member
                     boolean isUserAlreadyMember = isUserAlreadyMember(group, member);
 
