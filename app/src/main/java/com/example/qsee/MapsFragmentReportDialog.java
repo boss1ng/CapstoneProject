@@ -23,11 +23,14 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 public class MapsFragmentReportDialog extends DialogFragment {
+
+    public Boolean isNotRSS = false;
 
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Create a new Dialog instance
@@ -191,39 +194,51 @@ public class MapsFragmentReportDialog extends DialogFragment {
                                             for (DataSnapshot placeSnapshot : snapshot.getChildren()) {
                                                 // Extract place data (e.g., latitude, longitude, name) from placeSnapshot
                                                 String name = placeSnapshot.child("Location").getValue(String.class);
-                                                String filename = placeSnapshot.child("Image").getValue(String.class);
+                                                //String filename = placeSnapshot.child("Image").getValue(String.class);
+                                                String createdBy = placeSnapshot.child("CreatedBy").getValue(String.class);
 
                                                 if (name.equals(placeName)) {
-                                                    // Delete Location record from Firebase Realtime Database
-                                                    placeSnapshot.getRef().removeValue();
 
-                                                    //Toast.makeText(getContext(), filename, Toast.LENGTH_LONG).show();
+                                                    if (createdBy.equals("Administrator")) {
+                                                        isNotRSS = true;
+                                                    }
 
-                                                    //FirebaseApp.initializeApp(getContext());
+                                                    else {
+                                                        isNotRSS = false;
+                                                        // Delete Location record from Firebase Realtime Database
+                                                        placeSnapshot.getRef().removeValue();
 
-                                                    // Initialize Firebase Storage and Get a non-default Storage bucket
-                                                    FirebaseStorage storage = FirebaseStorage.getInstance("gs://capstone-project-ffe21.appspot.com");
+                                                        //Toast.makeText(getContext(), filename, Toast.LENGTH_LONG).show();
 
-                                                    // Create a storage reference from our app
-                                                    StorageReference storageRef = storage.getReference();
+                                                        //FirebaseApp.initializeApp(getContext());
 
-                                                    // Create a reference to the file to delete
-                                                    StorageReference fileReference = storageRef.child("Location/" + filename);
-                                                    // Delete image from Firebase Cloud Storage
-                                                    fileReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void aVoid) {
-                                                            // File deleted successfully
-                                                            // You can add your logic here
-                                                            //Toast.makeText(getContext(), "Successfully deleted.", Toast.LENGTH_LONG).show();
-                                                        }
-                                                    }).addOnFailureListener(new OnFailureListener() {
-                                                        @Override
-                                                        public void onFailure(@NonNull Exception e) {
-                                                            // An error occurred while deleting the file
-                                                            // Handle the error here
-                                                        }
-                                                    });
+                                                        // Initialize Firebase Storage and Get a non-default Storage bucket
+                                                        //FirebaseStorage storage = FirebaseStorage.getInstance("gs://capstone-project-ffe21.appspot.com");
+
+                                                        // Create a storage reference from our app
+                                                        //StorageReference storageRef = storage.getReference();
+
+                                                        // Create a reference to the file to delete
+                                                        //StorageReference fileReference = storageRef.child("Location/" + filename);
+                                                        // Delete image from Firebase Cloud Storage
+                                                        /*
+                                                        fileReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void aVoid) {
+                                                                // File deleted successfully
+                                                                // You can add your logic here
+                                                                //Toast.makeText(getContext(), "Successfully deleted.", Toast.LENGTH_LONG).show();
+                                                            }
+                                                        }).addOnFailureListener(new OnFailureListener() {
+                                                            @Override
+                                                            public void onFailure(@NonNull Exception e) {
+                                                                // An error occurred while deleting the file
+                                                                // Handle the error here
+                                                            }
+                                                        });
+                                                         */
+                                                    }
+
                                                 }
                                             }
                                         }
@@ -234,7 +249,16 @@ public class MapsFragmentReportDialog extends DialogFragment {
                                     });
                                 }
 
-                                Toast.makeText(getContext(), "Reported Successfully.", Toast.LENGTH_LONG).show();
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (isNotRSS)
+                                            Toast.makeText(getContext(), "Establishment Reported to the Administrator.", Toast.LENGTH_LONG).show();
+                                        else
+                                            Toast.makeText(getContext(), "Reported Successfully.", Toast.LENGTH_LONG).show();
+                                    }
+                                }, 500); // 1000 milliseconds = 1 second
+
                             }
                         }
                     }

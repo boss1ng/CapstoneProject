@@ -14,6 +14,7 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.LocationManager;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -69,6 +70,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
+import org.apache.commons.lang3.text.WordUtils;
 
 import org.w3c.dom.Text;
 
@@ -106,6 +108,14 @@ public class AddGlimpseFragment extends DialogFragment {
 
     private String filename;
     private String uniqueId;
+
+    private static final String TAG = "LocationExample";
+    private static final int REQUEST_LOCATION_PERMISSION = 1;
+    private boolean isFirstLocation = true;
+    private LocationManager locationManager;
+    private double accuracyRetrieved = 0;
+
+    private Boolean isNotEqualsIgnore = false;
 
     @Override
     public void onAttach(Context context) {
@@ -423,6 +433,15 @@ public class AddGlimpseFragment extends DialogFragment {
                 Toast.makeText(getContext(), "Camera permission is required to use camera", Toast.LENGTH_SHORT).show();
             }
         }
+
+        if (requestCode == REQUEST_LOCATION_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, initialize location updates
+                initLocationUpdates();
+            } else {
+                // Permission denied, handle accordingly
+            }
+        }
     }
 
 
@@ -606,83 +625,177 @@ public class AddGlimpseFragment extends DialogFragment {
                     // Initialize the Firebase Database reference
                     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("RSS");
 
-                    // Create a query to check if EstablishmentName matches the target name
-                    Query query = databaseReference.orderByChild("EstablishmentName").equalTo(userLocation);
-                    query.addListenerForSingleValueEvent(new ValueEventListener() {
+                    // Assuming you have a DatabaseReference named "databaseReference"
+                    databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
+
                             if (dataSnapshot.exists()) {
-                                // Check if userId already posted that establishment. If yes, skip. If no, update numPosts
 
                                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                                    String establishmentName = postSnapshot.child("EstablishmentName").getValue(String.class);
 
-                                    pushKey[0] = postSnapshot.getKey();
+                                    // Perform case-insensitive comparison
+                                    if (establishmentName != null && establishmentName.equalsIgnoreCase(userLocation)) {
+                                        // Match found
 
-                                    String numberPostsFirebase = postSnapshot.child("NumPosts").getValue(String.class);
-                                    //Toast.makeText(getContext(), numberReportsFirebase, Toast.LENGTH_LONG).show();
+                                        isNotEqualsIgnore = false;
+                                        pushKey[0] = postSnapshot.getKey();
 
-                                    // Access the "Users" node under the specific rss
-                                    DataSnapshot usersSnapshot = postSnapshot.child("Users");
+                                        String numberPostsFirebase = postSnapshot.child("NumPosts").getValue(String.class);
+                                        //Toast.makeText(getContext(), numberReportsFirebase, Toast.LENGTH_LONG).show();
 
-                                    // Iterate through the "Users"
-                                    for (DataSnapshot userSnapshot : usersSnapshot.getChildren()) {
-                                        String key = userSnapshot.getKey(); // Get the key ("-NhtkyoZUylTyqoeHvLQ")
-                                        String value = userSnapshot.getValue(String.class); // Get the value ("5456073013")
+                                        // Access the "Users" node under the specific rss
+                                        DataSnapshot usersSnapshot = postSnapshot.child("Users");
 
-                                        //Toast.makeText(getContext(), key, Toast.LENGTH_LONG).show();
-                                        //Toast.makeText(getContext(), value, Toast.LENGTH_LONG).show();
+                                        // Iterate through the "Users"
+                                        for (DataSnapshot userSnapshot : usersSnapshot.getChildren()) {
+                                            String key = userSnapshot.getKey(); // Get the key ("-NhtkyoZUylTyqoeHvLQ")
+                                            String value = userSnapshot.getValue(String.class); // Get the value ("5456073013")
 
-                                        if (value.equals(userId)) {
-                                            isUserExisting[0] = true;
-                                            break;
+                                            //Toast.makeText(getContext(), key, Toast.LENGTH_LONG).show();
+                                            //Toast.makeText(getContext(), value, Toast.LENGTH_LONG).show();
+
+                                            if (value.equals(userId)) {
+                                                isUserExisting[0] = true;
+                                                break;
+                                            }
                                         }
-                                    }
 
-                                    if (isUserExisting[0]) {
-                                        //Toast.makeText(getContext(), "Establishment already reported.", Toast.LENGTH_LONG).show();
+                                        if (isUserExisting[0]) {
+                                            //Toast.makeText(getContext(), "Establishment already reported.", Toast.LENGTH_LONG).show();
 
-                                    }
+                                        } else { // User not yet posting an initial RSS feed
 
-                                    else { // User not yet posting an initial RSS feed
+                                            // Verify if current loc is within the 0.000807 (90m) radius
+                                            Double firebaseLat = postSnapshot.child("Latitude").getValue(Double.class);
+                                            Double firebaseLong = postSnapshot.child("Longitude").getValue(Double.class);
+                                            Double accuracyLong = postSnapshot.child("Accuracy").getValue(Double.class);
 
-                                        // Verify if current loc is within the 0.000807 (90m) radius
-                                        Double firebaseLat = postSnapshot.child("Latitude").getValue(Double.class);
-                                        Double firebaseLong = postSnapshot.child("Longitude").getValue(Double.class);
+                                        /*
+                                        double radius;
+                                        double lowerBound = 0;
+                                        double upperBound = 0;
+                                        double leftBound = 0;
+                                        double rightBound = 0;
 
-                                        double radius = 0.000807; // 90 meters in degrees
-                                        double lowerBound = firebaseLat - radius;
-                                        double upperBound = firebaseLat + radius;
-                                        double leftBound = firebaseLong - radius;
-                                        double rightBound = firebaseLong + radius;
+                                        if (accuracyLong != null) {
+                                            radius = accuracyLong / 111319.9;  // 111319.9 is one degree of latitude
+                                            String formattedNumber = String.format("%.8f", radius);
+                                            radius = Double.parseDouble(formattedNumber);
 
-                                        if ((latitude >= lowerBound || latitude <= upperBound) && (longitude >= leftBound || longitude <= rightBound)) {
-                                            //Toast.makeText(context, "WITHIN 90", Toast.LENGTH_LONG).show();
+                                            radius = 0.0001797;
 
-                                            isWithinRadius[0] = true;
+                                            Log.d(TAG, "RADIUS: " + radius);
 
-                                            // Access the "Category" node under the specific report
-                                            DataSnapshot categoriesSnapshot = postSnapshot.child("Category");
+                                            lowerBound = firebaseLat - radius;
+                                            upperBound = firebaseLat + radius;
+                                            leftBound = firebaseLong - radius;
+                                            rightBound = firebaseLong + radius;
+                                        }
+                                         */
 
-                                            // Iterate through the "Category"
-                                            for (DataSnapshot catSnapshot : categoriesSnapshot.getChildren()) {
-                                                String key = catSnapshot.getKey(); // Get the key ("Accommodations")
-                                                //String value = catSnapshot.getValue(String.class); // Get the value ("1")
+                                            double radius = 0.0001797;
+                                            double lowerBound = firebaseLat - radius;
+                                            double upperBound = firebaseLat + radius;
+                                            double leftBound = firebaseLong - radius;
+                                            double rightBound = firebaseLong + radius;
 
-                                                if (key.equals(selectedCategory)) {
-                                                    //Toast.makeText(context, "Inside " + selectedCategory + " node.", Toast.LENGTH_LONG).show();
+                                            if ((latitude >= lowerBound && latitude <= upperBound) && (longitude >= leftBound && longitude <= rightBound)) {
+                                                //Toast.makeText(context, "WITHIN 90", Toast.LENGTH_LONG).show();
 
-                                                    isCategoryExisting[0] = true;
+                                                Log.d(TAG, "WITHIN");
 
-                                                    String numberPost = catSnapshot.child("Number").getValue(String.class);
-                                                    // Long timestampPosted = catSnapshot.child("Timestamp").getValue(Long.class);
+                                                isWithinRadius[0] = true;
 
-                                                    int intnumberPost = Integer.parseInt(numberPost);
-                                                    intnumberPost++;
+                                                // Access the "Category" node under the specific report
+                                                DataSnapshot categoriesSnapshot = postSnapshot.child("Category");
 
-                                                    DatabaseReference pushKeyCatRef = databaseReference.child(pushKey[0]).child("Category").child(selectedCategory);
-                                                    // Append a new child node under "Category" with the key as "selectedCategory" and the value as the incremented
-                                                    pushKeyCatRef.child("Number").setValue(String.valueOf(intnumberPost));
-                                                    pushKeyCatRef.child("Timestamp").setValue(ServerValue.TIMESTAMP);
+                                                // Iterate through the "Category"
+                                                for (DataSnapshot catSnapshot : categoriesSnapshot.getChildren()) {
+                                                    String key = catSnapshot.getKey(); // Get the key ("Accommodations")
+                                                    //String value = catSnapshot.getValue(String.class); // Get the value ("1")
+
+                                                    if (key.equals(selectedCategory)) {
+                                                        //Toast.makeText(context, "Inside " + selectedCategory + " node.", Toast.LENGTH_LONG).show();
+
+                                                        isCategoryExisting[0] = true;
+
+                                                        String numberPost = catSnapshot.child("Number").getValue(String.class);
+                                                        // Long timestampPosted = catSnapshot.child("Timestamp").getValue(Long.class);
+
+                                                        int intnumberPost = Integer.parseInt(numberPost);
+                                                        intnumberPost++;
+
+                                                        DatabaseReference pushKeyCatRef = databaseReference.child(pushKey[0]).child("Category").child(selectedCategory);
+                                                        // Append a new child node under "Category" with the key as "selectedCategory" and the value as the incremented
+                                                        pushKeyCatRef.child("Number").setValue(String.valueOf(intnumberPost));
+                                                        pushKeyCatRef.child("Timestamp").setValue(ServerValue.TIMESTAMP);
+
+                                                        // Convert numReports to an integer, update it, and set it back
+                                                        int intNumPosts = Integer.parseInt(numberPostsFirebase);
+                                                        intNumPosts++;
+                                                        postSnapshot.getRef().child("NumPosts").setValue(String.valueOf(intNumPosts));
+
+                                                        DatabaseReference pushKeyRef = databaseReference.child(pushKey[0]).child("Users");
+                                                        pushKeyRef.push().setValue(userId);
+
+                                                        if (intNumPosts == 20) {
+
+                                                            //reachThresholdPostLocation(firebaseLat, firebaseLong, categoriesSnapshot, downloadUrl, userLocation);
+                                                            //Toast.makeText(context, "ADD RSS FEED TO LOCATION", Toast.LENGTH_LONG).show();
+
+                                                            // Register the RSS Feed to Location table from Firebase
+                                                            DatabaseReference newLocation = FirebaseDatabase.getInstance().getReference("Location");
+                                                            //DatabaseReference newLocation = FirebaseDatabase.getInstance().getReference("Location");
+
+                                                            // Save the data to the Firebase Realtime Database
+                                                            DatabaseReference rssPostNewLoc = newLocation.push();
+
+                                                            // Identify Category with highest posts
+                                                            String highestCategory = null;
+                                                            int previousValue = 0;
+                                                            long previousTimestamp = 0;
+                                                            // Iterate through the "Category"
+                                                            for (DataSnapshot categorySnapshot : categoriesSnapshot.getChildren()) {
+                                                                String catKey = categorySnapshot.getKey(); // Get the key ("Accommodations")
+
+                                                                String catNumberPost = categorySnapshot.child("Number").getValue(String.class);
+                                                                Long catTimestampPosted = categorySnapshot.child("Timestamp").getValue(Long.class);
+
+                                                                if (Integer.parseInt(catNumberPost) > previousValue) {
+                                                                    previousValue = Integer.parseInt(catNumberPost);
+                                                                    highestCategory = key;
+                                                                    previousTimestamp = catTimestampPosted;
+                                                                } else if (Integer.parseInt(catNumberPost) == previousValue) {
+                                                                    if (previousTimestamp > catTimestampPosted) { // previousTimestamp more recent.
+                                                                        previousValue = Integer.parseInt(catNumberPost);
+                                                                        highestCategory = key;
+                                                                        previousTimestamp = catTimestampPosted;
+                                                                    } else {
+
+                                                                    }
+                                                                }
+                                                            }
+
+                                                            reachThresholdPostLocation(firebaseLat, firebaseLong, rssPostNewLoc, downloadUrl, userLocation, highestCategory);
+
+                                                            break;
+
+                                                        }
+
+                                                        //Toast.makeText(context, selectedCategory + ": " + String.valueOf(timestampPosted), Toast.LENGTH_LONG).show();
+
+                                                    }
+                                                }
+
+                                                if (isCategoryExisting[0]) {
+
+                                                } else {
+
+                                                    DatabaseReference pushKeyCatRef = databaseReference.child(pushKey[0]).child("Category");
+                                                    pushKeyCatRef.child(selectedCategory).child("Timestamp").setValue(ServerValue.TIMESTAMP);
+                                                    pushKeyCatRef.child(selectedCategory).child("Number").setValue("1");
 
                                                     // Convert numReports to an integer, update it, and set it back
                                                     int intNumPosts = Integer.parseInt(numberPostsFirebase);
@@ -690,10 +803,11 @@ public class AddGlimpseFragment extends DialogFragment {
                                                     postSnapshot.getRef().child("NumPosts").setValue(String.valueOf(intNumPosts));
 
                                                     DatabaseReference pushKeyRef = databaseReference.child(pushKey[0]).child("Users");
+
+                                                    // Append a new child node under "Users" with the key as "UserId" and the value as the user ID
                                                     pushKeyRef.push().setValue(userId);
 
                                                     if (intNumPosts == 20) {
-
                                                         //reachThresholdPostLocation(firebaseLat, firebaseLong, categoriesSnapshot, downloadUrl, userLocation);
                                                         //Toast.makeText(context, "ADD RSS FEED TO LOCATION", Toast.LENGTH_LONG).show();
 
@@ -709,27 +823,23 @@ public class AddGlimpseFragment extends DialogFragment {
                                                         int previousValue = 0;
                                                         long previousTimestamp = 0;
                                                         // Iterate through the "Category"
-                                                        for (DataSnapshot categorySnapshot : categoriesSnapshot.getChildren()) {
-                                                            String catKey = categorySnapshot.getKey(); // Get the key ("Accommodations")
+                                                        for (DataSnapshot catSnapshot : categoriesSnapshot.getChildren()) {
+                                                            String key = catSnapshot.getKey(); // Get the key ("Accommodations")
 
-                                                            String catNumberPost = categorySnapshot.child("Number").getValue(String.class);
-                                                            Long catTimestampPosted = categorySnapshot.child("Timestamp").getValue(Long.class);
+                                                            String numberPost = catSnapshot.child("Number").getValue(String.class);
+                                                            Long timestampPosted = catSnapshot.child("Timestamp").getValue(Long.class);
 
-                                                            if (Integer.parseInt(catNumberPost) > previousValue) {
-                                                                previousValue = Integer.parseInt(catNumberPost);
+                                                            if (Integer.parseInt(numberPost) > previousValue) {
+                                                                previousValue = Integer.parseInt(numberPost);
                                                                 highestCategory = key;
-                                                                previousTimestamp = catTimestampPosted;
-                                                            }
+                                                                previousTimestamp = timestampPosted;
+                                                            } else if (Integer.parseInt(numberPost) == previousValue) {
+                                                                if (previousTimestamp > timestampPosted) { // previousTimestamp more recent.
 
-                                                            else if (Integer.parseInt(catNumberPost) == previousValue) {
-                                                                if (previousTimestamp > catTimestampPosted) { // previousTimestamp more recent.
-                                                                    previousValue = Integer.parseInt(catNumberPost);
+                                                                } else {
+                                                                    previousValue = Integer.parseInt(numberPost);
                                                                     highestCategory = key;
-                                                                    previousTimestamp = catTimestampPosted;
-                                                                }
-
-                                                                else {
-
+                                                                    previousTimestamp = timestampPosted;
                                                                 }
                                                             }
                                                         }
@@ -737,114 +847,132 @@ public class AddGlimpseFragment extends DialogFragment {
                                                         reachThresholdPostLocation(firebaseLat, firebaseLong, rssPostNewLoc, downloadUrl, userLocation, highestCategory);
 
                                                         break;
-
                                                     }
+                                                }
 
-                                                    //Toast.makeText(context, selectedCategory + ": " + String.valueOf(timestampPosted), Toast.LENGTH_LONG).show();
+                                            } else {
+                                                //Toast.makeText(context, "OUTSIDE", Toast.LENGTH_LONG).show();
+                                                Log.d(TAG, "RADIUS: Outside radius");
 
+                                                // new record of RSS
+
+                                                locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+
+                                                // Check for location permission
+                                                if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                                    // Request location permission
+                                                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
+                                                } else {
+                                                    // Initialize location updates
+                                                    initLocationUpdates();
+
+                                                    // Save the data to the Firebase Realtime Database after a 1-second delay
+                                                    new Handler().postDelayed(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            DatabaseReference rssPost = databaseReference.push();
+
+                                                            rssPost.child("EstablishmentName").setValue(userLocation);
+                                                            //rssPost.child("userId").setValue(userId);
+                                                            rssPost.child("NumPosts").setValue("1");
+                                                            rssPost.child("Users").push().setValue(userId);
+                                                            rssPost.child("Category").child(selectedCategory).child("Timestamp").setValue(ServerValue.TIMESTAMP);
+                                                            rssPost.child("Category").child(selectedCategory).child("Number").setValue("1");
+                                                            rssPost.child("Latitude").setValue(latitude);
+                                                            rssPost.child("Longitude").setValue(longitude);
+                                                            rssPost.child("Accuracy").setValue(accuracyRetrieved);
+                                                        }
+                                                    }, 1000); // 1000 milliseconds = 1 second
                                                 }
                                             }
-
-                                            if (isCategoryExisting[0]) {
-
-                                            }
-
-                                            else {
-
-                                                DatabaseReference pushKeyCatRef = databaseReference.child(pushKey[0]).child("Category");
-                                                pushKeyCatRef.child(selectedCategory).child("Timestamp").setValue(ServerValue.TIMESTAMP);
-                                                pushKeyCatRef.child(selectedCategory).child("Number").setValue("1");
-
-                                                // Convert numReports to an integer, update it, and set it back
-                                                int intNumPosts = Integer.parseInt(numberPostsFirebase);
-                                                intNumPosts++;
-                                                postSnapshot.getRef().child("NumPosts").setValue(String.valueOf(intNumPosts));
-
-                                                DatabaseReference pushKeyRef = databaseReference.child(pushKey[0]).child("Users");
-
-                                                // Append a new child node under "Users" with the key as "UserId" and the value as the user ID
-                                                pushKeyRef.push().setValue(userId);
-
-                                                if (intNumPosts == 20) {
-                                                    //reachThresholdPostLocation(firebaseLat, firebaseLong, categoriesSnapshot, downloadUrl, userLocation);
-                                                    //Toast.makeText(context, "ADD RSS FEED TO LOCATION", Toast.LENGTH_LONG).show();
-
-                                                    // Register the RSS Feed to Location table from Firebase
-                                                    DatabaseReference newLocation = FirebaseDatabase.getInstance().getReference("Location");
-                                                    //DatabaseReference newLocation = FirebaseDatabase.getInstance().getReference("Location");
-
-                                                    // Save the data to the Firebase Realtime Database
-                                                    DatabaseReference rssPostNewLoc = newLocation.push();
-
-                                                    // Identify Category with highest posts
-                                                    String highestCategory = null;
-                                                    int previousValue = 0;
-                                                    long previousTimestamp = 0;
-                                                    // Iterate through the "Category"
-                                                    for (DataSnapshot catSnapshot : categoriesSnapshot.getChildren()) {
-                                                        String key = catSnapshot.getKey(); // Get the key ("Accommodations")
-
-                                                        String numberPost = catSnapshot.child("Number").getValue(String.class);
-                                                        Long timestampPosted = catSnapshot.child("Timestamp").getValue(Long.class);
-
-                                                        if (Integer.parseInt(numberPost) > previousValue) {
-                                                            previousValue = Integer.parseInt(numberPost);
-                                                            highestCategory = key;
-                                                            previousTimestamp = timestampPosted;
-                                                        }
-
-                                                        else if (Integer.parseInt(numberPost) == previousValue) {
-                                                            if (previousTimestamp > timestampPosted) { // previousTimestamp more recent.
-
-                                                            }
-
-                                                            else {
-                                                                previousValue = Integer.parseInt(numberPost);
-                                                                highestCategory = key;
-                                                                previousTimestamp = timestampPosted;
-                                                            }
-                                                        }
-                                                    }
-
-                                                    reachThresholdPostLocation(firebaseLat, firebaseLong, rssPostNewLoc, downloadUrl, userLocation, highestCategory);
-
-                                                    break;
-                                                }
-                                            }
-
-                                        } else {
-                                            //Toast.makeText(context, "OUTSIDE", Toast.LENGTH_LONG).show();
 
                                         }
 
                                     }
+
+                                    else {
+                                        isNotEqualsIgnore = true;
+                                    }
+
                                 }
 
-                                // end of for loop here
+                                if (isNotEqualsIgnore) {
+                                    // new record of RSS
 
+                                    locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+
+                                    // Check for location permission
+                                    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                        // Request location permission
+                                        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
+                                    } else {
+                                        // Initialize location updates
+                                        initLocationUpdates();
+
+                                        // Save the data to the Firebase Realtime Database after a 1-second delay
+                                        new Handler().postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                Log.d(TAG, "Accuracy Retrieved INSIDE: " + accuracyRetrieved);
+
+                                                DatabaseReference rssPost = databaseReference.push();
+
+                                                rssPost.child("EstablishmentName").setValue(userLocation);
+                                                //rssPost.child("userId").setValue(userId);
+                                                rssPost.child("NumPosts").setValue("1");
+                                                rssPost.child("Users").push().setValue(userId);
+                                                rssPost.child("Category").child(selectedCategory).child("Timestamp").setValue(ServerValue.TIMESTAMP);
+                                                rssPost.child("Category").child(selectedCategory).child("Number").setValue("1");
+                                                rssPost.child("Latitude").setValue(latitude);
+                                                rssPost.child("Longitude").setValue(longitude);
+                                                rssPost.child("Accuracy").setValue(accuracyRetrieved);
+                                            }
+                                        }, 1000); // 1000 milliseconds = 1 second
+                                    }
+                                }
                             }
 
                             // Add report on existing rss
                             else {
                                 // new record of RSS
 
-                                // Save the data to the Firebase Realtime Database
-                                DatabaseReference rssPost = databaseReference.push();
+                                locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
-                                rssPost.child("EstablishmentName").setValue(userLocation);
-                                //rssPost.child("userId").setValue(userId);
-                                rssPost.child("NumPosts").setValue("1");
-                                rssPost.child("Users").push().setValue(userId);
-                                rssPost.child("Category").child(selectedCategory).child("Timestamp").setValue(ServerValue.TIMESTAMP);
-                                rssPost.child("Category").child(selectedCategory).child("Number").setValue("1");
-                                rssPost.child("Latitude").setValue(latitude);
-                                rssPost.child("Longitude").setValue(longitude);
+                                // Check for location permission
+                                if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                    // Request location permission
+                                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
+                                } else {
+                                    // Initialize location updates
+                                    initLocationUpdates();
 
+                                    // Save the data to the Firebase Realtime Database after a 1-second delay
+                                    new Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Log.d(TAG, "Accuracy Retrieved INSIDE: " + accuracyRetrieved);
+
+                                            DatabaseReference rssPost = databaseReference.push();
+
+                                            rssPost.child("EstablishmentName").setValue(userLocation);
+                                            //rssPost.child("userId").setValue(userId);
+                                            rssPost.child("NumPosts").setValue("1");
+                                            rssPost.child("Users").push().setValue(userId);
+                                            rssPost.child("Category").child(selectedCategory).child("Timestamp").setValue(ServerValue.TIMESTAMP);
+                                            rssPost.child("Category").child(selectedCategory).child("Number").setValue("1");
+                                            rssPost.child("Latitude").setValue(latitude);
+                                            rssPost.child("Longitude").setValue(longitude);
+                                            rssPost.child("Accuracy").setValue(accuracyRetrieved);
+                                        }
+                                    }, 1000); // 1000 milliseconds = 1 second
+                                }
                             }
-                        }
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
 
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            // Handle errors
                         }
                     });
 
@@ -852,6 +980,67 @@ public class AddGlimpseFragment extends DialogFragment {
             }
         });
     }
+
+    private final android.location.LocationListener locationListener = new android.location.LocationListener() {
+        @Override
+        public void onLocationChanged(@NonNull Location location) {
+            // Handle new location updates here
+            double latitude = location.getLatitude();
+            double longitude = location.getLongitude();
+            float accuracy = location.getAccuracy();
+
+            accuracyRetrieved = accuracy;
+
+            Log.d(TAG, "Latitude: " + latitude + ", Longitude: " + longitude + ", Accuracy: " + accuracy);
+            Log.d(TAG, "Accuracy Retrieved OUTSIDE RSS METHOD: " + accuracyRetrieved);
+
+            // Check if this is the first location
+            if (isFirstLocation) {
+                Log.d(TAG, "First Location Received");
+                isFirstLocation = false;
+
+                // Stop location updates after the first location
+                stopLocationUpdates();
+            }
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+            // Handle location provider status changes (if needed)
+        }
+
+        @Override
+        public void onProviderEnabled(@NonNull String provider) {
+            // Handle location provider enabled (if needed)
+        }
+
+        @Override
+        public void onProviderDisabled(@NonNull String provider) {
+            // Handle location provider disabled (if needed)
+        }
+    };
+
+    private void initLocationUpdates() {
+        try {
+            // Request location updates with a listener
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void stopLocationUpdates() {
+        // Stop location updates when the first location is received
+        if (locationManager != null && locationListener != null) {
+            locationManager.removeUpdates(locationListener);
+            Log.d(TAG, "Location updates stopped");
+        }
+    }
+
+
+
+
+
 
     public void reachThresholdPostLocation(Double firebaseLat, Double firebaseLong, DatabaseReference rssPostNewLoc, String downloadUrl, String userLocation, String highestCategory) {
 
@@ -929,6 +1118,9 @@ public class AddGlimpseFragment extends DialogFragment {
                             String postalCode = address.getPostalCode();
                             String country = address.getCountryName();
 
+                            // Convert to proper capitalization
+                            String properCapitalizationUserLocation = WordUtils.capitalizeFully(userLocation);
+
                             rssPostNewLoc.child("Address").setValue(completeAddress);
                             rssPostNewLoc.child("AverageRate").setValue("0");
                             rssPostNewLoc.child("Category").setValue(highestCategory);
@@ -939,7 +1131,7 @@ public class AddGlimpseFragment extends DialogFragment {
                             rssPostNewLoc.child("Image").setValue(filename);
                             rssPostNewLoc.child("Latitude").setValue(String.valueOf(firebaseLat));
                             rssPostNewLoc.child("Link").setValue(downloadUrl);
-                            rssPostNewLoc.child("Location").setValue(userLocation);
+                            rssPostNewLoc.child("Location").setValue(properCapitalizationUserLocation);
                             rssPostNewLoc.child("Longitude").setValue(String.valueOf(firebaseLong));
                             rssPostNewLoc.child("LowestPrice").setValue("");
 

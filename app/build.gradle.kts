@@ -132,4 +132,7 @@ dependencies {
 
     implementation ("com.theartofdev.edmodo:android-image-cropper:2.8.+")
 
+    // Word Utils
+    implementation ("org.apache.commons:commons-lang3:3.12.0") // Use the latest version available
+
 }

@@ -22,8 +22,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
+import android.telephony.TelephonyManager;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,6 +43,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.location.LocationListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -65,13 +68,16 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -87,6 +93,10 @@ import java.util.regex.Pattern;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import android.location.Location;
+import android.location.LocationManager;
+
 
 interface TaskCompletedCallback {
     void onTaskCompleted(String response);
@@ -310,6 +320,7 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     // Android 13 (API level 33) or higher
                     createPdfWithTable();
+
                 } else {
                     // Below Android 13
                     if (ContextCompat.checkSelfPermission(requireContext(), WRITE_EXTERNAL_STORAGE)
@@ -453,8 +464,9 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
 
             // Create a Font with a larger size
             Font largeFont = new Font(Font.FontFamily.TIMES_ROMAN, 20, Font.BOLD);
-            Font tableHeader = new Font(Font.FontFamily.TIMES_ROMAN, 16, Font.BOLD);
-            Font activityHeader = new Font(Font.FontFamily.TIMES_ROMAN, 14, Font.BOLD);
+            Font tableHeader = new Font(Font.FontFamily.TIMES_ROMAN, 18, Font.BOLD);
+            Font activityHeader = new Font(Font.FontFamily.TIMES_ROMAN, 16, Font.BOLD);
+            Font cellData = new Font(Font.FontFamily.TIMES_ROMAN, 14);
 
             PdfPCell transitionRow = new PdfPCell(new Paragraph(" "));
             transitionRow.setColspan(5); // Set the number of columns to span
@@ -585,27 +597,27 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
                                         destCell.setBackgroundColor(hexToBaseColor("#A9D9E1"));
                                         table.addCell(destCell);
 
-                                        PdfPCell specificTimeCell = new PdfPCell(new Paragraph(outputTime));
+                                        PdfPCell specificTimeCell = new PdfPCell(new Paragraph(outputTime, cellData));
                                         specificTimeCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
                                         specificTimeCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
                                         specificTimeCell.setPadding(10);
                                         table.addCell(specificTimeCell);
 
-                                        PdfPCell specificActivityCell = new PdfPCell(new Paragraph(timeSnapshot.child("activity").getValue(String.class)));
+                                        PdfPCell specificActivityCell = new PdfPCell(new Paragraph(timeSnapshot.child("activity").getValue(String.class), cellData));
                                         specificActivityCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
                                         specificActivityCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
                                         specificActivityCell.setPadding(10);
                                         table.addCell(specificActivityCell);
 
                                         String origin = timeSnapshot.child("origin").getValue(String.class);
-                                        PdfPCell specificOriginCell = new PdfPCell(new Paragraph(origin));
+                                        PdfPCell specificOriginCell = new PdfPCell(new Paragraph(origin, cellData));
                                         specificOriginCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
                                         specificOriginCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
                                         specificOriginCell.setPadding(10);
                                         table.addCell(specificOriginCell);
 
                                         String destination = timeSnapshot.child("location").getValue(String.class);
-                                        PdfPCell specificDestCell = new PdfPCell(new Paragraph(destination));
+                                        PdfPCell specificDestCell = new PdfPCell(new Paragraph(destination, cellData));
                                         specificDestCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Center the content
                                         specificDestCell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE); // Center vertically
                                         specificDestCell.setPadding(10);
@@ -631,7 +643,7 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
                                             // Iterate over the instructionsList and create PdfPCell instances
                                             for (String instruction : instructionsList) {
                                                 // Create a PdfPCell with the instruction text
-                                                PdfPCell distanceCell = new PdfPCell(new Phrase(instruction));
+                                                PdfPCell distanceCell = new PdfPCell(new Phrase(instruction, cellData));
 
                                                 // Set the properties for the cell
                                                 distanceCell.setColspan(4); // Set the number of columns to span
@@ -897,8 +909,5 @@ public class ItineraryViewFragment extends Fragment implements TaskCompletedCall
             e.printStackTrace();
         }
     }
-
-
-
 
 }
